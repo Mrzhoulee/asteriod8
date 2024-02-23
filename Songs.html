@@ -2,6 +2,38 @@
 <html>
   <head>
     <style>
+      .container {
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+      }
+      
+      .container img {
+        width: 100%;
+        height: auto;
+      }
+      
+      .container .btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        background-color: #555;
+        color: white;
+        font-size: 16px;
+        padding: 12px 24px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        text-align: center;
+      }
+      
+      .container .btn:hover {
+        background-color: black;
+      }
+      </style>
+    <style>
       body {
         font-family: 'Lato', sans-serif;
       }
@@ -114,19 +146,11 @@
     <style>
     img {
         border-radius: 20%;
-        height: 130px;
-        width: 130x;
+        height: 100px;
+        width: 100x;
       }
       </style>
 
-
-   <b><a href= "ts.html"class = "button"><button><b><font face ="Impact" font color="black">CLICK HERE FOR TAYLOR SWIFT SONGS</b></button></a></b>
-       <h1><font color="purple"></h1>
-   
-
-<b><a href= "start.html"class ="mustar"><button><b><font face ="Impact" font color="black">Home</b></button></a></b>
-    <h3><font color="purple"></h3>
-    
 
     <figure>
      <figcaption><font color="coral" font face="Impact"</font>Cruel Summer:</figcaption>
@@ -245,8 +269,16 @@
            <audio controls src="Taylor Swift - Lover (Official Music Video).mp3"></audio>
             <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
             <figure>
-                <a href="thai.html"</a><img src="C:\Users\Administrator\Downloads\THHAI CLASSICS.png" class="img" alt="img"> <a href="ts.html"</a><img src="C:\Users\Administrator\Downloads\ts.png" class="img" alt="img" width="130">
-
+              <div class="container">
+                <img src="C:\Users\Administrator\Downloads\THHAI CLASSICS.png" alt="Snow"  height="100px" width="100px">
+                <button class="btn">THAI Songs</button>
+              </div>
+              <div class="container">
+                <img src="C:\Users\Administrator\Downloads\ts.png" alt="Snow" width="100px" height="100px">
+                <button class="btn">TAYLOR SWIFT</button>
+              </div>
+                  
+                  <a href="ts.html"><button><font face="Impact" font color="Black"></font>TAYLOR SWIFT</button></a>
             <figure><form id="！form" role="'search">
       <input type="search" id="query" name="q"
       placeholder="Search..."
