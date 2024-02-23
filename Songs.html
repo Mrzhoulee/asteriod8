@@ -1,7 +1,65 @@
 <!DOCTYPE html>
 <html>
   <head>
-
+    <style>
+      body {
+        font-family: 'Lato', sans-serif;
+      }
+      
+      .overlay {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: rgb(253, 8, 8);
+        background-color: rgba(245, 203, 13, 0.9);
+        overflow-x: hidden;
+        transition: 0.5s;
+      }
+      
+      .overlay-content {
+        position: relative;
+        top: 25%;
+        width: 100%;
+        text-align: center;
+        margin-top: 30px;
+      }
+      
+      .overlay a {
+        padding: 8px;
+        text-decoration: none;
+        font-size: 36px;
+        color: #ff0000;
+        display: block;
+        transition: 0.3s;
+      }
+      
+      .overlay a:hover, .overlay a:focus {
+        color: #f1550c;
+      }
+      
+      .overlay .closebtn {
+        position: absolute;
+        top: 20px;
+        right: 45px;
+        font-size: 60px;
+      }
+      
+      @media screen and (max-height: 450px) {
+        .overlay a {font-size: 20px}
+        .overlay .closebtn {
+        font-size: 40px;
+        top: 15px;
+        right: 35px;
+        }
+      }
+      <style>
+     body {
+       background-image: url('IMG_2105.JPG');
+     }
+     </style>
 
     <style>
     body {
@@ -11,6 +69,29 @@
     
   </head>
  <body>
+  <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;<font face="Impact" font color="White"</font>Open!</span>
+    <script>
+      function openNav() {
+        document.getElementById("myNav").style.width = "100%";
+      }
+      
+      function closeNav() {
+        document.getElementById("myNav").style.width = "0%";
+      }
+      </script>
+  
+    <div id="myNav" class="overlay">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+      <div class="overlay-content">
+        <a href="index.html">Home</a>
+        <a href="pl.html">Playlists</a>
+        <a href="Log in.html">Sign IN</a>
+        <a href="Acount.html">Account</a>
+      </div>
+    </div>
+  
+  
+  </html>
   <style>
    mustar{
    background-color:black;
@@ -163,7 +244,7 @@
             <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
             <figure>
                 <a href="thai.html"</a><img src="C:\Users\Administrator\Downloads\THHAI CLASSICS.png" height="140" width="140">
-    
+                  <a href="ts.html"</a><img src="C:\Users\Administrator\Downloads\ts.png" height="140" width="140">
             <figure><form id="！form" role="'search">
       <input type="search" id="query" name="q"
       placeholder="Search..."
@@ -252,4 +333,4 @@
       
           <img src="IMG_2146.jpeg" width="1200"height="270">
   </body>
-</html>
+</html>>
