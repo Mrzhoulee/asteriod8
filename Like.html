@@ -1,0 +1,32 @@
+<!-- like.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liked Songs</title>
+</head>
+<body>
+    <h1>Liked Songs</h1>
+    <ul id="playlist">
+        <!-- Liked songs will be dynamically added here -->
+    </ul>
+
+    <script>
+        // Retrieve playlist from local storage and display it
+        let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
+        let playlistElement = document.getElementById('playlist');
+        playlist.forEach(songUrl => {
+            let listItem = document.createElement('li');
+            let audio = document.createElement('audio');
+            audio.controls = true;
+            let source = document.createElement('source');
+            source.src = songUrl;
+            source.type = 'audio/mpeg';
+            audio.appendChild(source);
+            listItem.appendChild(audio);
+            playlistElement.appendChild(listItem);
+        });
+    </script>
+</body>
+</html>
