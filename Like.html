@@ -6,14 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liked Songs</title>
 </head>
-<body>
-    <h1>Liked Songs</h1>
-    <ul id="playlist">
+<body><ul id="playlist">
         <!-- Liked songs will be dynamically added here -->
     </ul>
 
     <script>
-        // Retrieve playlist from local storage and display it
         let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
         let playlistElement = document.getElementById('playlist');
         playlist.forEach(songUrl => {
