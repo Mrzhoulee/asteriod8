@@ -46,16 +46,13 @@
         function checkAnswer() {
             var userAnswer = parseInt(document.getElementById('answer').value);
             var correctAnswer = parseInt(sessionStorage.getItem('correctAnswer'));
+            var resultElement = document.getElementById('result');
             if (userAnswer === correctAnswer) {
-                document.getElementById('result').innerHTML = "Correct!";
+                resultElement.innerHTML = "Correct!";
             } else {
-                document.getElementById('result').innerHTML = "Incorrect. The correct answer is " + correctAnswer;
+                resultElement.innerHTML = "Incorrect. The correct answer is " + correctAnswer;
             }
-            generateQuestion();
         }
-     console.log('correctAnswer');
-        console.log('result');
-        c
 
         window.onload = generateQuestion;
     </script>
