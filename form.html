@@ -1,6 +1,33 @@
 <!doctype html>
 <html>
 <head>
+   <style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: coral; /* Set background color to coral */
+    }
+    
+    #intro-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+    
+    #intro-text {
+        color: #fff;
+        font-size: 40px;
+        text-align: center;
+    }
+</style>
    <style>  /* CSS */
 button{
   border:none;
@@ -66,7 +93,37 @@ background:black;
       </style> 
 </head>
      <body>
-
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var introContainer = document.getElementById("intro-container");
+        
+        // Trigger reflow to apply initial opacity transition
+        introContainer.offsetHeight;
+        
+        // Fade in the intro text
+        introContainer.style.opacity = "1";
+        
+        // Fade out the intro text after 3 seconds
+        setTimeout(function() {
+            introContainer.style.opacity = "0";
+        }, 3000);
+        
+        // Redirect to the start page after 4 seconds
+        setTimeout(function() {
+            window.location.href = "start.html";
+        }, 4000);
+        
+        // Prevent repeating the animation on page reload
+        window.sessionStorage.setItem("introShown", "true");
+    });
+    
+    // Prevent repeating the animation on page refresh
+    window.onload = function() {
+        if (window.sessionStorage.getItem("introShown")) {
+            window.location.href = "start.html";
+        }
+    }
+</script>
   <font face="Helvetica">Asteriod</font>
     <style>
 
