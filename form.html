@@ -93,33 +93,7 @@ background:black;
       </style> 
 </head>
      <body>
-     <div id="intro-container">
-    <div id="intro-text">
-        <h1>Welcome to Asteriod</h1>
-    </div>
-</div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var introContainer = document.getElementById("intro-container");
-        
-        // Trigger reflow to apply initial opacity transition
-        introContainer.offsetHeight;
-        
-        // Fade in the intro text
-        introContainer.style.opacity = "1";
-        
-        // Fade out the intro text after 3 seconds
-        setTimeout(function() {
-            introContainer.style.opacity = "0";
-        }, 3000);
-        
-        // Redirect to the start page after 4 seconds
-        setTimeout(function() {
-            window.location.href = "start.html";
-        }, 4000);
-    });
-</script>
   <font face="Helvetica">Asteriod</font>
     <style>
 
