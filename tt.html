@@ -28,7 +28,7 @@
         <h1>Times Tables Quiz</h1>
         <div id="question"></div>
         <input type="number" id="answer" placeholder="Enter your answer">
-        <button onclick="checkAnswer()">Check Answer</button>
+        <button onclick="checkAnswer()">></button>
         <div id="result"></div>
     </div>
 
@@ -53,6 +53,7 @@
             }
             generateQuestion();
         }
+        console.log(correctAnswer)
 
         window.onload = generateQuestion;
     </script>
