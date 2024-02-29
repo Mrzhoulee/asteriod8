@@ -92,41 +92,7 @@ background:black;
       </style> 
 </head>
      <body>
-        <div id="intro-container">
-    <div id="intro-text">
-        <h1>Welcome to Asteriod</h1>
-    </div>
-</div>
-        <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var introContainer = document.getElementById("intro-container");
-        
-        // Check if intro has already been shown
-        var introShown = window.sessionStorage.getItem("introShown");
-        
-        // If intro hasn't been shown, run the animation
-        if (!introShown) {
-            // Trigger reflow to apply initial opacity transition
-            introContainer.offsetHeight;
-            
-            // Fade in the intro text
-            introContainer.style.opacity = "1";
-            
-            // Fade out the intro text after 3 seconds
-            setTimeout(function() {
-                introContainer.style.opacity = "0";
-            }, 3000);
-            
-            
-            
-            // Mark intro as shown to prevent repeating
-            window.sessionStorage.setItem("introShown", "true");
-        } else {
-            // If intro has already been shown, redirect to start page immediately
-            window.location.href = "start.html";
-        }
-    });
-</script>
+
 <font face="Helvetica">Asteriod</font>
     <style>
 
