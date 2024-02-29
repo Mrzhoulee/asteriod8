@@ -1,7 +1,6 @@
 <!doctype html>
 <html>
-<head>
-     <style>
+<head><style>
     body {
         margin: 0;
         padding: 0;
@@ -10,21 +9,23 @@
     }
     
     #intro-container {
-        position: relative;
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100vw;
         height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #333; /* Change background color as needed */
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
     }
     
     #intro-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
         color: #fff;
         font-size: 40px;
         text-align: center;
-        opacity: 0;
-        transition: opacity 1s ease-in-out;
     }
 </style>
    <style>  /* CSS */
