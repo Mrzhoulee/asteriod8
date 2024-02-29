@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Times Tables Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #quiz-container {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        #question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #answer {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <h1>Times Tables Quiz</h1>
+        <div id="question"></div>
+        <input type="number" id="answer" placeholder="Enter your answer">
+        <button onclick="checkAnswer()">Check Answer</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function generateQuestion() {
+            var num1 = Math.floor(Math.random() * 10) + 1; // Random number between 1 and 10
+            var num2 = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('question').innerHTML = num1 + " x " + num2 + " = ";
+            document.getElementById('answer').value = '';
+            document.getElementById('result').innerHTML = '';
+            document.getElementById('answer').focus();
+            sessionStorage.setItem('correctAnswer', num1 * num2);
+        }
+
+        function checkAnswer() {
+            var userAnswer = parseInt(document.getElementById('answer').value);
+            var correctAnswer = parseInt(sessionStorage.getItem('correctAnswer'));
+            if (userAnswer === correctAnswer) {
+                document.getElementById('result').innerHTML = "Correct!";
+            } else {
+                document.getElementById('result').innerHTML = "Incorrect. The correct answer is " + correctAnswer;
+            }
+            generateQuestion();
+        }
+
+        window.onload = generateQuestion;
+    </script>
+</body>
+</html>
