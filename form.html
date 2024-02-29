@@ -117,10 +117,7 @@ background:black;
                 introContainer.style.opacity = "0";
             }, 3000);
             
-            // Redirect to the start page after 4 seconds
-            setTimeout(function() {
-                window.location.href = "start.html";
-            }, 4000);
+            
             
             // Mark intro as shown to prevent repeating
             window.sessionStorage.setItem("introShown", "true");
