@@ -215,34 +215,7 @@ body {font-family: "Lato", sans-serif;}
 </head>
   <body>
     
-<body>
-<div id="intro-container">
-    <div id="intro-text">
-        <h1>Welcome to Asteriod</h1>
-        <p>We code for public!</p>
-    </div>
-</div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var introText = document.getElementById("intro-text");
-        
-        // Fade in the intro text
-        setTimeout(function() {
-            introText.style.opacity = "1";
-        }, 1000);
-        
-        // Fade out the intro text after 3 seconds
-        setTimeout(function() {
-            introText.style.opacity = "0";
-        }, 3000);
-        
-        // Redirect to the main page after 4 seconds
-        setTimeout(function() {
-            window.location.href = "start.html";
-        }, 4000);
-    });
-</script>
     
     <div id="myNav" class="overlay">
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
