@@ -148,24 +148,9 @@ html {
     
   </head>
  <body>
-   <button onclick="duplicateAudio()">Duplicate Audio</button>
 
-    <script>
-        function duplicateAudio() {
-            // Retrieve the audio element from Songs.html
-            var audioElement = document.getElementById('audioElement');
-
-            // Clone the audio element
-            var clonedAudio = audioElement.cloneNode(true);
-
-            // Insert the cloned audio element into mp.html
-            var mpDocument = document.getElementById('mpFrame').contentWindow.document;
-            mpDocument.body.appendChild(clonedAudio);
-        }
-    </script>
-
-    <!-- Invisible iframe to load mp.html -->
-    <iframe id="mpFrame" src="mp.html" style="display:none;"></iframe>
+ 
+   
      <style>
 
   button{
