@@ -92,28 +92,32 @@ background:black;
       </style> 
 </head>
 <body>
-<div id="intro-container">
-    <div id="intro-text">
-        <h1>Welcome to Asteriod</h1>
-        <p>We code for public!</p>
-    </div>
-</div>
-
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        var introText = document.getElementById("intro-text");
+        var introText = document.createElement("div");
+        introText.innerHTML = `
+            <div id="intro-container">
+                <div id="intro-text">
+                    <h1>Welcome to Asteriod</h1>
+                    <p>Your destination for space exploration!</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(introText);
+        
+        var introContainer = document.getElementById("intro-container");
         
         // Fade in the intro text
         setTimeout(function() {
-            introText.style.opacity = "1";
+            introContainer.style.opacity = "1";
         }, 1000);
         
         // Fade out the intro text after 3 seconds
         setTimeout(function() {
-            introText.style.opacity = "0";
+            introContainer.style.opacity = "0";
         }, 3000);
         
-        // Redirect to the main page after 4 seconds
+        // Redirect to the start page after 4 seconds
         setTimeout(function() {
             window.location.href = "start.html";
         }, 4000);
