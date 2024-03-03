@@ -147,27 +147,7 @@ html {
     </style>
     
   </head>
- <body>
-
- <input type="text" id="searchInput" placeholder="Search for a song...">
-<button onclick="searchSong()">Search</button>
-
-<div id="searchResults"></div>
-
-<script>
-function searchSong() {
-    var searchTerm = document.getElementById("searchInput").value.toLowerCase();
-    var songName = "Lover"; // Song name to search for
-    
-    if (searchTerm === songName.toLowerCase()) {
-        document.getElementById("searchResults").innerHTML = "Song found: " + songName;
-    } else {
-        document.getElementById("searchResults").innerHTML = "Song not found.";
-    }
-}
-</script>
-   
-     <style>
+ <body><style>
 
   button{
   background-color: #F87954;
@@ -217,6 +197,25 @@ function searchSong() {
   <a href="tt.html">Times Tables Rocket</a>
 </div
    
+
+ <input type="text" id="searchInput" placeholder="Search for a song...">
+<button onclick="searchSong()" style="height: 30px; width: 70px;">Search</button>
+<div id="searchResults"></div>
+
+<script>
+function searchSong() {
+    var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+    var songName = "Lover"; // Song name to search for
+    
+    if (searchTerm === songName.toLowerCase()) {
+        document.getElementById("searchResults").innerHTML = "Song found: " + songName;
+    } else {
+        document.getElementById("searchResults").innerHTML = "Song not found.";
+    }
+}
+</script>
+   
+     
 
    <font face="Serif" font color="White"><h1>Try Asteriod Songs Now!</h1></font>
      <font face="Serif" font color="White"><p>We are Asteriod Teams, We code for public uses even for free!</p></font>
