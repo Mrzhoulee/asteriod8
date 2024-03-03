@@ -149,7 +149,23 @@ html {
   </head>
  <body>
 
- 
+ <input type="text" id="searchInput" placeholder="Search for a song...">
+<button onclick="searchSong()">Search</button>
+
+<div id="searchResults"></div>
+
+<script>
+function searchSong() {
+    var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+    var songName = "Lover"; // Song name to search for
+    
+    if (searchTerm === songName.toLowerCase()) {
+        document.getElementById("searchResults").innerHTML = "Song found: " + songName;
+    } else {
+        document.getElementById("searchResults").innerHTML = "Song not found.";
+    }
+}
+</script>
    
      <style>
 
