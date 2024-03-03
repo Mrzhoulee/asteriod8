@@ -1,87 +1,41 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <style>
-  canvas {
-      border:1px solid #d3d3d3;
-      background-color: #f1f1f1;
-  }
-  </style>
-  <style>
-  .circle {
-    height: 50px;
-    width: 50px;
-    background-color: #555;
-    border-radius: 50%;
-  }
-  </style>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>replit</title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
 </head>
-  <body onload="startGame()">
-  <script>
+<body onload="startGame()">
+<script>
 
-  var myGamePiece;
+var myGamePiece;
+var myObstacles = [];
+var myScore;
 
-  function startGame() {
-      myGamePiece = new component(30, 30, "red", 10, 120);
-      myGameArea.start();
-  }
+function startGame() {
+    myGamePiece = new component(30, 30, "red", 10, 120);
+    myGamePiece.gravity = 0.05;
+    myScore = new component("30px", "Consolas", "black", 280, 40, "text");
+    myGameArea.start();
+}
 
-  var myGameArea = {
-      canvas : document.createElement("canvas"),
-      start : function() {
-          this.canvas.width = 480;
-          this.canvas.height = 270;
-          this.context = this.canvas.getContext("2d");
-          document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-          this.interval = setInterval(updateGameArea, 20);
-      },
-      clear : function() {
-        this.y = y;    
-        this.update = function() {
-            ctx = myGameArea.context;
-            ctx.fillStyle = color;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-        }
-        this.newPos = function() {
-            this.x += this.speedX;
-            this.y += this.speedY;        
-        }    
-        }
-
-        function updateGameArea() {
-        myGameArea.clear();
-        myGamePiece.newPos();    
-        myGamePiece.update();
-        }
-    function moveup(){
-   myGamePeice.speedY -=1;
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 480;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.frameNo = 0;
+        this.interval = setInterval(updateGameArea, 20);
+        },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
+}
 
-    function moveright(){
-   myGamePiece.speedX +=1;
-      
-    }
-
-      function movedown(){
-     myGamePeice.speedY +=1;
-      }
-
-       function moveleft(){
-      myGamePeice.speedX -=1;
-       }
-    
-        </script>
-  <div style="text-align:center;width:480px;">
-    <button onclick="moveup()">UP</buttton>
-    <button onclick="moveright()">RIGHT</buttton>
-    <button onclick="moveleft()">LEFT</button>
-    <button onclick="movedown()">DOWN</button>
-  </div>
-  <script src="script.js"></script>
-</body>
-</html>
+function component(width, height, color, x, y, type) {
