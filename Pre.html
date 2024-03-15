@@ -7,7 +7,7 @@
 </head>
 <body>
     <h2>Login Form</h2>
-    <form id="loginForm" action="Game.html" method="post">
+    <form id="loginForm" method="post">
         <label for="username">Username:</label><br>
         <input type="text" id="username" name="username"><br>
         <label for="password">Password:</label><br>
@@ -17,15 +17,16 @@
 
     <script>
         document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent form submission
+            
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
             
             if (username === "Preuser" && password === "User102049") {
                 alert("Login successful!");
-                 location.replace("https://www.asteriod8.com/Game.html")
+                window.location.href = "Game.html"; // Redirect to Game.html
             } else {
                 alert("Cannot log in. Incorrect username or password.");
-                event.preventDefault(); // Prevent the form from submitting
             }
         });
     </script>
