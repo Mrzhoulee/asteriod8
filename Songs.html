@@ -147,7 +147,45 @@ html {
     </style>
     
   </head>
- <body><style>
+ <body>
+   
+   
+   
+<div class="row">
+  <div class="left" style="background-color:#bbb;">
+    <h2>Menu</h2>
+    <input type="text" id="mySearch" onkeyup="myFunction()" placeholder="Search.." title="Type in a category">
+    <ul id="myMenu">
+      <li><a href="ts.html">Taylor swift songs-></a></li>
+      <li><a href="meme.html">Meme songs-></a></li>
+      <li><a href="thai.html">Thai classics-></a></li>
+      <li><a href="Songs.html">American Classics-></a></li>
+      <li><a href="new.html">New somgs-></a></li>
+    </ul>
+  </div>
+
+  
+<script>
+function myFunction() {
+  var input, filter, ul, li, a, i;
+  input = document.getElementById("mySearch");
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("myMenu");
+  li = ul.getElementsByTagName("li");
+  for (i = 0; i < li.length; i++) {
+    a = li[i].getElementsByTagName("a")[0];
+    if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
+</script>
+   
+   
+   
+   <style>
 
   button{
   background-color: #F87954;
