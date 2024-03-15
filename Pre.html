@@ -20,11 +20,11 @@
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
             
-            if (username !== "Preuser" || password !== "User102049") {
+            if (username === "Preuser" && password === "User102049") {
+                alert("Login successful!");
+            } else {
                 alert("Cannot log in. Incorrect username or password.");
                 event.preventDefault(); // Prevent the form from submitting
-            } else {
-                alert("Login successful!");
             }
         });
     </script>
