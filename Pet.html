@@ -26,6 +26,11 @@
 </style>
 </head>
 <body>
+
+
+<img src="IMG_2942.jpeg">
+
+  
 <h1>Pet Care Game</h1>
 <div>
   <button onclick="choosePet('dog')">Dog</button>
@@ -75,7 +80,19 @@
       document.getElementById("pet").style.backgroundImage = "url('IMG_2941.jpeg')";
     }
   }
+
+  setInterval(function() {
+    if (hunger > 0) {
+      hunger -= 1;
+      updateStats();
+    }
+    if (happiness > 0) {
+      happiness -= 1;
+      updateStats();
+    }
+  }, 1000); // Update stats every second
 </script>
 </body>
 </html>
+
 
