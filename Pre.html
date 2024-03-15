@@ -1,23 +1,32 @@
-<!doctype html>
-<html>
-  <body>
-<a href="Game.html"><button>Log in</button></a>
-    
-<label for="fname">Username</label>
-<input type="text" id="a" name="a">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+</head>
+<body>
+    <h2>Login Form</h2>
+    <form id="loginForm" action="Game.html" method="post">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username"><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password"><br><br>
+        <input type="submit" value="Login">
+    </form>
 
-    <label for="fname">Password</label>
-<input type="text" id="b" name="b">
-
-    
-
-    
-
-
-
-
-
-
-    
-  </body>
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            
+            if (username !== "Preuser" || password !== "User102049") {
+                alert("Cannot log in. Incorrect username or password.");
+                event.preventDefault(); // Prevent the form from submitting
+            } else {
+                alert("Login successful!");
+            }
+        });
+    </script>
+</body>
 </html>
