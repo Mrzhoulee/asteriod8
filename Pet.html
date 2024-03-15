@@ -68,13 +68,13 @@
     document.getElementById("happinessValue").textContent = happiness;
     // Check if hunger level is greater than or equal to 40 and display image accordingly
     if (hunger >= 40) {
-      document.getElementById("pet").style.backgroundImage = "url('')";
+      document.getElementById("pet").style.backgroundImage = "url('IMG_2944.jpeg')";
     } else {
       document.getElementById("pet").style.backgroundImage = "url('IMG_2941.jpeg')";
     }
     // Check if happiness level is greater than or equal to 30 and display image accordingly
     if (happiness >= 30) {
-      document.getElementById("pet").style.backgroundImage = "url('')";
+      document.getElementById("pet").style.backgroundImage = "url('IMG_2944.jpeg')";
     } else {
       document.getElementById("pet").style.backgroundImage = "url('IMG_2941.jpeg')";
     }
@@ -83,13 +83,13 @@
   setInterval(function() {
     if (hunger > 0) {
       hunger -= 1;
-      updateStats();
     }
     if (happiness > 0) {
       happiness -= 1;
-      updateStats();
     }
+    updateStats();
   }, 1000); // Update stats every second
 </script>
 </body>
 </html>
+
