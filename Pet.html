@@ -37,7 +37,8 @@
 <div id="happiness">Happiness: <span id="happinessValue">50</span></div>
 <button onclick="feedPet()">Feed</button>
 <button onclick="playWithPet()">Play</button>
-
+  <button onclick="hurtpet()">Hurt</button>
+<div id="health">Health: <span id="healthvalue">1000</span></div>
 <script>
   var petType; // Variable to store the chosen pet type
   var hunger = 50;
@@ -56,6 +57,25 @@
     }
   }
 
+
+
+
+  function hurtpet() {
+    if (health < 10000) {
+      health -=20;
+      updateStats();
+    }
+  }
+
+
+
+
+
+
+
+
+
+
   function playWithPet() {
     if (happiness < 100) {
       happiness += 10;
@@ -67,6 +87,16 @@
     document.getElementById("hungerValue").textContent = hunger;
     document.getElementById("happinessValue").textContent = happiness;
     // Check if hunger level is greater than or equal to 40 and display image accordingly
+
+    if (health >= 70) {
+      document.getElementById("pet").style.backgroundImage = "url('IMG_2944.jpeg')";
+    } else {
+      document.getElementById("pet").style.backgroundImage = "url('IMG_2941.jpeg')";
+    }
+
+
+
+
     if (hunger >= 40) {
       document.getElementById("pet").style.backgroundImage = "url('IMG_2944.jpeg')";
     } else {
