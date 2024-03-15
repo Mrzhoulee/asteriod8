@@ -1,12 +1,4 @@
-<!doctype html>
-<html>
-<body>
-
-<button onclick="myFunction()"><</button>
-  <button onclick="myFunction2()">></button>
-  
-<script>
-  let stalk1;
+let stalk1;
 let stalk2;
 let player;
 let boulder;
@@ -46,20 +38,35 @@ function draw() {
 
   if (y2 == 600) {
     y2 = -600;
+imageMode(CORNER);
+  image(stalk1, 0, y1, 400, 600);
+  image(stalk2, 0, y2, 400, 600);
+
+  y1 += 2;
+  y2 += 2;
+
+  if (y1 == 600) {
+    y1 = -600;
+  }
+
+  if (y2 == 600) {
+    y2 = -600;
   }
 
   //HERO
   imageMode(CENTER);
   image(player, playerX, 450, 100, 135);
 
-
-    function myFuction() {
+  if (keyIsDown(RIGHT_ARROW)) {
+    if (playerX < 250) {
       playerX = playerX + 5;
     }
-  
+  }
 
-  function myFunction2() {
+  if (keyIsDown(LEFT_ARROW)) {
+    if (playerX > 100) {
       playerX = playerX - 5;
+    }
   }
   //boulder
   image(boulder, boulderX, boulderY, 100, 100);
@@ -78,36 +85,8 @@ function draw() {
     
     
     
-    
     } 
   
   
 } //end of function draw
 
-
-
-
-
-
-
-
-
-  
-
-
-
-  
-
-</script>
-
-
-
-
-
-
-
-
-
-  
-</body>
-</html>
