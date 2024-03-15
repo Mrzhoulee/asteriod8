@@ -26,11 +26,6 @@
 </style>
 </head>
 <body>
-
-
-<img src="IMG_2942.jpeg">
-
-  
 <h1>Pet Care Game</h1>
 <div>
   <button onclick="choosePet('dog')">Dog</button>
@@ -71,12 +66,16 @@
   function updateStats() {
     document.getElementById("hungerValue").textContent = hunger;
     document.getElementById("happinessValue").textContent = happiness;
-    // Check if hunger level is greater than 40 and display image accordingly
-    if (hunger > 40) {
+    // Check if hunger level is greater than or equal to 40 and display image accordingly
+    if (hunger >= 40) {
+      document.getElementById("pet").style.backgroundImage = "url('')";
+    } else {
       document.getElementById("pet").style.backgroundImage = "url('IMG_2941.jpeg')";
     }
-    // Check if happiness level is greater than 30 and display image accordingly
-    if (happiness > 30) {
+    // Check if happiness level is greater than or equal to 30 and display image accordingly
+    if (happiness >= 30) {
+      document.getElementById("pet").style.backgroundImage = "url('')";
+    } else {
       document.getElementById("pet").style.backgroundImage = "url('IMG_2941.jpeg')";
     }
   }
@@ -94,5 +93,3 @@
 </script>
 </body>
 </html>
-
-
