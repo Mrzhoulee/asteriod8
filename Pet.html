@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pet Care Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  #pet {
+    width: 200px;
+    height: 200px;
+    background-image: url(''); /* Placeholder for pet image */
+    background-size: cover;
+    display: inline-block;
+  }
+  #hunger, #happiness {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+</style>
+</head>
+<body>
+<h1>Pet Care Game</h1>
+<div>
+  <button onclick="choosePet('dog')">Dog</button>
+  <button onclick="choosePet('cat')">Cat</button>
+</div>
+
+<div id="pet"></div>
+<div id="hunger">Hunger: <span id="hungerValue">50</span></div>
+<div id="happiness">Happiness: <span id="happinessValue">50</span></div>
+<button onclick="feedPet()">Feed</button>
+<button onclick="playWithPet()">Play</button>
+
+<script>
+  var petType; // Variable to store the chosen pet type
+  var hunger = 50;
+  var happiness = 50;
+
+  function choosePet(type) {
+    petType = type;
+    // Set the background image of the pet based on the chosen type (dog or cat)
+    document.getElementById("pet").style.backgroundImage = "url('" + petType + ".png')";
+  }
+
+  function feedPet() {
+    if (hunger < 100) {
+      hunger += 10;
+      updateStats();
+    }
+  }
+
+  function playWithPet() {
+    if (happiness < 100) {
+      happiness += 10;
+      updateStats();
+    }
+  }
+
+  function updateStats() {
+    document.getElementById("hungerValue").textContent = hunger;
+    document.getElementById("happinessValue").textContent = happiness;
+  }
+</script>
+</body>
+</html>
