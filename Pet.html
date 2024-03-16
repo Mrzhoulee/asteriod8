@@ -36,9 +36,9 @@
 </head>
 <body>
 
-<button onclick="hurtpet()"><img src="IMG_2947.jpeg" width="70" height="70"></button>
-  <button onclick="feedpet()"><img src="IMG_2945.png" width="70" height="70"></button>
-  <button onclick="playWithPet()"><img src="IMG_2946.jpeg" width="70" height="70"></button>
+<button id="health"onclick="hurtpet()"><img src="IMG_2947.jpeg" width="70" height="70"></button>
+  <button id="hunger"onclick="feedpet()"><img src="IMG_2945.png" width="70" height="70"></button>
+  <button id="happiness"onclick="playWithPet()"><img src="IMG_2946.jpeg" width="70" height="70"></button>
    
   
 <h1>Pet Care Game</h1>
@@ -46,14 +46,15 @@
 
 <div id="pet"></div>
 <div id="hunger">Hunger: <span id="hungerValue">50</span></div>
-<div id="happiness">Happiness: <span id="happinessValue">50</span></div>
+<div id="happiness">Happiness: <span id="hungerValue">50</span></div>
+  <div id="health">health: <span id="healthvalue">50</span></div>
 
 <div id="health">Health: <span id="healthvalue">1000</span></div>
 <script>
   var petType; // Variable to store the chosen pet type
   var hunger = 50;
   var happiness = 50;
-
+  var health = 100;
   function choosePet(type) {
     petType = type;
     // Set the background image of the pet based on the chosen type (dog or cat)
@@ -61,7 +62,7 @@
   }
 
   function feedPet() {
-    if (hunger < 100) {
+    if (hunger < 1000) {
       hunger += 10;
       updateStats();
     }
