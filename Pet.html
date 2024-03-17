@@ -92,7 +92,7 @@ function playAudio() {
 
   function updatePetImage() {
     var petImage = document.getElementById("pet");
-    if (health > 40 && happiness > 40 && hunger > 40) {
+    if (health > 40 && happiness > 40 && hunger < 40) {
       petImage.style.backgroundImage = "url('IMG_2944.jpeg')";
       
     } else {
