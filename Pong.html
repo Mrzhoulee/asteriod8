@@ -10,12 +10,12 @@ Welcome to Pong!
     function submit(){
     var input = document.getElementById("userInput");
     if (userInput < 2018) {
-    age = "Congrats you are old enough to play!";
+    document.getElementById("demo").innerHTML = ("Congrats, you are old enough!")
     } else {
-    age = "Sorry, you are not old enough!";
+     document.getElementById("demo").innerHTML = ("Sorry, you are not old enough!")
+     }
     }
-    }
-      document.getElementById("demo").innerHTML = age;
+
     </script>
 
 　
