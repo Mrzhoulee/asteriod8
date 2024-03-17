@@ -1,19 +1,25 @@
 <!doctype html>
 <html>
 <body>
+  
 Welcome to Pong!
   Pls enter your birth year to play!
-  Enter your birth year:<input type="text" id="userInput">
-  <input type="submit" onclick="submit()"></button>
-    <script>
-      
-    function submit(){
-    var input = document.getElementById("userInput");
-    if (userInput < 2018) {
-    document.getElementById("demo").innerHTML = ("Congrats, you are old enough!");
-    } else {
-     document.getElementById("demo").innerHTML = ("Sorry, you are not old enough!");
-     }
+  <input id="text_a" type="text;" />
+   <p id="answer"></p>
+          <button onclick="myFunction()">Submit</button>
+      <script>
+    
+    function myFunction()
+    {
+    var a=document.getElementById("text_a").vlaue;
+      if (a <= "2018")
+      {
+        document.getElementById("answer").innerHTML="Congrats, you are old enough!";
+      }
+        else
+      {
+        document.getElementById("answer").innerHTML="Sorry, you are not old enough!";
+      }
     }
    
     </script>
