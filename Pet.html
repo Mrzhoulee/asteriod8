@@ -36,9 +36,9 @@
 </head>
 <body>
 
-<button id="health"onclick="hurtpet()"><img src="IMG_2947.jpeg" width="70" height="70"></button>
-  <button id="hunger"onclick="feedpet()"><img src="IMG_2945.png" width="70" height="70"></button>
-  <button id="happiness"onclick="playWithPet()"><img src="IMG_2946.jpeg" width="70" height="70"></button>
+<button id="health"onclick="hurtpet()">Hurt</button>
+  <button id="hunger"onclick="feedpet()">Feed</button>
+  <button id="happiness"onclick="playWithPet()">Play</button>
    
   
 <h1>Pet Care Game</h1>
@@ -46,15 +46,15 @@
 
 <div id="pet"></div>
 <div id="hunger">Hunger: <span id="hungerValue">50</span></div>
-<div id="happiness">Happiness: <span id="hungerValue">50</span></div>
-  <div id="health">health: <span id="healthvalue">50</span></div>
+<div id="happiness">Happiness: <span id="happinessvalue">50</span></div>
+  <div id="health">health: <span id="healthvalue">80</span></div>
 
-<div id="health">Health: <span id="healthvalue">1000</span></div>
+
 <script>
   var petType; // Variable to store the chosen pet type
   var hunger = 50;
   var happiness = 50;
-  var health = 100;
+  var health = 80;
   function choosePet(type) {
     petType = type;
     // Set the background image of the pet based on the chosen type (dog or cat)
@@ -95,8 +95,9 @@
   }
 
   function updateStats() {
-    document.getElementById("hungerValue").textContent = hunger;
-    document.getElementById("happinessValue").textContent = happiness;
+    document.getElementById("hungervalue").textContent = hunger;
+    document.getElementById("happinessvalue").textContent = happiness;
+    document.getElementById("healthvalue").textContent = health;
     // Check if hunger level is greater than or equal to 40 and display image accordingly
 
 
@@ -109,7 +110,7 @@
       document.getElementById("pet").style.backgroundImage = "url('IMG_2941.jpeg')";
     }
 
-    if (hunger >= 40) {
+    if (hunger <= 40) {
       document.getElementById("pet").style.backgroundImage = "url('IMG_2944.jpeg')";
     } else {
       document.getElementById("pet").style.backgroundImage = "url('IMG_2941.jpeg')";
