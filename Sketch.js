@@ -38,19 +38,6 @@ function draw() {
 
   if (y2 == 600) {
     y2 = -600;
-imageMode(CORNER);
-  image(stalk1, 0, y1, 400, 600);
-  image(stalk2, 0, y2, 400, 600);
-
-  y1 += 2;
-  y2 += 2;
-
-  if (y1 == 600) {
-    y1 = -600;
-  }
-
-  if (y2 == 600) {
-    y2 = -600;
   }
 
   //HERO
@@ -67,7 +54,7 @@ imageMode(CORNER);
     if (playerX > 100) {
       playerX = playerX - 5;
     }
-  }
+  } 
   //boulder
   image(boulder, boulderX, boulderY, 100, 100);
     image(boulder, boulderX, boulderY, 100, 100);
@@ -89,4 +76,3 @@ imageMode(CORNER);
   
   
 } //end of function draw
-
