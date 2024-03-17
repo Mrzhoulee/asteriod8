@@ -31,107 +31,66 @@
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-  }
+  
 </style>
 </head>
 <body>
 
-<button id="health"onclick="hurtpet">Hurt</button>
-  <button id="hunger"onclick="feedpet">Feed</button>
-  <button id="happiness"onclick="playWithPet">Play</button>
+<button id="health" onclick="hurtpet()">Hurt</button>
+  <button id="hunger" onclick="feedpet()">Feed</button>
+  <button id="happiness" onclick="playWithPet()">Play</button>
    
   
 <h1>Pet Care Game</h1>
 
 
 <div id="pet"></div>
-<div id="hunger">Hunger: <span id="hungerValue"></span></div>
-<div id="happiness">Happiness: <span id="happinessvalue"></span></div>
-  <div id="health">health: <span id="healthvalue"></span></div>
+<div id="hungervalue">Hunger: <span id="hungervalue"></span></div>
+<div id="happinessvalue">Happiness: <span id="happinessvalue"></span></div>
+  <div id="healthvalue">health: <span id="healthvalue"></span></div>
 
 
 <script>
-  var petType; // Variable to store the chosen pet type
+
   var hunger = 50;
   var happiness = 50;
   var health = 80;
-  function choosePet(type) {
-    petType = type;
-    // Set the background image of the pet based on the chosen type (dog or cat)
-    document.getElementById("pet").style.backgroundImage = "url('" + petType + ".png')";
+  var hungervalue = 50;
+  var happinessvalue = 50;
+  var healthvalue = 80;
+
+//edit for errors below here
+  
+  function hurtpet(){
+  20 -= healthvalue;    
+  }
+  
+ function playWithPet(){
+   10 += happinessvalue;
+ }
+
+  function feedpet(){
+    10 -= hungervalue;
   }
 
-  function feedPet {
-    if (hunger < 1000) {
-      hunger += 10;
-      updateStats();
-    }
-  }
+// program to display text 5 times
+const n = 1000;
 
+// looping from i = 1 to 5
+for (let i = 1; i <= n; i++) {
+   1 += hungervalue;
+   1 -= happinessvalue;
+}
 
-
-
-  function hurtpet {
-    if (health < 10000) {
-      health -=20;
-      updateStats();
-    }
-  }
-
-
-
-
-
-
-
-
-
-
-  function playWithPet {
-    if (happiness < 100) {
-      happiness += 10;
-      updateStats();
-    }
-  }
-
-  function updateStats() {
-    document.getElementById("hungervalue").textContent = hunger;
-    document.getElementById("happinessvalue").textContent = happiness;
-    document.getElementById("healthvalue").textContent = health;
-    // Check if hunger level is greater than or equal to 40 and display image accordingly
-
-
-
-
+  
     
-    if (health >= 70) {
-      document.getElementById("pet").style.backgroundImage = "url('IMG_2944.jpeg')";
-    } else {
-      document.getElementById("pet").style.backgroundImage = "url('IMG_2941.jpeg')";
-    }
 
-    if (hunger <= 40) {
-      document.getElementById("pet").style.backgroundImage = "url('IMG_2944.jpeg')";
-    } else {
-      document.getElementById("pet").style.backgroundImage = "url('IMG_2941.jpeg')";
-    }
-    // Check if happiness level is greater than or equal to 30 and display image accordingly
-    if (happiness >= 30) {
-      document.getElementById("pet").style.backgroundImage = "url('IMG_2944.jpeg')";
-    } else {
-      document.getElementById("pet").style.backgroundImage = "url('IMG_2941.jpeg')";
-    }
-  }
 
-  setInterval(function() {
-    if (hunger > 0) {
-      hunger -= 1;
-    }
-    if (happiness > 0) {
-      happiness -= 1;
-    }
-    updateStats();
-  }, 1000); // Update stats every second
+
+
+
+
+  
 </script>
 </body>
 </html>
