@@ -8,15 +8,14 @@ Welcome to Pong!
    <p id="answer"></p>
           <button onclick="myFunction()">Submit</button>
       <script>
+        let
         function myFunction()
          {
-       var a=document.getElementById("text_a").vlaue;
+       var a=document.getElementById("text_a").value;
 
-       if (a <= 2014)  {
+       if (a < 2018)  {
        document.getElementById("answer").innerHTML="Succeeded!";
-        }
-       else
-       {
+        } else  {
       document.getElementById("answer").innerHTML="Your not old enough";
       }
     }
