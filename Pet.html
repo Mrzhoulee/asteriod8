@@ -36,18 +36,18 @@
 </head>
 <body>
 
-<button id="health"onclick="hurtpet()">Hurt</button>
-  <button id="hunger"onclick="feedpet()">Feed</button>
-  <button id="happiness"onclick="playWithPet()">Play</button>
+<button id="health"onclick="hurtpet">Hurt</button>
+  <button id="hunger"onclick="feedpet">Feed</button>
+  <button id="happiness"onclick="playWithPet">Play</button>
    
   
 <h1>Pet Care Game</h1>
 
 
 <div id="pet"></div>
-<div id="hunger">Hunger: <span id="hungerValue">50</span></div>
-<div id="happiness">Happiness: <span id="happinessvalue">50</span></div>
-  <div id="health">health: <span id="healthvalue">80</span></div>
+<div id="hunger">Hunger: <span id="hungerValue"></span></div>
+<div id="happiness">Happiness: <span id="happinessvalue"></span></div>
+  <div id="health">health: <span id="healthvalue"></span></div>
 
 
 <script>
@@ -61,7 +61,7 @@
     document.getElementById("pet").style.backgroundImage = "url('" + petType + ".png')";
   }
 
-  function feedPet() {
+  function feedPet {
     if (hunger < 1000) {
       hunger += 10;
       updateStats();
@@ -71,7 +71,7 @@
 
 
 
-  function hurtpet() {
+  function hurtpet {
     if (health < 10000) {
       health -=20;
       updateStats();
@@ -87,7 +87,7 @@
 
 
 
-  function playWithPet() {
+  function playWithPet {
     if (happiness < 100) {
       happiness += 10;
       updateStats();
