@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pet Care Game</title>
 <style>
+  img{
+    border-radius: 5%;
+    width: 500px;
+    height: 500px;
+  }
+
+  image{
+    border-radius: 5%;
+    width: 500px;
+    height: 500px;
+  }
   body {
     font-family: Arial, sans-serif;
     text-align: center;
@@ -27,6 +39,13 @@
 </style>
 </head>
 <body>
+<button onclick="myAudio" type="button"><span class="material-symbols-outlined">volume_up</span></button>
+
+  
+<audio id="myAudio">
+  <source src="Happy and Joyful Children Free Music (No Copyright Music).mp3" type="audio/ogg">
+  <source src="Happy and Joyful Children Free Music (No Copyright Music).mp3" type="audio/mpeg">
+</audio>
 
 <button id="hurtButton" onclick="hurtPet()">Hurt</button>
 <button id="feedButton" onclick="feedPet()">Feed</button>
@@ -40,6 +59,15 @@
 <div id="health">Health: <span id="healthValue">80</span></div>
 
 <script>
+
+  var x = document.getElementById("myAudio"); 
+
+function playAudio() { 
+  x.play(); 
+}
+
+
+  
   var hunger = 50;
   var happiness = 50;
   var health = 80;
@@ -66,6 +94,7 @@
     var petImage = document.getElementById("pet");
     if (health > 40 && happiness > 40 && hunger > 40) {
       petImage.style.backgroundImage = "url('IMG_2944.jpeg')";
+      
     } else {
       petImage.style.backgroundImage = "url('IMG_2941.jpeg')";
     }
