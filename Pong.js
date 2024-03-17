@@ -56,8 +56,9 @@
             );
          
          ctx.fillRect(
-            PADDLE_OFFSET,
-            leftPaddleTop,
+            width - PADDLE_WIDTH - PADDLE_OFFSET,
+            rightPaddleTop,
             PADDLE_WIDTH,
             PADDLE_HEIGHT
             );
+                //draw scores
