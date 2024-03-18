@@ -2,6 +2,8 @@ let canvas = document.querySelector("#canvas");
 let ctx = canvas.getContext("2d");
 let width = canvas.width;
 let height = canvas.height;
+ctx.fillStyle = "black";
+ctx.fillRect(0,0, width, height);
 
 const MAX_COMPUTER_SPEED - 2;
 
@@ -33,10 +35,6 @@ document.addEventListener("mousemove", e => {
   rightPaddleTop = e.y - canvas.offsetTop;
 });
 
-function draw() {
-  //fill the canvas with black 
-   ctx.fillStyle = "black";
-   ctx.fillRect(0,0, width, height);
 
 //everything else will be white
 ctx.fillStyle = "white";
