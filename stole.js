@@ -11,7 +11,16 @@ let ballPosition = { x: 20, y: 30};
 let xSpeed = 4;
 let ySpeed = 2;
 
+const PADDLE_WIDTH = 5;
+const PADDLE_HEIGHT = 20;
+const PADDLE_OFFSET = 10;
 
+let leftPaddleTop = 10;
+let rightPaddleTop = 30;
+
+document.addEventListener("mousemove",  e => { 
+  rightPaddleTop = e.y - canvas.offsetTop;
+});
 
 function draw(){  
 ctx.fillStyle = "black";
@@ -20,6 +29,20 @@ ctx.fillRect(0, 0, width, height,);
 ctx.fillStyle = "white";
 ctx.fillRect(ballPosition.x, ballPosition.y, BALL_SIZE, BALL_SIZE);
 }
+
+ctx.fillRect(
+  PADDLE_OFFSET,
+  leftPaddleTop,
+  PADDLE_WIDTH,
+  PADDLE_HEIGHT
+  );
+ctx.fillRect(
+  width - PADDLE_WIDTH - PADDLE_OFFSET,
+  rightPaddleTop,
+  PADDLE_WIDTH,
+  PADDLE_HEIGHT
+  );
+
 
 function update() {
   ballPosition.x += xSpeed;
