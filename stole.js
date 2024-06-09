@@ -24,7 +24,7 @@ document.addEventListener("mousemove",  e => {
 
 function draw(){  
 ctx.fillStyle = "black";
-ctx.fillRect(0, 0, width, height,);
+ctx.fillRect(0, 0, width, height);
 
 ctx.fillStyle = "white";
 ctx.fillRect(ballPosition.x, ballPosition.y, BALL_SIZE, BALL_SIZE);
@@ -42,8 +42,7 @@ ctx.fillRect(
   PADDLE_WIDTH,
   PADDLE_HEIGHT
   );
-
-
+}
 function update() {
   ballPosition.x += xSpeed;
   ballPosition.y += ySpeed;
