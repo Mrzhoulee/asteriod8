@@ -78,47 +78,53 @@
         .hidden {
             display: none;
         }
-
-
-        .hidden {
-    display: none;
-}
-
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
             <h1>Sign In</h1>
-            <form>
-                <input type="text" class="form-control" id="email" name="email" placeholder="Enter Your Email">
-                <input type="password" class="form-control" id="password" name="password" placeholder="Enter Your Password">
+            <form id="signInForm">
+                <input type="text" class="form-control" id="email" name="email" placeholder="Enter Your Email" required>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Enter Your Password" required>
                 <button type="button" onclick="handleSignIn()" class="btn-primary">Sign In</button>
-                <a href="registraition.html"><button type="button" class="btn-signup">Sign Up</button></a>
-<a href="start.html"><button id="secondButton" class="btn btn-secondary hidden">OPEN MUSIC PAGE</button></a>
-
+                <a href="registration.html"><button type="button" class="btn-signup">Sign Up</button></a>
+                <a href="start.html"><button id="secondButton" class="btn btn-secondary hidden">OPEN MUSIC PAGE</button></a>
             </form>
         </div>
     </div>
 
     <script>
-function saveData() {
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
-    let user_records = JSON.parse(localStorage.getItem("users")) || [];
-    
-    if (user_records.some((v) => v.email == email && v.password == password)) {
-        alert("Log in Successful!");
-        showSecondButton();  // Call function to show the second button
-    } else {
-        alert("Incorrect Username or Password");
-    }
-}
+        function saveData() {
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+            // Replace this with actual user records stored in localStorage
+            let user_records = [
+                { email: "user@example.com", password: "password123" },
+                { email: "admin@example.com", password: "admin123" }
+            ];
 
+            // Check if the email and password match any user records
+            let isValidUser = user_records.some((v) => v.email === email && v.password === password);
+
+            if (isValidUser) {
+                alert("Log in Successful!");
+                showSecondButton();  // Call function to show the second button
+            } else {
+                alert("Incorrect Username or Password");
+            }
+        }
+
+        function showSecondButton() {
+            document.getElementById("secondButton").classList.remove("hidden");
+        }
+
+        function handleSignIn() {
+            saveData();
+        }
     </script>
 </body>
 </html>
-
 
 
 
