@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Resetting default margins and padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: black;
+            color: coral;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 50%;
+            height: 350px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: coral;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            text-align: center;
+        }
+
+        .card h1 {
+            margin-bottom: 20px;
+            color: black;
+        }
+
+        .form-control {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            width: 100%;
+        }
+
+        .btn-primary, .btn-signup {
+            background-color: black;
+            color: coral;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary:hover, .btn-signup:hover {
+            background-color: coral;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Sign In</h1>
+            <form action="#">
+                <input type="text" class="form-control" id="email" name="email" placeholder="Enter Your Email">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Enter Your Password">
+                <button type="button" onclick="saveData()" class="btn-primary">Sign In</button>
+                
+                <a href="registraition.html"><button type="button" class="btn-signup">Sign Up</button></a>
+                </a>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function saveData() {
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+            let user_records = JSON.parse(localStorage.getItem("users")) || [];
+            if (user_records.some((v) => v.email == email && v.password == password)) {
+                alert("Log in Successful!");
+            } else {
+                alert("Incorrect Username or Password");
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+

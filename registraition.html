@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: black;
+            color: coral;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .text {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            width: 50%;
+            height: 50%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            width: 350px;
+            max-width: 350px;
+            height: auto;
+            text-align: center;
+            background-color: coral;
+            padding: 30px;
+            border-radius: 15%;
+            box-sizing: border-box;
+        }
+
+        .form-control {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn-primary {
+            background-color: black;
+            color: coral;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: coral;
+            color: black;
+        }
+
+        .sign {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .sign button {
+            background-color: coral;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: auto;
+            width: 120px;
+            height: 35px;
+        }
+
+        .sign button:hover {
+            background-color: black;
+            color: coral;
+        }
+    </style>
+</head>
+<body>  
+    <div class="text">
+        <h1>Sign Up</h1>
+    </div>
+    <div class="container">
+        <div class="card">
+            <label for="name">Display name</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Full Name">
+
+            <label for="email">Email</label>
+            <input type="text" class="form-control" id="email" name="email" placeholder="Email">
+
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+        </div>
+        <div class="text-center">
+            <button type="button" onclick="saveData()" class="btn btn-primary" id="save_btn"><b>Sign Up</b></button>
+        </div>
+    </div>
+    <div class="sign">
+        <a href="login.html"><button><b>Sign In</b></button></a>
+    </div>
+</body>
+<script>
+    function saveData() {
+        let name = document.getElementById("name").value;
+        let email = document.getElementById("email").value;
+        let password = document.getElementById("password").value;
+        console.log(name + email + password);
+
+        let user_records = JSON.parse(localStorage.getItem("users")) || [];
+
+        if (user_records.some((v) => v.email === email)) {
+            alert("Duplicate Data");
+        } else {
+            user_records.push({
+                "name": name,
+                "email": email,
+                "password": password
+            });
+            localStorage.setItem("users", JSON.stringify(user_records));
+            alert("Data saved successfully!");
+        }
+    }
+</script>
+</html>
+
