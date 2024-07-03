@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap" rel="stylesheet">
     <style>
         body {
             background-color: black;
@@ -30,20 +30,18 @@
         }
 
         .container {
-            width: 50%;
-            height: 50%;
+            width: 100%;
             display: flex;
             justify-content: center;
         }
 
         .card {
-            width: 350px;
-            max-width: 350px;
-            height: auto;
+            width: 100%;
+            max-width: 400px;
             text-align: center;
             background-color: coral;
             padding: 30px;
-            border-radius: 15%;
+            border-radius: 15px;
             box-sizing: border-box;
         }
 
@@ -86,7 +84,6 @@
             font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
-            width: auto;
             width: 120px;
             height: 35px;
         }
@@ -97,7 +94,7 @@
         }
     </style>
 </head>
-<body>  
+<body>
     <div class="text">
         <h1>Sign Up</h1>
     </div>
@@ -105,42 +102,39 @@
         <div class="card">
             <label for="name">Display name</label>
             <input type="text" class="form-control" id="name" name="name" placeholder="Full Name">
-
             <label for="email">Email</label>
-            <input type="text" class="form-control" id="email" name="email" placeholder="Email">
-
+            <input type="email" class="form-control" id="email" name="email" placeholder="Email">
             <label for="password">Password</label>
             <input type="password" class="form-control" id="password" name="password" placeholder="Password">
-        </div>
-        <div class="text-center">
             <button type="button" onclick="saveData()" class="btn btn-primary" id="save_btn"><b>Sign Up</b></button>
         </div>
     </div>
     <div class="sign">
         <a href="login.html"><button><b>Sign In</b></button></a>
     </div>
-</body>
-<script>
-    function saveData() {
-        let name = document.getElementById("name").value;
-        let email = document.getElementById("email").value;
-        let password = document.getElementById("password").value;
-        console.log(name + email + password);
 
-        let user_records = JSON.parse(localStorage.getItem("users")) || [];
+    <script>
+        function saveData() {
+            let name = document.getElementById("name").value;
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+            console.log(name + email + password);
 
-        if (user_records.some((v) => v.email === email)) {
-            alert("Duplicate Data");
-        } else {
-            user_records.push({
-                "name": name,
-                "email": email,
-                "password": password
-            });
-            localStorage.setItem("users", JSON.stringify(user_records));
-            alert("Data saved successfully!");
+            let user_records = JSON.parse(localStorage.getItem("users")) || [];
+
+            if (user_records.some((v) => v.email === email)) {
+                alert("Duplicate Data");
+            } else {
+                user_records.push({
+                    "name": name,
+                    "email": email,
+                    "password": password
+                });
+                localStorage.setItem("users", JSON.stringify(user_records));
+                alert("Data saved successfully!");
+            }
         }
-    }
-</script>
+    </script>
+</body>
 </html>
 
