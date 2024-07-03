@@ -74,19 +74,22 @@
             background-color: coral;
             color: black;
         }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
             <h1>Sign In</h1>
-            <form action="#">
+            <form>
                 <input type="text" class="form-control" id="email" name="email" placeholder="Enter Your Email">
                 <input type="password" class="form-control" id="password" name="password" placeholder="Enter Your Password">
-                <button type="button" onclick="saveData()" class="btn-primary">Sign In</button>
-                
+                <button type="button" onclick="handleSignIn()" class="btn-primary">Sign In</button>
                 <a href="registraition.html"><button type="button" class="btn-signup">Sign Up</button></a>
-                </a>
+                <a href="start.html"><button id="secondButton" class="btn btn-secondary hidden">OPEN MUSIC PAGE</button></a>
             </form>
         </div>
     </div>
@@ -98,13 +101,23 @@
             let user_records = JSON.parse(localStorage.getItem("users")) || [];
             if (user_records.some((v) => v.email == email && v.password == password)) {
                 alert("Log in Successful!");
+                showSecondButton();
             } else {
                 alert("Incorrect Username or Password");
             }
         }
+
+        function showSecondButton() {
+            document.getElementById("secondButton").classList.remove("hidden");
+        }
+
+        function handleSignIn() {
+            saveData();
+        }
     </script>
 </body>
 </html>
+
 
 
 
