@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/style.css"> <!-- Correct relative path -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap" rel="stylesheet">
@@ -30,18 +27,20 @@
         }
 
         .container {
-            width: 100%;
+            width: 50%;
+            height: 50%;
             display: flex;
             justify-content: center;
         }
 
         .card {
-            width: 100%;
-            max-width: 400px;
+            width: 350px;
+            max-width: 350px;
+            height: auto;
             text-align: center;
             background-color: coral;
             padding: 30px;
-            border-radius: 15px;
+            border-radius: 15%;
             box-sizing: border-box;
         }
 
@@ -84,8 +83,7 @@
             font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
-            width: 120px;
-            height: 35px;
+            width: auto;
         }
 
         .sign button:hover {
@@ -94,7 +92,7 @@
         }
     </style>
 </head>
-<body>
+<body>  
     <div class="text">
         <h1>Sign Up</h1>
     </div>
@@ -102,17 +100,21 @@
         <div class="card">
             <label for="name">Display name</label>
             <input type="text" class="form-control" id="name" name="name" placeholder="Full Name">
+
             <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+            <input type="text" class="form-control" id="email" name="email" placeholder="Email">
+
             <label for="password">Password</label>
             <input type="password" class="form-control" id="password" name="password" placeholder="Password">
-            <button type="button" onclick="saveData()" class="btn btn-primary" id="save_btn"><b>Sign Up</b></button>
+            <!-- Ensure button is inside the card div -->
+            <div class="text-center">
+                <button type="button" onclick="saveData()" class="btn-primary"><b>Sign Up</b></button>
+            </div>
         </div>
     </div>
     <div class="sign">
         <a href="login.html"><button><b>Sign In</b></button></a>
     </div>
-
     <script>
         function saveData() {
             let name = document.getElementById("name").value;
@@ -137,4 +139,3 @@
     </script>
 </body>
 </html>
-
