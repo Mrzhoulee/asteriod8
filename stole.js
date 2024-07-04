@@ -1,27 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Canvas Game</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: black;
-    }
-    canvas {
-      border: 1px solid white;
-    }
-  </style>
-</head>
-<body>
-  <canvas id="canvas" width="400" height="300"></canvas>
-  
-  <script>
     const canvas = document.querySelector("#canvas");
     const ctx = canvas.getContext("2d");
     const width = canvas.width;
