@@ -42,7 +42,7 @@ ctx.fillRect(
   PADDLE_WIDTH,
   PADDLE_HEIGHT
   );
-
+} 
 
 function update() {
   ballPosition.x += xSpeed;
