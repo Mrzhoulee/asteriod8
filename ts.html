@@ -109,7 +109,101 @@ background:darkred;
    <figure>
 
 
+<div class="mini-player">
+    <div class="song-info">
+        <img id="songImg" src="" alt="Song Image">
+        <div class="song-details">
+            <div id="songTitle" class="song-title">Song Title</div>
+            <div id="artistName" class="artist-name">Artist Name</div>
+        </div>
+    </div>
+    <div class="controls">
+        <audio id="audioPlayer" controls style="width: 200px;">
+            Your browser does not support the audio element.
+        </audio>
+        <button onclick="playPause()">Play/Pause</button>
+    </div>
+</div>
 
+<!-- JavaScript for the mini player functionality -->
+<script>
+    // Replace these variables with your actual song details
+    var songTitle = "Cruel Summer";
+    var artistName = "Taylor Swift";
+    var songImgSrc = "path/to/your/song/image.jpg";
+    var songUrl = "Cruel summer.MP4"; // Replace with actual song URL
+
+    var audio = document.getElementById("audioPlayer");
+    var songTitleElement = document.getElementById("songTitle");
+    var artistNameElement = document.getElementById("artistName");
+    var songImgElement = document.getElementById("songImg");
+
+    // Set initial song details
+    songTitleElement.textContent = songTitle;
+    artistNameElement.textContent = artistName;
+    songImgElement.src = songImgSrc;
+    audio.src = songUrl;
+
+    // Function to play or pause the audio
+    function playPause() {
+        if (audio.paused) {
+            audio.play();
+        } else {
+            audio.pause();
+        }
+    }
+</script>
+ <style>
+        /* CSS styles for the mini player */
+        .mini-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .song-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .song-info img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .song-info .song-details {
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+        }
+
+        .song-info .song-title {
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .controls button {
+            background-color: #F87954;
+            color: coral;
+            border: none;
+            padding: 8px 16px;
+            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
   
 </body>
 </html>
