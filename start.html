@@ -12,7 +12,7 @@
       padding: 0;
       font-family: 'Lato', sans-serif;
       background-color: black;
-      color: black;
+      color: white; /* Changed text color to white for contrast */
     }
     
     /* Styling for scrollable content */
@@ -35,7 +35,7 @@
     }
     
     /* Styling for sections and links */
-    #popular {
+    #popular-section {
       background-color: chocolate;
       padding: 20px;
       text-align: center;
@@ -113,7 +113,7 @@
   <h1>Welcome to Asteroid!</h1>
   <h2>This is the home of Music</h2>
   
-  <div id="popular">
+  <div id="popular-section">
     <h2>Popular artists</h2>
     
     <div class="row">
@@ -139,8 +139,13 @@
       </div>
     </div>
     
-    <h2 id="popular"><a href="Premium.html"><button>Get SCOPE</button></a></h2>
-    <h2 id="popular">SCOPE is free until November 2025! Unlock Now!</h2>
+    <div class="row">
+      <div class="column">
+        <a href="Premium.html"><button>Get SCOPE</button></a>
+        <p>SCOPE is free until November 2025! Unlock Now!</p>
+      </div>
+    </div>
+    
   </div>
   
   <div class="scrollable-container">
@@ -151,7 +156,7 @@
   <div class="column">
     <div class="row">
       <div class="container">
-        <h1><a href="Acount.html"><button>My Account</button></a></h1>
+        <a href="Account.html"><button>My Account</button></a>
       </div>
     </div>
   </div>
