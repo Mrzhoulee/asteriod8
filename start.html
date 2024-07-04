@@ -2,204 +2,64 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-  /* Example for body element */
-body {
-    overflow-y: auto; /* Enables vertical scrolling if needed */
-}
 
-  #popular {
-  background-color: black;
-  width: 1250;
-  height: 650;
-  }
-  
-</style>
-<title>Asteroid - Enjoy Music, Enjoy Life!</title>
-<style>
-html {
-  scroll-behavior: smooth;
-}
-
-#section1 {
-  height: 600px;
-  background-color: pink;
-}
-
-#section2 {
-  height: 600px;
-  background-color: yellow;
-}
-
-
-
-  .scroll-area {
-  overflow-y: auto;
-  max-height: 400px;
-}
-
-</style>
-
-    
-    
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap')
-</style>
-    
-    <style>
-
-      h2 {
+  <style>
+    /* Resetting margin and padding */
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Lato', sans-serif;
       background-color: black;
-      width: 650;
-      height: 470;
-      }
-      
-    body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background-color: #000;
+      color: white;
     }
     
-    #intro-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 120vh;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #333; /* Change background color as needed */
-        opacity: 0;
-        transition: opacity 1s ease-in-out;
+    /* Styling for scrollable content */
+    .scrollable-container {
+      height: 400px; /* Set a fixed height for the container */
+      overflow: auto; /* Enable scrolling when content overflows */
+      padding: 10px; /* Add padding to content inside */
     }
     
-    #intro-text {
-        color: black;
-        font-size: 40px;
-        text-align: center;
-    }
-</style>
-  <style>
-
-  button{
-  background-color: #F87954;
-  color:coral;
-  width:90px;
-  height:40px;
-  border-radius:10px;
-  }
-
-  body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.topnav {
-  overflow: hidden;
-  background-color: #333;
-}
-
-.topnav a {
-  float: left;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-}
-
-.topnav a:hover {
-  background-color: #ddd;
-  color: black;
-}
-
-.topnav a.active {
-  background-color: #04AA6D;
-  color: white;
-}
-
-  </style>
-  <style>
-    body {font-family: "Lato", sans-serif;}
-    <style>
-body {font-family: "Lato", sans-serif;}
-
-.sidebar {
-  height: 100%;
-  width: 160px;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: #111;
-  overflow-x: hidden;
-  padding-top: 16px;
-}
-
-.sidebar a {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: 20px;
-  color: #818181;
-  display: block;
-}
-
-.sidebar a:hover {
-  color: #f1f1f1;
-}
-
-.main {
-  margin-left: 160px; /* Same as the width of the sidenav */
-  padding: 0px 10px;
-}
-
-@media screen and (max-height: 450px) {
-  .sidebar {padding-top: 15px;}
-  .sidebar a {font-size: 18px;}
-}
-<style>
-    .sidebar {
-      height: 100%;
-      width: 160px;
-      position: fixed;
-      z-index: 1;
-      top: 0;
-      left: 0;
-      background-color: #111;
-      overflow-x: hidden;
-      padding-top: 16px;
+    /* Basic button styling */
+    button {
+      background-color: coral;
+      color: white;
+      width: 180px;
+      height: 90px;
+      border-radius: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
     }
     
-    .sidebar a {
-      padding: 6px 8px 6px 16px;
-      text-decoration: none;
-      font-size: 20px;
-      color: #818181;
+    /* Styling for sections and links */
+    #popular {
+      background-color: chocolate;
+      padding: 20px;
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .container {
+      height: 250px;
+      width: 250px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-around;
+    }
+    
+    /* Responsive image styling */
+    img {
+      width: 100%;
+      height: auto;
       display: block;
     }
     
-    .sidebar a:hover {
-      color: #f1f1f1;
-    }
-    
-    .main {
-      margin-left: 160px; /* Same as the width of the sidenav */
-      padding: 0px 10px;
-    }
-    
-    @media screen and (max-height: 450px) {
-      .sidebar {padding-top: 15px;}
-      .sidebar a {font-size: 18px;}
-    }
-    </style>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-    
+    /* Navbar styling */
     .topnav {
       overflow: hidden;
       background-color: #333;
@@ -223,363 +83,101 @@ body {font-family: "Lato", sans-serif;}
       background-color: #04AA6D;
       color: white;
     }
-    </style>
-
-  <style>
-  body{
-  background-color: black;
+    
+    /* Column and row layout */
+    .column {
+      float: left;
+      width: 33.33%;
+      padding: 5px;
+    }
+    
+    .row::after {
+      content: "";
+      clear: both;
+      display: table;
     }
   </style>
-   
- 
-
-
-      </style>
-      <style>
-
-        h2 {
-          background-color: black;
-          width: 1250;
-          height: 650;
-        }
-        body {
-          font-family: 'Lato', sans-serif;
-        }
-        
-        .overlay {
-          height: 100%;
-          width: 0;
-          position: fixed;
-          z-index: 1;
-          top: 0;
-          left: 0;
-          background-color: rgb(253, 8, 8);
-          background-color: rgba(245, 203, 13, 0.9);
-          overflow-x: hidden;
-          transition: 0.5s;
-        }
-        
-        .overlay-content {
-          position: relative;
-          top: 25%;
-          width: 100%;
-          text-align: center;
-          margin-top: 30px;
-        }
-        
-        .overlay a {
-          padding: 8px;
-          text-decoration: none;
-          font-size: 36px;
-          color: #ff0000;
-          display: block;
-          transition: 0.3s;
-        }
-        
-        .overlay a:hover, .overlay a:focus {
-          color: #f1550c;
-        }
-        
-        .overlay .closebtn {
-          position: absolute;
-          top: 20px;
-          right: 45px;
-          font-size: 60px;
-        }
-        
-        @media screen and (max-height: 450px) {
-          .overlay a {font-size: 20px}
-          .overlay .closebtn {
-          font-size: 40px;
-          top: 15px;
-          right: 35px;
-          }
-        }
-        </style>
-
-
-    
-    
 </head>
-  <body>
-    <div class="con">
+<body>
 
-<a href="Pre.html"><font face="Montserrat" font color="White">Have a SCOPE account?, Log in Here!</font></a>
+<div class="topnav">
+  <a class="active" href="#home">Home</a>
+  <a href="#playlists">Playlists</a>
+  <a href="#signin">Sign In</a>
+  <a href="#account">Account</a>
+  <a href="#rocket">Times Tables Rocket</a>
+  <a href="#copyright">Copyright Policy &copy;</a>
+</div>
 
+<h1>Welcome to Asteroid!</h1>
+<h2>This is the home of Music</h2>
 
-
-      
-  <style>
-
-body{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-      <style>
-          .container{
-          height: 250px;
-          width:  250px;
-          border-radius: 50%;
-          overflow: hidden;
-
-              
-          }
-          </style>
-  <style>
-
-   button{
-   background-color: Black;
-   color:Black;
-   width:300px;
-   height:250px;
-   border-radius:5px;
-   }
-   </style>
-
-    
-    <div id="myNav" class="overlay">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-      <div class="overlay-content">
-        <a href="index.html">Home</a>
-        <a href="pl.html">Playlists</a>
-        <a href="Log in.html">Sign In</a>
-        <a href="Acount.html">Account</a>
-          <a href="tt.html">Times Tables Rocket</a>
-           <a href="Copyright.html"> Copyright Policy &copy;</a>
+<div id="popular">
+  <h2>Popular artists</h2>
+  
+  <div class="row">
+    <div class="column">
+      <div class="container">
+        <a href="ts.html"><img src="tas.jpg" alt="Artist 1"></a>
       </div>
     </div>
-
-  
-  
-  
-  
-  
-  
-  <h1><font face="Montserrat" font color="coral"><b>Welcome to Asteroid!</b></h1>
-
-    <h1><font face="Montserrat" font color="coral"><b>This is the home of Music</b></h2>
-                                                                               
-      
-    <h2><font face="Montserrat" font color="white"><b>Popular artists</b></h2>
-
-    
-      <style>
-          .container{
-          height: 250px;
-          width:  250px;
-          border-radius: 50%;
-          overflow: hidden;
-
-              
-          }
-          </style>
-      
-      <style>
-  <style>
-
-.container{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-          </style>
-      
-      <style>
-  #popular {
-    background-color: chocolate;
-  }
-
-        
-          .container{
-          height: 250px;
-          width:  250px;
-          border-radius: 50%;
-          overflow: hidden;
-
-              
-          }
-          </style>
-      
-      <style>
-          .container {
-          height: 250px;
-          width:  250px;
-          border-radius: 50%;
-          overflow: hidden;
-           display: flex:
-           flex-direction: row;
-           align-items: center;
-           justify-content: space-around;
-
-              
-          }
-          </style>
- <style>
-body{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-
-      
- <style>
-body{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-
-      
-
- <style>
-body{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-
-      
- <style>
-body{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-      <div class = "column">
-      <div class = "row">
-      <div class = "container">
-<a href="ts.html" class="button" id="button"><img src="tas.jpg" height="250" width="250" alt="button text"/></a>
-      </div> 
+    <div class="column">
+      <div class="container">
+        <a href="ed.html"><img src="eds.jpg" alt="Artist 2"></a>
       </div>
-        </div>
-          <div class = "column">
-            <div class = "row">
-            <div class = "container">
-<a href="ed.html" class="button" id="button"><img src="eds.jpg" height="250" width="250" alt="button text"/></a>
+    </div>
+    <div class="column">
+      <div class="container">
+        <a href="week.html"><img src="512x512-000000-80-0-0.webp" alt="Artist 3"></a>
       </div>
+    </div>
+    <div class="column">
+      <div class="container">
+        <a href="bro.html"><img src="ab6761610000e5ebc36dd9eb55fb0db4911f25dd.jpg" alt="Artist 4"></a>
+      </div>
+    </div>
   </div>
-        </div>
-          <div class = "column">
-             <div class="row">
-            <div class = "container">
-<a href="week.html" class="button" id="button"><img src="C:\Users\HP\Documents\Downloads\512x512-000000-80-0-0.webp" height="250" width="250" alt="button text"/></a>                 
-                </div> 
-              </div>
-           </div>
-   <div class = "column"> 
-    <div class="row">
-    <div class = "container">
-    <a href="bro.html" class="button" id="button"><img src="ab6761610000e5ebc36dd9eb55fb0db4911f25dd.jpg" height="250" width="250" alt="button text"/></a>
-    </div>
-    </div>
-   </div>
-<h2 id ="popular"><a href="Premium.html"><button><font face="Montserrat" font color="white">Get SCOPE</button></h2></a><h2 id="popular"><font face="Montserrat">SCOPE is free until November 2025! Unlock Now!</font></h2>
-   
-    <style>
-      .shl-btn{
-      background-color: black;
-      color: black;
-      border-radius: 50px;   
-      }  
-    </style>
-<style>
-* {
-  box-sizing: border-box;
-}
-
-.column {
-  float: left;
-  width: 33.33%;
-  padding: 5px;
-}
-
-/* Clearfix (clear floats) */
-.row::after {
-  content: "";
-  clear: both;
-  display: table;
-}
-</style>
-      
-
-     <div class = "column">
-      <div class = "row">
-      <div class = "container">
- <h1><b> <a href ="Songs.html"class = "button"><button><b><font face ="Montserrat" font color="white">Songs Menu</b></button> </a></b></h1>
-      </div>
-      </div>
-     </div>
-      
-      <div class = "column">
-      <div class = "row">
-      <div class = "container">
-      <h1><b> <a href ="Acount.html"class = "button"><button><b><font face ="Montserrat" font color="white"> My Account</b></button></a></b></h1>
-      </div>
-      </div>
-      </div>
-
   
+  <h2><a href="Premium.html"><button>Get SCOPE</button></a></h2>
+  <h2>SCOPE is free until November 2025! Unlock Now!</h2>
+</div>
 
+<div class="scrollable-container">
+  <h1>Songs Menu</h1>
+  <!-- List of songs or content that can be scrolled -->
+  <ul>
+    <li>Song 1</li>
+    <li>Song 2</li>
+    <li>Song 3</li>
+    <li>Song 4</li>
+    <li>Song 5</li>
+    <li>Song 6</li>
+    <li>Song 7</li>
+    <li>Song 8</li>
+    <li>Song 9</li>
+    <li>Song 10</li>
+    <li>Song 11</li>
+    <li>Song 12</li>
+    <li>Song 13</li>
+    <li>Song 14</li>
+    <li>Song 15</li>
+    <li>Song 16</li>
+    <li>Song 17</li>
+    <li>Song 18</li>
+    <li>Song 19</li>
+    <li>Song 20</li>
+  </ul>
+</div>
 
-
-<style>
- 
-button{
-background-color: coral;
-color:coral;
-width:180px;
-height:90px;
-border-radius:10px;
-}
-</style>
-
- 
- <style>
-img{
-postion:absoulte;
- left:0px;
- top:50px;
- z-index:-1;
- 
- 
-}
-
-body{
-background-color: black;
- color:black;
- 
-}
-
-   div.con {
-     .scrollable-container {
-    height: 400px; /* Set a fixed height for the container */
-    overflow: auto; /* Enable scrolling when content overflows */
-}
-
-   }
- 
-
-   </style>
-   <img src="IMG_2146.jpeg" width="1200"height="270">
+<div class="column">
+  <div class="row">
+    <div class="container">
+      <h1><a href="Acount.html"><button>My Account</button></a></h1>
     </div>
- </body>
+  </div>
+</div>
+
+<img src="IMG_2146.jpeg" alt="Banner Image">
+
+</body>
 </html>
