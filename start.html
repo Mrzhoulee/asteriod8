@@ -1,205 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-  /* Example for body element */
-body {
-    overflow-y: auto; /* Enables vertical scrolling if needed */
-}
-
-  #popular {
-  background-color: coral;
-  width: 1250;
-  height: 650;
-  }
+  <title>Asteroid - Enjoy Music, Enjoy Life!</title>
   
-</style>
-<title>Asteroid - Enjoy Music, Enjoy Life!</title>
-<style>
-html {
-  scroll-behavior: smooth;
-}
-
-#section1 {
-  height: 600px;
-  background-color: pink;
-}
-
-#section2 {
-  height: 600px;
-  background-color: yellow;
-}
-
-
-
-  .scroll-area {
-  overflow-y: auto;
-  max-height: 400px;
-}
-
-</style>
-
+  <style>
+    /* Resetting margin and padding */
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Lato', sans-serif;
+      background-color: black;
+      color: black;
+    }
     
+    /* Styling for scrollable content */
+    .scrollable-container {
+      height: 400px; /* Set a fixed height for the container */
+      overflow: auto; /* Enable scrolling when content overflows */
+    }
     
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap')
-</style>
-    
-    <style>
-
-      h2 {
+    /* Basic button styling */
+    button {
       background-color: coral;
-      width: 650;
-      height: 470;
-      }
-      
-    body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background-color: #000;
+      color: white;
+      width: 180px;
+      height: 90px;
+      border-radius: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
     }
     
-    #intro-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 120vh;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #333; /* Change background color as needed */
-        opacity: 0;
-        transition: opacity 1s ease-in-out;
+    /* Styling for sections and links */
+    #popular {
+      background-color: chocolate;
+      padding: 20px;
+      text-align: center;
+      margin-top: 20px;
     }
     
-    #intro-text {
-        color: coral;
-        font-size: 40px;
-        text-align: center;
-    }
-</style>
-  <style>
-
-  button{
-  background-color: #F87954;
-  color:coral;
-  width:90px;
-  height:40px;
-  border-radius:10px;
-  }
-
-  body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.topnav {
-  overflow: hidden;
-  background-color: #333;
-}
-
-.topnav a {
-  float: left;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-}
-
-.topnav a:hover {
-  background-color: #ddd;
-  color: black;
-}
-
-.topnav a.active {
-  background-color: #04AA6D;
-  color: white;
-}
-
-  </style>
-  <style>
-    body {font-family: "Lato", sans-serif;}
-    <style>
-body {font-family: "Lato", sans-serif;}
-
-.sidebar {
-  height: 100%;
-  width: 160px;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: #111;
-  overflow-x: hidden;
-  padding-top: 16px;
-}
-
-.sidebar a {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: 20px;
-  color: #818181;
-  display: block;
-}
-
-.sidebar a:hover {
-  color: #f1f1f1;
-}
-
-.main {
-  margin-left: 160px; /* Same as the width of the sidenav */
-  padding: 0px 10px;
-}
-
-@media screen and (max-height: 450px) {
-  .sidebar {padding-top: 15px;}
-  .sidebar a {font-size: 18px;}
-}
-<style>
-    .sidebar {
-      height: 100%;
-      width: 160px;
-      position: fixed;
-      z-index: 1;
-      top: 0;
-      left: 0;
-      background-color: #111;
-      overflow-x: hidden;
-      padding-top: 16px;
+    .container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-around;
+      height: 250px;
+      width: 250px;
+      border-radius: 50%;
+      overflow: hidden;
     }
     
-    .sidebar a {
-      padding: 6px 8px 6px 16px;
-      text-decoration: none;
-      font-size: 20px;
-      color: #818181;
+    /* Responsive image styling */
+    img {
+      width: 100%;
+      height: auto;
       display: block;
     }
     
-    .sidebar a:hover {
-      color: #f1f1f1;
-    }
-    
-    .main {
-      margin-left: 160px; /* Same as the width of the sidenav */
-      padding: 0px 10px;
-    }
-    
-    @media screen and (max-height: 450px) {
-      .sidebar {padding-top: 15px;}
-      .sidebar a {font-size: 18px;}
-    }
-    </style>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-    
+    /* Navbar styling */
     .topnav {
       overflow: hidden;
       background-color: #333;
@@ -223,642 +84,79 @@ body {font-family: "Lato", sans-serif;}
       background-color: #04AA6D;
       color: white;
     }
-    </style>
-
-  <style>
-  body{
-  background-color: black;
+    
+    /* Column and row layout */
+    .column {
+      float: left;
+      width: 33.33%;
+      padding: 5px;
+    }
+    
+    .row::after {
+      content: "";
+      clear: both;
+      display: table;
     }
   </style>
-   
- 
-
-
-      </style>
-      <style>
-
-        h2 {
-          background-color: coral;
-          width: 1250;
-          height: 650;
-        }
-        body {
-          font-family: 'Lato', sans-serif;
-        }
-        
-        .overlay {
-          height: 100%;
-          width: 0;
-          position: fixed;
-          z-index: 1;
-          top: 0;
-          left: 0;
-          background-color: rgb(253, 8, 8);
-          background-color: rgba(245, 203, 13, 0.9);
-          overflow-x: hidden;
-          transition: 0.5s;
-        }
-        
-        .overlay-content {
-          position: relative;
-          top: 25%;
-          width: 100%;
-          text-align: center;
-          margin-top: 30px;
-        }
-        
-        .overlay a {
-          padding: 8px;
-          text-decoration: none;
-          font-size: 36px;
-          color: #ff0000;
-          display: block;
-          transition: 0.3s;
-        }
-        
-        .overlay a:hover, .overlay a:focus {
-          color: #f1550c;
-        }
-        
-        .overlay .closebtn {
-          position: absolute;
-          top: 20px;
-          right: 45px;
-          font-size: 60px;
-        }
-        
-        @media screen and (max-height: 450px) {
-          .overlay a {font-size: 20px}
-          .overlay .closebtn {
-          font-size: 40px;
-          top: 15px;
-          right: 35px;
-          }
-        }
-        </style>
-
-
-    
-    
 </head>
-  <body>
-    <div class="con">
-
-<a href="Pre.html"><font face="Montserrat" font color="White">Have a SCOPE account?, Log in Here!</font></a>
-
-
-
-      
-  <style>
-
-body{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-      <style>
-          .container{
-          height: 250px;
-          width:  250px;
-          border-radius: 50%;
-          overflow: hidden;
-
-              
-          }
-          </style>
-  <style>
-
-   button{
-   background-color: Black;
-   color:Black;
-   width:300px;
-   height:250px;
-   border-radius:5px;
-   }
-   </style>
-
-    
-    <div id="myNav" class="overlay">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-      <div class="overlay-content">
-        <a href="index.html">Home</a>
-        <a href="pl.html">Playlists</a>
-        <a href="Log in.html">Sign In</a>
-        <a href="Acount.html">Account</a>
-          <a href="tt.html">Times Tables Rocket</a>
-           <a href="Copyright.html"> Copyright Policy &copy;</a>
-      </div>
-    </div>
-
+<body>
   
-  
-  
-  
-  
-  
-  <h1><font face="Montserrat" font color="coral"><b>Welcome to Asteroid!</b></h1>
-
-    <h1><font face="Montserrat" font color="coral"><b>This is the home of Music</b></h2>
-                                                                               
-      
-    <h2><font face="Montserrat" font color="white"><b>Popular artists</b></h2>
-
-    
-      <style>
-          .container{
-          height: 250px;
-          width:  250px;
-          border-radius: 50%;
-          overflow: hidden;
-
-              
-          }
-          </style>
-      
-      <style>
-  <style>
-
-.container{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-          </style>
-      
-      <style>
-  #popular {
-    background-color:coral;
-  }
-
-        
-          .container{
-          height: 250px;
-          width:  250px;
-          border-radius: 50%;
-          overflow: hidden;
-
-              
-          }
-          </style>
-      
-      <style>
-          .container {
-          height: 250px;
-          width:  250px;
-          border-radius: 50%;
-          overflow: hidden;
-           display: flex:
-           flex-direction: row;
-           align-items: center;
-           justify-content: space-around;
-
-              
-          }
-          </style>
- <style>
-body{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-
-      
- <style>
-body{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-
-      
-
- <style>
-body{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-
-      
- <style>
-body{
- display: flex:
-flex-direction: row;
-align-items: center;
-justify-content: space-around;
-
-}
-</style>
-      <div class = "column">
-      <div class = "row">
-      <div class = "container">
-<a href="ts.html" class="button" id="button"><img src="tas.jpg" height="250" width="250" alt="button text"/></a>
-      </div> 
-      </div>
-        </div>
-          <div class = "column">
-            <div class = "row">
-            <div class = "container">
-<a href="ed.html" class="button" id="button"><img src="eds.jpg" height="250" width="250" alt="button text"/></a>
-      </div>
+  <div class="topnav">
+    <a class="active" href="#home">Home</a>
+    <a href="#playlists">Playlists</a>
+    <a href="#signin">Sign In</a>
+    <a href="#account">Account</a>
+    <a href="#rocket">Times Tables Rocket</a>
+    <a href="#copyright">Copyright Policy &copy;</a>
   </div>
-        </div>
-          <div class = "column">
-             <div class="row">
-            <div class = "container">
-<a href="week.html" class="button" id="button"><img src="week.png" height="250" width="250" alt="button text"/></a>                 
-                </div> 
-              </div>
-           </div>
-   <div class = "column"> 
-    <div class="row">
-    <div class = "container">
-    <a href="bro.html" class="button" id="button"><img src="ab6761610000e5ebc36dd9eb55fb0db4911f25dd.jpg" height="250" width="250" alt="button text"/></a>
-    </div>
-    </div>
-   </div>
-<h2 id ="popular"><a href="Premium.html"><button><font face="Montserrat" font color="white">Get SCOPE</button></h2></a><h2 id="popular"><font face="Montserrat">SCOPE is free until November 2025! Unlock Now!</font></h2>
-   
-    <style>
-      .shl-btn{
-      background-color: black;
-      color: black;
-      border-radius: 50px;   
-      }  
-    </style>
-<style>
-* {
-  box-sizing: border-box;
-}
-
-.column {
-  float: left;
-  width: 33.33%;
-  padding: 5px;
-}
-
-/* Clearfix (clear floats) */
-.row::after {
-  content: "";
-  clear: both;
-  display: table;
-}
-</style>
-      
-
   
-
-
-
-<style>
- 
-button{
-background-color:black;
-color:black;
-width:180px;
-height:90px;
-border-radius:10px;
-}
-</style>
-
- 
- <style>
-img{
-postion:absoulte;
- left:0px;
- top:50px;
- z-index:-1;
- 
- 
-}
-
-body{
-background-color: black;
- color:black;
- 
-}
-
-   div.con {
-     .scrollable-container {
-    height: 400px; /* Set a fixed height for the container */
-    overflow: auto; /* Enable scrolling when content overflows */
-}
-
-   }
- 
-
-   </style>
-
-    </div>
+  <h1>Welcome to Asteroid!</h1>
+  <h2>This is the home of Music</h2>
+  
+  <div id="popular">
+    <h2>Popular artists</h2>
     
-  <h1><font face="Helvetica" font color="White">Discover</font></h1>
-     <font face="Serif" font color="White"><p>We are Asteriod Teams, We code for public uses even for free!</p></font>
-  <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;<font face="Impact" font color="White"</font>Open!</span>
-    <script>
-      function openNav() {
-        document.getElementById("myNav").style.width = "100%";
-      }
-      
-      function closeNav() {
-        document.getElementById("myNav").style.width = "0%";
-      }
-      </script>
-  
-    <div id="myNav" class="overlay">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-      <div class="overlay-content">
-        <a href="index.html">Home</a>
-        <a href="pl.html">Playlists</a>
-        <a href="Log in.html">Sign IN</a>
-        <a href="Acount.html">Account</a>
+    <div class="row">
+      <div class="column">
+        <div class="container">
+          <a href="ts.html"><img src="tas.jpg" alt="Artist 1"></a>
+        </div>
+      </div>
+      <div class="column">
+        <div class="container">
+          <a href="ed.html"><img src="eds.jpg" alt="Artist 2"></a>
+        </div>
+      </div>
+      <div class="column">
+        <div class="container">
+          <a href="week.html"><img src="512x512-000000-80-0-0.webp" alt="Artist 3"></a>
+        </div>
+      </div>
+      <div class="column">
+        <div class="container">
+          <a href="bro.html"><img src="ab6761610000e5ebc36dd9eb55fb0db4911f25dd.jpg" alt="Artist 4"></a>
+        </div>
       </div>
     </div>
-  
-  
-  </html>
-  <style>
-   mustar{
-   background-color:black;
-   color:black;
-   width:300px;
-   height:300px;
-   border-radius:10px;
-   }
-  </style>
-  <style>
-
-   button{
-   background-color: #F87954;
-   color:coral;
-   width:250px;
-   height:250px;
-   border-radius:5px;
-   }
-   </style>
-    <style>
-    img {
-        border-radius: 10%;
-        height: 250px;
-        width: 250x;
-      }
-      </style>
-    <ul id="songList">
-        <li>
-            <audio controls>
-              
-                   
- <font color="coral" font face="Impact"</font>Cruel Summer:</figcaption>
- <audio controls src="Cruel summer.MP4"></audio>            <button style="width:70px; height:30px;" onclick="addToPlaylist('song1.mp3')"><font face="Helvetica" font color="Black">Add to Playlist</button></font>
-  <font face="Impact" font color="coral"<audio src="Cruel summer.MP4"</audio>
-  
-            </audio>
-
-        </li>
-        <!-- Add more songs similarly -->
-    </ul>
-
-    <script>
-        function addToPlaylist(songUrl) {
-            let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
-            playlist.push(songUrl);
-            localStorage.setItem('playlist', JSON.stringify(playlist));
-            alert('Song added to playlist!');
-        }
-    </script>
-        
-   <figure>
- <figcaption><font color="coral" font face="Impact"</font>Shake it off:</figcaption>
- <audio controls src="Untitled 2.mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-  <figure>
     
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Love Story</figcaption>
-           <audio controls src="Taylor Swift - Love Story.mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-    
-     <figcaption><font color="coral" font face="Impact"</font>You belong with me:</figcaption>
- <audio controls src="[THAISUB] You Belong With Me (Taylor's Version) - Taylor Swift (แปลไทย).mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="[THAISUB] You Belong With Me (Taylor's Version) - Taylor Swift (แปลไทย).mp3"</audio>
-  <figure>
-      <figure>
-     <figcaption><font color="coral" font face="Impact"</font>Shotgun(George Erza):</figcaption>
- <audio controls src="George Ezra - Shotgun (Lyrics) [TubeRipper.com].m4a"></audio>
-  <font face="Impact" font color="coral"<audio src="George Ezra - Shotgun (Lyrics) [TubeRipper.com].m4a"</audio>
-  <figure>
-
-
-    <a href="mv.html"><font color ="white"><h1>Music Videos ></h1></font></a>
-            <video width="160" height="300" controls>
-    <source src="Nicky Youre, dazy - Sunroof (Official Music Video).mp4" type="video/mp4">
-  </video>
+    <h2 id="popular"><a href="Premium.html"><button>Get SCOPE</button></a></h2>
+    <h2 id="popular">SCOPE is free until November 2025! Unlock Now!</h2>
+  </div>
   
-  <video width="160" height="300" controls>
-    <source src="The Poop Song.mp4" type="video/mp4">
-      </video>
-
-      <video width="160" height="300" controls>
-    <source src ="Taylor Swift - Blank Space.mp4" type="video/mp4">
-      </video>     
+  <div class="scrollable-container">
+    <h1>Songs Menu</h1>
+    <!-- List of songs or content that can be scrolled -->
+  </div>
   
-          <a href="new.html"><font color="white"><h1>New Uploads ></h1></font></a>
-       <figure>
- <figcaption><font color="coral" font face="Impact"</font>Golden Hour</figcaption>
- <audio controls src="Sid.mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="Sid.mp3"</audio>
-  <figure>
-
-   <figure>
- <figcaption><font color="coral" font face="Impact"</font>Suffering</figcaption>
- <audio controls src="Suf.mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="Suf.mp3"</audio>
-  <figure>
-<font face="Helvetica" font color="White"><h1>Most People Likes</h1></font>
-      <figure>
-       <figcaption><font color="coral" font face="Impact"</font>Lazy Song(Bruno Mars)</figcaption>
-    <audio controls src="Bruno Mars - The Lazy Song (Lyrics) [TubeRipper.com].m4a"></audio>
-    <font face="Impact" font color="coral"<audio src="Bruno Mars - The Lazy Song (Lyrics) [TubeRipper.com].m4a"</audio>
-    <figure>
-
-            <figure>
-       <figcaption><font color="coral" font face="Impact"</font>Can't Stop the feeling</figcaption>
-    <audio controls src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a"></audio>
-    <font face="Impact" font color="coral"<audio src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a"</audio>
-    <figure>
-
-                  <figure>
-       <figcaption><font color="coral" font face="Impact"</font>Roar</figcaption>
-    <audio controls src="Katy Perry - Roar [TubeRipper.com].m4a"></audio>
-    <font face="Impact" font color="coral"<audio src="Katy Perry - Roar [TubeRipper.com].m4a"</audio>
-    <figure>
-
-
-         <figure>
-       <figcaption><font color="coral" font face="Impact"</font>What makes you beautiful</figcaption>
-       <audio controls src="One Direction - What Makes You Beautiful (Official Video).mp3"></audio>
-        <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-        <figure>
-
-
-             <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Just the way you are</figcaption>
-           <audio controls src="Bruno Mars - Just The Way You Are (Official Music Video).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Bohemian Rapsodi</figcaption>
-           <audio controls src="Queen  Bohemian Rhapsody (Official Video Remastered).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Locked out of Heaven</figcaption>
-           <audio controls src="Bruno Mars - Locked Out Of Heaven (Official Music Video).mp3"></audio>
->            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>       
-              
-              <figure>
-           <figcaption><font color="coral" font face="Impact"</font>We are the Champion</figcaption>
-           <audio controls src="Queen - We Are The Champions (Official Video).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-
-
-             <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Shape of You</figcaption>
-           <audio controls src="Ed Sheeran - Shape of You (Official Music Video).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Perfect</figcaption>
-           <audio controls src="Ed Sheeran - Perfect (Lyrics).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-              <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Just the way you are</figcaption>
-           <audio controls src="Bruno Mars - Just The Way You Are (Official Music Video).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Sugar</figcaption>
-           <audio controls src="Maroon 5 - Sugar (Lyrics).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-                  <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Blank Space</figcaption>
-           <audio controls src="Taylor Swift - Blank Space.mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Lover</figcaption>
-           <audio controls src="Taylor Swift - Lover (Official Music Video).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-              <font face="Helvetica" font color="White"><a href="pl.html"><h1>Asteriod8 Playlists</h1></a></font>
-<a href="thai.html" class="button" id="button"><img src="THHAI CLASSICS.png" height=250" width="250" alt="button text"/></a>
-              <a href="ts.html" class="button" id="button"><img src="ts.png" height="250" width="250" alt="button text"/></a>
-              <a href="meme.html" class="button" id="button"><img src="IMG_2496.jpeg" height="250" width="250" alt="button text"/></a>
-                 <a href="Songs.html" class="button" id="button"><img src="IMG_2498.jpeg" height="250" width="250" alt="button text"/></a>f 
-              
-
-                      
-        <font color="purple"</font><h1>Popular</h1>
-
-          <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Lazy Song(Bruno Mars)</figcaption>
-        <audio controls src="Bruno Mars - The Lazy Song (Lyrics) [TubeRipper.com].m4a"></audio>
-        <font face="Impact" font color="coral"<audio src="Bruno Mars - The Lazy Song (Lyrics) [TubeRipper.com].m4a"</audio>
-        <figure>
-
-
-          <font color="purple"</font><h1> Made for You</h1>
-
-        <figure>
-         <figcaption><font color="coral" font face="Impact"</font>Cruel Summer:</figcaption>
-          <audio controls src="Cruel summer.MP4"></audio>
-          <font face="Impact" font color="coral"<audio src="Cruel summer.MP4"</audio>
-            <font color="purple"</font><h1>Swiftie</h1>
-
-             <figcaption><font color="coral" font face="Impact"</font>You belong with me:</figcaption>
-         <audio controls src="[THAISUB] You Belong With Me (Taylor's Version) - Taylor Swift (แปลไทย).mp3"></audio>
-          <font face="Impact" font color="coral"<audio src="[THAISUB] You Belong With Me (Taylor's Version) - Taylor Swift (แปลไทย).mp3"</audio>
-          <figure>
+  <div class="column">
+    <div class="row">
+      <div class="container">
+        <h1><a href="Acount.html"><button>My Account</button></a></h1>
+      </div>
+    </div>
+  </div>
   
-        
-
-           <font color="purple"</font><h1>2024 Hits</h1>
-
-                <figure>
-           <figcaption><font color="coral" font face="Impact"</font>CANT STOP THE FEELING</figcaption>
-        <audio controls src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a"></audio>
-        <font face="Impact" font color="coral"<audio src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a"</audio>
-        <figure>
-
-
-
-
-
+  <img src="IMG_2146.jpeg" alt="Banner Image">
   
-
-
-        
-        <style>
-        
-      body{
-        background-color: black;
-        border: none;
-        color: coral;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        place-items:center;
-        width:1000;
-        height:6000;
-      }
-
-      </style>            
-
-
-    
-      <datalist id="input"> 
-      <option value="Cruel Summer">Cruel Summer</option>
-      <option value="Shake it off"> Shake it off</option>
-       <option value="Love story"> Love story</option>
-       <option value="You belong with me"> You belong with me</option>
-       <option value="Shotgun">Shotgun</option>
-       <option value="Lazy song">Lazy song</option>
-       <option value="Roar">Roar</option>
-       <option value="Can't stop the feeling">Can't stop the feeling</option>
-      </form>
-      
- </body>
+</body>
 </html>
-  
