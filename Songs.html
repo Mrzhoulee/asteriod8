@@ -1,232 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asteriod Teams Music Player</title>
+  
   <style>
-    html {
-      height: 100%;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
+    /* General styles */
     body {
-      background-color: #121212;
-      margin: 0;
       font-family: 'Lato', sans-serif;
-      color: #f2f2f2;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      background-color: black;
+      color: white;
+      margin: 0;
+      padding: 0;
     }
 
+    a {
+      color: coral;
+      text-decoration: none;
+    }
+
+    /* Navigation styles */
     .topnav {
       overflow: hidden;
-      background-color: #1DB954;
-      padding: 10px 20px;
+      background-color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0;
     }
 
     .topnav a {
-      float: left;
-      color: #f2f2f2;
-      text-align: center;
-      padding: 14px 16px;
-      text-decoration: none;
-      font-size: 17px;
-      transition: background-color 0.3s;
+      color: white;
+      padding: 10px 20px;
+      font-size: 18px;
     }
 
     .topnav a:hover {
-      background-color: #1DB954;
-      color: white;
+      background-color: #555;
     }
 
     .topnav a.active {
-      background-color: #1DB954;
+      background-color: #04AA6D;
       color: white;
     }
 
-    .container {
-      position: relative;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .container img {
-      width: 100%;
-      height: auto;
-    }
-
-    .container .btn {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      -ms-transform: translate(-50%, -50%);
-      background-color: #555;
-      color: white;
-      font-size: 16px;
-      padding: 12px 24px;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-      text-align: center;
-      transition: background-color 0.3s;
-    }
-
-    .container .btn:hover {
-      background-color: black;
-    }
-
-    .overlay {
-      height: 100%;
-      width: 0;
-      position: fixed;
-      z-index: 1;
-      top: 0;
-      left: 0;
-      background-color: rgba(245, 203, 13, 0.9);
-      overflow-x: hidden;
-      transition: 0.5s;
-    }
-
-    .overlay-content {
-      position: relative;
-      top: 25%;
-      width: 100%;
-      text-align: center;
-      margin-top: 30px;
-    }
-
-    .overlay a {
-      padding: 8px;
-      text-decoration: none;
-      font-size: 36px;
-      color: #ff0000;
-      display: block;
-      transition: color 0.3s;
-    }
-
-    .overlay a:hover, .overlay a:focus {
-      color: #f1550c;
-    }
-
-    .overlay .closebtn {
-      position: absolute;
-      top: 20px;
-      right: 45px;
-      font-size: 60px;
-    }
-
-    @media screen and (max-height: 450px) {
-      .overlay a {
-        font-size: 20px;
-      }
-      .overlay .closebtn {
-        font-size: 40px;
-        top: 15px;
-        right: 35px;
-      }
-    }
-
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      margin: 0 -16px;
-    }
-
-    .left {
-      flex: 30%;
+    /* Main section styles */
+    .main-content {
       padding: 20px;
-      background-color: #333;
-      border-radius: 10px;
-      margin: 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-
-    .left h2, .left input, .left ul {
-      margin-bottom: 20px;
-    }
-
-    .left input {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      margin-top: 10px;
-    }
-
-    .left ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    .left ul li {
-      padding: 8px;
-      background-color: #444;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-    }
-
-    .left ul li:hover {
-      background-color: #555;
-    }
-
-    .left ul li a {
-      color: #f2f2f2;
-      text-decoration: none;
-      display: block;
-    }
-
-    button {
-      background-color: #1DB954;
-      color: white;
-      width: 90px;
-      height: 40px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: #1ED760;
-    }
-
-    h1, h2, p {
-      color: white;
     }
 
     h1 {
-      font-size: 3rem;
-      margin-bottom: 20px;
+      font-size: 36px;
+      font-weight: bold;
+      color: coral;
     }
 
     p {
-      font-size: 1.25rem;
+      font-size: 18px;
+      line-height: 1.6;
     }
 
-    input[type="text"] {
-      padding: 10px;
-      width: calc(100% - 100px);
-      border-radius: 5px;
-      border: none;
-      margin-right: 10px;
-    }
-
-    #songList {
-      list-style-type: none;
-      padding: 0;
-      margin: 20px 0;
-    }
-
-    #songList li {
-      margin: 20px 0;
-    }
-
-    audio {
-      width: 100%;
-    }
-
+    /* Mini player styles */
     .mini-player {
       position: fixed;
       bottom: 0;
@@ -238,7 +73,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 -4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
     }
 
     .song-info {
@@ -250,6 +85,7 @@
       width: 40px;
       height: 40px;
       margin-right: 10px;
+      border-radius: 50%;
     }
 
     .song-info .song-details {
@@ -260,6 +96,7 @@
 
     .song-info .song-title {
       font-weight: bold;
+      color: coral;
     }
 
     .controls {
@@ -268,46 +105,134 @@
     }
 
     .controls button {
-      background-color: #1DB954;
-      color: white;
+      background-color: #F87954;
+      color: coral;
       border: none;
       padding: 8px 16px;
       margin-left: 10px;
       cursor: pointer;
       border-radius: 5px;
-      transition: background-color 0.3s;
+      font-size: 14px;
     }
 
-    .controls button:hover {
-      background-color: #1ED760;
+    /* Search bar styles */
+    .search-container {
+      text-align: center;
+      margin-top: 20px;
     }
 
-    img {
-      border-radius: 10%;
-      height: 250px;
-      width: 250px;
+    #searchInput {
+      width: 300px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid coral;
+      border-radius: 5px;
+    }
+
+    /* Song list styles */
+    .song-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+
+    .song-list li {
+      margin-bottom: 10px;
+    }
+
+    .song-list li audio {
+      width: 100%;
     }
   </style>
 </head>
 <body>
+
+  <!-- Navigation -->
   <div class="topnav">
     <a class="active" href="start.html">Home</a>
     <a href="ts.html">Taylor Swift Songs</a>
     <a href="Log in.html">Sign In</a>
-    <a href="Acount.html">Account</a>
-    <a href="Like.html">My Playlist</a>
+    <a href="Account.html">Account</a>
+    <a href="Like.html">My playlist</a>
     <a href="tt.html">Times Tables Rocket</a>
   </div>
 
-  <input type="text" id="searchInput" placeholder="Search for a song...">
-  <button onclick="searchSong()">Search</button>
-  <div id="searchResults"></div>
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1>Discover</h1>
+    <p>We are Asteriod Teams. We code for public use, even for free!</p>
 
+    <!-- Search bar -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search for a song...">
+      <button onclick="searchSong()">Search</button>
+    </div>
+
+    <!-- Song list -->
+    <ul class="song-list" id="songList">
+      <li>
+        <div class="song-info">
+          <img src="path/to/your/song/image.jpg" alt="Song Image">
+          <div class="song-details">
+            <div class="song-title">Cruel Summer</div>
+            <audio controls>
+              <source src="Taylor Swift - Cruel Summer.mp3" type="audio/mp3">
+              Your browser does not support the audio element.
+            </audio>
+            <button onclick="addToPlaylist('Taylor Swift - Cruel Summer.mp3')">Add to Playlist</button>
+          </div>
+        </div>
+      </li>
+      <!-- Add more songs similarly -->
+    </ul>
+  </div>
+
+  <!-- Mini player -->
+  <div class="mini-player">
+    <div class="song-info">
+      <img id="songImg" src="path/to/your/song/image.jpg" alt="Song Image">
+      <div class="song-details">
+        <div id="songTitle" class="song-title">Song Title</div>
+        <div id="artistName" class="artist-name">Artist Name</div>
+      </div>
+    </div>
+    <div class="controls">
+      <audio id="audioPlayer" controls style="width: 200px;">
+        Your browser does not support the audio element.
+      </audio>
+      <button onclick="playPause()">Play/Pause</button>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
   <script>
+    var audio = document.getElementById("audioPlayer");
+    var songTitleElement = document.getElementById("songTitle");
+    var artistNameElement = document.getElementById("artistName");
+    var songImgElement = document.getElementById("songImg");
+
+    // Function to play or pause the audio
+    function playPause() {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    }
+
+    // Function to add a song to the playlist
+    function addToPlaylist(songUrl) {
+      let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
+      playlist.push(songUrl);
+      localStorage.setItem('playlist', JSON.stringify(playlist));
+      alert('Song added to playlist!');
+    }
+
+    // Function to search for a song
     function searchSong() {
       var searchTerm = document.getElementById("searchInput").value.toLowerCase();
-      var songName = "Lover"; // Song name to search for
-      
+      var songName = "Cruel Summer"; // Replace with actual song name
+
       if (searchTerm === songName.toLowerCase()) {
         document.getElementById("searchResults").innerHTML = "Song found: " + songName;
       } else {
@@ -316,76 +241,5 @@
     }
   </script>
 
-  <div class="row">
-    <div class="left">
-      <h2>Menu</h2>
-      <input type="text" id="mySearch" onkeyup="myFunction()" placeholder="Search.." title="Type in a category">
-      <ul id="myMenu">
-        <li><a href="ts.html">Taylor Swift Songs</a></li>
-        <li><a href="meme.html">Meme Songs</a></li>
-        <li><a href="thai.html">Thai Era</a></li>
-        <li><a href="Songs.html">American Classics</a></li>
-        <li><a href="new.html">New Songs</a></li>
-        <li><a href="week.html">Weeknd</a></li>
-        <li><a href="ed.html">Ed Sheeran</a></li>
-        <li><a href="bro.html">Bruno Mars</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <h1>Discover</h1>
-  <p>We are Asteroid Teams, we code for public uses, even for free!</p>
-  <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Open!</span>
-
-  <script>
-    function openNav() {
-      document.getElementById("myNav").style.width = "100%";
-    }
-
-    function closeNav() {
-      document.getElementById("myNav").style.width = "0%";
-    }
-  </script>
-
-  <div id="myNav" class="overlay">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <div class="overlay-content">
-      <a href="index.html">Home</a>
-      <a href="pl.html">Playlists</a>
-      <a href="Log in.html">Sign In</a>
-      <a href="Acount.html">Account</a>
-    </div>
-  </div>
-
-  <div class="container">
-    <h2>Discover New Songs</h2>
-    <div class="button">
-      <img src="taylor.jpg" alt="Taylor Swift">
-      <button class="btn">Listen</button>
-    </div>
-    <div class="button">
-      <img src="weeknd.jpg" alt="The Weeknd">
-      <button class="btn">Listen</button>
-    </div>
-    <div class="button">
-      <img src="ed.jpg" alt="Ed Sheeran">
-      <button class="btn">Listen</button>
-    </div>
-  </div>
-
-  <div class="mini-player">
-    <div class="song-info">
-      <img id="songImg" src="" alt="Song Image">
-      <div class="song-details">
-        <div id="songTitle" class="song-title">Song Title</div>
-        <div id="artistName" class="artist-name">Artist Name</div>
-      </div>
-    </div>
-    <div class="controls">
-      <button>Prev</button>
-      <button>Play</button>
-      <button>Next</button>
-    </div>
-  </div>
 </body>
 </html>
