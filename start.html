@@ -2,123 +2,24 @@
 <html>
 <head>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        /* CSS styles for the mini player */
-        .mini-player {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #333;
-            color: white;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .song-info {
-            display: flex;
-            align-items: center;
-        }
-
-        .song-info img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .song-info .song-details {
-            display: flex;
-            flex-direction: column;
-            font-size: 14px;
-        }
-
-        .song-info .song-title {
-            font-weight: bold;
-        }
-
-        .controls {
-            display: flex;
-            align-items: center;
-        }
-
-        .controls button {
-            background-color: #F87954;
-            color: coral;
-            border: none;
-            padding: 8px 16px;
-            margin-left: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-    </style>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
-       
-    /* Resetting margin and padding */
+    /* Global styles */
     body, html {
       margin: 0;
       padding: 0;
-      font-family: 'Lato', sans-serif;
-      background-color: black;
-      color: white;
-    }
-    
-    /* Styling for scrollable content */
-    .scrollable-container {
-      height: 400px; /* Set a fixed height for the container */
-      overflow: auto; /* Enable scrolling when content overflows */
-      padding: 10px; /* Add padding to content inside */
-    }
-    
-    /* Basic button styling */
-    button {
-      background-color: coral;
-      color: white;
-      width: 180px;
-      height: 90px;
-      border-radius: 10px;
       font-family: 'Montserrat', sans-serif;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
+      background-color: #1e1e1e;
+      color: white;
     }
-    
-    /* Styling for sections and links */
-    #popular {
-      background-color: black;
-      padding: 20px;
-      text-align: center;
-      margin-top: 20px;
-    }
-    
-    .container {
-      height: 250px;
-      width: 250px;
-      border-radius: 50%;
-      overflow: hidden;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-around;
-    }
-    
-    /* Responsive image styling */
-    img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-    
-    /* Navbar styling */
+
+    /* Top navigation bar */
     .topnav {
       overflow: hidden;
       background-color: #333;
     }
-    
+
     .topnav a {
       float: left;
       color: #f2f2f2;
@@ -127,28 +28,144 @@
       text-decoration: none;
       font-size: 17px;
     }
-    
+
     .topnav a:hover {
       background-color: #ddd;
       color: black;
     }
-    
+
     .topnav a.active {
       background-color: #04AA6D;
       color: white;
     }
-    
-    /* Column and row layout */
-    .column {
-      float: left;
-      width: 33.33%;
-      padding: 5px;
+
+    /* Main content styling */
+    .content {
+      padding: 20px;
     }
-    
-    .row::after {
-      content: "";
-      clear: both;
-      display: table;
+
+    h1, h2 {
+      font-family: 'Montserrat', sans-serif;
+      text-align: center;
+    }
+
+    /* Popular artists section */
+    #popular {
+      background-color: #121212;
+      padding: 20px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .container {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Button styling */
+    button {
+      background-color: #1db954;
+      color: white;
+      width: 180px;
+      height: 50px;
+      border-radius: 25px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1ed760;
+    }
+
+    /* Scrollable container */
+    .scrollable-container {
+      height: 400px;
+      overflow-y: auto;
+      padding: 10px;
+      margin-top: 20px;
+      background-color: #121212;
+    }
+
+    .scrollable-container ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .scrollable-container ul li {
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    /* Mini player */
+    .mini-player {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #212121;
+      color: white;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .song-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .song-info img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      border-radius: 50%;
+    }
+
+    .song-info .song-details {
+      font-size: 14px;
+    }
+
+    .song-info .song-title {
+      font-weight: bold;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+    }
+
+    .controls button {
+      background-color: #1db954;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      margin-left: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .controls button:hover {
+      background-color: #1ed760;
     }
   </style>
 </head>
@@ -162,126 +179,108 @@
   <a href="Copyright.html">Copyright Policy &copy;</a>
 </div>
 
-<h1><font face="Montserrat">Welcome to Asteroid!</font></h1>
-  <h2><font face="Montserrat">This is the <b>START OF HAPPINESS!</b></font></h2>
+<div class="content">
+  <h1>Welcome to Asteroid!</h1>
+  <h2>This is the <b>START OF HAPPINESS!</b></h2>
 
-<div id="popular">
-  <h2>Popular artists</h2>
-  
-  <div class="row">
-    <div class="column">
-      <div class="container">
-        <a href="ts.html"><img src="tas.jpg"></a>
+  <div id="popular">
+    <h2>Popular artists</h2>
+    <div class="row">
+      <div class="column">
+        <div class="container">
+          <a href="ts.html"><img src="tas.jpg"></a>
+        </div>
+      </div>
+      <div class="column">
+        <div class="container">
+          <a href="ed.html"><img src="eds.jpg"></a>
+        </div>
+      </div>
+      <div class="column">
+        <div class="container">
+          <a href="week.html"><img src="512x512-000000-80-0-0.webp"></a>
+        </div>
+      </div>
+      <div class="column">
+        <div class="container">
+          <a href="bro.html"><img src="ab6761610000e5ebc36dd9eb55fb0db4911f25dd.jpg"></a>
+        </div>
       </div>
     </div>
+    <h2><a href="Premium.html"><button>Get SCOPE</button></a></h2>
+    <h2>SCOPE is free until November 2025! Unlock Now!</h2>
   </div>
-  <div class="row">
-    <div class="column">
-      <div class="container">
-        <a href="ed.html"><img src="eds.jpg"></a>
-      </div>
-    </div>
-  </div>
-    <div class="column">
-      <div class="container">
-        <a href="week.html"><img src="512x512-000000-80-0-0.webp"></a>
-      </div>
-    </div>
-    <div class="column">
-      <div class="container">
-        <a href="bro.html"><img src="ab6761610000e5ebc36dd9eb55fb0db4911f25dd.jpg"></a>
-      </div>
-    </div>
-  </div>
-  
-  <h2><a href="Premium.html"><button><font face="Montserrat">Get SCOPE</font></button></a></h2>
-  <h2><font face="Montserrat">SCOPE is free until November 2025! Unlock Now!</font></h2>
-</div>
-  <iframe src="https://www.asteriod8.com/pl.html" title="Asteroid Playlists" width="700" height="700"></iframe>
 
-<div class="scrollable-container">
-  <h1>Songs Menu</h1>
-  <!-- List of songs or content that can be scrolled -->
-  <ul>
-    <li>Song 1</li>
-    <li>Song 2</li>
-    <li>Song 3</li>
-    <li>Song 4</li>
-    <li>Song 5</li>
-    <li>Song 6</li>
-    <li>Song 7</li>
-    <li>Song 8</li>
-    <li>Song 9</li>
-    <li>Song 10</li>
-    <li>Song 11</li>
-    <li>Song 12</li>
-    <li>Song 13</li>
-    <li>Song 14</li>
-    <li>Song 15</li>
-    <li>Song 16</li>
-    <li>Song 17</li>
-    <li>Song 18</li>
-    <li>Song 19</li>
-    <li>Song 20</li>
-  </ul>
-</div>
-
-<div class="column">
-  <div class="row">
-    <div class="container">
-      <h1><a href="Acount.html"><button><font face="Montserrat">My Account</font></button></a></h1>
-    </div>
+  <div class="scrollable-container">
+    <h1>Songs Menu</h1>
+    <ul>
+      <li>Song 1</li>
+      <li>Song 2</li>
+      <li>Song 3</li>
+      <li>Song 4</li>
+      <li>Song 5</li>
+      <li>Song 6</li>
+      <li>Song 7</li>
+      <li>Song 8</li>
+      <li>Song 9</li>
+      <li>Song 10</li>
+      <li>Song 11</li>
+      <li>Song 12</li>
+      <li>Song 13</li>
+      <li>Song 14</li>
+      <li>Song 15</li>
+      <li>Song 16</li>
+      <li>Song 17</li>
+      <li>Song 18</li>
+      <li>Song 19</li>
+      <li>Song 20</li>
+    </ul>
   </div>
 </div>
-
-<img src="IMG_2146.jpeg" alt="Banner Image">
-
 
 <div class="mini-player">
-    <div class="song-info">
-        <img id="songImg" src="" alt="Song Image">
-        <div class="song-details">
-            <div id="songTitle" class="song-title">Song Title</div>
-            <div id="artistName" class="artist-name">Artist Name</div>
-        </div>
+  <div class="song-info">
+    <img id="songImg" src="" alt="Song Image">
+    <div class="song-details">
+      <div id="songTitle" class="song-title">Song Title</div>
+      <div id="artistName" class="artist-name">Artist Name</div>
     </div>
-    <div class="controls">
-        <audio id="audioPlayer" controls style="width: 200px;">
-            Your browser does not support the audio element.
-        </audio>
-        <button onclick="playPause()"><font color="black">Play/Pause</font></button>
-    </div>
+  </div>
+  <div class="controls">
+    <audio id="audioPlayer" controls style="width: 200px;">
+      Your browser does not support the audio element.
+    </audio>
+    <button onclick="playPause()">Play/Pause</button>
+  </div>
 </div>
 
-<!-- JavaScript for the mini player functionality -->
 <script>
-    // Replace these variables with your actual song details
-    var songTitle = "Cruel Summer";
-    var artistName = "Taylor Swift";
-    var songImgSrc = "download.webp";
-    var songUrl = "Taylor Swift - Cruel Summer.mp3"; // Replace with actual song URL
+  // Replace these variables with your actual song details
+  var songTitle = "Cruel Summer";
+  var artistName = "Taylor Swift";
+  var songImgSrc = "download.webp";
+  var songUrl = "Taylor Swift - Cruel Summer.mp3"; // Replace with actual song URL
 
-    var audio = document.getElementById("audioPlayer");
-    var songTitleElement = document.getElementById("songTitle");
-    var artistNameElement = document.getElementById("artistName");
-    var songImgElement = document.getElementById("songImg");
+  var audio = document.getElementById("audioPlayer");
+  var songTitleElement = document.getElementById("songTitle");
+  var artistNameElement = document.getElementById("artistName");
+  var songImgElement = document.getElementById("songImg");
 
-    // Set initial song details
-    songTitleElement.textContent = songTitle;
-    artistNameElement.textContent = artistName;
-    songImgElement.src = songImgSrc;
-    audio.src = songUrl;
+  // Set initial song details
+  songTitleElement.textContent = songTitle;
+  artistNameElement.textContent = artistName;
+  songImgElement.src = songImgSrc;
+  audio.src = songUrl;
 
-    // Function to play or pause the audio
-    function playPause() {
-        if (audio.paused) {
-            audio.play();
-        } else {
-            audio.pause();
-        }
+  // Function to play or pause the audio
+  function playPause() {
+    if (audio.paused) {
+      audio.play();
+    } else {
+      audio.pause();
     }
+  }
 </script>
 
-  
 </body>
 </html>
