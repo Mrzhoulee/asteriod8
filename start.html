@@ -10,8 +10,8 @@
       margin: 0;
       padding: 0;
       font-family: 'Montserrat', sans-serif;
-      background-color: #1e1e1e;
-      color: white;
+      background-color: #121212;
+      color: #f2f2f2;
     }
 
     /* Top navigation bar */
@@ -27,15 +27,15 @@
       padding: 14px 16px;
       text-decoration: none;
       font-size: 17px;
+      transition: background-color 0.3s;
     }
 
     .topnav a:hover {
-      background-color: #ddd;
-      color: black;
+      background-color: #555;
     }
 
     .topnav a.active {
-      background-color: #04AA6D;
+      background-color: #F87954;
       color: white;
     }
 
@@ -51,16 +51,18 @@
 
     /* Popular artists section */
     #popular {
-      background-color: #121212;
+      background-color: #1e1e1e;
       padding: 20px;
       text-align: center;
       margin-top: 20px;
+      border-radius: 10px;
     }
 
     .row {
       display: flex;
       justify-content: center;
       gap: 20px;
+      margin-top: 20px;
     }
 
     .container {
@@ -69,6 +71,7 @@
       border-radius: 50%;
       overflow: hidden;
       position: relative;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 
     .container img {
@@ -79,7 +82,7 @@
 
     /* Button styling */
     button {
-      background-color: #1db954;
+      background-color: #F87954;
       color: white;
       width: 180px;
       height: 50px;
@@ -87,11 +90,11 @@
       font-size: 16px;
       border: none;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s;
     }
 
     button:hover {
-      background-color: #1ed760;
+      background-color: #ff9a76;
     }
 
     /* Scrollable container */
@@ -100,7 +103,8 @@
       overflow-y: auto;
       padding: 10px;
       margin-top: 20px;
-      background-color: #121212;
+      background-color: #1e1e1e;
+      border-radius: 10px;
     }
 
     .scrollable-container ul {
@@ -111,6 +115,11 @@
     .scrollable-container ul li {
       margin-bottom: 10px;
       cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .scrollable-container ul li:hover {
+      color: #ff9a76;
     }
 
     /* Mini player */
@@ -125,7 +134,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
     }
 
     .song-info {
@@ -154,18 +163,18 @@
     }
 
     .controls button {
-      background-color: #1db954;
+      background-color: #F87954;
       color: white;
       border: none;
       padding: 8px 16px;
       margin-left: 10px;
       cursor: pointer;
       border-radius: 5px;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s;
     }
 
     .controls button:hover {
-      background-color: #1ed760;
+      background-color: #ff9a76;
     }
   </style>
 </head>
@@ -186,25 +195,17 @@
   <div id="popular">
     <h2>Popular artists</h2>
     <div class="row">
-      <div class="column">
-        <div class="container">
-          <a href="ts.html"><img src="tas.jpg"></a>
-        </div>
+      <div class="container">
+        <a href="ts.html"><img src="tas.jpg"></a>
       </div>
-      <div class="column">
-        <div class="container">
-          <a href="ed.html"><img src="eds.jpg"></a>
-        </div>
+      <div class="container">
+        <a href="ed.html"><img src="eds.jpg"></a>
       </div>
-      <div class="column">
-        <div class="container">
-          <a href="week.html"><img src="512x512-000000-80-0-0.webp"></a>
-        </div>
+      <div class="container">
+        <a href="week.html"><img src="512x512-000000-80-0-0.webp"></a>
       </div>
-      <div class="column">
-        <div class="container">
-          <a href="bro.html"><img src="ab6761610000e5ebc36dd9eb55fb0db4911f25dd.jpg"></a>
-        </div>
+      <div class="container">
+        <a href="bro.html"><img src="ab6761610000e5ebc36dd9eb55fb0db4911f25dd.jpg"></a>
       </div>
     </div>
     <h2><a href="Premium.html"><button>Get SCOPE</button></a></h2>
