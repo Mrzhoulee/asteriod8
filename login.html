@@ -111,8 +111,10 @@
             document.getElementById("secondButton").classList.remove("hidden");
         }
 
-        function handleSignIn() {
+        function handleLogin() {
             saveData();
+            localStorage.setItem("currentUser", email);
+            window.location.href = "start.html";
         }
     </script>
 </body>
