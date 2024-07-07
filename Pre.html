@@ -1,20 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <style>
-        body{
-            background-color: black;
-            color: coral;
-        }
-
-        h2 {
-            color: coral;
-        }
-
-        .loginForm {
-            color: coral;
-        }
-    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Form</title>
@@ -32,19 +18,15 @@
     <script>
         document.getElementById("loginForm").addEventListener("submit", function(event) {
             event.preventDefault(); // Prevent form submission
-
+            
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
-
-            if (isPremiumUser) {
-                if (username === "Preuser" && password === "User102049") {
-                    alert("Login successful!");
-                    window.location.href = "Game.html";
-                } else {
-                    alert("Cannot log in. Incorrect username or password.");
-                }
+            
+            if (username === "Preuser" && password === "User102049") {
+                alert("Login successful!");
+                window.location.href = "Game.html"; // Redirect to Game.html
             } else {
-                alert("You do not have SCOPE ACCESS");
+                alert("Cannot log in. Incorrect username or password.");
             }
         });
     </script>
