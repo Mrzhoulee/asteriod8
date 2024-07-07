@@ -99,7 +99,8 @@
 
     /* Scrollable container */
     .scrollable-container {
-      height: 400px;
+      width: 180000px;
+      height: 900000000px;
       overflow-y: auto;
       padding: 10px;
       margin-top: 20px;
@@ -210,12 +211,16 @@
     </div>
     <h2><a href="Premium.html"><button>Get SCOPE</button></a></h2>
     <h2>SCOPE is free until November 2025! Unlock Now!</h2>
+        <div id="premiumContent">
+        <h2>SCOPE CONTENT</h2>
+        <p>This content is only available to SCOPE users.</p>
+    </div>
   </div>
   <iframe src="https://www.asteriod8.com/pl.html" width="700" height="700"></iframe> <h1><font face="Montserrat" font color="Coral">Scoll down to the Songs!</font></h1>
 
   <div class="scrollable-container">
     <h1>Songs Menu</h1>
-  <iframe src="https://www.asteriod8.com/Songs.html" width="1200" height="90000"></iframe>
+  <iframe src="https://www.asteriod8.com/Songs.html" width="1800" height="90000"></iframe>
   </div>
 </div>
 
@@ -242,6 +247,16 @@
   var songImgSrc = "download.webp";
   var songUrl = "Taylor Swift - Cruel Summer.mp3"; // Replace with actual song URL
 
+    var songTitle = "Shake it off";
+  var artistName = "Taylor Swift";
+  var songImgSrc = "download.webp";
+  var songUrl = "Taylor Swift - Cruel Summer.mp3"; 
+
+    var songTitle = "Cruel Summer";
+  var artistName = "Taylor Swift";
+  var songImgSrc = "download.webp";
+  var songUrl = "Taylor Swift - Cruel Summer.mp3"; 
+
   var audio = document.getElementById("audioPlayer");
   var songTitleElement = document.getElementById("songTitle");
   var artistNameElement = document.getElementById("artistName");
@@ -262,6 +277,25 @@
     }
   }
 </script>
+    <script>
+        // Check if user has premium status
+        window.onload = function() {
+            let isPremiumUser = localStorage.getItem("premiumUser");
+            if (isPremiumUser && JSON.parse(isPremiumUser)) {
+                document.getElementById("premiumContent").style.display = "block";
+            }
+        };
+    </script>
 
+
+      <script>
+        // Check if user has premium status
+        window.onload = function() {
+            let isPremiumUser = localStorage.getItem("isPremiumUser");
+            if (isPremiumUser && JSON.parse(isPremiumUser)) {
+                document.getElementById("premiumContent").style.display = "block";
+            }
+        };
+    </script>
 </body>
 </html>
