@@ -63,14 +63,18 @@ color: #67708f;
     <font face="Montserrat" font color="white">You can play all the games,  Walt(Social media), Shelf(News blog) , <b>LIVE CONCERT</b>and SpaceMail! and other features from Asteroid, Unlock Now!</font>
   <font color ="white">Free $0.00</font>
 
-<button onclick="myFunction()"><font color="white">Unlock <b>SCOPE</b></font></button>
+<button onclick="purchasePremium()"><font color="white">Unlock <b>SCOPE</b></font></button>
 
 <p id="demo"></p>
 
 <script>
-function myFunction() {
+function purchasePremium() {
   document.getElementById("demo").innerHTML = "Username = Preuser, Password =  User102049 ";
 }
+
+  function purchasePremium() {
+            localStorage.setItem("isPremiumUser", true);
+  }
 </script>
 <a href="Pre.html"><font face="Montserrat" font color="White">Go to SCOPE LOG IN</font></a>
 
