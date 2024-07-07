@@ -290,8 +290,8 @@
     }
 
     function playWithAd(title, songSrc) {
-      const miniPlayerAudio = document.getElementById('miniPlayerAudio');
-      const adSrc = getRandomAd();
+      let miniPlayerAudio = document.getElementById('miniPlayerAudio');
+      let adSrc = getRandomAd();
 
       miniPlayerAudio.src = adSrc;
       miniPlayerAudio.play();
