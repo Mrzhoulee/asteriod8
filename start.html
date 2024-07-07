@@ -125,6 +125,7 @@
 
     /* Mini player */
     .mini-player {
+      visibility: hidden;
       position: fixed;
       bottom: 0;
       left: 0;
@@ -224,7 +225,7 @@
   </div>
 </div>
 
-<div class="mini-player">
+<div class="mini-player" id="minivis">
   <div class="song-info">
     <img id="songImg" src="" alt="Song Image">
     <div class="song-details">
@@ -232,6 +233,7 @@
       <div id="artistName" class="artist-name">Artist Name</div>
     </div>
   </div>
+
   <div class="controls">
     <audio id="audioPlayer" controls style="width: 200px;">
       Your browser does not support the audio element.
@@ -258,6 +260,7 @@
   // Function to play or pause the audio
   function playPause() {
     if (audio.paused) {
+      document.getElementById("minivis").style.visibility = "visible";
       audio.play();
     } else {
       audio.pause();
