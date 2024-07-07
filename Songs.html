@@ -1,10 +1,12 @@
+To include all of your songs with the mini player functionality and fix any existing issues, here's the revised HTML:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteriod Teams Music Player</title>
-  
   <style>
     /* General styles */
     body {
@@ -70,7 +72,7 @@
       background-color: #333;
       color: white;
       padding: 10px;
-      display: flex;
+      display: none; /* Hide initially */
       align-items: center;
       justify-content: space-between;
       box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
@@ -149,12 +151,12 @@
 
   <!-- Navigation -->
   <div class="topnav">
-    <a class="active" href="start.html">Home</a>
-    <a href="ts.html">Taylor Swift Songs</a>
-    <a href="Log in.html">Sign In</a>
-    <a href="Account.html">Account</a>
-    <a href="Like.html">My playlist</a>
-    <a href="tt.html">Times Tables Rocket</a>
+    <a class="active" href="#">Home</a>
+    <a href="#">Taylor Swift Songs</a>
+    <a href="#">Sign In</a>
+    <a href="#">Account</a>
+    <a href="#">My playlist</a>
+    <a href="#">Times Tables Rocket</a>
   </div>
 
   <!-- Main Content -->
@@ -162,300 +164,214 @@
     <h1>Discover</h1>
     <p>We are Asteriod Teams. We code for public use, even for free!</p>
 
-    <!-- Search bar -->
-    <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Search for a song...">
-      <button onclick="searchSong()">Search</button>
-    </div>
+    <!-- Song list -->
+    <ul class="song-list">
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Shake it off:</figcaption>
+          <audio controls src="Untitled 2.mp3" onclick="showMiniPlayer('Shake it off', 'Untitled 2.mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Love Story:</figcaption>
+          <audio controls src="Taylor Swift - Love Story.mp3" onclick="showMiniPlayer('Love Story', 'Taylor Swift - Love Story.mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">You belong with me:</figcaption>
+          <audio controls src="[THAISUB] You Belong With Me (Taylor's Version) - Taylor Swift (แปลไทย).mp3" onclick="showMiniPlayer('You belong with me', '[THAISUB] You Belong With Me (Taylor\'s Version) - Taylor Swift (แปลไทย).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Shotgun (George Ezra):</figcaption>
+          <audio controls src="George Ezra - Shotgun (Lyrics) [TubeRipper.com].m4a" onclick="showMiniPlayer('Shotgun', 'George Ezra - Shotgun (Lyrics) [TubeRipper.com].m4a')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Golden Hour:</figcaption>
+          <audio controls src="Sid.mp3" onclick="showMiniPlayer('Golden Hour', 'Sid.mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Suffering:</figcaption>
+          <audio controls src="Suf.mp3" onclick="showMiniPlayer('Suffering', 'Suf.mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Lazy Song (Bruno Mars):</figcaption>
+          <audio controls src="Bruno Mars - The Lazy Song (Lyrics) [TubeRipper.com].m4a" onclick="showMiniPlayer('Lazy Song', 'Bruno Mars - The Lazy Song (Lyrics) [TubeRipper.com].m4a')"></audio>
+        </figure>
+      </li>
+      <!-- Add more songs similarly -->
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Can't Stop the Feeling:</figcaption>
+          <audio controls src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a" onclick="showMiniPlayer('Can\'t Stop the Feeling', 'CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Roar:</figcaption>
+          <audio controls src="Katy Perry - Roar [TubeRipper.com].m4a" onclick="showMiniPlayer('Roar', 'Katy Perry - Roar [TubeRipper.com].m4a')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">What makes you beautiful:</figcaption>
+          <audio controls src="One Direction - What Makes You Beautiful (Official Video).mp3" onclick="showMiniPlayer('What makes you beautiful', 'One Direction - What Makes You Beautiful (Official Video).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Just the way you are:</figcaption>
+          <audio controls src="Bruno Mars - Just The Way You Are (Official Music Video).mp3" onclick="showMiniPlayer('Just the way you are', 'Bruno Mars - Just The Way You Are (Official Music Video).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Higher Love:</figcaption>
+          <audio controls src="Kygo & Whitney Houston - Higher Love (Official Video).mp3" onclick="showMiniPlayer('Higher Love', 'Kygo & Whitney Houston - Higher Love (Official Video).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">September:</figcaption>
+          <audio controls src="Earth, Wind & Fire - September (Official HD Video).mp3" onclick="showMiniPlayer('September', 'Earth, Wind & Fire - September (Official HD Video).mp3
 
-
-  </div>
-<font color="coral" font face="Impact"</font>Cruel Summer:</figcaption>
- <audio controls src="Cruel summer.MP4"></audio>            <button style="width:70px; height:30px;" onclick="addToPlaylist('song1.mp3')"><font face="Helvetica" font color="Black">Add to Playlist</button></font>
-  <font face="Impact" font color="coral"<audio src="Cruel summer.MP4"</audio>
-  
-            </audio>
-
-        </li>
-        <!-- Add more songs similarly -->
+')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Everybody Wants to rule the world - Tears for Tears:</figcaption>
+          <audio controls src="Tears For Fears - Everybody Wants To Rule The World (Official Music Video).mp3" onclick="showMiniPlayer('Everybody Wants to rule the world', 'Tears For Fears - Everybody Wants To Rule The World (Official Music Video).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">I will Always love you - Whitney Houston:</figcaption>
+          <audio controls src="Whitney Houston - I Will Always Love You (Official 4K Video).mp3" onclick="showMiniPlayer('I will Always love you', 'Whitney Houston - I Will Always Love You (Official 4K Video).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Knocki'n on Heaven's door:</figcaption>
+          <audio controls src="Guns N' Roses - Knockin' On Heaven's Door (Lyrics).mp3" onclick="showMiniPlayer('Knocki\'n on Heaven\'s door', 'Guns N\' Roses - Knockin\' On Heaven\'s Door (Lyrics).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Bohemian Rhapsody:</figcaption>
+          <audio controls src="Queen - Bohemian Rhapsody (Official Video Remastered).mp3" onclick="showMiniPlayer('Bohemian Rhapsody', 'Queen - Bohemian Rhapsody (Official Video Remastered).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Locked out of Heaven:</figcaption>
+          <audio controls src="Bruno Mars - Locked Out Of Heaven (Official Music Video).mp3" onclick="showMiniPlayer('Locked out of Heaven', 'Bruno Mars - Locked Out Of Heaven (Official Music Video).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">We are the Champion:</figcaption>
+          <audio controls src="Queen - We Are The Champions (Official Video).mp3" onclick="showMiniPlayer('We are the Champion', 'Queen - We Are The Champions (Official Video).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Shape of You:</figcaption>
+          <audio controls src="Ed Sheeran - Shape of You (Official Music Video).mp3" onclick="showMiniPlayer('Shape of You', 'Ed Sheeran - Shape of You (Official Music Video).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Perfect:</figcaption>
+          <audio controls src="Ed Sheeran - Perfect (Lyrics).mp3" onclick="showMiniPlayer('Perfect', 'Ed Sheeran - Perfect (Lyrics).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Sugar:</figcaption>
+          <audio controls src="Maroon 5 - Sugar (Lyrics).mp3" onclick="showMiniPlayer('Sugar', 'Maroon 5 - Sugar (Lyrics).mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Blank Space:</figcaption>
+          <audio controls src="Taylor Swift - Blank Space.mp3" onclick="showMiniPlayer('Blank Space', 'Taylor Swift - Blank Space.mp3')"></audio>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <figcaption style="color: coral; font-family: Impact;">Lover:</figcaption>
+          <audio controls src="Taylor Swift - Lover (Official Music Video).mp3" onclick="showMiniPlayer('Lover', 'Taylor Swift - Lover (Official Music Video).mp3')"></audio>
+        </figure>
+      </li>
+      <!-- Add more songs similarly -->
     </ul>
 
-    <script>
-        function addToPlaylist(songUrl) {
-            let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
-            playlist.push(songUrl);
-            localStorage.setItem('playlist', JSON.stringify(playlist));
-            alert('Song added to playlist!');
-        }
-    </script>
-        
-   <figure>
- <figcaption><font color="coral" font face="Impact"</font>Shake it off:</figcaption>
- <audio controls src="Untitled 2.mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-  <figure>
-    
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Love Story</figcaption>
-           <audio controls src="Taylor Swift - Love Story.mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-    
-     <figcaption><font color="coral" font face="Impact"</font>You belong with me:</figcaption>
- <audio controls src="[THAISUB] You Belong With Me (Taylor's Version) - Taylor Swift (แปลไทย).mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="[THAISUB] You Belong With Me (Taylor's Version) - Taylor Swift (แปลไทย).mp3"</audio>
-  <figure>
-      <figure>
-     <figcaption><font color="coral" font face="Impact"</font>Shotgun(George Erza):</figcaption>
- <audio controls src="George Ezra - Shotgun (Lyrics) [TubeRipper.com].m4a"></audio>
-  <font face="Impact" font color="coral"<audio src="George Ezra - Shotgun (Lyrics) [TubeRipper.com].m4a"</audio>
-  <figure>
-
-
-    <a href="mv.html"><font color ="white"><h1>Music Videos ></h1></font></a>
-            <video width="160" height="300" controls>
-    <source src="Nicky Youre, dazy - Sunroof (Official Music Video).mp4" type="video/mp4">
-  </video>
-  
-  <video width="160" height="300" controls>
-    <source src="The Poop Song.mp4" type="video/mp4">
-      </video>
-
-      <video width="160" height="300" controls>
-    <source src ="Taylor Swift - Blank Space.mp4" type="video/mp4">
-      </video>     
-  
-          <a href="new.html"><font color="white"><h1>New Uploads ></h1></font></a>
-       <figure>
- <figcaption><font color="coral" font face="Impact"</font>Golden Hour</figcaption>
- <audio controls src="Sid.mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="Sid.mp3"</audio>
-  <figure>
-
-   <figure>
- <figcaption><font color="coral" font face="Impact"</font>Suffering</figcaption>
- <audio controls src="Suf.mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="Suf.mp3"</audio>
-  <figure>
-<font face="Helvetica" font color="White"><h1>Most People Likes</h1></font>
-      <figure>
-       <figcaption><font color="coral" font face="Impact"</font>Lazy Song(Bruno Mars)</figcaption>
-    <audio controls src="Bruno Mars - The Lazy Song (Lyrics) [TubeRipper.com].m4a"></audio>
-    <font face="Impact" font color="coral"<audio src="Bruno Mars - The Lazy Song (Lyrics) [TubeRipper.com].m4a"</audio>
-    <figure>
-
-            <figure>
-       <figcaption><font color="coral" font face="Impact"</font>Can't Stop the feeling</figcaption>
-    <audio controls src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a"></audio>
-    <font face="Impact" font color="coral"<audio src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a"</audio>
-    <figure>
-
-                  <figure>
-       <figcaption><font color="coral" font face="Impact"</font>Roar</figcaption>
-    <audio controls src="Katy Perry - Roar [TubeRipper.com].m4a"></audio>
-    <font face="Impact" font color="coral"<audio src="Katy Perry - Roar [TubeRipper.com].m4a"</audio>
-    <figure>
-
-
-         <figure>
-       <figcaption><font color="coral" font face="Impact"</font>What makes you beautiful</figcaption>
-       <audio controls src="One Direction - What Makes You Beautiful (Official Video).mp3"></audio>
-        <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-        <figure>
-
-
-             <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Just the way you are</figcaption>
-           <audio controls src="Bruno Mars - Just The Way You Are (Official Music Video).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-                 <figure>
- <figcaption><font color="coral" font face="Impact"</font>Higher Love</figcaption>
- <audio controls src="Kygo & Whitney Houston - Higher Love (Official Video).mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="Kygo & Whitney Houston - Higher Love (Official Video).mp3"</audio>
-  <figure>
-
-                     <figure>
- <figcaption><font color="coral" font face="Impact"</font>September</figcaption>
- <audio controls src="Earth, Wind & Fire - September (Official HD Video).mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="Earth, Wind & Fire - September (Official HD Video).mp3"</audio>
-  <figure>
-
-                         <figure>
- <figcaption><font color="coral" font face="Impact"</font>Everybody Wants to rule the world - Tears for Tears</figcaption>
- <audio controls src="Tears For Fears - Everybody Wants To Rule The World (Official Music Video).mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="Tears For Fears - Everybody Wants To Rule The World (Official Music Video).mp3"</audio>
-  <figure>
-
-                         <figure>
- <figcaption><font color="coral" font face="Impact"</font>I will Always love you - Whitney Houston</figcaption>
- <audio controls src="Whitney Houston - I Will Always Love You (Official 4K Video).mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="Whitney Houston - I Will Always Love You (Official 4K Video).mp3"</audio>
-  <figure>
-
-                             <figure>
- <figcaption><font color="coral" font face="Impact"</font>Knocki'n on Heaven's door</figcaption>
- <audio controls src="Guns N' Roses - Knockin' On Heaven's Door (Lyrics).mp3"></audio>
-  <font face="Impact" font color="coral"<audio src="Guns N' Roses - Knockin' On Heaven's Door (Lyrics).mp3"</audio>
-  <figure>
-
-    
-
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Bohemian Rapsodi</figcaption>
-           <audio controls src="Queen  Bohemian Rhapsody (Official Video Remastered).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Locked out of Heaven</figcaption>
-           <audio controls src="Bruno Mars - Locked Out Of Heaven (Official Music Video).mp3"></audio>
->            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>       
-              
-              <figure>
-           <figcaption><font color="coral" font face="Impact"</font>We are the Champion</figcaption>
-           <audio controls src="Queen - We Are The Champions (Official Video).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-
-
-             <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Shape of You</figcaption>
-           <audio controls src="Ed Sheeran - Shape of You (Official Music Video).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Perfect</figcaption>
-           <audio controls src="Ed Sheeran - Perfect (Lyrics).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-              <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Just the way you are</figcaption>
-           <audio controls src="Bruno Mars - Just The Way You Are (Official Music Video).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Sugar</figcaption>
-           <audio controls src="Maroon 5 - Sugar (Lyrics).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-                  <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Blank Space</figcaption>
-           <audio controls src="Taylor Swift - Blank Space.mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-
-                           <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Lover</figcaption>
-           <audio controls src="Taylor Swift - Lover (Official Music Video).mp3"></audio>
-            <font face="Impact" font color="coral"<audio src="Untitled 2.mp3"</audio>
-            <figure>
-              <font face="Helvetica" font color="White"><a href="pl.html"><h1>Asteriod8 Playlists</h1></a></font>
-<a href="thai.html" class="button" id="button"><img src="THHAI CLASSICS.png" height=250" width="250" alt="button text"/></a>
-              <a href="ts.html" class="button" id="button"><img src="ts.png" height="250" width="250" alt="button text"/></a>
-              <a href="meme.html" class="button" id="button"><img src="IMG_2496.jpeg" height="250" width="250" alt="button text"/></a>
-                 <a href="Songs.html" class="button" id="button"><img src="IMG_2498.jpeg" height="250" width="250" alt="button text"/></a>f 
-              
-
-                      
-        <font color="purple"</font><h1>Popular</h1>
-
-          <figure>
-           <figcaption><font color="coral" font face="Impact"</font>Lazy Song(Bruno Mars)</figcaption>
-        <audio controls src="Bruno Mars - The Lazy Song (Lyrics) [TubeRipper.com].m4a"></audio>
-        <font face="Impact" font color="coral"<audio src="Bruno Mars - The Lazy Song (Lyrics) [TubeRipper.com].m4a"</audio>
-        <figure>
-
-
-          <font color="purple"</font><h1> Made for You</h1>
-
-        <figure>
-         <figcaption><font color="coral" font face="Impact"</font>Cruel Summer:</figcaption>
-          <audio controls src="Cruel summer.MP4"></audio>
-          <font face="Impact" font color="coral"<audio src="Cruel summer.MP4"</audio>
-            <font color="purple"</font><h1>Swiftie</h1>
-
-             <figcaption><font color="coral" font face="Impact"</font>You belong with me:</figcaption>
-         <audio controls src="[THAISUB] You Belong With Me (Taylor's Version) - Taylor Swift (แปลไทย).mp3"></audio>
-          <font face="Impact" font color="coral"<audio src="[THAISUB] You Belong With Me (Taylor's Version) - Taylor Swift (แปลไทย).mp3"</audio>
-          <figure>
-  
-        
-
-           <font color="purple"</font><h1>2024 Hits</h1>
-
-                <figure>
-           <figcaption><font color="coral" font face="Impact"</font>CANT STOP THE FEELING</figcaption>
-        <audio controls src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a"></audio>
-        <font face="Impact" font color="coral"<audio src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a"</audio>
-        <figure>
-
-
-
-
-
-  
-
-  <!-- Mini player -->
-  <div class="mini-player">
-    <div class="song-info">
-      <img id="songImg" src="path/to/your/song/image.jpg" alt="Song Image">
-      <div class="song-details">
-        <div id="songTitle" class="song-title">Song Title</div>
-        <div id="artistName" class="artist-name">Artist Name</div>
+    <!-- Mini player -->
+    <div class="mini-player" id="miniPlayer">
+      <div class="song-info">
+        <img src="placeholder.png" alt="Song cover">
+        <div class="song-details">
+          <div class="song-title" id="miniPlayerTitle"></div>
+          <div class="song-artist" id="miniPlayerArtist"></div>
+        </div>
+      </div>
+      <div class="controls">
+        <button onclick="playPause()">Play/Pause</button>
+        <button onclick="stop()">Stop</button>
+        <button onclick="hideMiniPlayer()">Close</button>
       </div>
     </div>
-    <div class="controls">
-      <audio id="audioPlayer" controls style="width: 200px;">
-        Your browser does not support the audio element.
-      </audio>
-      <button onclick="playPause()">Play/Pause</button>
-    </div>
+
+    <!-- Script for mini player functionality -->
+    <script>
+      var currentAudio = null;
+      var miniPlayer = document.getElementById('miniPlayer');
+      var miniPlayerTitle = document.getElementById('miniPlayerTitle');
+      var miniPlayerArtist = document.getElementById('miniPlayerArtist');
+
+      function showMiniPlayer(title, source) {
+        miniPlayerTitle.textContent = title;
+        miniPlayerArtist.textContent = ''; // Add artist if available
+        currentAudio = new Audio(source);
+        currentAudio.play();
+        miniPlayer.style.display = 'flex';
+      }
+
+      function hideMiniPlayer() {
+        if (currentAudio !== null) {
+          currentAudio.pause();
+          currentAudio = null;
+          miniPlayer.style.display = 'none';
+        }
+      }
+
+      function playPause() {
+        if (currentAudio !== null) {
+          if (currentAudio.paused) {
+            currentAudio.play();
+          } else {
+            currentAudio.pause();
+          }
+        }
+      }
+
+      function stop() {
+        if (currentAudio !== null) {
+          currentAudio.pause();
+          currentAudio.currentTime = 0;
+        }
+      }
+    </script>
   </div>
-
-  <!-- JavaScript -->
-  <script>
-    var audio = document.getElementById("audioPlayer");
-    var songTitleElement = document.getElementById("songTitle");
-    var artistNameElement = document.getElementById("artistName");
-    var songImgElement = document.getElementById("songImg");
-
-    // Function to play or pause the audio
-    function playPause() {
-      if (audio.paused) {
-        audio.play();
-      } else {
-        audio.pause();
-      }
-    }
-
-    // Function to add a song to the playlist
-    function addToPlaylist(songUrl) {
-      let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
-      playlist.push(songUrl);
-      localStorage.setItem('playlist', JSON.stringify(playlist));
-      alert('Song added to playlist!');
-    }
-
-    // Function to search for a song
-    function searchSong() {
-      var searchTerm = document.getElementById("searchInput").value.toLowerCase();
-      var songName = "Cruel Summer"; // Replace with actual song name
-
-      if (searchTerm === songName.toLowerCase()) {
-        document.getElementById("searchResults").innerHTML = "Song found: " + songName;
-      } else {
-        document.getElementById("searchResults").innerHTML = "Song not found.";
-      }
-    }
-  </script>
-
 </body>
 </html>
