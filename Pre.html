@@ -4,8 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Form</title>
+
+    <style>
+        body {
+        background-color: black;
+        align-items: center;
+        text-alight: center;
+        }
+
+        .loginForm {
+        align-items: center;
+        text-alight: center;
+        }
+
+        div.forum {
+        
+        }
+    </style>
 </head>
 <body>
+    <div class="forum">
     <h2>Login Form</h2>
     <form id="loginForm" method="post">
         <label for="username">Username:</label><br>
@@ -14,6 +32,7 @@
         <input type="password" id="password" name="password"><br><br>
         <input type="submit" value="Login">
     </form>
+    </div>
 
     <script>
         document.getElementById("loginForm").addEventListener("submit", function(event) {
