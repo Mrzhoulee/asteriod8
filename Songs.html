@@ -74,10 +74,12 @@
       align-items: center;
       justify-content: space-between;
       box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease-in-out;
+      transform: translateY(100%);
     }
 
-    .mini-player.hidden {
-      display: none;
+    .mini-player.active {
+      transform: translateY(0%);
     }
 
     .song-info {
@@ -178,6 +180,7 @@
     </div>
 
     <!-- Song List -->
+    <h1><font face="Montserrat" font face="coral">ASTEROID RECOMMENDS👍🏻</font></h1>
     <ul class="song-list" id="songList">
       <li>
         <figcaption><font color="coral" face="Impact">Cruel Summer:</font></figcaption>
@@ -186,19 +189,19 @@
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Shake it off:</font></figcaption>
-        <audio controls src="Untitled 2.mp3"></audio>
+        <audio controls src="Shake_it_off.mp3"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Love Story:</font></figcaption>
-        <audio controls src="Taylor Swift - Love Story.mp3"></audio>
+        <audio controls src="Taylor_Swift_Love_Story.mp3"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">You belong with me:</font></figcaption>
-        <audio controls src="[THAISUB] You Belong With Me (Taylor's Version) - Taylor Swift (แปลไทย).mp3"></audio>
+        <audio controls src="You_Belong_With_Me.mp3"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Shotgun (George Ezra):</font></figcaption>
-        <audio controls src="George Ezra - Shotgun (Lyrics) [TubeRipper.com].m4a"></audio>
+        <audio controls src="George_Ezra_Shotgun.m4a"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Golden Hour:</font></figcaption>
@@ -210,57 +213,57 @@
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Lazy Song (Bruno Mars):</font></figcaption>
-        <audio controls src="Bruno Mars - The Lazy Song (Lyrics) [TubeRipper.com].m4a"></audio>
+        <audio controls src="Bruno_Mars_Lazy_Song.m4a"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Can't Stop the Feeling:</font></figcaption>
-        <audio controls src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a"></audio>
+        <audio controls src="Cant_Stop_The_Feeling.m4a"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Roar:</font></figcaption>
-        <audio controls src="Katy Perry - Roar [TubeRipper.com].m4a"></audio>
+        <audio controls src="Katy_Perry_Roar.m4a"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">What makes you beautiful:</font></figcaption>
-        <audio controls src="One Direction - What Makes You Beautiful (Official Video).mp3"></audio>
+        <audio controls src="What_Makes_You_Beautiful.mp3"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Just the way you are:</font></figcaption>
-        <audio controls src="Bruno Mars - Just The Way You Are (Official Music Video).mp3"></audio>
+        <audio controls src="Just_The_Way_You_Are.mp3"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Higher Love:</font></figcaption>
-        <audio controls src="Kygo & Whitney Houston - Higher Love (Official Video).mp3"></audio>
+        <audio controls src="Higher_Love.mp3"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">September:</font></figcaption>
-        <audio controls src="Earth, Wind & Fire - September (Official HD Video).mp3"></audio>
+        <audio controls src="September.mp3"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Everybody Wants to Rule the World - Tears for Fears:</font></figcaption>
-        <audio controls src="Tears For Fears - Everybody Wants To Rule The World (Official Music Video).mp3"></audio>
+        <audio controls src="Everybody_Wants_To_Rule_The_World.mp3"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">I Will Always Love You - Whitney Houston:</font></figcaption>
-        <audio controls src="Whitney Houston - I Will Always Love You (Official 4K Video).mp3"></audio>
+        <audio controls src="I_Will_Always_Love_You.mp3"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Knockin' on Heaven's Door:</font></figcaption>
-        <audio controls src="Guns N' Roses - Knockin' On Heaven's Door (Lyrics).mp3"></audio>
+        <audio controls src="Knockin_On_Heavens_Door.mp3"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Bohemian Rhapsody:</font></figcaption>
-        <audio controls src="Queen – Bohemian Rhapsody (Official Video Remastered).mp3"></audio>
+        <audio controls src="Bohemian_Rhapsody.mp3"></audio>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Hotel California:</font></figcaption>
-        <audio controls src="Eagles - Hotel California.mp3"></audio>
+        <audio controls src="Hotel_California.mp3"></audio>
       </li>
     </ul>
   </div>
 
   <!-- Mini Player -->
-  <div id="miniPlayer" class="mini-player hidden">
+  <div id="miniPlayer" class="mini-player">
     <div class="song-info">
       <img id="miniPlayerImage" src="" alt="Song Art">
       <div class="song-details">
@@ -284,6 +287,16 @@
     const songList = document.getElementById('songList');
     const audioElements = songList.getElementsByTagName('audio');
 
+    // Show the mini player when audio is played
+    for (let i = 0; i < audioElements.length; i++) {
+      audioElements[i].addEventListener('play', function() {
+        miniPlayer.classList.add('active');
+        miniPlayerTitle.textContent = this.parentElement.getElementsByTagName('figcaption')[0].textContent;
+        miniPlayerArtist.textContent = ''; // Add the artist info if available
+        miniPlayerImage.src = ''; // Add the song art if available
+      });
+    }
+
     function searchSong() {
       const filter = searchInput.value.toUpperCase();
       const li = songList.getElementsByTagName('li');
@@ -295,7 +308,6 @@
     }
 
     function addToPlaylist(src) {
-      // Add your implementation to handle adding to the playlist
       console.log('Add to Playlist:', src);
     }
 
@@ -303,15 +315,12 @@
       const button = event.target;
       if (button.textContent === 'Play') {
         button.textContent = 'Pause';
-        // Add your implementation to handle play action
       } else {
         button.textContent = 'Play';
-        // Add your implementation to handle pause action
       }
     }
 
     function expandPlayer() {
-      // Add your implementation to handle expanding the mini player
       console.log('Expand Player');
     }
   </script>
