@@ -70,7 +70,7 @@
       background-color: #333;
       color: white;
       padding: 10px;
-      display: flex;
+      display: none; /* Initially hidden */
       align-items: center;
       justify-content: space-between;
       box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
@@ -79,7 +79,8 @@
     }
 
     .mini-player.active {
-      transform: translateY(0%);
+      display: flex;
+      transform: translateY(0);
     }
 
     .song-info {
