@@ -186,7 +186,7 @@
       <li>
         <figcaption><font color="coral" face="Impact">Cruel Summer:</font></figcaption>
         <audio controls src="Cruel summer.MP4"></audio>
-        <button style="width:70px; height:30px;" onclick="addToPlaylist('Cruel summer.MP4')"><font face="Helvetica" color="Black">Add to Playlist</button>
+             <button onclick="saveSong('Cruel Summer', 'file:///C:/Users/HP/Downloads/Taylor%20Swift%20-%20Cruel%20Summer.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
         <figcaption><font color="coral" face="Impact">Shake it off:</font></figcaption>
@@ -325,5 +325,40 @@
     }
   </script>
 
+   <script>
+    function saveSong(title, src) {
+      // Retrieve the song list container on pat.html
+      var songListContainer = window.opener.document.getElementById('songListContainer');
+
+      // Create a new table row
+      var newRow = document.createElement('tr');
+
+      // Create table cells for title and audio
+      var titleCell = document.createElement('td');
+      var audioCell = document.createElement('td');
+
+      // Create audio element and set attributes
+      var audio = document.createElement('audio');
+      audio.controls = true;
+      var source = document.createElement('source');
+      source.src = src;
+      source.type = 'audio/mpeg';
+      audio.appendChild(source);
+
+      // Append audio element to its cell
+      audioCell.appendChild(audio);
+
+      // Set the text content of the title cell
+      titleCell.textContent = title;
+
+      // Append cells to the new row
+      newRow.appendChild(titleCell);
+      newRow.appendChild(audioCell);
+
+      // Append the new row to the song list container
+      songListContainer.appendChild(newRow);
+    }
+  </script>
+  
 </body>
 </html>
