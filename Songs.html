@@ -284,15 +284,14 @@
     const miniPlayerTitle = document.getElementById('miniPlayerTitle');
     const miniPlayerArtist = document.getElementById('miniPlayerArtist');
 
-    const searchInput = document.getElementById('searchInput');
-    const songList = document.getElementById('songList');
-    const audioElements = songList.getElementsByTagName('audio');
+    const audioElements = document.getElementsByTagName('audio');
 
-    // Show the mini player when audio is played
+    // Show the mini player and update details when audio is played
     for (let i = 0; i < audioElements.length; i++) {
       audioElements[i].addEventListener('play', function() {
         miniPlayer.classList.add('active');
         miniPlayerTitle.textContent = this.parentElement.getElementsByTagName('figcaption')[0].textContent;
+        // Clear the artist and image if not available in your setup
         miniPlayerArtist.textContent = ''; // Add the artist info if available
         miniPlayerImage.src = ''; // Add the song art if available
       });
