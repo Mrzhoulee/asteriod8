@@ -182,20 +182,30 @@
     }
 
 
-   div.sode{
-    background-color: dark-gray;
+.sode {
+      background-color: darkgray;
       color: coral;
-      align: items: right;
+      float: right; /* Float the sidebar to the right */
+      width: 25%; /* Set the width of the sidebar */
+      height: 100vh; /* Adjust height as needed */
+      position: fixed; /* Fixed positioning to keep it in view */
+      top: 0; /* Align to the top */
+      right: 0; /* Align to the right */
+      overflow-y: auto; /* Enable vertical scrolling if needed */
+    }
+
+    .sode .w3-sidebar {
+      margin-top: 50px; /* Adjust top margin to position below navigation */
     }
   </style>
 </head>
 <body>
-  <div class="sode" align="right">
-<div class="w3-sidebar w3-light-grey w3-bar-block" style="width:25%">
-  <a href="Premium.html" class="w3-bar-item w3-button">SCOPE</a>
-  <a href="pat.html" class="w3-bar-item w3-button">My Playlist</a>
-  <a href="pl.html" class="w3-bar-item w3-button">ASTEROID PLAYLISTS</a>
-</div>
+  <div class="sode">
+    <div class="w3-sidebar w3-light-grey w3-bar-block">
+      <a href="Premium.html" class="w3-bar-item w3-button">SCOPE</a>
+      <a href="pat.html" class="w3-bar-item w3-button">My Playlist</a>
+      <a href="pl.html" class="w3-bar-item w3-button">ASTEROID PLAYLISTS</a>
+    </div>
   </div>
 <div class="topnav">
   <a class="active" href="#home">Home</a>
