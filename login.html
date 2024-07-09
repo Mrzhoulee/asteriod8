@@ -84,7 +84,7 @@
     <div class="container">
         <div class="card">
             <h1>Sign In</h1>
-            <form>
+            <form id="loginForm">
                 <input type="text" class="form-control" id="email" name="email" placeholder="Enter Your Email">
                 <input type="password" class="form-control" id="password" name="password" placeholder="Enter Your Password">
                 <button type="button" onclick="handleLogin()" class="btn-primary">Sign In</button>
@@ -116,6 +116,14 @@
             localStorage.setItem("currentUser", email);
             window.location.href = "start.html";
         }
+
+
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const username = document.getElementById('username').value;
+      localStorage.setItem('currentUser', username);
+      window.location.href = 'Songs.html';
+    });
     </script>
 </body>
 </html>
