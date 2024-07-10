@@ -185,66 +185,14 @@
     <!-- Song List -->
     <h2>ASTEROID RECOMMENDS👍🏻</h2>
     <ul class="song-list" id="songList">
-      <li>
-        <figcaption>Cruel Summer</figcaption>
-        <audio controls src="Cruel_Summer.mp3" onplay="playSong('Cruel Summer', 'Cruel_Summer.mp3')"></audio>
-        <button onclick="saveSong('Cruel Summer', 'Cruel_Summer.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Shake it off</figcaption>
-        <audio controls src="Shake_it_off.mp3" onplay="playSong('Shake it off', 'Shake_it_off.mp3')"></audio>
-        <button onclick="saveSong('Shake it off', 'Shake_it_off.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Love Story</figcaption>
-        <audio controls src="Taylor_Swift_Love_Story.mp3" onplay="playSong('Love Story', 'Taylor_Swift_Love_Story.mp3')"></audio>
-        <button onclick="saveSong('Love Story', 'Taylor_Swift_Love_Story.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>You belong with me</figcaption>
-        <audio controls src="You_Belong_With_Me.mp3" onplay="playSong('You belong with me', 'You_Belong_With_Me.mp3')"></audio>
-        <button onclick="saveSong('You belong with me', 'You_Belong_With_Me.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Shotgun (George Ezra)</figcaption>
-        <audio controls src="George_Ezra_Shotgun.mp3" onplay="playSong('Shotgun', 'George_Ezra_Shotgun.mp3')"></audio>
-        <button onclick="saveSong('Shotgun', 'George_Ezra_Shotgun.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Golden Hour</figcaption>
-        <audio controls src="Sid.mp3" onplay="playSong('Golden Hour', 'Sid.mp3')"></audio>
-        <button onclick="saveSong('Golden Hour', 'Sid.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Suffering</figcaption>
-        <audio controls src="Suf.mp3" onplay="playSong('Suffering', 'Suf.mp3')"></audio>
-        <button onclick="saveSong('Suffering', 'Suf.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Lazy Song (Bruno Mars)</figcaption>
-        <audio controls src="Bruno_Mars_Lazy_Song.mp3" onplay="playSong('Lazy Song', 'Bruno_Mars_Lazy_Song.mp3')"></audio>
-        <button onclick="saveSong('Lazy Song', 'Bruno_Mars_Lazy_Song.mp3')">SAVE SONG ❤️</button>
-      </li>
+      
       <li>
         <figcaption>Can't Stop the Feeling</figcaption>
-        <audio controls src="Cant_Stop_The_Feeling.mp3" onplay="playSong('Can\'t Stop the Feeling', 'Cant_Stop_The_Feeling.mp3')"></audio>
-        <button onclick="saveSong('Can\'t Stop the Feeling', 'Cant_Stop_The_Feeling.mp3')">SAVE SONG ❤️</button>
+        <audio controls src=""C:\Users\HP\Downloads\asteriod8-main\asteriod8-main\Asteriod files\CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a"" onplay="playSong('Can\'t Stop the Feeling', 'Cant_Stop_The_Feeling.mp3')"></audio>
+        <button onclick="saveSong('Can't Stop the Feeling', 'Cant_Stop_The_Feeling.mp3')">SAVE SONG ❤️</button>
       </li>
-      <li>
-        <figcaption>Roar</figcaption>
-        <audio controls src="Katy_Perry_Roar.mp3" onplay="playSong('Roar', 'Katy_Perry_Roar.mp3')"></audio>
-        <button onclick="saveSong('Roar', 'Katy_Perry_Roar.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Alone</figcaption>
-        <audio controls src="Alone.mp3" onplay="playSong('Alone', 'Alone.mp3')"></audio>
-        <button onclick="saveSong('Alone', 'Alone.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Alone Pt 2</figcaption>
-        <audio controls src="Alone_Pt_2.mp3" onplay="playSong('Alone Pt 2', 'Alone_Pt_2.mp3')"></audio>
-        <button onclick="saveSong('Alone Pt 2', 'Alone_Pt_2.mp3')">SAVE SONG ❤️</button>
-      </li>
+
+
     </ul>
   </div>
 
@@ -314,13 +262,13 @@
 
     // Function to save song information in localStorage
     function saveSong(title, src) {
-      if (!username) {
+      if (!email) {
       alert("YOU NEED TO LOG IN FIRST!")
       }
       const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
       savedSongs.push({ title, src });
       localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
-      alert('Song saved to your playlist!');
+      alert(title + 'Is saved to your playlist!');
     }
 
     // Function to search for a song
