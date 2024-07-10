@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteroid Teams Music Player</title>
   
+  <!-- Load external fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
     /* General styles */
     body {
@@ -184,198 +187,63 @@
     <ul class="song-list" id="songList">
       <li>
         <figcaption>Cruel Summer</figcaption>
-        <audio controls src="Cruel_Summer.mp3"></audio>
+        <audio controls src="Cruel_Summer.mp3" onplay="playSong('Cruel Summer', 'Cruel_Summer.mp3')"></audio>
         <button onclick="saveSong('Cruel Summer', 'Cruel_Summer.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
         <figcaption>Shake it off</figcaption>
-        <audio controls src="Shake_it_off.mp3"></audio>
+        <audio controls src="Shake_it_off.mp3" onplay="playSong('Shake it off', 'Shake_it_off.mp3')"></audio>
         <button onclick="saveSong('Shake it off', 'Shake_it_off.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
         <figcaption>Love Story</figcaption>
-        <audio controls src="Taylor_Swift_Love_Story.mp3"></audio>
+        <audio controls src="Taylor_Swift_Love_Story.mp3" onplay="playSong('Love Story', 'Taylor_Swift_Love_Story.mp3')"></audio>
         <button onclick="saveSong('Love Story', 'Taylor_Swift_Love_Story.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
         <figcaption>You belong with me</figcaption>
-        <audio controls src="You_Belong_With_Me.mp3"></audio>
+        <audio controls src="You_Belong_With_Me.mp3" onplay="playSong('You belong with me', 'You_Belong_With_Me.mp3')"></audio>
         <button onclick="saveSong('You belong with me', 'You_Belong_With_Me.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
         <figcaption>Shotgun (George Ezra)</figcaption>
-        <audio controls src="George_Ezra_Shotgun.mp3"></audio>
+        <audio controls src="George_Ezra_Shotgun.mp3" onplay="playSong('Shotgun', 'George_Ezra_Shotgun.mp3')"></audio>
         <button onclick="saveSong('Shotgun', 'George_Ezra_Shotgun.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
         <figcaption>Golden Hour</figcaption>
-        <audio controls src="Sid.mp3"></audio>
+        <audio controls src="Sid.mp3" onplay="playSong('Golden Hour', 'Sid.mp3')"></audio>
         <button onclick="saveSong('Golden Hour', 'Sid.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
         <figcaption>Suffering</figcaption>
-        <audio controls src="Suf.mp3"></audio>
+        <audio controls src="Suf.mp3" onplay="playSong('Suffering', 'Suf.mp3')"></audio>
         <button onclick="saveSong('Suffering', 'Suf.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
         <figcaption>Lazy Song (Bruno Mars)</figcaption>
-        <audio controls src="Bruno_Mars_Lazy_Song.mp3"></audio>
+        <audio controls src="Bruno_Mars_Lazy_Song.mp3" onplay="playSong('Lazy Song', 'Bruno_Mars_Lazy_Song.mp3')"></audio>
         <button onclick="saveSong('Lazy Song', 'Bruno_Mars_Lazy_Song.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
         <figcaption>Can't Stop the Feeling</figcaption>
-        <audio controls src="Cant_Stop_The_Feeling.mp3"></audio>
+        <audio controls src="Cant_Stop_The_Feeling.mp3" onplay="playSong('Can\'t Stop the Feeling', 'Cant_Stop_The_Feeling.mp3')"></audio>
         <button onclick="saveSong('Can\'t Stop the Feeling', 'Cant_Stop_The_Feeling.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
         <figcaption>Roar</figcaption>
-        <audio controls src="Katy_Perry_Roar.mp3"></audio>
+        <audio controls src="Katy_Perry_Roar.mp3" onplay="playSong('Roar', 'Katy_Perry_Roar.mp3')"></audio>
         <button onclick="saveSong('Roar', 'Katy_Perry_Roar.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
-        <figcaption>What makes you beautiful</figcaption>
-        <audio controls src="What_Makes_You_Beautiful.mp3"></audio>
-        <button onclick="saveSong('What makes you beautiful', 'What_Makes_You_Beautiful.mp3')">SAVE SONG ❤️</button>
+        <figcaption>Alone</figcaption>
+        <audio controls src="Alone.mp3" onplay="playSong('Alone', 'Alone.mp3')"></audio>
+        <button onclick="saveSong('Alone', 'Alone.mp3')">SAVE SONG ❤️</button>
       </li>
       <li>
-        <figcaption>Just the way you are</figcaption>
-        <audio controls src="Just_The_Way_You_Are.mp3"></audio>
-        <button onclick="saveSong('Just the way you are', 'Just_The_Way_You_Are.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Higher Love</figcaption>
-        <audio controls src="Higher_Love.mp3"></audio>
-        <button onclick="saveSong('Higher Love', 'Higher_Love.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>September</figcaption>
-        <audio controls src="September.mp3"></audio>
-        <button onclick="saveSong('September', 'September.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Everybody Wants to Rule the World - Tears for Fears</figcaption>
-        <audio controls src="Everybody_Wants_To_Rule_The_World.mp3"></audio>
-        <button onclick="saveSong('Everybody Wants to Rule the World', 'Everybody_Wants_To_Rule_The_World.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Never Gonna Give You Up - Rick Astley</figcaption>
-        <audio controls src="Never_Gonna_Give_You_Up.mp3"></audio>
-        <button onclick="saveSong('Never Gonna Give You Up', 'Never_Gonna_Give_You_Up.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Uptown Funk - Mark Ronson ft. Bruno Mars</figcaption>
-        <audio controls src="Uptown_Funk.mp3"></audio>
-        <button onclick="saveSong('Uptown Funk', 'Uptown_Funk.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Havana - Camila Cabello</figcaption>
-        <audio controls src="Havana.mp3"></audio>
-        <button onclick="saveSong('Havana', 'Havana.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Shape of You - Ed Sheeran</figcaption>
-        <audio controls src="Shape_Of_You.mp3"></audio>
-        <button onclick="saveSong('Shape of You', 'Shape_Of_You.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Believer - Imagine Dragons</figcaption>
-        <audio controls src="Believer.mp3"></audio>
-        <button onclick="saveSong('Believer', 'Believer.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Despacito - Luis Fonsi ft. Daddy Yankee</figcaption>
-        <audio controls src="Despacito.mp3"></audio>
-        <button onclick="saveSong('Despacito', 'Despacito.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Stay - Zedd, Alessia Cara</figcaption>
-        <audio controls src="Stay.mp3"></audio>
-        <button onclick="saveSong('Stay', 'Stay.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Happier - Marshmello, Bastille</figcaption>
-        <audio controls src="Happier.mp3"></audio>
-        <button onclick="saveSong('Happier', 'Happier.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Sunflower - Post Malone, Swae Lee</figcaption>
-        <audio controls src="Sunflower.mp3"></audio>
-        <button onclick="saveSong('Sunflower', 'Sunflower.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Memories - Maroon 5</figcaption>
-        <audio controls src="Memories.mp3"></audio>
-        <button onclick="saveSong('Memories', 'Memories.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Bad Guy - Billie Eilish</figcaption>
-        <audio controls src="Bad_Guy.mp3"></audio>
-        <button onclick="saveSong('Bad Guy', 'Bad_Guy.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Sucker - Jonas Brothers</figcaption>
-        <audio controls src="Sucker.mp3"></audio>
-        <button onclick="saveSong('Sucker', 'Sucker.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Señorita - Shawn Mendes, Camila Cabello</figcaption>
-        <audio controls src="Senorita.mp3"></audio>
-        <button onclick="saveSong('Señorita', 'Senorita.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Old Town Road - Lil Nas X ft. Billy Ray Cyrus</figcaption>
-        <audio controls src="Old_Town_Road.mp3"></audio>
-        <button onclick="saveSong('Old Town Road', 'Old_Town_Road.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Rockstar - Post Malone ft. 21 Savage</figcaption>
-        <audio controls src="Rockstar.mp3"></audio>
-        <button onclick="saveSong('Rockstar', 'Rockstar.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Watermelon Sugar - Harry Styles</figcaption>
-        <audio controls src="Watermelon_Sugar.mp3"></audio>
-        <button onclick="saveSong('Watermelon Sugar', 'Watermelon_Sugar.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Blinding Lights - The Weeknd</figcaption>
-        <audio controls src="Blinding_Lights.mp3"></audio>
-        <button onclick="saveSong('Blinding Lights', 'Blinding_Lights.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Dance Monkey - Tones and I</figcaption>
-        <audio controls src="Dance_Monkey.mp3"></audio>
-        <button onclick="saveSong('Dance Monkey', 'Dance_Monkey.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Savage Love - Jawsh 685, Jason Derulo</figcaption>
-        <audio controls src="Savage_Love.mp3"></audio>
-        <button onclick="saveSong('Savage Love', 'Savage_Love.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Rain on Me - Lady Gaga, Ariana Grande</figcaption>
-        <audio controls src="Rain_On_Me.mp3"></audio>
-        <button onclick="saveSong('Rain on Me', 'Rain_On_Me.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Don't Start Now - Dua Lipa</figcaption>
-        <audio controls src="Dont_Start_Now.mp3"></audio>
-        <button onclick="saveSong('Don\'t Start Now', 'Dont_Start_Now.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Levitating - Dua Lipa ft. DaBaby</figcaption>
-        <audio controls src="Levitating.mp3"></audio>
-        <button onclick="saveSong('Levitating', 'Levitating.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Peaches - Justin Bieber ft. Daniel Caesar, Giveon</figcaption>
-        <audio controls src="Peaches.mp3"></audio>
-        <button onclick="saveSong('Peaches', 'Peaches.mp3')">SAVE SONG ❤️</button>
-      </li>
-      <li>
-        <figcaption>Montero (Call Me By Your Name) - Lil Nas X</figcaption>
-        <audio controls src="Montero.mp3"></audio>
-        <button onclick="saveSong('Montero (Call Me By Your Name)', 'Montero.mp3')">SAVE SONG ❤️</button>
+        <figcaption>Alone Pt 2</figcaption>
+        <audio controls src="Alone_Pt_2.mp3" onplay="playSong('Alone Pt 2', 'Alone_Pt_2.mp3')"></audio>
+        <button onclick="saveSong('Alone Pt 2', 'Alone_Pt_2.mp3')">SAVE SONG ❤️</button>
       </li>
     </ul>
   </div>
@@ -383,67 +251,96 @@
   <!-- Mini Player -->
   <div class="mini-player" id="miniPlayer">
     <div class="song-info">
-      <img src="music-icon.png" alt="Song Cover">
+      <img src="default_album_art.jpg" alt="Album Art" id="albumArt">
       <div class="song-details">
-        <span class="song-title">Song Title</span>
-        <span class="song-artist">Artist</span>
+        <span class="song-title" id="miniSongTitle">Song Title</span>
+        <span class="song-artist" id="miniSongArtist">Artist Name</span>
       </div>
     </div>
     <div class="controls">
-      <audio controls id="audioPlayer">
-        <source src="" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
-      <button onclick="toggleMiniPlayer()">Close</button>
+      <button onclick="pauseMiniPlayer()">Pause</button>
+      <button onclick="closeMiniPlayer()">Close</button>
     </div>
   </div>
 
   <script>
-    // Function to save song including title
-    function saveSong(title, src) {
-      const username = localStorage.getItem('currentUser');
-      if (!username) {
-         alert("YOU NEED TO LOG IN FIRST!");
-         setTimeout(function() {
-          window.location.href = "login.html";
-         }, 3000);
-         return;
+    // Function to handle playing a song and showing the mini player
+    function playSong(title, src) {
+      const miniPlayer = document.getElementById('miniPlayer');
+      const miniSongTitle = document.getElementById('miniSongTitle');
+      const miniSongArtist = document.getElementById('miniSongArtist');
+      const albumArt = document.getElementById('albumArt');
+      
+      miniSongTitle.textContent = title;
+      miniSongArtist.textContent = "Artist Name"; // Add logic to set artist name if available
+      albumArt.src = "default_album_art.jpg"; // Add logic to set album art if available
+
+      miniPlayer.classList.add('active');
+
+      const audio = new Audio(src);
+      audio.play();
+
+      // Pause current audio in mini player before playing new one
+      const currentAudio = document.getElementById('miniPlayerAudio');
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.remove();
       }
 
-      alert("YOUR SONG '" + title + "' IS SUCCESSFULLY SAVED!");
+      // Create a new audio element for the mini player
+      const miniPlayerAudio = document.createElement('audio');
+      miniPlayerAudio.id = 'miniPlayerAudio';
+      miniPlayerAudio.src = src;
+      miniPlayerAudio.play();
+      miniPlayer.appendChild(miniPlayerAudio);
+    }
 
-      // Get the table in pat.html where songs are saved
-      var songTable = window.opener.document.getElementById('songListContainer');
+    // Function to pause the mini player audio
+    function pauseMiniPlayer() {
+      const miniPlayerAudio = document.getElementById('miniPlayerAudio');
+      if (miniPlayerAudio) {
+        miniPlayerAudio.pause();
+      }
+    }
 
-      // Create a new table row
-      var newRow = document.createElement('tr');
+    // Function to close the mini player
+    function closeMiniPlayer() {
+      const miniPlayer = document.getElementById('miniPlayer');
+      miniPlayer.classList.remove('active');
 
-      // Create table cells for title and audio
-      var titleCell = document.createElement('td');
-      var audioCell = document.createElement('td');
+      const miniPlayerAudio = document.getElementById('miniPlayerAudio');
+      if (miniPlayerAudio) {
+        miniPlayerAudio.pause();
+        miniPlayerAudio.remove();
+      }
+    }
 
-      // Create audio element and set attributes
-      var audio = document.createElement('audio');
-      audio.controls = true;
-      var source = document.createElement('source');
-      source.src = src;
-      source.type = 'audio/mpeg';
-      audio.appendChild(source);
+    // Function to save song information in localStorage
+    function saveSong(title, src) {
+      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+      savedSongs.push({ title, src });
+      localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
+      alert('Song saved to your playlist!');
+    }
 
-      // Append audio element to its cell
-      audioCell.appendChild(audio);
+    // Function to search for a song
+    function searchSong() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const songList = document.getElementById('songList');
+      const songs = songList.getElementsByTagName('li');
 
-      // Set the text content of the title cell
-      titleCell.textContent = title;
-
-      // Append cells to the new row
-      newRow.appendChild(titleCell);
-      newRow.appendChild(audioCell);
-
-      // Append the new row to the table
-      songTable.appendChild(newRow);
+      for (let i = 0; i < songs.length; i++) {
+        const figcaption = songs[i].getElementsByTagName('figcaption')[0];
+        if (figcaption) {
+          const txtValue = figcaption.textContent || figcaption.innerText;
+          if (txtValue.toLowerCase().indexOf(input) > -1) {
+            songs[i].style.display = '';
+          } else {
+            songs[i].style.display = 'none';
+          }
+        }
+      }
     }
   </script>
-
 </body>
 </html>
