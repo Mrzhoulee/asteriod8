@@ -188,8 +188,8 @@
       
       <li>
         <figcaption>Can't Stop the Feeling</figcaption>
-        <audio controls src=""C:\Users\HP\Downloads\asteriod8-main\asteriod8-main\Asteriod files\CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a"" onplay="playSong('Can\'t Stop the Feeling', 'Cant_Stop_The_Feeling.mp3')"></audio>
-        <button onclick="saveSong('Can't Stop the Feeling', 'Cant_Stop_The_Feeling.mp3')">SAVE SONG ❤️</button>
+        <audio controls src="C:\Users\HP\Downloads\asteriod8-main\asteriod8-main\Asteriod files\CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a" onplay="playSong('Can\'t Stop the Feeling', 'C:\Users\HP\Downloads\asteriod8-main\asteriod8-main\Asteriod files\CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a')"></audio>
+        <button onclick="saveSong('Can't Stop the Feeling', 'C:\Users\HP\Downloads\asteriod8-main\asteriod8-main\Asteriod files\CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a')">SAVE SONG ❤️</button>
       </li>
 
 
@@ -262,13 +262,10 @@
 
     // Function to save song information in localStorage
     function saveSong(title, src) {
-      if (!email) {
-      alert("YOU NEED TO LOG IN FIRST!")
-      }
       const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
       savedSongs.push({ title, src });
       localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
-      alert(title + 'Is saved to your playlist!');
+      alert('Your Song Is saved to your playlist!');
     }
 
     // Function to search for a song
