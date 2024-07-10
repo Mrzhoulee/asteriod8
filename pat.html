@@ -1,23 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<style>
-  body {
-  background-color: black;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Playlist</title>
+  
+  <!-- Load external fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* General styles */
+    body {
+      background-color: black;
+      font-family: 'Lato', sans-serif;
+      background-color: black;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    a {
+      color: coral;
+      text-decoration: none;
+    }
+
+    /* Navigation styles */
+    .topnav {
+      overflow: hidden;
+      background-color: #333;
+      display: flex;
+      justify-content: flex-end; /* Aligns items to the right */
+      padding: 10px 0;
+    }
+
+    .topnav a {
+      color: white;
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+
+    .topnav a:hover {
+      background-color: #555;
+    }
+
+    .topnav a.active {
+      background-color: #04AA6D;
+      color: white;
+    }
+
+    /* Main section styles */
+    .main-content {
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: bold;
+      color: coral;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    /* Saved song list styles */
+    .song-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+
+    .song-list li {
+      margin-bottom: 10px;
+    }
+
+    .song-list li audio {
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
-<h1>This is your Like songs!</h1>
- <audio controls>
-    <source src="Taylor Swift - Cruel Summer.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
 
+  <!-- Navigation -->
+  <div class="topnav">
+    <a href="index.html">Home</a>
+    <a href="ts.html">Taylor Swift Songs</a>
+    <a href="login.html">Sign In</a>
+    <a href="account.html">Account</a>
+    <a class="active" href="pat.html">My Playlist</a>
+    <a href="tt.html">Times Tables Rocket</a>
+  </div>
 
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1>My Playlist</h1>
+    <p>These are the songs you have saved.</p>
+    <ul class="song-list" id="savedSongList"></ul>
+  </div>
 
-  <table id="songListContainer">
+  <script>
+    // Function to load saved songs from localStorage and display them
+    function loadSavedSongs() {
+      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+      const savedSongList = document.getElementById('savedSongList');
 
-  </table>
+      savedSongs.forEach(song => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <figcaption>${song.title}</figcaption>
+          <audio controls src="${song.src}"></audio>
+        `;
+        savedSongList.appendChild(li);
+      });
+    }
+
+    // Load saved songs on page load
+    window.onload = loadSavedSongs;
+  </script>
 </body>
 </html>
