@@ -99,6 +99,8 @@
     <ul class="song-list" id="savedSongList"></ul>
   </div>
 
+  <button onclick="clearSongs()">Delete All Saved Songs 🗑️</button>
+
   <script>
     // Function to load saved songs from localStorage and display them
     function loadSavedSongs() {
@@ -117,6 +119,16 @@
 
     // Load saved songs on page load
     window.onload = loadSavedSongs;
+
+
+  function clearSongs() {
+    // Select the element by its ID
+    const div = document.getElementById('savedSongsList');
+    // Remove the element from the DOM
+    if (div) {
+      div.remove();
+    }
+  }
   </script>
 </body>
 </html>
