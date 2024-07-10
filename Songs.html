@@ -314,6 +314,9 @@
 
     // Function to save song information in localStorage
     function saveSong(title, src) {
+      if (!username) {
+      alert("YOU NEED TO LOG IN FIRST!")
+      }
       const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
       savedSongs.push({ title, src });
       localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
