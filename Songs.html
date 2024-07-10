@@ -277,9 +277,6 @@
 
       miniPlayer.classList.add('active');
 
-      const audio = new Audio(src);
-      audio.play();
-
       // Pause current audio in mini player before playing new one
       const currentAudio = document.getElementById('miniPlayerAudio');
       if (currentAudio) {
