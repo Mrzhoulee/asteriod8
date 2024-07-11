@@ -13,7 +13,6 @@
     body {
       background-color: black;
       font-family: 'Lato', sans-serif;
-      background-color: black;
       color: white;
       margin: 0;
       padding: 0;
@@ -120,15 +119,12 @@
     // Load saved songs on page load
     window.onload = loadSavedSongs;
 
-
-  function clearSongs() {
-    // Select the element by its ID
-    const div = document.getElementById('savedSongsList');
-    // Remove the element from the DOM
-    if (div) {
-      div.remove();
+    // Function to clear all saved songs from localStorage and update the UI
+    function clearSongs() {
+      localStorage.removeItem('savedSongs');
+      const savedSongList = document.getElementById('savedSongList');
+      savedSongList.innerHTML = '';
     }
-  }
   </script>
 </body>
 </html>
