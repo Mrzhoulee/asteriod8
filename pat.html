@@ -98,32 +98,39 @@
     <ul class="song-list" id="savedSongList"></ul>
   </div>
 
-  <button onclick="clearSongs()">Delete All Saved Songs 🗑️</button>
+  <button class="clear-button" onclick="clearSongs()">Delete All Saved Songs 🗑️</button>
 
   <script>
     // Function to load saved songs from localStorage and display them
-    function loadSavedSongs() {
+ window.onload = function() {
       const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-      const savedSongList = document.getElementById('savedSongList');
+      const songListTable = document.getElementById('songListTable');
 
       savedSongs.forEach(song => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <figcaption>${song.title}</figcaption>
-          <audio controls src="${song.src}"></audio>
-        `;
-        savedSongList.appendChild(li);
+        const newRow = document.createElement('tr');
+        const titleCell = document.createElement('td');
+        const audioCell = document.createElement('td');
+
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        const source = document.createElement('source');
+        source.src = song.src;
+        source.type = 'audio/mpeg';
+        audio.appendChild(source);
+
+        titleCell.textContent = song.title;
+        audioCell.appendChild(audio);
+
+        newRow.appendChild(titleCell);
+        newRow.appendChild(audioCell);
+
+        songListTable.appendChild(newRow);
       });
     }
-
-    // Load saved songs on page load
-    window.onload = loadSavedSongs;
-
-    // Function to clear all saved songs from localStorage and update the UI
     function clearSongs() {
       localStorage.removeItem('savedSongs');
-      const savedSongList = document.getElementById('savedSongList');
-      savedSongList.innerHTML = '';
+      loadSongs();
+      alert("All songs have been removed from your playlist.");
     }
   </script>
 </body>
