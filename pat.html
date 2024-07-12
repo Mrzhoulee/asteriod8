@@ -4,15 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Playlist</title>
-  
-  <!-- Load external fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
-
   <style>
-    /* General styles */
     body {
-      background-color: black;
       font-family: 'Lato', sans-serif;
+      background-color: black;
       color: white;
       margin: 0;
       padding: 0;
@@ -23,12 +19,11 @@
       text-decoration: none;
     }
 
-    /* Navigation styles */
     .topnav {
       overflow: hidden;
       background-color: #333;
       display: flex;
-      justify-content: flex-end; /* Aligns items to the right */
+      justify-content: flex-end;
       padding: 10px 0;
     }
 
@@ -47,7 +42,6 @@
       color: white;
     }
 
-    /* Main section styles */
     .main-content {
       padding: 20px;
     }
@@ -63,25 +57,77 @@
       line-height: 1.6;
     }
 
-    /* Saved song list styles */
-    .song-list {
+    .mini-player {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease-in-out;
+      transform: translateY(100%);
+    }
+
+    .mini-player.active {
+      display: flex;
+      transform: translateY(0);
+    }
+
+    .song-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .song-info img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      border-radius: 50%;
+    }
+
+    .song-info .song-details {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+    }
+
+    .song-info .song-title {
+      font-weight: bold;
+      color: coral;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+    }
+
+    .controls button {
+      background-color: #F87954;
+      color: coral;
+      border: none;
+      padding: 8px 16px;
+      margin-left: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .playlist {
       list-style-type: none;
       padding: 0;
-      margin: 20px 0;
     }
 
-    .song-list li {
-      margin-bottom: 10px;
-    }
-
-    .song-list li audio {
-      width: 100%;
+    .playlist li {
+      margin: 10px 0;
     }
   </style>
 </head>
 <body>
-
-  <!-- Navigation -->
   <div class="topnav">
     <a href="index.html">Home</a>
     <a href="ts.html">Taylor Swift Songs</a>
@@ -91,47 +137,86 @@
     <a href="tt.html">Times Tables Rocket</a>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
     <h1>My Playlist</h1>
-    <p>These are the songs you have saved.</p>
-    <ul class="song-list" id="savedSongList"></ul>
+    <ul class="playlist" id="playlist">
+      <!-- Saved songs will be dynamically added here -->
+    </ul>
   </div>
 
-  <button class="clear-button" onclick="clearSongs()">Delete All Saved Songs 🗑️</button>
+  <div class="mini-player" id="miniPlayer">
+    <div class="song-info">
+      <img src="default_album_art.jpg" alt="Album Art" id="albumArt">
+      <div class="song-details">
+        <span class="song-title" id="miniSongTitle">Song Title</span>
+        <span class="song-artist" id="miniSongArtist">Artist Name</span>
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="pauseMiniPlayer()">Pause</button>
+      <button onclick="closeMiniPlayer()">Close</button>
+    </div>
+  </div>
 
   <script>
-    // Function to load saved songs from localStorage and display them
- window.onload = function() {
+    function playSong(title, src) {
+      const miniPlayer = document.getElementById('miniPlayer');
+      const miniSongTitle = document.getElementById('miniSongTitle');
+      const miniSongArtist = document.getElementById('miniSongArtist');
+      const albumArt = document.getElementById('albumArt');
+
+      miniSongTitle.textContent = title;
+      miniSongArtist.textContent = "Artist Name"; // Add logic to set artist name if available
+      albumArt.src = "default_album_art.jpg"; // Add logic to set album art if available
+
+      miniPlayer.classList.add('active');
+
+      const currentAudio = document.getElementById('miniPlayerAudio');
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.remove();
+      }
+
+      const miniPlayerAudio = document.createElement('audio');
+      miniPlayerAudio.id = 'miniPlayerAudio';
+      miniPlayerAudio.src = src;
+      miniPlayerAudio.play();
+      miniPlayer.appendChild(miniPlayerAudio);
+    }
+
+    function pauseMiniPlayer() {
+      const miniPlayerAudio = document.getElementById('miniPlayerAudio');
+      if (miniPlayerAudio) {
+        miniPlayerAudio.pause();
+      }
+    }
+
+    function closeMiniPlayer() {
+      const miniPlayer = document.getElementById('miniPlayer');
+      miniPlayer.classList.remove('active');
+
+      const miniPlayerAudio = document.getElementById('miniPlayerAudio');
+      if (miniPlayerAudio) {
+        miniPlayerAudio.pause();
+        miniPlayerAudio.remove();
+      }
+    }
+
+    function loadPlaylist() {
       const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-      const songListTable = document.getElementById('songListTable');
+      const playlist = document.getElementById('playlist');
 
       savedSongs.forEach(song => {
-        const newRow = document.createElement('tr');
-        const titleCell = document.createElement('td');
-        const audioCell = document.createElement('td');
-
-        const audio = document.createElement('audio');
-        audio.controls = true;
-        const source = document.createElement('source');
-        source.src = song.src;
-        source.type = 'audio/mpeg';
-        audio.appendChild(source);
-
-        titleCell.textContent = song.title;
-        audioCell.appendChild(audio);
-
-        newRow.appendChild(titleCell);
-        newRow.appendChild(audioCell);
-
-        songListTable.appendChild(newRow);
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <figcaption>${song.title}</figcaption>
+          <audio controls src="${song.src}" onplay="playSong('${song.title}', '${song.src}')"></audio>
+        `;
+        playlist.appendChild(li);
       });
     }
-    function clearSongs() {
-      localStorage.removeItem('savedSongs');
-      loadSongs();
-      alert("All songs have been removed from your playlist.");
-    }
+
+    window.onload = loadPlaylist;
   </script>
 </body>
 </html>
