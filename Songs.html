@@ -259,10 +259,10 @@
 
     // Function to save song information in localStorage
     function saveSong(title, src) {
-      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-      savedSongs.push({ title, src });
-      localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
-      alert("Your Song Is saved to your playlist!");
+    alert("Your Song Is saved to your playlist!");
+    const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+    savedSongs.push( title, src );
+    localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
     }
 
     // Function to search for a song
