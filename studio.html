@@ -4,8 +4,14 @@
     <style>
       body  {
       background-color: black;
-        align-items: center;
-        text-align: center;
+      align-items: center;
+      text-align: center;
+      }
+
+
+      div.align {
+      text-align: center;
+      align-items: center;
       }
       
     </style>
@@ -14,18 +20,24 @@
     
 
 <form id="upload">
-    <input type="file" id="video" name="video" accept="video/*"> 
+  <div class="align">
+    <input type="file" id="video" name="video" accept="video/*" required> 
     <input type="text" id="title" placeholder="Enter your Song Title" required>
     <input type="ratio" id="Public" value="Public" required>
   <label for="Public">Public</label><br>
     <input type="ratio" id="Private" value="Private" required>
    <label for="Private">Private</label><br>
       <input type="button" onclick="upload(); return false;"value="Upload" required>
+  </div>
 
 </form>
 
 <script>
-  function upload();
+  function upload() {
+  const video = JSON.parse(localStorage.getItem('video')) || [];
+  video.push({ title, src });
+  localStorage.setItem('video', JSON.stringify(video));
+  }
 </script>
     
   </body>
