@@ -5,11 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteroid Teams Music Player</title>
   
-  <!-- Load external fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
-
   <style>
-    /* General styles */
     body {
       font-family: 'Lato', sans-serif;
       background-color: black;
@@ -23,7 +20,6 @@
       text-decoration: none;
     }
 
-    /* Navigation styles */
     .topnav {
       overflow: hidden;
       background-color: #333;
@@ -47,7 +43,6 @@
       color: white;
     }
 
-    /* Main section styles */
     .main-content {
       padding: 20px;
     }
@@ -63,7 +58,6 @@
       line-height: 1.6;
     }
 
-    /* Mini player styles */
     .mini-player {
       position: fixed;
       bottom: 0;
@@ -77,7 +71,7 @@
       justify-content: space-between;
       box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
       transition: transform 0.3s ease-in-out;
-    transform: translateY(100%);
+      transform: translateY(100%);
     }
 
     .mini-player.active {
@@ -124,7 +118,6 @@
       font-size: 14px;
     }
 
-    /* Search bar styles */
     .search-container {
       text-align: center;
       margin-top: 20px;
@@ -138,7 +131,6 @@
       border-radius: 5px;
     }
 
-    /* Song list styles */
     .song-list {
       list-style-type: none;
       padding: 0;
@@ -160,8 +152,6 @@
   </style>
 </head>
 <body>
-
-  <!-- Navigation -->
   <div class="topnav">
     <a class="active" href="index.html">Home</a>
     <a href="ts.html">Taylor Swift Songs</a>
@@ -171,18 +161,15 @@
     <a href="tt.html">Times Tables Rocket</a>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
     <h1>Discover</h1>
     <p>We are Asteroid Teams. We code for public use, even for free!</p>
 
-    <!-- Search bar -->
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Search for a song...">
       <button onclick="searchSong()">Search</button>
     </div>
 
-    <!-- Song List -->
     <h2>ASTEROID RECOMMENDS👍🏻</h2>
     <ul class="song-list" id="songList">
       <li>
@@ -193,7 +180,6 @@
     </ul>
   </div>
 
-  <!-- Mini Player -->
   <div class="mini-player" id="miniPlayer">
     <div class="song-info">
       <img src="default_album_art.jpg" alt="Album Art" id="albumArt">
@@ -216,8 +202,8 @@
       const albumArt = document.getElementById('albumArt');
 
       miniSongTitle.textContent = title;
-      miniSongArtist.textContent = "Artist Name"; // Add logic to set artist name if available
-      albumArt.src = "default_album_art.jpg"; // Add logic to set album art if available
+      miniSongArtist.textContent = "Artist Name";
+      albumArt.src = "default_album_art.jpg";
 
       miniPlayer.classList.add('active');
 
@@ -279,4 +265,3 @@
   </script>
 </body>
 </html>
-
