@@ -233,7 +233,9 @@
       savedSongs.splice(index, 1);
       localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
       loadPlaylist();
+      alert("Your Songs are all deleted from the Your Playlist!");
     }
+    
 
     window.onload = loadPlaylist;
   </script>
