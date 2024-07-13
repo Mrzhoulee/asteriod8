@@ -77,7 +77,7 @@
       justify-content: space-between;
       box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
       transition: transform 0.3s ease-in-out;
-      transform: translateY(100%);
+    transform: translateY(100%);
     }
 
     .mini-player.active {
@@ -209,27 +209,24 @@
   </div>
 
   <script>
-    // Function to handle playing a song and showing the mini player
     function playSong(title, src) {
       const miniPlayer = document.getElementById('miniPlayer');
       const miniSongTitle = document.getElementById('miniSongTitle');
       const miniSongArtist = document.getElementById('miniSongArtist');
       const albumArt = document.getElementById('albumArt');
-      
+
       miniSongTitle.textContent = title;
       miniSongArtist.textContent = "Artist Name"; // Add logic to set artist name if available
       albumArt.src = "default_album_art.jpg"; // Add logic to set album art if available
 
       miniPlayer.classList.add('active');
 
-      // Pause current audio in mini player before playing new one
       const currentAudio = document.getElementById('miniPlayerAudio');
       if (currentAudio) {
         currentAudio.pause();
         currentAudio.remove();
       }
 
-      // Create a new audio element for the mini player
       const miniPlayerAudio = document.createElement('audio');
       miniPlayerAudio.id = 'miniPlayerAudio';
       miniPlayerAudio.src = src;
@@ -237,7 +234,6 @@
       miniPlayer.appendChild(miniPlayerAudio);
     }
 
-    // Function to pause the mini player audio
     function pauseMiniPlayer() {
       const miniPlayerAudio = document.getElementById('miniPlayerAudio');
       if (miniPlayerAudio) {
@@ -245,7 +241,6 @@
       }
     }
 
-    // Function to close the mini player
     function closeMiniPlayer() {
       const miniPlayer = document.getElementById('miniPlayer');
       miniPlayer.classList.remove('active');
@@ -257,7 +252,6 @@
       }
     }
 
-    // Function to save song information in localStorage
     function saveSong(title, src) {
       const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
       savedSongs.push({ title, src });
@@ -265,7 +259,6 @@
       alert("Your Song Is saved to your playlist!");
     }
 
-    // Function to search for a song
     function searchSong() {
       const input = document.getElementById('searchInput').value.toLowerCase();
       const songList = document.getElementById('songList');
@@ -286,3 +279,4 @@
   </script>
 </body>
 </html>
+
