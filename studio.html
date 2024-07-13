@@ -19,13 +19,13 @@
   <body>
     
 
-<form id="upload">
+<form  action="/action_page.php" id="upload">
   <div class="align">
     <input type="file" id="video" name="video" accept="video/*" required> 
     <input type="text" id="title" placeholder="Enter your Song Title" required>
-    <input type="ratio" id="Public" value="Public" required>
+    <input type="radio" id="Public" value="Public" required>
   <label for="Public">Public</label><br>
-    <input type="ratio" id="Private" value="Private" required>
+    <input type="radio" id="Private" value="Private" required>
    <label for="Private">Private</label><br>
       <input type="button" onclick="upload(); return false;"value="Upload" required>
   </div>
