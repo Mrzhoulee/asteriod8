@@ -91,8 +91,7 @@
     <a href="tt.html">Times Tables Rocket</a>
   </div>
 
-  <!-- Main Content -->
-  <div class="main-content">
+ <div class="main-content">
     <h1>My Playlist</h1>
     <p>These are the songs you have saved.</p>
     <div class="savedSongs">
@@ -104,7 +103,7 @@
   </div>
 
   <script>
-    // Function to load saved songs from localStorage and display them
+        // Function to load saved songs from localStorage and display them
     window.onload = function() {
       loadSongs();
     }
@@ -138,6 +137,14 @@
       localStorage.removeItem('savedSongs');
       loadSongs();
       alert("All songs have been removed from your playlist.");
+    }
+
+    // Save song function
+    function saveSong(title, src) {
+      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+      savedSongs.push({ title, src });
+      localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
+      alert("Your song has been saved to your playlist!");
     }
   </script>
 </body>
