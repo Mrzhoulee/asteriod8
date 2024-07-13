@@ -95,40 +95,45 @@
   <div class="main-content">
     <h1>My Playlist</h1>
     <p>These are the songs you have saved.</p>
-    <div class="savedSongs" id="saveSongs">
-    <ul class="song-list" id="savedSongs"></ul>
+    <div class="savedSongs">
+      <ul class="song-list" id="savedSongs">
+        <!-- Songs will be loaded here -->
+      </ul>
+    </div>
+    <button class="clear-button" onclick="clearSongs()">Delete All Saved Songs 🗑️</button>
   </div>
-  </div>
-
-  <button class="clear-button" onclick="clearSongs()">Delete All Saved Songs 🗑️</button>
 
   <script>
     // Function to load saved songs from localStorage and display them
- window.onload = function() {
+    window.onload = function() {
+      loadSongs();
+    }
+
+    function loadSongs() {
       const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-      const songListTable = document.getElementById('songListTable');
+      const songList = document.getElementById('savedSongs');
+      songList.innerHTML = '';
 
       savedSongs.forEach(song => {
-        const newRow = document.createElement('tr');
-        const titleCell = document.createElement('td');
-        const audioCell = document.createElement('td');
-
+        const listItem = document.createElement('li');
+        const title = document.createElement('p');
         const audio = document.createElement('audio');
+
         audio.controls = true;
         const source = document.createElement('source');
         source.src = song.src;
         source.type = 'audio/mpeg';
         audio.appendChild(source);
 
-        titleCell.textContent = song.title;
-        audioCell.appendChild(audio);
+        title.textContent = song.title;
 
-        newRow.appendChild(titleCell);
-        newRow.appendChild(audioCell);
+        listItem.appendChild(title);
+        listItem.appendChild(audio);
 
-        songListTable.appendChild(newRow);
+        songList.appendChild(listItem);
       });
     }
+
     function clearSongs() {
       localStorage.removeItem('savedSongs');
       loadSongs();
