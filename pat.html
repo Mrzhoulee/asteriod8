@@ -23,7 +23,7 @@
       overflow: hidden;
       background-color: #333;
       display: flex;
-      justify-content: flex-end;
+      justify-content: flex-end; /* Aligns items to the right */
       padding: 10px 0;
     }
 
@@ -65,7 +65,7 @@
       background-color: #333;
       color: white;
       padding: 10px;
-      display: none;
+      display: none; /* Initially hidden */
       align-items: center;
       justify-content: space-between;
       box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
@@ -120,38 +120,43 @@
     .playlist {
       list-style-type: none;
       padding: 0;
+      margin: 20px 0;
     }
 
     .playlist li {
-      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid coral;
     }
 
-    .delete-button {
-      background-color: red;
-      color: white;
+    .playlist li button {
+      background-color: #F87954;
+      color: coral;
       border: none;
-      padding: 5px 10px;
+      padding: 8px 16px;
       cursor: pointer;
       border-radius: 5px;
       font-size: 14px;
-      margin-left: 10px;
     }
   </style>
 </head>
 <body>
   <div class="topnav">
-    <a href="index.html">Home</a>
+    <a class="active" href="index.html">Home</a>
     <a href="ts.html">Taylor Swift Songs</a>
     <a href="login.html">Sign In</a>
     <a href="account.html">Account</a>
-    <a class="active" href="pat.html">My Playlist</a>
+    <a href="pat.html">My Playlist</a>
     <a href="tt.html">Times Tables Rocket</a>
   </div>
 
   <div class="main-content">
     <h1>My Playlist</h1>
+    <p>Here are your saved songs:</p>
     <ul class="playlist" id="playlist">
-      <!-- Saved songs will be dynamically added here -->
+      <!-- Songs will be dynamically added here -->
     </ul>
   </div>
 
@@ -170,6 +175,29 @@
   </div>
 
   <script>
+    function loadPlaylist() {
+      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+      const playlist = document.getElementById('playlist');
+      playlist.innerHTML = '';
+
+      savedSongs.forEach((song, index) => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+          <span>${song.title}</span>
+          <audio controls src="${song.src}"></audio>
+          <button onclick="deleteSong(${index})">Delete</button>
+        `;
+        playlist.appendChild(listItem);
+      });
+    }
+
+    function deleteSong(index) {
+      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+      savedSongs.splice(index, 1);
+      localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
+      loadPlaylist();
+    }
+
     function playSong(title, src) {
       const miniPlayer = document.getElementById('miniPlayer');
       const miniSongTitle = document.getElementById('miniSongTitle');
@@ -177,8 +205,8 @@
       const albumArt = document.getElementById('albumArt');
 
       miniSongTitle.textContent = title;
-      miniSongArtist.textContent = "Artist Name"; // Add logic to set artist name if available
-      albumArt.src = "default_album_art.jpg"; // Add logic to set album art if available
+      miniSongArtist.textContent = "Artist Name";
+      albumArt.src = "default_album_art.jpg";
 
       miniPlayer.classList.add('active');
 
@@ -213,31 +241,7 @@
       }
     }
 
-    function loadPlaylist() {
-      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-      const playlist = document.getElementById('playlist');
-
-      savedSongs.forEach((song, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <figcaption>${song.title}</figcaption>
-          <audio controls src="${song.src}" onplay="playSong('${song.title}', '${song.src}')"></audio>
-          <button class="delete-button" onclick="deleteSong(${index})">Delete</button>
-        `;
-        playlist.appendChild(li);
-      });
-    }
-
-    function deleteSong(index) {
-      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-      savedSongs.splice(index, 1);
-      localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
-      loadPlaylist();
-      alert("Your Songs are all deleted from the Your Playlist!");
-    }
-    
-
-    window.onload = loadPlaylist;
+    document.addEventListener('DOMContentLoaded', loadPlaylist);
   </script>
 </body>
 </html>
