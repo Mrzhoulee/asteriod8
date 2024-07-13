@@ -258,13 +258,7 @@
     }
 
     // Function to save song information in localStorage
-    function saveSong(title, src) {
-    alert("Your Song Is saved to your playlist!");
-    const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-    savedSongs.push( title, src );
-    localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
-    }
-
+    
     // Function to search for a song
     function searchSong() {
       const input = document.getElementById('searchInput').value.toLowerCase();
@@ -282,6 +276,19 @@
           }
         }
       }
+    }
+  </script>
+
+
+    <script>
+    function saveSong(title, src) {
+      console.log('saveSong function called');
+      console.log(`Saving song: ${title}, ${src}`);
+      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+      savedSongs.push({ title, src });
+      localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
+      console.log('Song saved successfully');
+      alert("Your Song Is saved to your playlist!");
     }
   </script>
 </body>
