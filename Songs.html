@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteroid Teams Music Player</title>
-  
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -14,50 +13,41 @@
       margin: 0;
       padding: 0;
     }
-
     a {
       color: coral;
       text-decoration: none;
     }
-
     .topnav {
       overflow: hidden;
       background-color: #333;
       display: flex;
-      justify-content: flex-end; /* Aligns items to the right */
+      justify-content: flex-end;
       padding: 10px 0;
     }
-
     .topnav a {
       color: white;
       padding: 10px 20px;
       font-size: 18px;
     }
-
     .topnav a:hover {
       background-color: #555;
     }
-
     .topnav a.active {
       background-color: #04AA6D;
       color: white;
     }
-
     .main-content {
       padding: 20px;
     }
-
     h1 {
       font-size: 36px;
       font-weight: bold;
       color: coral;
     }
-
     p {
       font-size: 18px;
       line-height: 1.6;
     }
-
     .mini-player {
       position: fixed;
       bottom: 0;
@@ -66,47 +56,40 @@
       background-color: #333;
       color: white;
       padding: 10px;
-      display: none; /* Initially hidden */
+      display: none;
       align-items: center;
       justify-content: space-between;
       box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
       transition: transform 0.3s ease-in-out;
       transform: translateY(100%);
     }
-
     .mini-player.active {
       display: flex;
       transform: translateY(0);
     }
-
     .song-info {
       display: flex;
       align-items: center;
     }
-
     .song-info img {
       width: 40px;
       height: 40px;
       margin-right: 10px;
       border-radius: 50%;
     }
-
     .song-info .song-details {
       display: flex;
       flex-direction: column;
       font-size: 14px;
     }
-
     .song-info .song-title {
       font-weight: bold;
       color: coral;
     }
-
     .controls {
       display: flex;
       align-items: center;
     }
-
     .controls button {
       background-color: #F87954;
       color: coral;
@@ -117,12 +100,10 @@
       border-radius: 5px;
       font-size: 14px;
     }
-
     .search-container {
       text-align: center;
       margin-top: 20px;
     }
-
     #searchInput {
       width: 300px;
       padding: 10px;
@@ -130,7 +111,6 @@
       border: 1px solid coral;
       border-radius: 5px;
     }
-
     .song-list {
       list-style-type: none;
       padding: 0;
@@ -138,14 +118,12 @@
       overflow-x: auto;
       white-space: nowrap;
     }
-
     .song-list li {
       display: inline-block;
       width: 200px;
       margin-right: 10px;
       white-space: normal;
     }
-
     .song-list li audio {
       width: 100%;
     }
@@ -160,16 +138,13 @@
     <a href="pat.html">My Playlist</a>
     <a href="tt.html">Times Tables Rocket</a>
   </div>
-
   <div class="main-content">
     <h1>Discover</h1>
     <p>We are Asteroid Teams. We code for public use, even for free!</p>
-
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Search for a song...">
       <button onclick="searchSong()">Search</button>
     </div>
-
     <h2>ASTEROID RECOMMENDS👍🏻</h2>
     <ul class="song-list" id="songList">
       <li>
@@ -179,7 +154,6 @@
       </li>
     </ul>
   </div>
-
   <div class="mini-player" id="miniPlayer">
     <div class="song-info">
       <img src="default_album_art.jpg" alt="Album Art" id="albumArt">
@@ -193,63 +167,52 @@
       <button onclick="closeMiniPlayer()">Close</button>
     </div>
   </div>
-
   <script>
     function playSong(title, src) {
       const miniPlayer = document.getElementById('miniPlayer');
       const miniSongTitle = document.getElementById('miniSongTitle');
       const miniSongArtist = document.getElementById('miniSongArtist');
       const albumArt = document.getElementById('albumArt');
-
       miniSongTitle.textContent = title;
       miniSongArtist.textContent = "Artist Name";
       albumArt.src = "default_album_art.jpg";
-
       miniPlayer.classList.add('active');
-
       const currentAudio = document.getElementById('miniPlayerAudio');
       if (currentAudio) {
         currentAudio.pause();
         currentAudio.remove();
       }
-
       const miniPlayerAudio = document.createElement('audio');
       miniPlayerAudio.id = 'miniPlayerAudio';
       miniPlayerAudio.src = src;
       miniPlayerAudio.play();
       miniPlayer.appendChild(miniPlayerAudio);
     }
-
     function pauseMiniPlayer() {
       const miniPlayerAudio = document.getElementById('miniPlayerAudio');
       if (miniPlayerAudio) {
         miniPlayerAudio.pause();
       }
     }
-
     function closeMiniPlayer() {
       const miniPlayer = document.getElementById('miniPlayer');
       miniPlayer.classList.remove('active');
-
       const miniPlayerAudio = document.getElementById('miniPlayerAudio');
       if (miniPlayerAudio) {
         miniPlayerAudio.pause();
         miniPlayerAudio.remove();
       }
     }
-
     function saveSong(title, src) {
       const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
       savedSongs.push({ title, src });
       localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
       alert("Your Song Is saved to your playlist!");
     }
-
     function searchSong() {
       const input = document.getElementById('searchInput').value.toLowerCase();
       const songList = document.getElementById('songList');
       const songs = songList.getElementsByTagName('li');
-
       for (let i = 0; i < songs.length; i++) {
         const figcaption = songs[i].getElementsByTagName('figcaption')[0];
         if (figcaption) {
@@ -265,3 +228,4 @@
   </script>
 </body>
 </html>
+
