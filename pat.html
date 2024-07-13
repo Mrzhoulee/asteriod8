@@ -125,6 +125,17 @@
     .playlist li {
       margin: 10px 0;
     }
+
+    .delete-button {
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 14px;
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
@@ -206,14 +217,22 @@
       const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
       const playlist = document.getElementById('playlist');
 
-      savedSongs.forEach(song => {
+      savedSongs.forEach((song, index) => {
         const li = document.createElement('li');
         li.innerHTML = `
           <figcaption>${song.title}</figcaption>
           <audio controls src="${song.src}" onplay="playSong('${song.title}', '${song.src}')"></audio>
+          <button class="delete-button" onclick="deleteSong(${index})">Delete</button>
         `;
         playlist.appendChild(li);
       });
+    }
+
+    function deleteSong(index) {
+      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+      savedSongs.splice(index, 1);
+      localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
+      loadPlaylist();
     }
 
     window.onload = loadPlaylist;
