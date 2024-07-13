@@ -185,17 +185,11 @@
     <!-- Song List -->
     <h2>ASTEROID RECOMMENDS👍🏻</h2>
     <ul class="song-list" id="songList">
-      <ul class="video id="video">
-      <div class="video id="video">
-        
-      
       <li>
-        <figcaption>Can't Stop the Feeling</figcaption>
-        <audio controls src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a" onplay="playSong('Can't Stop the Feeling', 'CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a')"></audio>
-        <button onclick="saveSong('Can't Stop the Feeling', 'CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a')">SAVE SONG ❤️</button>
+        <figcaption>Cruel Summer</figcaption>
+        <audio controls src="Cruel_Summer.mp3" onplay="playSong('Cruel Summer', 'Cruel_Summer.mp3')"></audio>
+        <button onclick="saveSong('Cruel Summer', 'Cruel_Summer.mp3')">SAVE SONG ❤️</button>
       </li>
-      </ul>
-      <div>
     </ul>
   </div>
 
@@ -264,11 +258,14 @@
     }
 
     // Function to save song information in localStorage
- function saveSong(title, src) {
+    function saveSong(title, src) {
+      if (!username) {
+      alert("YOU NEED TO LOG IN FIRST!")
+      }
       const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
       savedSongs.push({ title, src });
       localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
-      alert("Your Song Is saved to your playlist!");
+      alert('Song saved to your playlist!');
     }
 
     // Function to search for a song
