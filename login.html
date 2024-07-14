@@ -100,9 +100,9 @@
             let password = document.getElementById("password").value;
             let user_records = JSON.parse(localStorage.getItem("users")) || [];
             
-            if (user_records((v) => v.email == email && v.password == password)) {
+            if (user_records.some((v) => v.email == email && v.password == password)) {
                 alert("Log in Successful!");
-                showSecondButton();
+                window.location.href = "start.html";
             } else {
                 alert("Incorrect Username or Password");
             }
