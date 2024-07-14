@@ -1,151 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Playlist</title>
-  
-  <!-- Load external fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Playlist</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
+        }
 
-  <style>
-    /* General styles */
-    body {
-      background-color: black;
-      font-family: 'Lato', sans-serif;
-      color: white;
-      margin: 0;
-      padding: 0;
-    }
+        .playlist-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #333;
+            border-radius: 10px;
+        }
 
-    a {
-      color: coral;
-      text-decoration: none;
-    }
+        h1 {
+            text-align: center;
+            color: coral;
+        }
 
-    /* Navigation styles */
-    .topnav {
-      overflow: hidden;
-      background-color: #333;
-      display: flex;
-      justify-content: flex-end; /* Aligns items to the right */
-      padding: 10px 0;
-    }
+        .song {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #444;
+            border-radius: 5px;
+        }
 
-    .topnav a {
-      color: white;
-      padding: 10px 20px;
-      font-size: 18px;
-    }
+        .song-info {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
 
-    .topnav a:hover {
-      background-color: #555;
-    }
+        .song-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
 
-    .topnav a.active {
-      background-color: #04AA6D;
-      color: white;
-    }
+        .song-artist {
+            font-size: 14px;
+        }
 
-    /* Main section styles */
-    .main-content {
-      padding: 20px;
-    }
+        .delete-btn {
+            background-color: coral;
+            color: black;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
 
-    h1 {
-      font-size: 36px;
-      font-weight: bold;
-      color: coral;
-    }
-
-    p {
-      font-size: 18px;
-      line-height: 1.6;
-    }
-
-    /* Saved song list styles */
-    .song-list {
-      list-style-type: none;
-      padding: 0;
-      margin: 20px 0;
-    }
-
-    .song-list li {
-      margin-bottom: 10px;
-    }
-
-    .song-list li audio {
-      width: 100%;
-    }
-  </style>
+        .delete-btn:hover {
+            background-color: red;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-
-  <!-- Navigation -->
-  <div class="topnav">
-    <a href="index.html">Home</a>
-    <a href="ts.html">Taylor Swift Songs</a>
-    <a href="login.html">Sign In</a>
-    <a href="account.html">Account</a>
-    <a class="active" href="pat.html">My Playlist</a>
-    <a href="tt.html">Times Tables Rocket</a>
-  </div>
-
- <div class="main-content">
-    <h1>My Playlist</h1>
-    <p>These are the songs you have saved.</p>
-    <div class="savedSongs" id="savedSongs">
-      <ul class="song-list" id="savedSongs">
-        <!-- Songs will be loaded here -->
-      </ul>
+    <div class="playlist-container">
+        <h1>My Playlist</h1>
+        <div id="playlist"></div>
     </div>
-    <button class="clear-button" onclick="clearSongs()">Delete All Saved Songs 🗑️</button>
-  </div>
 
-  <script>
-        // Function to load saved songs from localStorage and display them
-    window.onload = function() {
-      loadSongs();
-    }
+    <script>
+        function loadPlaylist() {
+            let currentUser = localStorage.getItem("currentUser");
+            if (!currentUser) {
+                document.getElementById("playlist").innerHTML = "<p>Please log in to view your playlist.</p>";
+                return;
+            }
 
-    function loadSongs() {
-      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-      const songList = document.getElementById('savedSongs');
-      songList.innerHTML = '';
+            let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
+            let playlist = userPlaylists[currentUser] || [];
 
-      savedSongs.forEach(song => {
-        const listItem = document.createElement('li');
-        const title = document.createElement('p');
-        const audio = document.createElement('audio');
+            let playlistDiv = document.getElementById("playlist");
+            playlistDiv.innerHTML = "";
 
-        audio.controls = true;
-        const source = document.createElement('source');
-        source.src = song.src;
-        source.type = 'audio/mpeg';
-        audio.appendChild(source);
+            if (playlist.length === 0) {
+                playlistDiv.innerHTML = "<p>Your playlist is empty.</p>";
+            } else {
+                playlist.forEach((song, index) => {
+                    let songDiv = document.createElement("div");
+                    songDiv.className = "song";
 
-        title.textContent = song.title;
+                    let songInfoDiv = document.createElement("div");
+                    songInfoDiv.className = "song-info";
 
-        listItem.appendChild(title);
-        listItem.appendChild(audio);
+                    let songTitleDiv = document.createElement("div");
+                    songTitleDiv.className = "song-title";
+                    songTitleDiv.textContent = song.title;
 
-        songList.appendChild(listItem);
-      });
-    }
+                    let songArtistDiv = document.createElement("div");
+                    songArtistDiv.className = "song-artist";
+                    songArtistDiv.textContent = song.artist;
 
-    function clearSongs() {
-      localStorage.removeItem('savedSongs');
-      loadSongs();
-      alert("All songs have been removed from your playlist.");
-    }
+                    songInfoDiv.appendChild(songTitleDiv);
+                    songInfoDiv.appendChild(songArtistDiv);
 
-    // Save song function
-    function saveSong(title, src) {
-      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-      savedSongs.push({ title, src });
-      localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
-      alert("Your song has been saved to your playlist!");
-    }
-  </script>
+                    let deleteButton = document.createElement("button");
+                    deleteButton.className = "delete-btn";
+                    deleteButton.textContent = "Delete";
+                    deleteButton.onclick = function() {
+                        deleteSong(index);
+                    };
+
+                    songDiv.appendChild(songInfoDiv);
+                    songDiv.appendChild(deleteButton);
+
+                    playlistDiv.appendChild(songDiv);
+                });
+            }
+        }
+
+        function deleteSong(index) {
+            let currentUser = localStorage.getItem("currentUser");
+            if (!currentUser) {
+                alert("Please log in to delete songs from your playlist.");
+                return;
+            }
+
+            let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
+            let playlist = userPlaylists[currentUser] || [];
+
+            playlist.splice(index, 1);
+            userPlaylists[currentUser] = playlist;
+
+            localStorage.setItem("userPlaylists", JSON.stringify(userPlaylists));
+            loadPlaylist();
+        }
+
+        window.onload = function() {
+            loadPlaylist();
+        };
+    </script>
 </body>
 </html>
