@@ -66,52 +66,79 @@
 <body>
     <div class="playlist-container">
         <h1>My Playlist</h1>
-        <ul id="savedSongs"></ul>
-        <button onclick="clearSongs()">Clear all of my Playlist🗑️</button>
+        <div id="playlist"></div>
     </div>
 
     <script>
+        function loadPlaylist() {
+            let currentUser = localStorage.getItem("currentUser");
+            if (!currentUser) {
+                document.getElementById("playlist").innerHTML = "<p>Please log in to view your playlist.</p>";
+                return;
+            }
+
+            let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
+            let playlist = userPlaylists[currentUser] || [];
+
+            let playlistDiv = document.getElementById("playlist");
+            playlistDiv.innerHTML = "";
+
+            if (playlist.length === 0) {
+                playlistDiv.innerHTML = "<p>Your playlist is empty.</p>";
+            } else {
+                playlist.forEach((song, index) => {
+                    let songDiv = document.createElement("div");
+                    songDiv.className = "song";
+
+                    let songInfoDiv = document.createElement("div");
+                    songInfoDiv.className = "song-info";
+
+                    let songTitleDiv = document.createElement("div");
+                    songTitleDiv.className = "song-title";
+                    songTitleDiv.textContent = song.title;
+
+                    let songArtistDiv = document.createElement("div");
+                    songArtistDiv.className = "song-artist";
+                    songArtistDiv.textContent = song.artist;
+
+                    songInfoDiv.appendChild(songTitleDiv);
+                    songInfoDiv.appendChild(songArtistDiv);
+
+                    let deleteButton = document.createElement("button");
+                    deleteButton.className = "delete-btn";
+                    deleteButton.textContent = "Delete";
+                    deleteButton.onclick = function() {
+                        deleteSong(index);
+                    };
+
+                    songDiv.appendChild(songInfoDiv);
+                    songDiv.appendChild(deleteButton);
+
+                    playlistDiv.appendChild(songDiv);
+                });
+            }
+        }
+
+        function deleteSong(index) {
+            let currentUser = localStorage.getItem("currentUser");
+            if (!currentUser) {
+                alert("Please log in to delete songs from your playlist.");
+                return;
+            }
+
+            let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
+            let playlist = userPlaylists[currentUser] || [];
+
+            playlist.splice(index, 1);
+            userPlaylists[currentUser] = playlist;
+
+            localStorage.setItem("userPlaylists", JSON.stringify(userPlaylists));
+            loadPlaylist();
+        }
+
         window.onload = function() {
-            loadSongs();
-        }
-
-        function loadSongs() {
-            const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-            const songList = document.getElementById('savedSongs');
-            songList.innerHTML = '';
-
-            savedSongs.forEach(song => {
-                const listItem = document.createElement('li');
-                const title = document.createElement('p');
-                const audio = document.createElement('audio');
-
-                audio.controls = true;
-                const source = document.createElement('source');
-                source.src = song.src;
-                source.type = 'audio/mpeg';
-                audio.appendChild(source);
-
-                title.textContent = song.title;
-
-                listItem.appendChild(title);
-                listItem.appendChild(audio);
-
-                songList.appendChild(listItem);
-            });
-        }
-
-        function clearSongs() {
-            localStorage.removeItem('savedSongs');
-            loadSongs();
-            alert("All of your Songs from your SAVED SONGS are deleted!");
-        }
-
-        function saveSong(title, src) {
-            const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-            savedSongs.push({ title, src });
-            localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
-            loadSongs();
-        }
+            loadPlaylist();
+        };
     </script>
 </body>
 </html>
