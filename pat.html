@@ -66,46 +66,51 @@
 <body>
     <div class="playlist-container">
         <h1>My Playlist</h1>
-        <div id="playlist"></div>
+        <ul id="savedSongs"></ul>
         <button onclick="clearSongs()">Clear all of my Playlist🗑️</button>
     </div>
 
     <script>
-        
-    window.onload = function() {
-      loadSongs();
-    }
+        window.onload = function() {
+            loadSongs();
+        }
 
-    function loadSongs() {
-      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-      const songList = document.getElementById('savedSongs');
-      songList.innerHTML = '';
+        function loadSongs() {
+            const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+            const songList = document.getElementById('savedSongs');
+            songList.innerHTML = '';
 
-      savedSongs.forEach(song => {
-        const listItem = document.createElement('li');
-        const title = document.createElement('p');
-        const audio = document.createElement('audio');
+            savedSongs.forEach(song => {
+                const listItem = document.createElement('li');
+                const title = document.createElement('p');
+                const audio = document.createElement('audio');
 
-        audio.controls = true;
-        const source = document.createElement('source');
-        source.src = song.src;
-        source.type = 'audio/mpeg';
-        audio.appendChild(source);
+                audio.controls = true;
+                const source = document.createElement('source');
+                source.src = song.src;
+                source.type = 'audio/mpeg';
+                audio.appendChild(source);
 
-        title.textContent = song.title;
+                title.textContent = song.title;
 
-        listItem.appendChild(title);
-        listItem.appendChild(audio);
+                listItem.appendChild(title);
+                listItem.appendChild(audio);
 
-        songList.appendChild(listItem);
-      });
-    }
-
+                songList.appendChild(listItem);
+            });
+        }
 
         function clearSongs() {
-        localStorage.removeItem('savedSongs');
-        loadSongs();
-        alert("All of your Songs from your SAVED SONGS are deleted!");
+            localStorage.removeItem('savedSongs');
+            loadSongs();
+            alert("All of your Songs from your SAVED SONGS are deleted!");
+        }
+
+        function saveSong(title, src) {
+            const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+            savedSongs.push({ title, src });
+            localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
+            loadSongs();
         }
     </script>
 </body>
