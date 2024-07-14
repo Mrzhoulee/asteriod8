@@ -72,79 +72,39 @@
 
     <script>
         
-        function loadPlaylist() {
-            let currentUser = localStorage.getItem("currentUser");
-            if (!currentUser) {
-                document.getElementById("playlist").innerHTML = "<p>Please log in to view your playlist.</p>";
-                return;
-            }
+    window.onload = function() {
+      loadSongs();
+    }
 
-            let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
-            let playlist = userPlaylists[currentUser] || [];
+    function loadSongs() {
+      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+      const songList = document.getElementById('savedSongs');
+      songList.innerHTML = '';
 
-            let playlistDiv = document.getElementById("playlist");
-            playlistDiv.innerHTML = "";
+      savedSongs.forEach(song => {
+        const listItem = document.createElement('li');
+        const title = document.createElement('p');
+        const audio = document.createElement('audio');
 
-            if (playlist.length === 0) {
-                playlistDiv.innerHTML = "<p>Your playlist is empty.</p>";
-            } else {
-                playlist.forEach((song, index) => {
-                    let songDiv = document.createElement("div");
-                    songDiv.className = "song";
+        audio.controls = true;
+        const source = document.createElement('source');
+        source.src = song.src;
+        source.type = 'audio/mpeg';
+        audio.appendChild(source);
 
-                    let songInfoDiv = document.createElement("div");
-                    songInfoDiv.className = "song-info";
+        title.textContent = song.title;
 
-                    let songTitleDiv = document.createElement("div");
-                    songTitleDiv.className = "song-title";
-                    songTitleDiv.textContent = song.title;
+        listItem.appendChild(title);
+        listItem.appendChild(audio);
 
-                    let songArtistDiv = document.createElement("div");
-                    songArtistDiv.className = "song-artist";
-                    songArtistDiv.textContent = song.artist;
+        songList.appendChild(listItem);
+      });
+    }
 
-                    songInfoDiv.appendChild(songTitleDiv);
-                    songInfoDiv.appendChild(songArtistDiv);
-
-                    let deleteButton = document.createElement("button");
-                    deleteButton.className = "delete-btn";
-                    deleteButton.textContent = "Delete";
-                    deleteButton.onclick = function() {
-                        deleteSong(index);
-                    };
-
-                    songDiv.appendChild(songInfoDiv);
-                    songDiv.appendChild(deleteButton);
-
-                    playlistDiv.appendChild(songDiv);
-                });
-            }
-        }
-
-        function deleteSong(index) {
-            let currentUser = localStorage.getItem("currentUser");
-            if (!currentUser) {
-                alert("Please log in to delete songs from your playlist.");
-                return;
-            }
-
-            let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
-            let playlist = userPlaylists[currentUser] || [];
-
-            playlist.splice(index, 1);
-            userPlaylists[currentUser] = playlist;
-
-            localStorage.setItem("userPlaylists", JSON.stringify(userPlaylists));
-            loadPlaylist();
-        }
-
-        window.onload = function() {
-            loadPlaylist();
-        };
 
         function clearSongs() {
         localStorage.removeItem('savedSongs');
-        loadPlaylist();
+        loadSongs();
         alert("All of your Songs from your SAVED SONGS are deleted!");
         }
     </script>
