@@ -71,6 +71,7 @@
     </div>
 
     <script>
+        
         function loadPlaylist() {
             let currentUser = localStorage.getItem("currentUser");
             if (!currentUser) {
@@ -141,8 +142,14 @@
             loadPlaylist();
         };
 
+            function loadSongs() {
+      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+      const songList = document.getElementById('savedSongs');
+      songList.innerHTML = '';
+
         function clearSongs() {
-        localStorage.removeItem(playlist);
+        localStorage.removeItem('savedSongs');
+        loadSongs();
         alert("All of your Songs from your SAVED SONGS are deleted!");
         }
     </script>
