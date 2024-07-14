@@ -182,13 +182,21 @@
       <button onclick="searchSong()">Search</button>
     </div>
 
-    <!-- Song List -->
-    <h2>ASTEROID RECOMMENDS👍🏻</h2>
-    <ul class="song-list" id="songList">
+    <!-- List of Songs -->
+    <ul class="song-list">
       <li>
-        <figcaption>Can't Stop the Feeling</figcaption>
-        <audio controls src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a" onplay="playSong('Can't Stop the Feeling', 'CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a')"></audio>
-        <button onclick="saveSong('Can't Stop the Feeling', 'C:\Users\HP\Downloads\asteriod8-main\asteriod8-main\Asteriod files\CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a')">SAVE SONG ❤️</button>
+        <audio controls>
+          <source src="mediafiles/music/TaylorSwift-LoveStory.mp3" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+        <button onclick="saveSong('Taylor Swift', 'Love Story', 'mediafiles/music/TaylorSwift-LoveStory.mp3')">Add to Playlist</button>
+      </li>
+      <li>
+        <audio controls>
+          <source src="mediafiles/music/CruelSummer.mp3" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+        <button onclick="saveSong('Taylor Swift', 'Cruel Summer', 'mediafiles/music/CruelSummer.mp3')">Add to Playlist</button>
       </li>
     </ul>
   </div>
@@ -196,99 +204,64 @@
   <!-- Mini Player -->
   <div class="mini-player" id="miniPlayer">
     <div class="song-info">
-      <img src="default_album_art.jpg" alt="Album Art" id="albumArt">
+      <img src="placeholder.png" alt="Album Art" id="miniPlayerAlbumArt">
       <div class="song-details">
-        <span class="song-title" id="miniSongTitle">Song Title</span>
-        <span class="song-artist" id="miniSongArtist">Artist Name</span>
+        <span class="song-title" id="miniPlayerSongTitle"></span>
+        <span class="song-artist" id="miniPlayerSongArtist"></span>
       </div>
     </div>
     <div class="controls">
-      <button onclick="pauseMiniPlayer()">Pause</button>
+      <button onclick="togglePlayPause()">Play/Pause</button>
       <button onclick="closeMiniPlayer()">Close</button>
     </div>
   </div>
 
   <script>
-    // Function to handle playing a song and showing the mini player
-    function playSong(title, src) {
-      const miniPlayer = document.getElementById('miniPlayer');
-      const miniSongTitle = document.getElementById('miniSongTitle');
-      const miniSongArtist = document.getElementById('miniSongArtist');
-      const albumArt = document.getElementById('albumArt');
-      
-      miniSongTitle.textContent = title;
-      miniSongArtist.textContent = "Artist Name"; // Add logic to set artist name if available
-      albumArt.src = "default_album_art.jpg"; // Add logic to set album art if available
-
-      miniPlayer.classList.add('active');
-
-      // Pause current audio in mini player before playing new one
-      const currentAudio = document.getElementById('miniPlayerAudio');
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.remove();
-      }
-
-      // Create a new audio element for the mini player
-      const miniPlayerAudio = document.createElement('audio');
-      miniPlayerAudio.id = 'miniPlayerAudio';
-      miniPlayerAudio.src = src;
-      miniPlayerAudio.play();
-      miniPlayer.appendChild(miniPlayerAudio);
-    }
-
-    // Function to pause the mini player audio
-    function pauseMiniPlayer() {
-      const miniPlayerAudio = document.getElementById('miniPlayerAudio');
-      if (miniPlayerAudio) {
-        miniPlayerAudio.pause();
-      }
-    }
-
-    // Function to close the mini player
-    function closeMiniPlayer() {
-      const miniPlayer = document.getElementById('miniPlayer');
-      miniPlayer.classList.remove('active');
-
-      const miniPlayerAudio = document.getElementById('miniPlayerAudio');
-      if (miniPlayerAudio) {
-        miniPlayerAudio.pause();
-        miniPlayerAudio.remove();
-      }
-    }
-
-    // Function to save song information in localStorage
-    
-    // Function to search for a song
+    // Search functionality
     function searchSong() {
-      const input = document.getElementById('searchInput').value.toLowerCase();
-      const songList = document.getElementById('songList');
-      const songs = songList.getElementsByTagName('li');
-
-      for (let i = 0; i < songs.length; i++) {
-        const figcaption = songs[i].getElementsByTagName('figcaption')[0];
-        if (figcaption) {
-          const txtValue = figcaption.textContent || figcaption.innerText;
-          if (txtValue.toLowerCase().indexOf(input) > -1) {
-            songs[i].style.display = '';
+      var input, filter, ul, li, audio, i;
+      input = document.getElementById('searchInput');
+      filter = input.value.toUpperCase();
+      ul = document.querySelector('.song-list');
+      li = ul.getElementsByTagName('li');
+      for (i = 0; i < li.length; i++) {
+        audio = li[i].getElementsByTagName('audio')[0];
+        if (audio) {
+          if (audio.getElementsByTagName('source')[0].src.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = '';
           } else {
-            songs[i].style.display = 'none';
+            li[i].style.display = 'none';
           }
-        }
+        }       
       }
     }
-  </script>
 
+    // Save song to localStorage
+    function saveSong(artist, title, src) {
+      let currentUser = localStorage.getItem("currentUser");
+      if (!currentUser) {
+        alert("Please log in to save songs to your playlist.");
+        return;
+      }
 
-    <script>
-    function saveSong(title, src) {
-      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-      console.log('saveSong function called');
-      console.log(`Saving song: ${title}, ${src}`);
-      alert("Your Song Is saved to your playlist!");
-      savedSongs.push({ title, src });
-      localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
-      console.log('Song saved successfully');
+      let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
+      let playlist = userPlaylists[currentUser] || [];
+
+      let newSong = { artist, title, src };
+      playlist.push(newSong);
+      userPlaylists[currentUser] = playlist;
+
+      localStorage.setItem("userPlaylists", JSON.stringify(userPlaylists));
+      alert("Song added to playlist!");
+    }
+
+    // Mini player functionality
+    function togglePlayPause() {
+      // Implement play/pause functionality
+    }
+
+    function closeMiniPlayer() {
+      document.getElementById("miniPlayer").classList.remove("active");
     }
   </script>
 </body>
