@@ -5,14 +5,12 @@
     <style>
       body  {
       background-color: black;
-      align-items: center;
       text-align: center;
       }
 
 
       div.align {
       text-align: center;
-      align-items: center;
       font-color: coral;
       }
       
@@ -41,6 +39,7 @@
   const video = JSON.parse(localStorage.getItem('video')) || [];
   video.push({ title, src });
   localStorage.setItem('video', JSON.stringify(video));
+    alert("Your Song is Uploaded GOOD LUCK!😊");
   }
 </script>
     
