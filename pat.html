@@ -67,6 +67,7 @@
     <div class="playlist-container">
         <h1>My Playlist</h1>
         <div id="playlist"></div>
+        <button onclick="clearSongs()">Clear all of my Playlist🗑️</button>
     </div>
 
     <script>
@@ -139,6 +140,10 @@
         window.onload = function() {
             loadPlaylist();
         };
+
+        function clearSongs() {
+        localStorage.removeItem("playlist");
+        }
     </script>
 </body>
 </html>
