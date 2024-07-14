@@ -2,26 +2,26 @@
 <html>
   <head>
       <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
-    <style>
+  </head>
+  <body>
+        <style>
       body  {
       background-color: black;
       text-align: center;
       }
 
 
-      div.align {
+      div.forma {
       text-align: center;
       font-color: coral;
+      font-face: Montserrat;
       }
       
     </style>
-  </head>
-  <body>
-    
 
 <form id="upload">
-  <font color="coral" font face="Montserrat">
-  <div class="align">
+
+  <div class="forma">
     <input type="file" id="video" name="video" accept="video/*" required> 
     <input type="text" id="title" placeholder="Enter your Song Title" required>
     <input type="radio" id="Public" value="Public" required>
@@ -30,7 +30,6 @@
    <label for="Private">Private</label><br>
    <button onclick="upload()"> Upload</button>
   </div>
-  </font>
 
 </form>
 
