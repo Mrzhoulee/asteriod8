@@ -28,7 +28,7 @@
   <label for="Public">Public</label><br>
     <input type="radio" id="Private" value="Private" required>
    <label for="Private">Private</label><br>
-      <input type="button" onclick="upload(); return false;"value="Upload" required>
+      <input type="button" onclick="upload()"value="Upload" required>
   </div>
   </font>
 
@@ -39,7 +39,7 @@
   const video = JSON.parse(localStorage.getItem('video')) || [];
   video.push({ title, src });
   localStorage.setItem('video', JSON.stringify(video));
-    alert("Your Song is Uploaded GOOD LUCK!😊");
+  alert("Your Song is Uploaded GOOD LUCK!😊");
   }
 </script>
     
