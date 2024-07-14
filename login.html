@@ -99,7 +99,8 @@
             let email = document.getElementById("email").value;
             let password = document.getElementById("password").value;
             let user_records = JSON.parse(localStorage.getItem("users")) || [];
-            if (user_records.some((v) => v.email == email && v.password == password)) {
+            
+            if (user_records.all((v) => v.email == email && v.password == password)) {
                 alert("Log in Successful!");
                 window.location.href = "start.html";
             } else {
