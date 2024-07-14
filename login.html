@@ -95,36 +95,19 @@
     </div>
 
     <script>
-        function saveData() {
+          function handleLogin() {
             let email = document.getElementById("email").value;
             let password = document.getElementById("password").value;
             let user_records = JSON.parse(localStorage.getItem("users")) || [];
-            
-            if (user_records.some((v) => v.email == email && v.password == password)) {
+
+            if (user_records.some((v) => v.email === email && v.password === password)) {
                 alert("Log in Successful!");
+                localStorage.setItem("currentUser", email);
                 window.location.href = "start.html";
             } else {
                 alert("Incorrect Username or Password");
             }
         }
-
-        function showSecondButton() {
-            document.getElementById("secondButton").classList.remove("hidden");
-        }
-
-        function handleLogin() {
-            saveData();
-            const email = document.getElementById("email").value;
-            localStorage.setItem("currentUser", email);
-            window.location.href = "start.html";
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            localStorage.setItem('currentUser', email);
-            window.location.href = 'Songs.html';
-        });
     </script>
 </body>
 </html>
