@@ -13,15 +13,13 @@
 
       div.forma {
       text-align: center;
-      font-color: coral;
-      font-face: Montserrat;
       }
       
     </style>
-
+  <div id="forma" class="forma">
 <form id="upload">
+<font color="coral" font face="Montserrat">
 
-  <div class="forma">
     <input type="file" id="video" name="video" accept="video/*" required> 
     <input type="text" id="title" placeholder="Enter your Song Title" required>
     <input type="radio" id="Public" value="Public" required>
@@ -29,9 +27,10 @@
     <input type="radio" id="Private" value="Private" required>
    <label for="Private">Private</label><br>
    <button onclick="upload()"> Upload</button>
-  </div>
-
+  
+</font>
 </form>
+    </div>
 
 <script>
   function upload() {
