@@ -142,14 +142,9 @@
             loadPlaylist();
         };
 
-            function loadSongs() {
-      const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
-      const songList = document.getElementById('savedSongs');
-      songList.innerHTML = '';
-
         function clearSongs() {
         localStorage.removeItem('savedSongs');
-        loadSongs();
+        loadPlaylist();
         alert("All of your Songs from your SAVED SONGS are deleted!");
         }
     </script>
