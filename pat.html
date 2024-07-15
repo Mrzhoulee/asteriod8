@@ -110,7 +110,7 @@ input:checked + .slider:before {
     </div>
 
     <script>
-        function loadPlaylist() {
+        function loadPlaylist(artist, title, src) {
             let currentUser = localStorage.getItem("currentUser");
             if (!currentUser) {
                 document.getElementById("playlist").innerHTML = "<p>Please log in to view your playlist.</p>";
@@ -123,9 +123,20 @@ input:checked + .slider:before {
             let playlistDiv = document.getElementById("playlist");
             playlistDiv.innerHTML = "";
 
-            if (playlist.length === 0) {
-                playlistDiv.innerHTML = "<p>Your playlist is empty.</p>";
-            } else {
+                  function loadPlaylist(artist, title, src) {
+            let currentUser = localStorage.getItem("currentUser");
+            if (!currentUser) {
+                document.getElementById("playlist").innerHTML = "<p>Please log in to view your playlist.</p>";
+                return;
+            }
+
+            let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
+            let playlist = userPlaylists[currentUser] || [];
+
+            let playlistDiv = document.getElementById("playlist");
+            playlistDiv.innerHTML = "";
+
+ 
                 playlist.forEach((song, index) => {
                     let songDiv = document.createElement("div");
                     songDiv.className = "song";
@@ -150,6 +161,14 @@ input:checked + .slider:before {
                     deleteButton.onclick = function() {
                         deleteSong(index);
                     };
+
+                    songDiv.appendChild(songInfoDiv);
+                    songDiv.appendChild(deleteButton);
+
+                    playlistDiv.appendChild(songDiv);
+                });
+            }
+        
 
                     songDiv.appendChild(songInfoDiv);
                     songDiv.appendChild(deleteButton);
