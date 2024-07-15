@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Playlist</title>
@@ -65,9 +61,6 @@
             background-color: red;
             color: white;
         }
-
-        
-
     </style>
 
     
@@ -134,15 +127,9 @@ input:checked + .slider:before {
     </style>
 </head>
 <body>
-    
-    <div class="main">
     <div class="playlist-container">
         <h1>My Playlist</h1>
-
-
-
-  
-    </div>
+        <div id="playlist"></div>
     </div>
 
     <script>
@@ -216,8 +203,8 @@ input:checked + .slider:before {
             loadPlaylist();
         };
     </script>
-    
-    <div class="sidenav">
+
+<div class="sidenav">
 <label class="switch">
   <input type="checkbox" checked>
   <span class="slider round"></span>
@@ -226,5 +213,6 @@ input:checked + .slider:before {
         <h5><font face="Montserrat" font color="coral">LOOP MUSIC🎧</font></h5>
      
   </div>
+    
 </body>
 </html>
