@@ -175,14 +175,24 @@ Turn up the volume and let the music play!</p></h4></font>
   
 <style>
 
+    if (!currentUser) {
+        // Initialize currentUser if it doesn't exist
+        currentUser = {
+            isPremiumUser: false,
+            premiumExpiry: null
+        };
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+    }
+
+    // Update UI based on current premium status
+    updateStatusMessage(currentUser.isPremiumUser);
+});
 
 
 </style>
-<script>
-let isPremiumUser = true;
-</script>
+        <script>
 
-
+        </script>
   
 </body>
 </html>
