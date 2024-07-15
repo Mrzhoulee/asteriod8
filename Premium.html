@@ -64,9 +64,9 @@ color: #67708f;
   <font color ="white">Free $0.00</font>
 <button id="purchaseButton" onclick="purchasePremium()"><font face="Montserrat" font color="white">PURCHASE SCOPE</font></button>
 <button onclick="myFunc()"><font color="white">Unlock <b>SCOPE</b></font></button>
-   <a href="Pre.html"><font face="Montserrat" font color="coral">Already a SCOPE User?, Log in now!</font></a>
+  
 <p id="demo"></p>
-     <a href="Pre.html"><font face="Montserrat" font color="coral">LOG IN SCOPE</font></a>
+     
 
 <script>
 
@@ -84,26 +84,22 @@ color: #67708f;
   
 function myFunc() {
   document.getElementById("demo").innerHTML = "Username = Preuser, Password =  User102049 ";
+  document.write("SCOPE Username and Password is Set for your Log In!");
 }
 
 function purchasePremium() {
-    // Get the current user
-    let currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-    if (currentUser) {
-        // Change the premium status to true and set the expiry date to one month from now
-        currentUser.isPremiumUser = true;
+        let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        alert("You have successfully purchased SCOPE for one full year!");
+         currentUser.isPremiumUser = true;
         let expiryDate = new Date();
         expiryDate.setMonth(expiryDate.getMonth() + 12);
         currentUser.premiumExpiry = expiryDate.toISOString();
 
         localStorage.setItem("currentUser", JSON.stringify(currentUser));
         updateStatusMessage(currentUser.isPremiumUser);
-        alert("You have successfully purchased SCOPE for one full year!");
-    } else {
-        alert("User is not signed in.");
-    }
+
 }
+  
 
   function checkPremiumStatus(user) {
     if (user.isPremiumUser) {
