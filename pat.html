@@ -24,6 +24,29 @@
             color: coral;
         }
 
+        .song {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #444;
+            border-radius: 5px;
+        }
+
+        .song-info {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .song-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .song-artist {
+            font-size: 14px;
+        }
 
         .delete-btn {
             background-color: coral;
@@ -32,6 +55,7 @@
             padding: 5px 10px;
             cursor: pointer;
             border-radius: 5px;
+            margin-top: 10px;
         }
 
         .delete-btn:hover {
@@ -40,67 +64,65 @@
         }
     </style>
 
-    
-<style>
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
 
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
 
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
 
-input:checked + .slider {
-  background-color: #2196F3;
-}
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
 
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
 
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
 
-    /* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
+        .slider.round {
+            border-radius: 34px;
+        }
 
-.slider.round:before {
-  border-radius: 50%;
-}
+        .slider.round:before {
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -110,7 +132,7 @@ input:checked + .slider:before {
     </div>
 
     <script>
-        function loadPlaylist(artist, title, src) {
+        function loadPlaylist() {
             let currentUser = localStorage.getItem("currentUser");
             if (!currentUser) {
                 document.getElementById("playlist").innerHTML = "<p>Please log in to view your playlist.</p>";
@@ -123,20 +145,9 @@ input:checked + .slider:before {
             let playlistDiv = document.getElementById("playlist");
             playlistDiv.innerHTML = "";
 
-                  function loadPlaylist(artist, title, src) {
-            let currentUser = localStorage.getItem("currentUser");
-            if (!currentUser) {
-                document.getElementById("playlist").innerHTML = "<p>Please log in to view your playlist.</p>";
-                return;
-            }
-
-            let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
-            let playlist = userPlaylists[currentUser] || [];
-
-            let playlistDiv = document.getElementById("playlist");
-            playlistDiv.innerHTML = "";
-
- 
+            if (playlist.length === 0) {
+                playlistDiv.innerHTML = "<p>Your playlist is empty.</p>";
+            } else {
                 playlist.forEach((song, index) => {
                     let songDiv = document.createElement("div");
                     songDiv.className = "song";
@@ -152,6 +163,15 @@ input:checked + .slider:before {
                     songArtistDiv.className = "song-artist";
                     songArtistDiv.textContent = song.artist;
 
+                    let audioElement = document.createElement("audio");
+                    audioElement.controls = true;
+
+                    let sourceElement = document.createElement("source");
+                    sourceElement.src = song.src;
+                    sourceElement.type = "audio/mpeg";
+
+                    audioElement.appendChild(sourceElement);
+
                     songInfoDiv.appendChild(songTitleDiv);
                     songInfoDiv.appendChild(songArtistDiv);
 
@@ -163,14 +183,7 @@ input:checked + .slider:before {
                     };
 
                     songDiv.appendChild(songInfoDiv);
-                    songDiv.appendChild(deleteButton);
-
-                    playlistDiv.appendChild(songDiv);
-                });
-            }
-        
-
-                    songDiv.appendChild(songInfoDiv);
+                    songDiv.appendChild(audioElement);
                     songDiv.appendChild(deleteButton);
 
                     playlistDiv.appendChild(songDiv);
@@ -200,15 +213,13 @@ input:checked + .slider:before {
         };
     </script>
 
-<div class="sidenav">
-<label class="switch">
-  <input type="checkbox" checked>
-  <span class="slider round"></span>
-</label>
+    <div class="sidenav">
+        <label class="switch">
+            <input type="checkbox" checked>
+            <span class="slider round"></span>
+        </label>
         <p>OFF ON</p>
         <h5><font face="Montserrat" font color="coral">LOOP MUSIC🎧</font></h5>
-     
-  </div>
-    
+    </div>
 </body>
 </html>
