@@ -67,6 +67,11 @@
         }
 
         
+
+    </style>
+
+    
+<style>
 .switch {
   position: relative;
   display: inline-block;
@@ -102,55 +107,33 @@
   background-color: white;
   -webkit-transition: .4s;
   transition: .4s;
-
-    
-body {
-  font-family: "Lato", sans-serif;
 }
 
-.sidenav {
-  width: 130px;
-  position: fixed;
-  z-index: 1;
-  top: 20px;
-  left: 10px;
-  background: #eee;
-  overflow-x: hidden;
-  padding: 8px 0;
+input:checked + .slider {
+  background-color: #2196F3;
 }
 
-.sidenav a {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: 25px;
-  color: #2196F3;
-  display: block;
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
 }
 
-.sidenav a:hover {
-  color: #064579;
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
 }
 
-.main {
-  margin-left: 140px; /* Same width as the sidebar + left position in px */
-  font-size: 28px; /* Increased text to enable scrolling */
-  padding: 0px 10px;
+    /* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
 }
 
-@media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
+.slider.round:before {
+  border-radius: 50%;
+}
     </style>
 </head>
 <body>
-    <div class="sidenav">
-<label class="switch">
-  <input type="checkbox" checked>
-  <span class="slider round"></span>
-</label>
-        <p>OFF ON</p>
-        <h5><font face="Montserrat" font color="coral">LOOP MUSIC🎧</font></h5>
-     
-  </div>
     
     <div class="main">
     <div class="playlist-container">
@@ -233,5 +216,15 @@ body {
             loadPlaylist();
         };
     </script>
+    
+    <div class="sidenav">
+<label class="switch">
+  <input type="checkbox" checked>
+  <span class="slider round"></span>
+</label>
+        <p>OFF ON</p>
+        <h5><font face="Montserrat" font color="coral">LOOP MUSIC🎧</font></h5>
+     
+  </div>
 </body>
 </html>
