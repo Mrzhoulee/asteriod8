@@ -73,10 +73,11 @@
 
 <script>
   function upload() {
+  alert("Your Song is Uploaded GOOD LUCK!😊");
+    return;
   const video = JSON.parse(localStorage.getItem('video')) || [];
   video.push({ title, src });
   localStorage.setItem('video', JSON.stringify(video));
-  alert("Your Song is Uploaded GOOD LUCK!😊");
   }
 </script>
     
