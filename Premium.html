@@ -88,18 +88,31 @@ alert("Your SCOPE USERNAME AND PASSWORD IS SUCCESSFULLY CREATED FOR YOU!👌")
 }
 
 function purchasePremium() {
-        localStorage.setItem("isPremiumUser", "true");
-        let currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        alert("You have successfully purchased SCOPE for one full year!");
-         currentUser.isPremiumUser = true;
-        let expiryDate = new Date();
-        expiryDate.setMonth(expiryDate.getMonth() + 12);
-        currentUser.premiumExpiry = expiryDate.toISOString();
+    let currentUserEmail = localStorage.getItem("currentUser");
+    let user_records = JSON.parse(localStorage.getItem("users")) || [];
 
-        localStorage.setItem("currentUser", JSON.stringify(currentUser));
-        updateStatusMessage(currentUser.isPremiumUser);
+    user_records = user_records.map(user => {
+        if (user.email === currentUserEmail) {
+            user.isPremiumUser = true;
+            user.premiumStartDate = new Date().toISOString(); // Set current date as premium start date
+
+            // Calculate premium expiration date (12 months from now)
+            let premiumEndDate = new Date(user.premiumStartDate);
+            premiumEndDate.setMonth(premiumEndDate.getMonth() + 12); // Add 12 months
+
+            user.premiumEndDate = premiumEndDate.toISOString(); // Store expiration date
+        }
+        return user;
+    });
+
+    localStorage.setItem("users", JSON.stringify(user_records));
+    localStorage.setItem("isPremiumUser", "true");
+
+    alert("Premium Purchased Successfully for one full year!");
 
 }
+
+  
   
 
   function checkPremiumStatus(user) {
