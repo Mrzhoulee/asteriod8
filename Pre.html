@@ -48,10 +48,11 @@ width: 100%;
     </div>
 
     <script>
-        if (!isPremiumUser) {
+        if (isPremiumUser == false) {
         alert("You do not have SCOPE ACCESS go buy SCOPE to access this feature!");
         window.location.href = "Premium.html";
         }
+        
         document.getElementById("loginForm").addEventListener("submit", function(event) {
             event.preventDefault(); // Prevent form submission
             
