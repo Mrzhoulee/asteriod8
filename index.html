@@ -179,6 +179,9 @@ Turn up the volume and let the music play!</p></h4></font>
 
 </style>
         <script>
+   localStorage.setItem("isPremiumUser", "false");
+   localStorage.setItem("currentUser", JSON.stringify(currentUser));
+   updateStatusMessage(currentUser.isPremiumUser);
   if (!currentUser) {
         // Initialize currentUser if it doesn't exist
         currentUser = {
