@@ -89,21 +89,30 @@
                 <input type="password" class="form-control" id="password" name="password" placeholder="Enter Your Password">
                 <button type="button" onclick="handleLogin()" class="btn-primary">Sign In</button>
                 <a href="registraition.html"><button type="button" class="btn-signup">Sign Up</button></a>
-                <button id="secondButton" class="btn btn-secondary hidden">  <a href="start.html">OPEN HOME PAGE</a></button>
+                <button id="secondButton" class="btn btn-secondary hidden"><a href="start.html">OPEN HOME PAGE</a></button>
             </form>
         </div>
     </div>
 
     <script>
-     localStorage.setItem("isPremiumUser", "false");
-          function handleLogin() {
+        function handleLogin() {
             let email = document.getElementById("email").value;
             let password = document.getElementById("password").value;
             let user_records = JSON.parse(localStorage.getItem("users")) || [];
 
-            if (user_records.some((v) => v.email === email && v.password === password)) {
+            let user = user_records.find((v) => v.email === email && v.password === password);
+
+            if (user) {
                 alert("Log in Successful!");
                 localStorage.setItem("currentUser", email);
+
+                // Set the user's premium status based on their stored record
+                if (user.isPremiumUser) {
+                    localStorage.setItem("isPremiumUser", "true");
+                } else {
+                    localStorage.setItem("isPremiumUser", "false");
+                }
+
                 window.location.href = "start.html";
             } else {
                 alert("Incorrect Username or Password");
