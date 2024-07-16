@@ -50,7 +50,7 @@ width: 100%;
     <script>
         if (!isPremiumUser) {
         alert("You do not have SCOPE ACCESS go buy SCOPE to access this feature!");
-        return;
+        window.location.href = "Premium.html";
         }
         document.getElementById("loginForm").addEventListener("submit", function(event) {
             event.preventDefault(); // Prevent form submission
