@@ -88,6 +88,7 @@ function myFunc() {
 }
 
 function purchasePremium() {
+        localStorage.setItem("isPremiumUser", "true");
         let currentUser = JSON.parse(localStorage.getItem("currentUser"));
         alert("You have successfully purchased SCOPE for one full year!");
          currentUser.isPremiumUser = true;
