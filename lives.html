@@ -3,12 +3,44 @@
   <head>
     <style>
       body {
-        background-color: blacl;
+        background-color: black;
+      }
+
+      div.error {
+      background-color: red;
+      border-radius: 20%;
+      width:100%;
       }
     </style>
   </head>
   <body>
-    <h1><b>TAYLOR SWIFT ROOM</b></h1>
+    <button onclick="myFunction()">❌</button>
+    <div id="myDIV">
+        <div class="error">
+<font face="Tahoma" font color="black"><h6>ℹ️ Taylor swift concert is not availabel in your region/country</h6>
+    </div>
+    </div>
+    <h1><b><font face="Tahoma" font color="black">TAYLOR SWIFT ROOM </font></b></h1>
       <a href="lv.html" class="button" id="button"><img src="LIVE CONCERT.png" height="250" width="250" alt="button text"/></a>
+
+     <h1><b><font face="Tahoma" font color="black"> #1 ROOM OF THE 70S 80S 90S CLASSICS</font></b></h1>
+      <a href="1O.html" class="button" id="button"><img src="C:\Users\HP\Documents\Downloads\images.jpg" height="250" width="250" alt="button text"/></a>
+
+         <h1><b><font face="Tahoma" font color="black"> #1 ROOM OF THE 70S 80S 90S CLASSICS</font></b></h1>
+      <a href="2O.html" class="button" id="button"><img src="C:\Users\HP\Documents\Downloads\images.jpg" height="250" width="250" alt="button text"/></a>
+
+         <h1><b><font face="Tahoma" font color="black"> #1 ROOM OF THE 70S 80S 90S CLASSICS</font></b></h1>
+      <a href="3O.html" class="button" id="button"><img src="C:\Users\HP\Documents\Downloads\images.jpg" height="250" width="250" alt="button text"/></a>
+
+    <script>
+      function myFunction() {
+  var x = document.getElementById("myDIV");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+    </script>
   </body>
 </html>
