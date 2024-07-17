@@ -1,108 +1,108 @@
 <!doctype HTML>
 <html>
-  <head>
-      <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-        <style>
-      body  {
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
       background-color: black;
       text-align: center;
-      }
+    }
 
-
-      div.forma {
+    div.forma {
       text-align: center;
-      }
+    }
 
-          form {
-          text-align: center;
-          }
+    form {
+      text-align: center;
+    }
 
- input[type=text]{
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid white;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
+    input[type=text] {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid white;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
 
-   input[type=file] {
-  width: 100%;
-  background-color: coral;
-  color: black;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
+    input[type=file] {
+      width: 100%;
+      background-color: coral;
+      color: black;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
-          input[type=radio] {
-          width: 25%;
-          background-color: coral;
-          }
-      
-    </style>
+    input[type=radio] {
+      width: 25%;
+      background-color: coral;
+    }
+  </style>
+</head>
+<body>
   <div id="forma" class="forma">
     <center>
-<form id="upload">
-<font color="coral" font face="Montserrat">
+      <form id="upload">
+        <font color="coral" face="Montserrat">
+          <input type="file" id="video" name="video" accept="video/*" required>
+          <br>
+          <input type="text" id="title" placeholder="Enter your Song Title" required>
+          <br>
+          <input type="radio" id="Public" name="visibility" value="Public" required>
+          <br>
+          <label for="Public">Public</label>
+          <br>
+          <input type="radio" id="Private" name="visibility" value="Private" required>
+          <br>
+          <label for="Private">Private</label>
+          <br>
+          <br>
+          <button type="button" onclick="upload()">Upload</button>
+          <br>
+        </font>
+      </form>
+    </center>
+  </div>
 
-    <input type="file" id="video" name="video" accept="video/*" required> 
-  <br>
-    <input type="text" id="title" placeholder="Enter your Song Title" required>
-  <br>
-    <input type="radio" id="Public" value="Public" required>
-  <br>
-  <label for="Public">Public</label>
-  <br>
-    <input type="radio" id="Private" value="Private" required>
-  <br>
-   <label for="Private">Private</label><br>
-  <br>
-   <button onclick="upload()"> Upload</button>
-  <br>
+  <script>
+    function upload() {
+      const videoInput = document.getElementById('video');
+      const titleInput = document.getElementById('title').value;
+      const isPublic = document.getElementById('Public').checked;
 
-</font>
-</form>
-      </center>
-    </div>
+      if (videoInput.files.length > 0) {
+        const file = videoInput.files[0];
+        const reader = new FileReader();
 
-<script>
-  function upload() {
-  alert("YOUR SONG AUDIO IS UPLOADED GOOD LUCK😊!");
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    // Get the container where videos will be displayed
-    const videoContainer = document.getElementById('videoContainer');
-    const videoContainer = document.getElementById('videoContainer1');
-    const videoContainer = document.getElementById('videoContainer2');
-    const videoContainer = document.getElementById('videoContainer3');
+        reader.onload = function(e) {
+          const videoSrc = e.target.result;
 
-    // Retrieve videos from localStorage
-    const videos = JSON.parse(localStorage.getItem('videos')) || [];
+          // Get existing videos from localStorage
+          const videos = JSON.parse(localStorage.getItem('videos')) || [];
 
-    // Display videos
-    videos.forEach(function(video) {
-      // Create video element
-      const videoElement = document.createElement('video');
-      videoElement.controls = true;
-      videoElement.src = video.src;
-      videoElement.width = 300; // Set video width
+          // Add new video to the array
+          videos.push({ title: titleInput, src: videoSrc, public: isPublic });
 
-      // Create title element
-      const titleElement = document.createElement('h3');
-      titleElement.textContent = video.title;
+          // Save updated video array back to localStorage
+          localStorage.setItem('videos', JSON.stringify(videos));
 
-      // Append elements to the container
-      videoContainer.appendChild(titleElement);
-      videoContainer.appendChild(videoElement);
-    });
-  });
-</script>
-    
-  </body>
+          // Alert user of successful upload
+          alert("Your Song is Uploaded GOOD LUCK!😊");
+
+          // Clear form inputs
+          document.getElementById('upload').reset();
+        };
+
+        // Read video file as a data URL
+        reader.readAsDataURL(file);
+      } else {
+        alert("Please select a video file to upload.");
+      }
+    }
+  </script>
+</body>
 </html>
