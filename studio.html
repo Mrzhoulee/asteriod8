@@ -72,9 +72,15 @@
     </div>
 
 <script>
+  function upload() {
+  alert("YOUR SONG AUDIO IS UPLOADED GOOD LUCK😊!");
+  }
   document.addEventListener('DOMContentLoaded', function() {
     // Get the container where videos will be displayed
     const videoContainer = document.getElementById('videoContainer');
+    const videoContainer = document.getElementById('videoContainer1');
+    const videoContainer = document.getElementById('videoContainer2');
+    const videoContainer = document.getElementById('videoContainer3');
 
     // Retrieve videos from localStorage
     const videos = JSON.parse(localStorage.getItem('videos')) || [];
