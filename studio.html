@@ -72,13 +72,30 @@
     </div>
 
 <script>
-  function upload() {
-  alert("Your Song is Uploaded GOOD LUCK!😊");
-    return;
-  const video = JSON.parse(localStorage.getItem('video')) || [];
-  video.push({ title, src });
-  localStorage.setItem('video', JSON.stringify(video));
-  }
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get the container where videos will be displayed
+    const videoContainer = document.getElementById('videoContainer');
+
+    // Retrieve videos from localStorage
+    const videos = JSON.parse(localStorage.getItem('videos')) || [];
+
+    // Display videos
+    videos.forEach(function(video) {
+      // Create video element
+      const videoElement = document.createElement('video');
+      videoElement.controls = true;
+      videoElement.src = video.src;
+      videoElement.width = 300; // Set video width
+
+      // Create title element
+      const titleElement = document.createElement('h3');
+      titleElement.textContent = video.title;
+
+      // Append elements to the container
+      videoContainer.appendChild(titleElement);
+      videoContainer.appendChild(videoElement);
+    });
+  });
 </script>
     
   </body>
