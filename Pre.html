@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Form</title>
 
     <style>
@@ -39,31 +42,25 @@ width: 100%;
         <input type="text" id="username" name="username"><br>
         <label for="password">Password:</label><br>
         <input type="password" id="password" name="password"><br><br>
-        <input type="submit" value="Sign In" onclick="login()">
+        <input type="submit" value="Login">
     </form>
     </center>
     </div>
 
     <script>
-        function checkPremium() {
-        if (isPremiumUser == false) {
-        alert("You do not have SCOPE ACCESS go buy SCOPE to access this feature!");
-        window.location.href = "Premium.html";
-        }
-        }
-
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent form submission
+            
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
             
-            function login() {
             if (username === "Preuser" && password === "User102049") {
                 alert("Login successful!");
-                window.location.href = "Game.html";
-            } else{
-              alert("Cannot log in. Incorrect username or password.");
+                window.location.href = "Game.html"; // Redirect to Game.html
+            } else {
+                alert("Cannot log in. Incorrect username or password.");
             }
-            }
-        
+        });
     </script>
 </body>
 </html>
