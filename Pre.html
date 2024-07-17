@@ -39,30 +39,31 @@ width: 100%;
         <input type="text" id="username" name="username"><br>
         <label for="password">Password:</label><br>
         <input type="password" id="password" name="password"><br><br>
-        <input type="submit" value="Login">
+        <input type="submit" value="Sign In" onclick="login()">
     </form>
     </center>
     </div>
 
     <script>
+        function checkPremium() {
         if (isPremiumUser == false) {
         alert("You do not have SCOPE ACCESS go buy SCOPE to access this feature!");
         window.location.href = "Premium.html";
         }
-        
-        document.getElementById("loginForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevent form submission
-            
+        }
+
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
             
+            function login() {
             if (username === "Preuser" && password === "User102049") {
                 alert("Login successful!");
                 window.location.href = "Game.html";
-            } else {
-                alert("Cannot log in. Incorrect username or password.");
+            } else{
+              alert("Cannot log in. Incorrect username or password.");
             }
-        });
+            }
+        
     </script>
 </body>
 </html>
