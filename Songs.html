@@ -182,8 +182,30 @@
       <button onclick="searchSong()">Search</button>
     </div>
 
-    <!-- Recommended Section -->
-    <div id="videoContainer">
+    <!-- Section for uploaded songs -->
+    <div id="uploadedSongs">
+      <h1>Uploaded Songs</h1>
+      <ul class="song-list" id="uploadedSongList">
+        <!-- JavaScript will populate this list -->
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Mini Player -->
+  <div class="mini-player" id="miniPlayer">
+    <div class="song-info">
+      <img src="placeholder.png" alt="Album Art" id="miniPlayerAlbumArt">
+      <div class="song-details">
+        <span class="song-title" id="miniPlayerSongTitle"></span>
+        <span class="song-artist" id="miniPlayerSongArtist"></span>
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="togglePlayPause()">Play/Pause</button>
+      <button onclick="closeMiniPlayer()">Close</button>
+    </div>
+  </div><div id="videoContainer">
       <h1>RECOMMENDED FOR YOU👍🏻</h1>
       <ul class="song-list">
         <li>
@@ -218,23 +240,29 @@
 
   </div>
 
-  <!-- Mini Player -->
-  <div class="mini-player" id="miniPlayer">
-    <div class="song-info">
-      <img src="placeholder.png" alt="Album Art" id="miniPlayerAlbumArt">
-      <div class="song-details">
-        <span class="song-title" id="miniPlayerSongTitle"></span>
-        <span class="song-artist" id="miniPlayerSongArtist"></span>
-      </div>
-    </div>
-    <div class="controls">
-      <button onclick="togglePlayPause()">Play/Pause</button>
-      <button onclick="closeMiniPlayer()">Close</button>
-    </div>
-  </div>
-
+    
   <script>
-    // Example function to save song to localStorage
+    document.addEventListener('DOMContentLoaded', function() {
+      // Retrieve uploaded songs from localStorage
+      const uploadedSongs = JSON.parse(localStorage.getItem('videos')) || [];
+
+      // Display uploaded songs
+      const uploadedSongList = document.getElementById('uploadedSongList');
+      uploadedSongs.forEach(function(song) {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <h3><font face="Montserrat" font color="Coral">${song.title}</font></h3>
+          <audio controls>
+            <source src="${song.src}" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+          <button onclick="saveSong('${song.title}', '${song.title}', '${song.src}')">Add to Playlist</button>
+        `;
+        uploadedSongList.appendChild(li);
+      });
+    });
+
+    // Save song to localStorage
     function saveSong(artist, title, src) {
       let currentUser = localStorage.getItem("currentUser");
       if (!currentUser) {
