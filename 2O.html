@@ -8,9 +8,9 @@
         body {
             background-color: black;
             margin: 0;
-            over-flow: hidden;
             display: flex;
             height: 100vh;
+            overflow: hidden;
         }
         #stream-container {
             flex: 1;
@@ -30,8 +30,8 @@
 </head>
 <body>
     <div id="stream-container">
-        <iframe id="stream" src="https://player.twitch.tv/?channel=bluestagejams&parent=www.example.com" allowfullscreen="true" scrolling="no"></iframe>
+        <iframe id="stream" src="https://player.twitch.tv/?channel=bluestagejams&parent=localhost" allowfullscreen="true" scrolling="no"></iframe>
     </div>
-    <iframe id="chat-container" src="https://www.twitch.tv/embed/bluestagejams/chat?parent=www.example.com"></iframe>
+    <iframe id="chat-container" src="https://www.twitch.tv/embed/bluestagejams/chat?parent=localhost"></iframe>
 </body>
 </html>
