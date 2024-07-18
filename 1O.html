@@ -4,24 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>#1 90s 80s 70s</title>
-   
-</head>
-<body>
     <style>
-  body {
-        background-color: black;
+        body {
+            background-color: black;
+            margin: 0;
+            overflow: hidden;
+        }
+        #twitch-embed,
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
-   <iframe src="https://player.twitch.tv/?video=2045218878&parent=www.example.com" frameborder="0" allowfullscreen="true" scrolling="no" height="900" width="1500"></iframe>
+</head>
+<body>
+    <iframe src="https://player.twitch.tv/?video=2045218878&parent=www.example.com" allowfullscreen="true" scrolling="no"></iframe>
 
-<!-- Add a placeholder for the Twitch embed -->
+    <!-- Add a placeholder for the Twitch embed -->
+    <div id="twitch-embed"></div>
 
+    <!-- Load the Twitch embed script -->
+    <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 
-<!-- Load the Twitch embed script -->
-
-
-<!-- Create a Twitch.Player object. This will render within the placeholder div -->
-
-</script>
+    <!-- Create a Twitch.Player object. This will render within the placeholder div -->
+    <script type="text/javascript">
+        new Twitch.Player("twitch-embed", {
+            video: "2045218878"
+        });
+    </script>
 </body>
 </html>
