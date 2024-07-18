@@ -3,26 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
+    <title>Live Stream with Chat</title>
     <style>
-  body {
-        background-color: black;
-        width: 2000;
-        height: 1000;
+        body {
+            background-color: black;
+            margin: 0;
+            over-flow: hidden;
+            display: flex;
+            height: 100vh;
+        }
+        #stream-container {
+            flex: 1;
+            position: relative;
+        }
+        #stream {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        #chat-container {
+            width: 350px;
+            height: 100%;
+            border: none;
         }
     </style>
-<iframe src="https://player.twitch.tv/?channel=bluestagejams&parent=www.example.com" frameborder="0" allowfullscreen="true" scrolling="no" height="900" width="1500"></iframe>
- <iframe
-  id="chat_embed"
-  src="https://www.twitch.tv/embed/bluestagejams/chat?parent=www.example.com"
-  height="500"
-  width="350">
-</iframe>
-    <!-- Add a placeholder for the Twitch embed -->
-<div id="twitch-embed"></div>
-
-<!-- Load the Twitch embed script -->
-
+</head>
+<body>
+    <div id="stream-container">
+        <iframe id="stream" src="https://player.twitch.tv/?channel=bluestagejams&parent=www.example.com" allowfullscreen="true" scrolling="no"></iframe>
+    </div>
+    <iframe id="chat-container" src="https://www.twitch.tv/embed/bluestagejams/chat?parent=www.example.com"></iframe>
 </body>
 </html>
