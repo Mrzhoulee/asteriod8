@@ -48,7 +48,7 @@
     <center>
       <form id="upload">
         <font color="coral" face="Montserrat">
-          <input type="file" id="video" name="video" accept="video/*" required>
+          <input type="file" id="video" name="video" accept="audio/*" required>
           <br>
           <input type="text" id="title" placeholder="Enter your Song Title" required>
           <br>
@@ -73,7 +73,7 @@
       const videoInput = document.getElementById('video');
       const titleInput = document.getElementById('title').value;
       const isPublic = document.getElementById('Public').checked;
-
+      alert("Your Song is Uploaded GOOD LUCK!😊");
       if (videoInput.files.length > 0) {
         const file = videoInput.files[0];
         const reader = new FileReader();
@@ -91,7 +91,7 @@
           localStorage.setItem('videos', JSON.stringify(videos));
 
           // Alert user of successful upload
-          alert("Your Song is Uploaded GOOD LUCK!😊");
+          
 
           // Clear form inputs
           document.getElementById('upload').reset();
