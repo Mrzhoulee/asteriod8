@@ -3,29 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   
-</head>
-<body>
+    <title>Live Stream with Chat</title>
     <style>
         body {
-        background-color: black;
-        width: 2000;
-        height: 1000;
+            background-color: black;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
-        </style>
-<iframe src="https://player.twitch.tv/?channel=spiritmusik&parent=www.example.com" frameborder="0" allowfullscreen="true" scrolling="no" height="900" width="1500"></iframe>
-<iframe
-  id="chat_embed"
-  src="https://www.twitch.tv/embed/spiritmusik/chat?parent=www.example.com"
-  height="400"
-  width="200">
-</iframe>
-                <!-- Add a placeholder for the Twitch embed -->
-<div id="twitch-embed">
-    
-</div>
-
-<!-- Load the Twitch embed script -->
-
+        #stream-container {
+            flex: 1;
+            position: relative;
+        }
+        #stream {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        #chat-container {
+            width: 380;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="stream-container">
+        <iframe id="stream" src="https://player.twitch.tv/?channel=spiritmusik&parent=www.example.com" allowfullscreen="true" scrolling="no"></iframe>
+    </div>
+    <iframe id="chat-container" src="https://www.twitch.tv/embed/spiritmusik/chat?parent=www.example.com"></iframe>
 </body>
 </html>
