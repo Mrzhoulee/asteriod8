@@ -6,9 +6,10 @@
     body {
       background-color: black;
       text-align: center;
+      color: white;
     }
 
-    div.forma {
+    .forma {
       text-align: center;
     }
 
@@ -38,34 +39,35 @@
     }
 
     input[type=radio] {
-      width: 25%;
       background-color: coral;
+    }
+
+    button {
+      background-color: coral;
+      color: black;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div id="forma" class="forma">
-    <center>
-      <form id="upload()">
-        <font color="coral" face="Montserrat">
-          <input type="file" id="video" name="video" accept="audio/*" required>
-          <br>
-          <input type="text" id="title" name="title" placeholder="Enter your Song Title" required>
-          <br>
-          <input type="radio" id="Public" name="public" value="Public" required>
-          <br>
-          <label for="Public">Public</label>
-          <br>
-          <input type="radio" id="Private" name="visibility" value="Private" required>
-          <br>
-          <label for="Private">Private</label>
-          <br>
-          <br>
-          <button type="button" onclick="upload()">Upload</button>
-          <br>
-        </font>
-      </form>
-    </center>
+  <div class="forma">
+    <form id="uploadForm">
+      <input type="file" id="video" name="video" accept="video/mp4" required>
+      <br>
+      <input type="text" id="title" name="title" placeholder="Enter your Song Title" required>
+      <br>
+      <input type="radio" id="Public" name="visibility" value="Public" required>
+      <label for="Public">Public</label>
+      <br>
+      <input type="radio" id="Private" name="visibility" value="Private" required>
+      <label for="Private">Private</label>
+      <br><br>
+      <button type="button" onclick="upload()">Upload</button>
+      <br>
+    </form>
   </div>
 
   <script>
@@ -82,7 +84,7 @@
           const videoSrc = e.target.result;
 
           // Get existing videos from localStorage
-          const video = JSON.parse(localStorage.getItem('video')) || [];
+          const videos = JSON.parse(localStorage.getItem('videos')) || [];
 
           // Add new video to the array
           videos.push({ title: titleInput, src: videoSrc, public: isPublic });
@@ -91,10 +93,10 @@
           localStorage.setItem('videos', JSON.stringify(videos));
 
           // Alert user of successful upload
-          alert(" Song uploaded successfully!");
+          alert("Song uploaded successfully!");
 
           // Clear form inputs
-          document.getElementById('upload').reset();
+          document.getElementById('uploadForm').reset();
         };
 
         // Read video file as a data URL
@@ -106,3 +108,4 @@
   </script>
 </body>
 </html>
+
