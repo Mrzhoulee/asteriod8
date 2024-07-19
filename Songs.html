@@ -166,7 +166,8 @@
 
     <div id="uploadedSongs">
       <h1>RECOMMENDED FOR YOU👍🏻</h1>
-      <ul class="song-list" id="uploadedSongList">
+    <ul class="song-list" id="uploadedSongs"></ul>
+
         
         <li>
           <h3><font face="Montserrat" font color="Coral">Cant Stop The Feeling! - Justin Timberlake</font></h3>
@@ -212,84 +213,50 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Retrieve uploaded songs from localStorage
-      const uploadedSongs = JSON.parse(localStorage.getItem('videos')) || [];
+  // Retrieve uploaded videos from localStorage
+  const uploadedSongs = JSON.parse(localStorage.getItem('videos')) || [];
 
-      // Display uploaded songs
-      const uploadedSongList = document.getElementById('uploadedSongList');
-      uploadedSongs.forEach(function(song) {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <h3><font face="Montserrat" color="Coral">${song.title}</font></h3>
-          <audio controls>
-            <source src="${song.src}" type="video/mp4">
-            Your browser does not support the audio element.
-          </audio>
-          <button onclick="saveSong('${song.title}', '${song.src}')">Add to Playlist</button>
-        `;
-        uploadedSongList.appendChild(li);
-      });
-    });
+  // Display uploaded videos
+  const uploadedSongList = document.getElementById('uploadedSongs');
+  uploadedSongs.forEach(function(song) {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <h3><font face="Montserrat" color="Coral">${song.title}</font></h3>
+      <audio controls>
+        <source src="${song.src}" type="video/mp4">
+        Your browser does not support the audio element.
+      </audio>
+      <button onclick="saveSong('${song.title}', '${song.src}')">Add to Playlist</button>
+    `;
+    uploadedSongList.appendChild(li);
+  });
+});
 
-    function saveSong(title, src) {
-      let currentUser = localStorage.getItem("currentUser");
-      if (!currentUser) {
-        alert("Please log in to save songs to your playlist.");
-        return;
-      }
+function saveSong(title, src) {
+  let currentUser = localStorage.getItem("currentUser");
+  if (!currentUser) {
+    alert("Please log in to save songs to your playlist.");
+    return;
+  }
 
-      let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
-      let playlist = userPlaylists[currentUser] || [];
+  let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
+  let playlist = userPlaylists[currentUser] || [];
 
-      let newSong = { title, src };
-      playlist.push(newSong);
-      userPlaylists[currentUser] = playlist;
+  // Check if the song already exists in the playlist
+  const songExists = playlist.some(song => song.title === title && song.src === src);
+  if (songExists) {
+    alert("This song is already in your playlist.");
+    return;
+  }
 
-      localStorage.setItem("userPlaylists", JSON.stringify(userPlaylists));
+  let newSong = { title, src };
+  playlist.push(newSong);
+  userPlaylists[currentUser] = playlist;
+  localStorage.setItem("userPlaylists", JSON.stringify(userPlaylists));
 
-      alert("Song added to your playlist!");
-    }
+  alert("Song added to your playlist!");
+}
 
-    function searchSong() {
-      const searchInput = document.getElementById('searchInput').value.toLowerCase();
-      const songItems = document.querySelectorAll('.song-list li');
-
-      songItems.forEach(function(item) {
-        const songTitle = item.querySelector('h3').innerText.toLowerCase();
-        if (songTitle.includes(searchInput)) {
-          item.style.display = 'inline-block';
-        } else {
-          item.style.display = 'none';
-        }
-      });
-    }
-
-    function openMiniPlayer(songTitle, songArtist, songSrc) {
-      document.getElementById('miniPlayerSongTitle').innerText = songTitle;
-      document.getElementById('miniPlayerSongArtist').innerText = songArtist;
-      document.getElementById('miniPlayerAlbumArt').src = 'placeholder.png'; // Replace with actual album art if available
-
-      const miniPlayer = document.getElementById('miniPlayer');
-      miniPlayer.style.display = 'flex';
-      miniPlayer.classList.add('active');
-    }
-
-    function closeMiniPlayer() {
-      const miniPlayer = document.getElementById('miniPlayer');
-      miniPlayer.classList.remove('active');
-      setTimeout(() => {
-        miniPlayer.style.display = 'none';
-      }, 300);
-    }
-
-    function togglePlayPause() {
-      const audio = document.querySelector('.mini-player audio');
-      if (audio.paused) {
-        audio.play();
-      } else {
-        audio.pause();
-      }
-    }
   </script>
 </body>
 </html>
