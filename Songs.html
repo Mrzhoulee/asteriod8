@@ -185,7 +185,7 @@
     <!-- Section for uploaded songs -->
     <div id="uploadedSongs">
       <h1>Uploaded Songs</h1>
-      <ul class="song-list" id="uploadedSongList">
+      <ul class="song-list" id="uploadedSong">
         <!-- JavaScript will populate this list -->
       </ul>
     </div>
@@ -244,7 +244,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Retrieve uploaded songs from localStorage
-      const uploadedSongs = JSON.parse(localStorage.getItem('videos')) || [];
+      const uploadedSongs = JSON.parse(localStorage.getItem('video')) || [];
 
       // Check if there are any uploaded songs
       console.log("Uploaded Songs:", uploadedSongs);
@@ -256,10 +256,10 @@
         li.innerHTML = `
           <h3><font face="Montserrat" color="Coral">${song.title}</font></h3>
           <audio controls>
-            <source src="${song.src}" type="audio/mpeg">
+            <source src="${song.src}" type="video/mp4">
             Your browser does not support the audio element.
           </audio>
-          <button onclick="saveSong('${song.title}', '${song.title}', '${song.src}')">Add to Playlist</button>
+          <button onclick="saveSong('${title}', '${src}')">Add to Playlist</button>
         `;
         uploadedSongList.appendChild(li);
       });
