@@ -66,40 +66,35 @@
   </center>
 
   <script>
-    function upload() {
-      const videoInput = document.getElementById('video');
-      const titleInput = document.getElementById('title').value;
-      const isPublic = document.getElementById('Public').checked;
+  function upload() {
+  const videoInput = document.getElementById('video');
+  const titleInput = document.getElementById('title').value;
+  const isPublic = document.getElementById('Public').checked;
 
-      if (videoInput.files.length > 0) {
-        const file = videoInput.files[0];
-        const reader = new FileReader();
+  if (videoInput.files.length > 0) {
+    const file = videoInput.files[0];
+    const reader = new FileReader();
 
-        reader.onload = function(e) {
-          const videoSrc = e.target.result;
+    reader.onload = function(e) {
+      const videoSrc = e.target.result;
+      alert("Video Source: " + videoSrc); // Check the file data
 
-          // Get existing videos from localStorage
-          let videos = JSON.parse(localStorage.getItem('videos')) || [];
+      let videos = JSON.parse(localStorage.getItem('videos')) || [];
+      alert("Existing Videos: " + JSON.stringify(videos)); // Check existing videos
 
-          // Add new video to the array
-          videos.push({ title: titleInput, src: videoSrc, public: isPublic });
+      videos.push({ title: titleInput, src: videoSrc, public: isPublic });
+      localStorage.setItem('videos', JSON.stringify(videos));
 
-          // Save updated video array back to localStorage
-          localStorage.setItem('videos', JSON.stringify(videos));
+      alert("Song uploaded successfully!");
+      document.getElementById('uploadForm').reset();
+    };
 
-          // Alert user of successful upload
-          alert("Video uploaded successfully!");
+    reader.readAsDataURL(file);
+  } else {
+    alert("Please select a video file to upload.");
+  }
+}
 
-          // Clear form inputs
-          document.getElementById('uploadForm').reset();
-        };
-
-        // Read video file as a data URL
-        reader.readAsDataURL(file);
-      } else {
-        alert("Please select a video file to upload.");
-      }
-    }
   </script>
 </body>
 </html>
