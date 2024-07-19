@@ -9,10 +9,6 @@
       color: white;
     }
 
-    .forma {
-      text-align: center;
-    }
-
     form {
       text-align: center;
     }
@@ -54,47 +50,46 @@
 </head>
 <body>
   <center>
-  <form id="uploadForm">
-    <input type="file" id="video" name="video" accept="video/*" required>
-    <input type="text" id="title" name="title" placeholder="Enter your Video Title" required>
-    <input type="radio" id="Public" name="visibility" value="Public" required>
-    <label for="Public">Public</label>
-    <input type="radio" id="Private" name="visibility" value="Private" required>
-    <label for="Private">Private</label>
-    <button type="button" onclick="upload()">Upload</button>
-  </form>
+    <form id="uploadForm">
+      <input type="file" id="video" name="video" accept="video/*" required>
+      <input type="text" id="title" name="title" placeholder="Enter your Video Title" required>
+      <input type="radio" id="Public" name="visibility" value="Public" required>
+      <label for="Public">Public</label>
+      <input type="radio" id="Private" name="visibility" value="Private" required>
+      <label for="Private">Private</label>
+      <button type="button" onclick="upload()">Upload</button>
+    </form>
   </center>
 
   <script>
-  function upload() {
-  const videoInput = document.getElementById('video');
-  const titleInput = document.getElementById('title').value;
-  const isPublic = document.getElementById('Public').checked;
+    function upload() {
+      const videoInput = document.getElementById('video');
+      const titleInput = document.getElementById('title').value;
+      const isPublic = document.getElementById('Public').checked;
 
-  if (videoInput.files.length > 0) {
-    const file = videoInput.files[0];
-    const reader = new FileReader();
+      if (videoInput.files.length > 0) {
+        const file = videoInput.files[0];
+        const reader = new FileReader();
 
-    reader.onload = function(e) {
-      const videoSrc = e.target.result;
-      alert("Video Source: " + videoSrc); // Check the file data
+        reader.onload = function(e) {
+          const videoSrc = e.target.result;
+          alert("Video Source: " + videoSrc); // Check the file data
 
-      let videos = JSON.parse(localStorage.getItem('videos')) || [];
-      alert("Existing Videos: " + JSON.stringify(videos)); // Check existing videos
+          let videos = JSON.parse(localStorage.getItem('videos')) || [];
+          alert("Existing Videos: " + JSON.stringify(videos)); // Check existing videos
 
-      videos.push({ title: titleInput, src: videoSrc, public: isPublic });
-      localStorage.setItem('videos', JSON.stringify(videos));
+          videos.push({ title: titleInput, src: videoSrc, public: isPublic });
+          localStorage.setItem('videos', JSON.stringify(videos));
 
-      alert("Song uploaded successfully!");
-      document.getElementById('uploadForm').reset();
-    };
+          alert("Video uploaded successfully!");
+          document.getElementById('uploadForm').reset();
+        };
 
-    reader.readAsDataURL(file);
-  } else {
-    alert("Please select a video file to upload.");
-  }
-}
-
+        reader.readAsDataURL(file);
+      } else {
+        alert("Please select a video file to upload.");
+      }
+    }
   </script>
 </body>
 </html>
