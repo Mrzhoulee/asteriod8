@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asteroid Teams Music Player</title>
+  <title>Asteroid Teams Media Player</title>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -65,7 +65,7 @@
       border-radius: 5px;
     }
 
-    .song-list {
+    .media-list {
       list-style-type: none;
       padding: 0;
       margin: 20px 0;
@@ -73,14 +73,15 @@
       white-space: nowrap;
     }
 
-    .song-list li {
+    .media-list li {
       display: inline-block;
-      width: 200px;
+      width: 300px;
       margin-right: 10px;
       white-space: normal;
     }
 
-    .song-list li audio {
+    .media-list li video,
+    .media-list li audio {
       width: 100%;
     }
 
@@ -105,25 +106,25 @@
       transform: translateY(0);
     }
 
-    .song-info {
+    .media-info {
       display: flex;
       align-items: center;
     }
 
-    .song-info img {
+    .media-info img {
       width: 40px;
       height: 40px;
       margin-right: 10px;
       border-radius: 50%;
     }
 
-    .song-info .song-details {
+    .media-info .media-details {
       display: flex;
       flex-direction: column;
       font-size: 14px;
     }
 
-    .song-info .song-title {
+    .media-info .media-title {
       font-weight: bold;
       color: coral;
     }
@@ -160,49 +161,38 @@
     <p>We are Asteroid Teams. We code for public use, even for free!</p>
 
     <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Search for a song...">
-      <button onclick="searchSong()">Search</button>
+      <input type="text" id="searchInput" placeholder="Search for a media...">
+      <button onclick="searchMedia()">Search</button>
     </div>
 
-    <div id="uploadedSongs">
+    <div id="uploadedMedia">
       <h1>RECOMMENDED FOR YOU👍🏻</h1>
-    <ul class="song-list" id="uploadedSongs"></ul>
-
-        
-        <li>
-          <h3><font face="Montserrat" font color="Coral">Cant Stop The Feeling! - Justin Timberlake</font></h3>
-          <audio controls>
-            <source src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a" type="audio/mpeg">
-            Your browser does not support the audio element.
-          </audio>
-          <button onclick="saveSong('Justin Timberlake', 'Cant Stop The Feeling!', 'CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a')">Add to Playlist</button>
-        </li>
-        <!-- Songs will be dynamically inserted here -->
+      <ul class="media-list" id="uploadedMedia">
       </ul>
+      
     </div>
 
     <div id="videoContainer1">
       <h1>HITS IN THE WORLD</h1>
-      <!-- Add songs for Hits in the World -->
+      <!-- Add videos for Hits in the World -->
     </div>
 
     <div id="videoContainer2">
       <h1>MOST POPULAR</h1>
-      <!-- Add songs for Most Popular -->
+      <!-- Add videos for Most Popular -->
     </div>
 
     <div id="videoContainer3">
-      <h1>YOU MUST LISTEN</h1>
-      <!-- Add songs for You Must Listen -->
+      <h1>YOU MUST WATCH</h1>
+      <!-- Add videos for You Must Watch -->
     </div>
   </div>
 
   <div class="mini-player" id="miniPlayer">
-    <div class="song-info">
-      <img src="placeholder.png" alt="Album Art" id="miniPlayerAlbumArt">
-      <div class="song-details">
-        <span class="song-title" id="miniPlayerSongTitle"></span>
-        <span class="song-artist" id="miniPlayerSongArtist"></span>
+    <div class="media-info">
+      <img src="placeholder.png" alt="Media Thumbnail" id="miniPlayerThumbnail">
+      <div class="media-details">
+        <span class="media-title" id="miniPlayerMediaTitle"></span>
       </div>
     </div>
     <div class="controls">
@@ -213,51 +203,42 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-  // Retrieve uploaded videos from localStorage
-  const uploadedSongs = JSON.parse(localStorage.getItem('videos')) || [];
+      // Retrieve uploaded media from localStorage
+      const uploadedMedia = JSON.parse(localStorage.getItem('videos')) || [];
+      const mediaList = document.getElementById('uploadedMedia');
 
-  // Display uploaded videos
-  const uploadedSongList = document.getElementById('uploadedSongs');
-  uploadedSongs.forEach(function(song) {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <h3><font face="Montserrat" color="Coral">${song.title}</font></h3>
-      <audio controls>
-        <source src="${song.src}" type="video/mp4">
-        Your browser does not support the audio element.
-      </audio>
-      <button onclick="saveSong('${song.title}', '${song.src}')">Add to Playlist</button>
-    `;
-    uploadedSongList.appendChild(li);
-  });
-});
+      uploadedMedia.forEach(media => {
+        const listItem = document.createElement('li');
+        const mediaElement = document.createElement(media.src.endsWith('.mp4') ? 'video' : 'audio');
+        mediaElement.src = media.src;
+        mediaElement.controls = true;
+        mediaElement.addEventListener('play', function() {
+          const miniPlayer = document.getElementById('miniPlayer');
+          document.getElementById('miniPlayerMediaTitle').textContent = media.title;
+          miniPlayer.style.display = 'flex';
+        });
 
-function saveSong(title, src) {
-  let currentUser = localStorage.getItem("currentUser");
-  if (!currentUser) {
-    alert("Please log in to save songs to your playlist.");
-    return;
-  }
+        listItem.appendChild(mediaElement);
+        mediaList.appendChild(listItem);
+      });
+    });
 
-  let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
-  let playlist = userPlaylists[currentUser] || [];
+    function searchMedia() {
+      // Implement search functionality for media
+    }
 
-  // Check if the song already exists in the playlist
-  const songExists = playlist.some(song => song.title === title && song.src === src);
-  if (songExists) {
-    alert("This song is already in your playlist.");
-    return;
-  }
+    function togglePlayPause() {
+      const mediaElement = document.querySelector('.mini-player video') || document.querySelector('.mini-player audio');
+      if (mediaElement.paused) {
+        mediaElement.play();
+      } else {
+        mediaElement.pause();
+      }
+    }
 
-  let newSong = { title, src };
-  playlist.push(newSong);
-  userPlaylists[currentUser] = playlist;
-  localStorage.setItem("userPlaylists", JSON.stringify(userPlaylists));
-
-  alert("Song added to your playlist!");
-}
-
+    function closeMiniPlayer() {
+      document.getElementById('miniPlayer').style.display = 'none';
+    }
   </script>
 </body>
 </html>
-
