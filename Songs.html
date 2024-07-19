@@ -80,8 +80,7 @@
       white-space: normal;
     }
 
-    .media-list li video,
-    .media-list li audio {
+    .media-list li video {
       width: 100%;
     }
 
@@ -161,7 +160,7 @@
     <p>We are Asteroid Teams. We code for public use, even for free!</p>
 
     <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Search for a media...">
+      <input type="text" id="searchInput" placeholder="Search for media...">
       <button onclick="searchMedia()">Search</button>
     </div>
 
@@ -169,7 +168,6 @@
       <h1>RECOMMENDED FOR YOU👍🏻</h1>
       <ul class="media-list" id="uploadedMedia">
       </ul>
-      
     </div>
 
     <div id="videoContainer1">
@@ -202,15 +200,6 @@
   </div>
 
   <script>
-
-document.addEventListener('DOMContentLoaded', function() {
-  let uploadedMedia = JSON.parse(localStorage.getItem('videos')) || [];
-  alert("Uploaded Media: " + JSON.stringify(uploadedMedia)); // Check stored media
-
-  // Existing code to display media
-});
-
-    
     document.addEventListener('DOMContentLoaded', function() {
       // Retrieve uploaded media from localStorage
       const uploadedMedia = JSON.parse(localStorage.getItem('videos')) || [];
@@ -218,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       uploadedMedia.forEach(media => {
         const listItem = document.createElement('li');
-        const mediaElement = document.createElement(media.src.endsWith('.mp4') ? 'video' : 'audio');
+        const mediaElement = document.createElement('video');
         mediaElement.src = media.src;
         mediaElement.controls = true;
         mediaElement.addEventListener('play', function() {
@@ -230,6 +219,9 @@ document.addEventListener('DOMContentLoaded', function() {
         listItem.appendChild(mediaElement);
         mediaList.appendChild(listItem);
       });
+
+      // Alert to verify if videos are retrieved correctly
+      alert("Uploaded Media: " + JSON.stringify(uploadedMedia));
     });
 
     function searchMedia() {
@@ -237,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function togglePlayPause() {
-      const mediaElement = document.querySelector('.mini-player video') || document.querySelector('.mini-player audio');
+      const mediaElement = document.querySelector('.mini-player video');
       if (mediaElement.paused) {
         mediaElement.play();
       } else {
