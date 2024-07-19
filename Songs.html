@@ -202,6 +202,15 @@
   </div>
 
   <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+  let uploadedMedia = JSON.parse(localStorage.getItem('videos')) || [];
+  alert("Uploaded Media: " + JSON.stringify(uploadedMedia)); // Check stored media
+
+  // Existing code to display media
+});
+
+    
     document.addEventListener('DOMContentLoaded', function() {
       // Retrieve uploaded media from localStorage
       const uploadedMedia = JSON.parse(localStorage.getItem('videos')) || [];
