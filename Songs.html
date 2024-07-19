@@ -190,6 +190,46 @@
       </ul>
     </div>
 
+    <!-- Additional song categories -->
+    <div id="videoContainer">
+      <h1>RECOMMENDED FOR YOU👍🏻</h1>
+      <ul class="song-list">
+        <li>
+          <h3><font face="Montserrat" color="Coral">Can't Stop The Feeling! - Justin Timberlake</font></h3>
+          <audio controls>
+            <source src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+          <button onclick="saveSong('Justin Timberlake', 'Can't Stop The Feeling!', 'CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a')">Add to Playlist</button>
+        </li>
+        <!-- Add more recommended songs here -->
+      </ul>
+    </div>
+
+    <!-- Hits in the World Section -->
+    <div id="videoContainer1">
+      <h1>HITS IN THE WORLD</h1>
+      <ul class="song-list">
+        <!-- Add your hits in the world songs here -->
+      </ul>
+    </div>
+
+    <!-- Most Popular Section -->
+    <div id="videoContainer2">
+      <h1>MOST POPULAR</h1>
+      <ul class="song-list">
+        <!-- Add your most popular songs here -->
+      </ul>
+    </div>
+
+    <!-- You Must Listen Section -->
+    <div id="videoContainer3">
+      <h1>YOU MUST LISTEN</h1>
+      <ul class="song-list">
+        <!-- Add your must listen songs here -->
+      </ul>
+    </div>
+
   </div>
 
   <!-- Mini Player -->
@@ -205,41 +245,7 @@
       <button onclick="togglePlayPause()">Play/Pause</button>
       <button onclick="closeMiniPlayer()">Close</button>
     </div>
-  </div><div id="videoContainer">
-      <h1>RECOMMENDED FOR YOU👍🏻</h1>
-      <ul class="song-list">
-        <li>
-          <h3><font face="Montserrat" font color="Coral">Cant Stop The Feeling! - Justin Timberlake</font></h3>
-          <audio controls>
-            <source src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a" type="audio/mpeg">
-            Your browser does not support the audio element.
-          </audio>
-          <button onclick="saveSong('Justin Timberlake', 'Cant Stop The Feeling!', 'CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a')">Add to Playlist</button>
-        </li>
-        <!-- Add more recommended songs here -->
-      </ul>
-    </div>
-
-    <!-- Hits in the World Section -->
-    <div id="videoContainer1">
-      <h1>HITS IN THE WOLD</h1>
-      <!-- You can add more sections like this if needed -->
-    </div>
-
-    <!-- Most Popular Section -->
-    <div id="videoContainer2">
-      <h1>MOST POPULAR</h1>
-      <!-- You can add more sections like this if needed -->
-    </div>
-
-    <!-- You Must Listen Section -->
-    <div id="videoContainer3">
-      <h1>YOU MUST LISTEN</h1>
-      <!-- You can add more sections like this if needed -->
-    </div>
-
   </div>
-
     
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -251,7 +257,7 @@
       uploadedSongs.forEach(function(song) {
         const li = document.createElement('li');
         li.innerHTML = `
-          <h3><font face="Montserrat" font color="Coral">${song.title}</font></h3>
+          <h3><font face="Montserrat" color="Coral">${song.title}</font></h3>
           <audio controls>
             <source src="${song.src}" type="audio/mpeg">
             Your browser does not support the audio element.
@@ -288,27 +294,48 @@
       filter = input.value.toUpperCase();
       ul = document.querySelector('.song-list');
       li = ul.getElementsByTagName('li');
+
       for (i = 0; i < li.length; i++) {
         audio = li[i].getElementsByTagName('audio')[0];
         if (audio) {
-          if (audio.getElementsByTagName('source')[0].src.toUpperCase().indexOf(filter) > -1) {
+          txtValue = audio.getAttribute('src');
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
             li[i].style.display = '';
           } else {
             li[i].style.display = 'none';
           }
-        }       
+        }
       }
     }
 
-    // Mini player functionality (to be implemented)
-    function togglePlayPause() {
-      // Implement play/pause functionality
+    // Mini player functionality
+    function openMiniPlayer(songTitle, songArtist, songSrc) {
+      const miniPlayer = document.getElementById('miniPlayer');
+      const miniPlayerSongTitle = document.getElementById('miniPlayerSongTitle');
+      const miniPlayerSongArtist = document.getElementById('miniPlayerSongArtist');
+      const miniPlayerAudio = new Audio(songSrc);
+
+      miniPlayerSongTitle.textContent = songTitle;
+      miniPlayerSongArtist.textContent = songArtist;
+
+      miniPlayer.classList.add('active');
+      miniPlayerAudio.play();
     }
 
     function closeMiniPlayer() {
-      document.getElementById("miniPlayer").classList.remove("active");
+      const miniPlayer = document.getElementById('miniPlayer');
+      miniPlayer.classList.remove('active');
+    }
+
+    function togglePlayPause() {
+      const miniPlayerAudio = document.querySelector('.mini-player audio');
+      if (miniPlayerAudio.paused) {
+        miniPlayerAudio.play();
+      } else {
+        miniPlayerAudio.pause();
+      }
     }
   </script>
-
 </body>
 </html>
+
