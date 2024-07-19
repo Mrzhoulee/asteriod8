@@ -205,6 +205,9 @@
       const uploadedMedia = JSON.parse(localStorage.getItem('videos')) || [];
       const mediaList = document.getElementById('uploadedMedia');
 
+      // Clear previous content
+      mediaList.innerHTML = '';
+
       uploadedMedia.forEach(media => {
         const listItem = document.createElement('li');
         const mediaElement = document.createElement('video');
@@ -219,9 +222,6 @@
         listItem.appendChild(mediaElement);
         mediaList.appendChild(listItem);
       });
-
-      // Alert to verify if videos are retrieved correctly
-      alert("Uploaded Media: " + JSON.stringify(uploadedMedia));
     });
 
     function searchMedia() {
