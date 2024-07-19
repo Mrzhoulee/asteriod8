@@ -4,12 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteroid Teams Music Player</title>
-  
-  <!-- Load external fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
-
   <style>
-    /* General styles */
     body {
       font-family: 'Lato', sans-serif;
       background-color: black;
@@ -23,12 +19,11 @@
       text-decoration: none;
     }
 
-    /* Navigation styles */
     .topnav {
       overflow: hidden;
       background-color: #333;
       display: flex;
-      justify-content: flex-end; /* Aligns items to the right */
+      justify-content: flex-end;
       padding: 10px 0;
     }
 
@@ -47,7 +42,6 @@
       color: white;
     }
 
-    /* Main section styles */
     .main-content {
       padding: 20px;
     }
@@ -58,12 +52,38 @@
       color: coral;
     }
 
-    p {
-      font-size: 18px;
-      line-height: 1.6;
+    .search-container {
+      text-align: center;
+      margin-top: 20px;
     }
 
-    /* Mini player styles */
+    #searchInput {
+      width: 300px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid coral;
+      border-radius: 5px;
+    }
+
+    .song-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 20px 0;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .song-list li {
+      display: inline-block;
+      width: 200px;
+      margin-right: 10px;
+      white-space: normal;
+    }
+
+    .song-list li audio {
+      width: 100%;
+    }
+
     .mini-player {
       position: fixed;
       bottom: 0;
@@ -72,7 +92,7 @@
       background-color: #333;
       color: white;
       padding: 10px;
-      display: none; /* Initially hidden */
+      display: none;
       align-items: center;
       justify-content: space-between;
       box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
@@ -123,45 +143,9 @@
       border-radius: 5px;
       font-size: 14px;
     }
-
-    /* Search bar styles */
-    .search-container {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    #searchInput {
-      width: 300px;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid coral;
-      border-radius: 5px;
-    }
-
-    /* Song list styles */
-    .song-list {
-      list-style-type: none;
-      padding: 0;
-      margin: 20px 0;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    .song-list li {
-      display: inline-block;
-      width: 200px;
-      margin-right: 10px;
-      white-space: normal;
-    }
-
-    .song-list li audio {
-      width: 100%;
-    }
   </style>
 </head>
 <body>
-
-  <!-- Navigation -->
   <div class="topnav">
     <a class="active" href="index.html">Home</a>
     <a href="ts.html">Taylor Swift Songs</a>
@@ -171,54 +155,38 @@
     <a href="tt.html">Times Tables Rocket</a>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
     <h1>Discover</h1>
     <p>We are Asteroid Teams. We code for public use, even for free!</p>
 
-    <!-- Search bar -->
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Search for a song...">
       <button onclick="searchSong()">Search</button>
     </div>
 
-  <!-- Recommended Songs -->
     <div id="uploadedSongs">
       <h1>RECOMMENDED FOR YOU👍🏻</h1>
-      <ul class="song-list" id="uploadedSongs>
-        <li>
-          <h3><font face="Montserrat" color="Coral">Can't Stop The Feeling! - Justin Timberlake</font></h3>
-          <audio controls>
-            <source src="CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a" type="audio/mpeg">
-            Your browser does not support the audio element.
-          </audio>
-          <button onclick="saveSong('Justin Timberlake', 'Can't Stop The Feeling!', 'CANT STOP THE FEELING! (from DreamWorks Animations TROLLS) (Official Video) [TubeRipper.com].m4a')">Add to Playlist</button>
-        </li>
-        <!-- Add more recommended songs here -->
+      <ul class="song-list" id="uploadedSongList">
+        <!-- Songs will be dynamically inserted here -->
       </ul>
     </div>
 
-    <!-- Hits in the World Section -->
     <div id="videoContainer1">
       <h1>HITS IN THE WORLD</h1>
       <!-- Add songs for Hits in the World -->
     </div>
 
-    <!-- Most Popular Section -->
     <div id="videoContainer2">
       <h1>MOST POPULAR</h1>
       <!-- Add songs for Most Popular -->
     </div>
 
-    <!-- You Must Listen Section -->
     <div id="videoContainer3">
       <h1>YOU MUST LISTEN</h1>
       <!-- Add songs for You Must Listen -->
     </div>
-
   </div>
 
-  <!-- Mini Player -->
   <div class="mini-player" id="miniPlayer">
     <div class="song-info">
       <img src="placeholder.png" alt="Album Art" id="miniPlayerAlbumArt">
@@ -236,10 +204,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Retrieve uploaded songs from localStorage
-      const uploadedSongs = JSON.parse(localStorage.getItem('video')) || [];
-
-      // Check if there are any uploaded songs
-      console.log("Uploaded Songs:", uploadedSongs);
+      const uploadedSongs = JSON.parse(localStorage.getItem('videos')) || [];
 
       // Display uploaded songs
       const uploadedSongList = document.getElementById('uploadedSongList');
@@ -251,14 +216,13 @@
             <source src="${song.src}" type="video/mp4">
             Your browser does not support the audio element.
           </audio>
-          <button onclick="saveSong('${title}', '${src}')">Add to Playlist</button>
+          <button onclick="saveSong('${song.title}', '${song.src}')">Add to Playlist</button>
         `;
         uploadedSongList.appendChild(li);
       });
     });
 
-    // Save song to localStorage
-    function saveSong(artist, title, src) {
+    function saveSong(title, src) {
       let currentUser = localStorage.getItem("currentUser");
       if (!currentUser) {
         alert("Please log in to save songs to your playlist.");
@@ -268,7 +232,7 @@
       let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
       let playlist = userPlaylists[currentUser] || [];
 
-      let newSong = { artist, title, src };
+      let newSong = { title, src };
       playlist.push(newSong);
       userPlaylists[currentUser] = playlist;
 
@@ -277,11 +241,10 @@
       alert("Song added to your playlist!");
     }
 
-    // Search for a song
     function searchSong() {
       const searchInput = document.getElementById('searchInput').value.toLowerCase();
       const songItems = document.querySelectorAll('.song-list li');
-      
+
       songItems.forEach(function(item) {
         const songTitle = item.querySelector('h3').innerText.toLowerCase();
         if (songTitle.includes(searchInput)) {
@@ -292,7 +255,6 @@
       });
     }
 
-    // Mini player functions
     function openMiniPlayer(songTitle, songArtist, songSrc) {
       document.getElementById('miniPlayerSongTitle').innerText = songTitle;
       document.getElementById('miniPlayerSongArtist').innerText = songArtist;
@@ -322,3 +284,4 @@
   </script>
 </body>
 </html>
+
