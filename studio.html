@@ -46,13 +46,13 @@
 <body>
   <div id="forma" class="forma">
     <center>
-      <form id="upload">
+      <form id="upload()">
         <font color="coral" face="Montserrat">
           <input type="file" id="video" name="video" accept="audio/*" required>
           <br>
-          <input type="text" id="title" placeholder="Enter your Song Title" required>
+          <input type="text" id="title" name="title" placeholder="Enter your Song Title" required>
           <br>
-          <input type="radio" id="Public" name="visibility" value="Public" required>
+          <input type="radio" id="Public" name="public" value="Public" required>
           <br>
           <label for="Public">Public</label>
           <br>
@@ -82,7 +82,7 @@
           const videoSrc = e.target.result;
 
           // Get existing videos from localStorage
-          const videos = JSON.parse(localStorage.getItem('videos')) || [];
+          const video = JSON.parse(localStorage.getItem('video')) || [];
 
           // Add new video to the array
           videos.push({ title: titleInput, src: videoSrc, public: isPublic });
@@ -91,7 +91,7 @@
           localStorage.setItem('videos', JSON.stringify(videos));
 
           // Alert user of successful upload
-          alert(`${titleInput} uploaded successfully!`);
+          alert(" Song uploaded successfully!");
 
           // Clear form inputs
           document.getElementById('upload').reset();
