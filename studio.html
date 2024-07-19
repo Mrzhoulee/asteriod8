@@ -53,58 +53,54 @@
   </style>
 </head>
 <body>
-  <div class="forma">
-    <form id="uploadForm">
-      <input type="file" id="video" name="video" accept="video/mp4" required>
-      <br>
-      <input type="text" id="title" name="title" placeholder="Enter your Song Title" required>
-      <br>
-      <input type="radio" id="Public" name="visibility" value="Public" required>
-      <label for="Public">Public</label>
-      <br>
-      <input type="radio" id="Private" name="visibility" value="Private" required>
-      <label for="Private">Private</label>
-      <br><br>
-      <button type="button" onclick="upload()">Upload</button>
-      <br>
-    </form>
-  </div>
+  <center>
+  <form id="uploadForm">
+  <input type="file" id="video" name="video" accept="audio/*" required>
+  <input type="text" id="title" name="title" placeholder="Enter your Song Title" required>
+  <input type="radio" id="Public" name="visibility" value="Public" required>
+  <label for="Public">Public</label>
+  <input type="radio" id="Private" name="visibility" value="Private" required>
+  <label for="Private">Private</label>
+  <button type="button" onclick="upload()">Upload</button>
+</form>
+  </center>
 
   <script>
     function upload() {
-      const videoInput = document.getElementById('video');
-      const titleInput = document.getElementById('title').value;
-      const isPublic = document.getElementById('Public').checked;
+  const videoInput = document.getElementById('video');
+  const titleInput = document.getElementById('title').value;
+  const isPublic = document.getElementById('Public').checked;
 
-      if (videoInput.files.length > 0) {
-        const file = videoInput.files[0];
-        const reader = new FileReader();
+  if (videoInput.files.length > 0) {
+    const file = videoInput.files[0];
+    const reader = new FileReader();
 
-        reader.onload = function(e) {
-          const videoSrc = e.target.result;
+    reader.onload = function(e) {
+      const videoSrc = e.target.result;
 
-          // Get existing videos from localStorage
-          const videos = JSON.parse(localStorage.getItem('videos')) || [];
+      // Get existing videos from localStorage
+      let videos = JSON.parse(localStorage.getItem('videos')) || [];
 
-          // Add new video to the array
-          videos.push({ title: titleInput, src: videoSrc, public: isPublic });
+      // Add new video to the array
+      videos.push({ title: titleInput, src: videoSrc, public: isPublic });
 
-          // Save updated video array back to localStorage
-          localStorage.setItem('videos', JSON.stringify(videos));
+      // Save updated video array back to localStorage
+      localStorage.setItem('videos', JSON.stringify(videos));
 
-          // Alert user of successful upload
-          alert("Song uploaded successfully!");
+      // Alert user of successful upload
+      alert("Song uploaded successfully!");
 
-          // Clear form inputs
-          document.getElementById('uploadForm').reset();
-        };
+      // Clear form inputs
+      document.getElementById('uploadForm').reset();
+    };
 
-        // Read video file as a data URL
-        reader.readAsDataURL(file);
-      } else {
-        alert("Please select a video file to upload.");
-      }
-    }
+    // Read video file as a data URL
+    reader.readAsDataURL(file);
+  } else {
+    alert("Please select a video file to upload.");
+  }
+}
+
   </script>
 </body>
 </html>
