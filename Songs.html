@@ -190,7 +190,7 @@
       </ul>
     </div>
 
-    <!-- Additional song categories -->
+    <!-- Recommended Songs -->
     <div id="videoContainer">
       <h1>RECOMMENDED FOR YOU👍🏻</h1>
       <ul class="song-list">
@@ -209,25 +209,19 @@
     <!-- Hits in the World Section -->
     <div id="videoContainer1">
       <h1>HITS IN THE WORLD</h1>
-      <ul class="song-list">
-        <!-- Add your hits in the world songs here -->
-      </ul>
+      <!-- Add songs for Hits in the World -->
     </div>
 
     <!-- Most Popular Section -->
     <div id="videoContainer2">
       <h1>MOST POPULAR</h1>
-      <ul class="song-list">
-        <!-- Add your most popular songs here -->
-      </ul>
+      <!-- Add songs for Most Popular -->
     </div>
 
     <!-- You Must Listen Section -->
     <div id="videoContainer3">
       <h1>YOU MUST LISTEN</h1>
-      <ul class="song-list">
-        <!-- Add your must listen songs here -->
-      </ul>
+      <!-- Add songs for You Must Listen -->
     </div>
 
   </div>
@@ -246,11 +240,14 @@
       <button onclick="closeMiniPlayer()">Close</button>
     </div>
   </div>
-    
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Retrieve uploaded songs from localStorage
       const uploadedSongs = JSON.parse(localStorage.getItem('videos')) || [];
+
+      // Check if there are any uploaded songs
+      console.log("Uploaded Songs:", uploadedSongs);
 
       // Display uploaded songs
       const uploadedSongList = document.getElementById('uploadedSongList');
@@ -284,58 +281,52 @@
       userPlaylists[currentUser] = playlist;
 
       localStorage.setItem("userPlaylists", JSON.stringify(userPlaylists));
-      alert(title + " added to your playlist!");
+
+      alert("Song added to your playlist!");
     }
 
-    // Search functionality
+    // Search for a song
     function searchSong() {
-      var input, filter, ul, li, audio, i;
-      input = document.getElementById('searchInput');
-      filter = input.value.toUpperCase();
-      ul = document.querySelector('.song-list');
-      li = ul.getElementsByTagName('li');
-
-      for (i = 0; i < li.length; i++) {
-        audio = li[i].getElementsByTagName('audio')[0];
-        if (audio) {
-          txtValue = audio.getAttribute('src');
-          if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            li[i].style.display = '';
-          } else {
-            li[i].style.display = 'none';
-          }
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const songItems = document.querySelectorAll('.song-list li');
+      
+      songItems.forEach(function(item) {
+        const songTitle = item.querySelector('h3').innerText.toLowerCase();
+        if (songTitle.includes(searchInput)) {
+          item.style.display = 'inline-block';
+        } else {
+          item.style.display = 'none';
         }
-      }
+      });
     }
 
-    // Mini player functionality
+    // Mini player functions
     function openMiniPlayer(songTitle, songArtist, songSrc) {
+      document.getElementById('miniPlayerSongTitle').innerText = songTitle;
+      document.getElementById('miniPlayerSongArtist').innerText = songArtist;
+      document.getElementById('miniPlayerAlbumArt').src = 'placeholder.png'; // Replace with actual album art if available
+
       const miniPlayer = document.getElementById('miniPlayer');
-      const miniPlayerSongTitle = document.getElementById('miniPlayerSongTitle');
-      const miniPlayerSongArtist = document.getElementById('miniPlayerSongArtist');
-      const miniPlayerAudio = new Audio(songSrc);
-
-      miniPlayerSongTitle.textContent = songTitle;
-      miniPlayerSongArtist.textContent = songArtist;
-
+      miniPlayer.style.display = 'flex';
       miniPlayer.classList.add('active');
-      miniPlayerAudio.play();
     }
 
     function closeMiniPlayer() {
       const miniPlayer = document.getElementById('miniPlayer');
       miniPlayer.classList.remove('active');
+      setTimeout(() => {
+        miniPlayer.style.display = 'none';
+      }, 300);
     }
 
     function togglePlayPause() {
-      const miniPlayerAudio = document.querySelector('.mini-player audio');
-      if (miniPlayerAudio.paused) {
-        miniPlayerAudio.play();
+      const audio = document.querySelector('.mini-player audio');
+      if (audio.paused) {
+        audio.play();
       } else {
-        miniPlayerAudio.pause();
+        audio.pause();
       }
     }
   </script>
 </body>
 </html>
-
