@@ -5,7 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteroid Teams Media Studio</title>
   <style>
-    /* Add your styles here */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    center {
+      display: block;
+      margin: 0 auto;
+      max-width: 600px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #555;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin: 10px 0;
+    }
+    li button {
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
@@ -17,14 +48,13 @@
       <input type="file" id="video" accept="video/*" required>
       <br>
       <input type="radio" id="Public" name="Public" value="Public" checked>
-      <label for="Public">Public</label><br>
+      <label for="Public">Public</label>
+      <br>
       <button id="upload-btn" type="button">Upload</button>
     </form>
+    <h2>Video List</h2>
+    <ul id="videoList"></ul>
   </center>
-  <ul id="videoList">
-    
-  </ul>
-
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Ensure the element exists before adding event listeners
@@ -53,6 +83,13 @@
       // Open IndexedDB and retrieve videos
       const request = indexedDB.open('MyDatabase', 1);
 
+      request.onupgradeneeded = function(event) {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains('videos')) {
+          db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
+        }
+      };
+
       request.onsuccess = function(event) {
         const db = event.target.result;
         const transaction = db.transaction(['videos'], 'readonly');
@@ -64,6 +101,14 @@
           videos.forEach(video => {
             const li = document.createElement('li');
             li.textContent = video.title;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.onclick = function() {
+              deleteVideo(video.id);
+            };
+
+            li.appendChild(deleteBtn);
             videoList.appendChild(li);
           });
         };
@@ -93,37 +138,61 @@
       reader.onload = function(e) {
         const videoData = e.target.result;
 
-        // Save video data to IndexedDB
+        // Open IndexedDB and add the new video
         const request = indexedDB.open('MyDatabase', 1);
 
         request.onsuccess = function(event) {
           const db = event.target.result;
           const transaction = db.transaction(['videos'], 'readwrite');
           const store = transaction.objectStore('videos');
-          const addRequest = store.add({
+          
+          store.add({
             title: titleInput,
             data: videoData,
             public: isPublic
           });
 
-          addRequest.onsuccess = function() {
-            alert('Video uploaded successfully GOOD LUCK!');
+          transaction.oncomplete = function() {
+            alert('Video uploaded successfully!');
             document.getElementById('uploadForm').reset();
-            updateVideoList(); // Update list after upload
+            updateVideoList();
           };
 
-          addRequest.onerror = function(event) {
-            console.error('Error saving video to IndexedDB:', event);
-            alert('Failed to upload video.');
+          transaction.onerror = function(event) {
+            console.log('Error adding video:', event);
           };
         };
 
         request.onerror = function(event) {
-          console.error('Error opening IndexedDB:', event);
+          console.log('Error opening IndexedDB:', event);
         };
       };
 
       reader.readAsDataURL(file);
+    }
+
+    function deleteVideo(id) {
+      const request = indexedDB.open('MyDatabase', 1);
+
+      request.onsuccess = function(event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['videos'], 'readwrite');
+        const store = transaction.objectStore('videos');
+        
+        store.delete(id);
+
+        transaction.oncomplete = function() {
+          updateVideoList();
+        };
+
+        transaction.onerror = function(event) {
+          console.log('Error deleting video:', event);
+        };
+      };
+
+      request.onerror = function(event) {
+        console.log('Error opening IndexedDB:', event);
+      };
     }
   </script>
 </body>
