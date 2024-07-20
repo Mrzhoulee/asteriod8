@@ -69,6 +69,7 @@
         const file = videoInput.files[0];
         const reader = new FileReader();
         reader.onload = function(e) {
+          alert("Song Uploaded Successfully!");
           const videoSrc = e.target.result;
           alert("Video Source: " + videoSrc); // Check the file data
           let video = JSON.parse(localStorage.getItem('videos')) || [];
