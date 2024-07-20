@@ -66,16 +66,12 @@
       const videoInput = document.getElementById('video');
       const titleInput = document.getElementById('title').value;
       const isPublic = document.getElementById('Public').checked;
-
-      if (videoInput.files.length > 0) {
         const file = videoInput.files[0];
         const reader = new FileReader();
-
         reader.onload = function(e) {
           const videoSrc = e.target.result;
           alert("Video Source: " + videoSrc); // Check the file data
-
-          let videos = JSON.parse(localStorage.getItem('videos')) || [];
+          let video = JSON.parse(localStorage.getItem('videos')) || [];
           alert("Existing Videos: " + JSON.stringify(videos)); // Check existing videos
 
           videos.push({ title: titleInput, src: videoSrc, public: isPublic });
@@ -86,10 +82,8 @@
         };
 
         reader.readAsDataURL(file);
-      } else {
-        alert("Please select a video file to upload.");
-      }
-    }
+      } 
+    
   </script>
 </body>
 </html>
