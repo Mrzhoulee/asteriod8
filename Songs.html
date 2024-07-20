@@ -14,11 +14,6 @@
       padding: 0;
     }
 
-    a {
-      color: coral;
-      text-decoration: none;
-    }
-
     .topnav {
       overflow: hidden;
       background-color: #333;
@@ -156,7 +151,6 @@
   </div>
 
   <div class="main-content">
-  </div>
     <h1>Discover</h1>
     <p>We are Asteroid Teams. We code for public use, even for free!</p>
 
@@ -167,8 +161,7 @@
 
     <div id="uploadedMedia">
       <h1>RECOMMENDED FOR YOU👍🏻</h1>
-      <ul class="mediaList" id="uploadedMedia">
-      </ul>
+      <ul class="media-list" id="mediaList"></ul>
     </div>
 
     <div id="videoContainer1">
@@ -185,7 +178,7 @@
       <h1>YOU MUST WATCH</h1>
       <!-- Add videos for You Must Watch -->
     </div>
-  
+  </div>
 
   <div class="mini-player" id="miniPlayer">
     <div class="media-info">
@@ -202,27 +195,52 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Retrieve uploaded media from localStorage
-      const uploadedMedia = JSON.parse(localStorage.getItem('video')) || [];
-      const mediaList = document.getElementById('uploadedMedia');
+      // Retrieve uploaded media from IndexedDB
+      const mediaList = document.getElementById('mediaList');
+
+      if (!mediaList) {
+        console.error('Element with ID "mediaList" not found');
+        return;
+      }
 
       // Clear previous content
       mediaList.innerHTML = '';
 
-      uploadedMedia.forEach(media => {
-        const listItem = document.createElement('li');
-        const mediaElement = document.createElement('video');
-        mediaElement.src = media.src;
-        mediaElement.controls = true;
-        mediaElement.addEventListener('play', function() {
-          const miniPlayer = document.getElementById('miniPlayer');
-          document.getElementById('miniPlayerMediaTitle').textContent = media.title;
-          miniPlayer.style.display = 'flex';
-        });
+      // Open IndexedDB and retrieve videos
+      const request = indexedDB.open('MyDatabase', 1);
 
-        listItem.appendChild(mediaElement);
-        mediaList.appendChild(listItem);
-      });
+      request.onsuccess = function(event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['videos'], 'readonly');
+        const store = transaction.objectStore('videos');
+        const getAllRequest = store.getAll();
+
+        getAllRequest.onsuccess = function(event) {
+          const videos = event.target.result;
+          videos.forEach(video => {
+            const listItem = document.createElement('li');
+            const videoElement = document.createElement('video');
+            videoElement.src = video.data;
+            videoElement.controls = true;
+            videoElement.addEventListener('play', function() {
+              const miniPlayer = document.getElementById('miniPlayer');
+              document.getElementById('miniPlayerMediaTitle').textContent = video.title;
+              miniPlayer.style.display = 'flex';
+            });
+
+            listItem.appendChild(videoElement);
+            mediaList.appendChild(listItem);
+          });
+        };
+
+        getAllRequest.onerror = function(event) {
+          console.log('Error retrieving videos:', event);
+        };
+      };
+
+      request.onerror = function(event) {
+        console.log('Error opening IndexedDB:', event);
+      };
     });
 
     function searchMedia() {
