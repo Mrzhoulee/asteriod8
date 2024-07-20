@@ -72,7 +72,7 @@
           alert("Song Uploaded Successfully!");
           const videoSrc = e.target.result;
           alert("Video Source: " + videoSrc); // Check the file data
-          let video = JSON.parse(localStorage.getItem('videos')) || [];
+          let video = JSON.parse(localStorage.getItem('video')) || [];
           alert("Existing Videos: " + JSON.stringify(videos)); // Check existing videos
 
           videos.push({ title: titleInput, src: videoSrc, public: isPublic });
