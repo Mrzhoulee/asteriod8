@@ -117,9 +117,12 @@
     }
   </script>
 
+  <!-- Firebase App (the core Firebase SDK) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
+  <!-- Firebase Firestore -->
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js"></script>
   <script>
+    // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
       authDomain: "asteroid-92576.firebaseapp.com",
@@ -129,6 +132,7 @@
       appId: "1:200976920431:web:6f56a336597e5c397c829a"
     };
 
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
   </script>
