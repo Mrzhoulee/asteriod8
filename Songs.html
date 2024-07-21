@@ -17,57 +17,59 @@
       margin-top: 20px;
     }
     .video-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .video-item {
+      display: inline-block;
       margin: 10px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      width: 300px;
-      background-color: #fff;
-    }
-    .video-item video {
-      width: 100%;
     }
   </style>
-<script>
+</head>
+<body>
+  <center>
+    <h1>My Videos</h1>
+    <div id="videosList"></div>
+  </center>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      loadVideos();
+    });
 
     function loadVideos() {
       const request = indexedDB.open('MyDatabase', 1);
+
+      request.onupgradeneeded = function(event) {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains('videos')) {
+          db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
+        }
+      };
 
       request.onsuccess = function(event) {
         const db = event.target.result;
         const transaction = db.transaction(['videos'], 'readonly');
         const store = transaction.objectStore('videos');
-        const getRequest = store.getAll();
+        const getAllRequest = store.getAll();
 
-        getRequest.onsuccess = function(event) {
+        getAllRequest.onsuccess = function(event) {
           const videos = event.target.result;
-          const videoContainer = document.getElementById('video-container');
-          videoContainer.innerHTML = '';
+          const videosList = document.getElementById('videosList');
+          videosList.innerHTML = '';
 
-          videos.forEach(video => {
-            const videoItem = document.createElement('div');
-            videoItem.className = 'video-item';
-
-            const videoElement = document.createElement('video');
-            videoElement.src = video.data;
-            videoElement.controls = true;
-
-            const titleElement = document.createElement('h3');
-            titleElement.textContent = video.title;
-
-            videoItem.appendChild(titleElement);
-            videoItem.appendChild(videoElement);
-            videoContainer.appendChild(videoItem);
+          videos.forEach(function(video) {
+            const videoContainer = document.createElement('div');
+            videoContainer.className = 'video-container';
+            videoContainer.innerHTML = `
+              <h2>${video.title}</h2>
+              <video controls>
+                <source src="${video.data}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            `;
+            videosList.appendChild(videoContainer);
           });
         };
 
-        getRequest.onerror = function(event) {
-          console.error('Error fetching videos from IndexedDB:', event);
+        getAllRequest.onerror = function(event) {
+          console.error('Error retrieving videos from IndexedDB:', event);
         };
       };
 
@@ -76,30 +78,21 @@
       };
     }
   </script>
-</head>
-<body>
-  <h1>Uploaded Videos</h1>
-  <div class="video-container" id="video-container">
-    <!-- Videos will be displayed here -->
-  </div>
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js"></script>
+  <script>
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
+      authDomain: "asteroid-92576.firebaseapp.com",
+      projectId: "asteroid-92576",
+      storageBucket: "asteroid-92576.appspot.com",
+      messagingSenderId: "200976920431",
+      appId: "1:200976920431:web:6f56a336597e5c397c829a"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    document.addEventListener('DOMContentLoaded', function() {
-      loadVideos();
-    });
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
 </body>
 </html>
