@@ -211,7 +211,7 @@
 
       request.onsuccess = function(event) {
         const db = event.target.result;
-        const transaction = db.transaction(['videos'], 'readonly');
+        const transaction = db.transaction('videos', 'readonly');
         const store = transaction.objectStore('videos');
         const getAllRequest = store.getAll();
 
