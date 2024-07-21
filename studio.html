@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asteroid Teams Media Studio</title>
+  <title>Studio</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,112 +16,116 @@
     h1 {
       margin-top: 20px;
     }
-    #uploadForm {
-      margin: 20px auto;
-      max-width: 400px;
-    }
-    input[type="text"], input[type="file"] {
-      margin: 10px 0;
-      padding: 10px;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button {
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
+    .video-container {
+      display: inline-block;
+      margin: 10px;
     }
   </style>
 </head>
 <body>
   <center>
-    <h1>Asteroid Teams Studio</h1>
-    <h2>Upload Media</h2>
-    <form id="uploadForm">
-      <input type="text" id="title" placeholder="Enter Title" required>
-      <input type="file" id="video" accept="video/*" required>
-      <br>
-      <input type="radio" id="Public" name="Public" value="Public" checked>
-      <label for="Public">Public</label><br>
-      <button id="upload-btn" type="button">Upload</button>
-    </form>
+    <h1>Upload Videos</h1>
+    <input type="file" id="fileInput" accept="video/*">
+    <button onclick="upload()">Upload</button>
+    <div id="videosList"></div>
   </center>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const uploadBtn = document.getElementById('upload-btn');
-      if (uploadBtn) {
-        uploadBtn.addEventListener('click', upload);
-      } else {
-        console.error('Element with ID "upload-btn" not found');
-      }
+      loadVideos();
     });
 
-    function upload() {
-      const videoInput = document.getElementById('video');
-      const titleInput = document.getElementById('title').value;
-      const isPublic = document.getElementById('Public').checked;
-      const file = videoInput.files[0];
+    function loadVideos() {
+      const request = indexedDB.open('MyDatabase', 1);
 
-      if (!file) {
-        alert('Please select a file to upload.');
-        return;
-      }
+      request.onupgradeneeded = function(event) {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains('videos')) {
+          db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
+        }
+      };
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const videoData = e.target.result;
+      request.onsuccess = function(event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['videos'], 'readonly');
+        const store = transaction.objectStore('videos');
+        const getAllRequest = store.getAll();
 
-        const request = indexedDB.open('MyDatabase', 1);
+        getAllRequest.onsuccess = function(event) {
+          const videos = event.target.result;
+          const videosList = document.getElementById('videosList');
+          videosList.innerHTML = '';
 
-        request.onupgradeneeded = function(event) {
-          const db = event.target.result;
-          if (!db.objectStoreNames.contains('videos')) {
-            db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
-          }
-        };
-
-        request.onsuccess = function(event) {
-          const db = event.target.result;
-          const transaction = db.transaction(['videos'], 'readwrite');
-          const store = transaction.objectStore('videos');
-          const addRequest = store.add({
-            title: titleInput,
-            data: videoData,
-            public: isPublic
+          videos.forEach(function(video) {
+            const videoContainer = document.createElement('div');
+            videoContainer.className = 'video-container';
+            videoContainer.innerHTML = `
+              <h2>${video.title}</h2>
+              <video controls>
+                <source src="${video.data}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            `;
+            videosList.appendChild(videoContainer);
           });
-
-          addRequest.onsuccess = function() {
-            alert('Video uploaded successfully!');
-            document.getElementById('uploadForm').reset();
-          };
-
-          addRequest.onerror = function(event) {
-            console.error('Error saving video to IndexedDB:', event);
-            alert('Failed to upload video.');
-          };
         };
 
-        request.onerror = function(event) {
-          console.error('Error opening IndexedDB:', event);
+        getAllRequest.onerror = function(event) {
+          console.error('Error retrieving videos from IndexedDB:', event);
         };
       };
 
-      reader.readAsDataURL(file);
+      request.onerror = function(event) {
+        console.error('Error opening IndexedDB:', event);
+      };
+    }
+
+    function upload() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+          const data = event.target.result;
+          const title = file.name;
+
+          const request = indexedDB.open('MyDatabase', 1);
+
+          request.onsuccess = function(event) {
+            const db = event.target.result;
+            const transaction = db.transaction(['videos'], 'readwrite');
+            const store = transaction.objectStore('videos');
+            const video = { title: title, data: data };
+
+            const addRequest = store.add(video);
+
+            addRequest.onsuccess = function(event) {
+              loadVideos();
+            };
+
+            addRequest.onerror = function(event) {
+              console.error('Error adding video to IndexedDB:', event);
+            };
+          };
+
+          request.onerror = function(event) {
+            console.error('Error opening IndexedDB:', event);
+          };
+        };
+
+        reader.readAsDataURL(file);
+      }
     }
   </script>
 
-  <!-- Firebase App (the core Firebase SDK) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
-  <!-- Firebase Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js"></script>
-  <script>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
     // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
@@ -133,8 +137,8 @@
     };
 
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
   </script>
 </body>
 </html>
