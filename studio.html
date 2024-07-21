@@ -30,49 +30,7 @@
       } else {
         console.error('Element with ID "upload-btn" not found');
       }
-
-      // Initialize the video list when the page loads
-      updateVideoList();
     });
-
-    function updateVideoList() {
-      // Ensure the videoList element exists before manipulating it
-      const videoList = document.getElementById('videoList');
-      if (!videoList) {
-        console.error('Element with ID "videoList" not found');
-        return;
-      }
-
-      // Clear the existing list
-      videoList.innerHTML = '';
-
-      // Open IndexedDB and retrieve videos
-      const request = indexedDB.open('MyDatabase', 1);
-
-      request.onsuccess = function(event) {
-        const db = event.target.result;
-        const transaction = db.transaction(['videos'], 'readonly');
-        const store = transaction.objectStore('videos');
-        const getAllRequest = store.getAll();
-
-        getAllRequest.onsuccess = function(event) {
-          const videos = event.target.result;
-          videos.forEach(video => {
-            const li = document.createElement('li');
-            li.textContent = video.title;
-            videoList.appendChild(li);
-          });
-        };
-
-        getAllRequest.onerror = function(event) {
-          console.log('Error retrieving videos:', event);
-        };
-      };
-
-      request.onerror = function(event) {
-        console.log('Error opening IndexedDB:', event);
-      };
-    }
 
     function upload() {
       const videoInput = document.getElementById('video');
@@ -92,6 +50,13 @@
         // Save video data to IndexedDB
         const request = indexedDB.open('MyDatabase', 1);
 
+        request.onupgradeneeded = function(event) {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains('videos')) {
+            db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
+          }
+        };
+
         request.onsuccess = function(event) {
           const db = event.target.result;
           const transaction = db.transaction(['videos'], 'readwrite');
@@ -103,9 +68,8 @@
           });
 
           addRequest.onsuccess = function() {
-            alert('Video uploaded successfully GOOD LUCK!');
+            alert('Video uploaded successfully!');
             document.getElementById('uploadForm').reset();
-            updateVideoList(); // Update list after upload
           };
 
           addRequest.onerror = function(event) {
