@@ -3,264 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asteroid Teams Media Player</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <title>Songs</title>
   <style>
+    /* Add your styles here */
     body {
-      font-family: 'Lato', sans-serif;
-      background-color: black;
-      color: white;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
       margin: 0;
       padding: 0;
-    }
-
-    .topnav {
-      overflow: hidden;
-      background-color: #333;
-      display: flex;
-      justify-content: flex-end;
-      padding: 10px 0;
-    }
-
-    .topnav a {
-      color: white;
-      padding: 10px 20px;
-      font-size: 18px;
-    }
-
-    .topnav a:hover {
-      background-color: #555;
-    }
-
-    .topnav a.active {
-      background-color: #04AA6D;
-      color: white;
-    }
-
-    .main-content {
-      padding: 20px;
-    }
-
-    h1 {
-      font-size: 36px;
-      font-weight: bold;
-      color: coral;
-    }
-
-    .search-container {
       text-align: center;
+    }
+    h1 {
       margin-top: 20px;
     }
-
-    #searchInput {
-      width: 300px;
+    .video-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .video-item {
+      margin: 10px;
       padding: 10px;
-      font-size: 16px;
-      border: 1px solid coral;
+      border: 1px solid #ccc;
       border-radius: 5px;
-    }
-
-    .media-list {
-      list-style-type: none;
-      padding: 0;
-      margin: 20px 0;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    .media-list li {
-      display: inline-block;
       width: 300px;
-      margin-right: 10px;
-      white-space: normal;
+      background-color: #fff;
     }
-
-    .media-list li video {
+    .video-item video {
       width: 100%;
-    }
-
-    .mini-player {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background-color: #333;
-      color: white;
-      padding: 10px;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s ease-in-out;
-      transform: translateY(100%);
-    }
-
-    .mini-player.active {
-      display: flex;
-      transform: translateY(0);
-    }
-
-    .media-info {
-      display: flex;
-      align-items: center;
-    }
-
-    .media-info img {
-      width: 40px;
-      height: 40px;
-      margin-right: 10px;
-      border-radius: 50%;
-    }
-
-    .media-info .media-details {
-      display: flex;
-      flex-direction: column;
-      font-size: 14px;
-    }
-
-    .media-info .media-title {
-      font-weight: bold;
-      color: coral;
-    }
-
-    .controls {
-      display: flex;
-      align-items: center;
-    }
-
-    .controls button {
-      background-color: #F87954;
-      color: coral;
-      border: none;
-      padding: 8px 16px;
-      margin-left: 10px;
-      cursor: pointer;
-      border-radius: 5px;
-      font-size: 14px;
     }
   </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
 </head>
 <body>
-  <div class="topnav">
-    <a class="active" href="index.html">Home</a>
-    <a href="ts.html">Taylor Swift Songs</a>
-    <a href="login.html">Sign In</a>
-    <a href="account.html">Account</a>
-    <a href="pat.html">My Playlist</a>
-    <a href="tt.html">Times Tables Rocket</a>
+  <h1>Uploaded Videos</h1>
+  <div class="video-container" id="video-container">
+    <!-- Videos will be displayed here -->
   </div>
-
-  <div class="main-content">
-    <h1>Discover</h1>
-    <p>We are Asteroid Teams. We code for public use, even for free!</p>
-
-    <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Search for media...">
-      <button onclick="searchMedia()">Search</button>
-    </div>
-
-    <div id="uploadedMedia">
-      <h1>RECOMMENDED FOR YOU👍🏻</h1>
-      <ul class="media-list" id="mediaList"></ul>
-    </div>
-
-    <div id="videoContainer1">
-      <h1>HITS IN THE WORLD</h1>
-      <!-- Add videos for Hits in the World -->
-    </div>
-
-    <div id="videoContainer2">
-      <h1>MOST POPULAR</h1>
-      <!-- Add videos for Most Popular -->
-    </div>
-
-    <div id="videoContainer3">
-      <h1>YOU MUST WATCH</h1>
-      <!-- Add videos for You Must Watch -->
-    </div>
-  </div>
-
-  <div class="mini-player" id="miniPlayer">
-    <div class="media-info">
-      <img src="placeholder.png" alt="Media Thumbnail" id="miniPlayerThumbnail">
-      <div class="media-details">
-        <span class="media-title" id="miniPlayerMediaTitle"></span>
-      </div>
-    </div>
-    <div class="controls">
-      <button onclick="togglePlayPause()">Play/Pause</button>
-      <button onclick="closeMiniPlayer()">Close</button>
-    </div>
-  </div>
-
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Retrieve uploaded media from IndexedDB
-      const mediaList = document.getElementById('mediaList');
+      loadVideos();
+    });
 
-      if (!mediaList) {
-        console.error('Element with ID "mediaList" not found');
-        return;
-      }
-
-      // Clear previous content
-      mediaList.innerHTML = '';
-
-      // Open IndexedDB and retrieve videos
+    function loadVideos() {
       const request = indexedDB.open('MyDatabase', 1);
 
       request.onsuccess = function(event) {
         const db = event.target.result;
-        const transaction = db.transaction('videos', 'readonly');
-        const store = transaction.objectStore('videos');
-        const getAllRequest = store.getAll();
+        var transaction = db.transaction(['videos'], 'readonly');
+        var store = transaction.objectStore('videos');
+        var getRequest = store.getAll();
 
-        getAllRequest.onsuccess = function(event) {
+        getRequest.onsuccess = function(event) {
           const videos = event.target.result;
+          const videoContainer = document.getElementById('video-container');
+          videoContainer.innerHTML = ''; // Clear previous content
+
           videos.forEach(video => {
-            const listItem = document.createElement('li');
+            const videoItem = document.createElement('div');
+            videoItem.className = 'video-item';
+
             const videoElement = document.createElement('video');
             videoElement.src = video.data;
             videoElement.controls = true;
-            videoElement.addEventListener('play', function() {
-              const miniPlayer = document.getElementById('miniPlayer');
-              document.getElementById('miniPlayerMediaTitle').textContent = video.title;
-              miniPlayer.style.display = 'flex';
-            });
 
-            listItem.appendChild(videoElement);
-            mediaList.appendChild(listItem);
+            const titleElement = document.createElement('h3');
+            titleElement.textContent = video.title;
+
+            videoItem.appendChild(titleElement);
+            videoItem.appendChild(videoElement);
+            videoContainer.appendChild(videoItem);
           });
         };
 
-        getAllRequest.onerror = function(event) {
-          console.log('Error retrieving videos:', event);
+        getRequest.onerror = function(event) {
+          console.error('Error fetching videos from IndexedDB:', event);
         };
       };
 
       request.onerror = function(event) {
-        console.log('Error opening IndexedDB:', event);
+        console.error('Error opening IndexedDB:', event);
       };
-    });
-
-    function searchMedia() {
-      // Implement search functionality for media
-    }
-
-    function togglePlayPause() {
-      const mediaElement = document.querySelector('.mini-player video');
-      if (mediaElement.paused) {
-        mediaElement.play();
-      } else {
-        mediaElement.pause();
-      }
-    }
-
-    function closeMiniPlayer() {
-      document.getElementById('miniPlayer').style.display = 'none';
     }
   </script>
-
 
   <script type="module">
   // Import the functions you need from the SDKs you need
