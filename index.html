@@ -130,7 +130,7 @@
 
  <center>
     <a href="start.html" class="button">
-      <button class="button" color="coral"><font color="black">Listen to Musics </font></button>
+      <button onclick="nok()" class="button" color="coral"><font color="black">Listen to Musics </font></button>
      <div class="ol">
       <h3><font face="Montserrat" font color="black">All Features will not be availabel if you do not sign in</font></h3>
       </div>
@@ -150,9 +150,11 @@
   </font>
 
 <script>
-
-let email = null;
-let password = null;
+function nok() {
+localStorage.setItem("email", "null");
+localStorage.setItem("password", "null");
+localStorage.setItem("currentUser", "null");
+}
 
 </script>
   
