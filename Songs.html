@@ -79,11 +79,12 @@
     }
   </script>
 
-  <!-- Firebase App (the core Firebase SDK) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
-  <!-- Firebase Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js"></script>
-  <script>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
     // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
@@ -95,8 +96,8 @@
     };
 
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
   </script>
 </body>
 </html>
