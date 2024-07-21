@@ -22,46 +22,46 @@
     </form>
   </center>
   <script>
-    // Function to open or create the IndexedDB database and object store
-    function openDatabase(callback) {
-      var request = indexedDB.open('MyDatabase', 1);
+    document.addEventListener('DOMContentLoaded', function() {
+      // Ensure the element exists before adding event listeners
+      const uploadBtn = document.getElementById('upload-btn');
+      if (uploadBtn) {
+        uploadBtn.addEventListener('click', upload);
+      } else {
+        console.error('Element with ID "upload-btn" not found');
+      }
+    });
 
-      request.onupgradeneeded = function(event) {
-        var db = event.target.result;
-        if (!db.objectStoreNames.contains('videos')) {
-          db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
-        }
-      };
-
-      request.onsuccess = function(event) {
-        callback(event.target.result);
-      };
-
-      request.onerror = function(event) {
-        console.error('Error opening IndexedDB:', event);
-      };
-    }
-
-    // Function to upload video
     function upload() {
-      var videoInput = document.getElementById('video');
-      var titleInput = document.getElementById('title').value;
-      var isPublic = document.getElementById('Public').checked;
-      var file = videoInput.files[0];
+      const videoInput = document.getElementById('video');
+      const titleInput = document.getElementById('title').value;
+      const isPublic = document.getElementById('Public').checked;
+      const file = videoInput.files[0];
 
       if (!file) {
         alert('Please select a file to upload.');
         return;
       }
 
-      var reader = new FileReader();
+      const reader = new FileReader();
       reader.onload = function(e) {
-        var videoData = e.target.result;
+        const videoData = e.target.result;
 
-        openDatabase(function(db) {
-          var transaction = db.transaction(['videos'], 'readwrite');
-          var store = transaction.objectStore('videos');
-          var addRequest = store.add({
+        // Save video data to IndexedDB
+        const request = indexedDB.open('MyDatabase', 1);
+
+        request.onupgradeneeded = function(event) {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains('videos')) {
+            db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
+          }
+        };
+
+        request.onsuccess = function(event) {
+          const db = event.target.result;
+          const transaction = db.transaction(['videos'], 'readwrite');
+          const store = transaction.objectStore('videos');
+          const addRequest = store.add({
             title: titleInput,
             data: videoData,
             public: isPublic
@@ -76,21 +76,15 @@
             console.error('Error saving video to IndexedDB:', event);
             alert('Failed to upload video.');
           };
-        });
+        };
+
+        request.onerror = function(event) {
+          console.error('Error opening IndexedDB:', event);
+        };
       };
 
       reader.readAsDataURL(file);
     }
-
-    // Attach event listener to the upload button
-    document.addEventListener('DOMContentLoaded', function() {
-      var uploadBtn = document.getElementById('upload-btn');
-      if (uploadBtn) {
-        uploadBtn.addEventListener('click', upload);
-      } else {
-        console.error('Element with ID "upload-btn" not found');
-      }
-    });
   </script>
 </body>
 </html>
