@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteroid Teams Media Studio</title>
   <style>
-    /* Add your styles here */
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
@@ -39,10 +38,11 @@
       background-color: #45a049;
     }
   </style>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
-  <script>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
     // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
@@ -54,24 +54,9 @@
     };
 
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-  </script>
-</head>
-<body>
-  <center>
-    <h1>Asteroid Teams Studio</h1>
-    <h2>Upload Media</h2>
-    <form id="uploadForm">
-      <input type="text" id="title" placeholder="Enter Title" required>
-      <input type="file" id="video" accept="video/*" required>
-      <br>
-      <input type="radio" id="Public" name="Public" value="Public" checked>
-      <label for="Public">Public</label><br>
-      <button id="upload-btn" type="button">Upload</button>
-    </form>
-  </center>
-  <script>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     document.addEventListener('DOMContentLoaded', function() {
       const uploadBtn = document.getElementById('upload-btn');
       if (uploadBtn) {
@@ -135,8 +120,20 @@
       reader.readAsDataURL(file);
     }
   </script>
-
-
+</head>
+<body>
+  <center>
+    <h1>Asteroid Teams Studio</h1>
+    <h2>Upload Media</h2>
+    <form id="uploadForm">
+      <input type="text" id="title" placeholder="Enter Title" required>
+      <input type="file" id="video" accept="video/*" required>
+      <br>
+      <input type="radio" id="Public" name="Public" value="Public" checked>
+      <label for="Public">Public</label><br>
+      <button id="upload-btn" type="button">Upload</button>
+    </form>
+  </center>
   <script type="module">
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
@@ -158,3 +155,4 @@
 </script>
 </body>
 </html>
++
