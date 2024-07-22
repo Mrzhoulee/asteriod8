@@ -13,8 +13,7 @@
 
   <!-- Styles -->
   <style>
-
-    h1{
+    h1 {
       font-size: 80px;
       font-family: Montserrat;
       text-align: center;
@@ -22,13 +21,13 @@
 
     body {
       margin: 0;
-      font-family: 'Montserrat', sans-serif; /* Updated to use Montserrat font */
-      background-color: black; /* Background color set to black */
-      color: white; /* Default text color */
+      font-family: 'Montserrat', sans-serif;
+      background-color: black;
+      color: white;
     }
 
     .topnav {
-      height: 100;
+      height: 100px;
       overflow: hidden;
       background-color: coral;
     }
@@ -57,50 +56,48 @@
       color: black;
       width: 500px;
       height: 90px;
-      border-radius: 70%;
-      border: black;
+      border-radius: 5px;
+      border: none;
       padding: 10px;
       font-weight: bold;
-      border-radius: 5px;
-      font-family: 'Montserrat', sans-serif; /* Ensure button text uses Montserrat */
+      font-family: 'Montserrat', sans-serif;
     }
 
     #shell-btn {
       background-color: black;
       width: 190px;
       height: 80px;
-      border: 100px;
+      border: 10px solid black;
       border-radius: 45%;
-      position: absolute; /* Absolute positioning */
-      top: -1px; /* Distance from the top */
-      right: 10px; /* Distance from the right */
+      position: absolute;
+      top: -1px;
+      right: 10px;
     }
 
     #shell {
       background: white;
       width: 190px;
       height: 80px;
-      border: 10px;
+      border: 10px solid black;
       border-radius: 45%;
-      position: absolute; /* Absolute positioning */
-      top: -1px; /* Distance from the top of the container */
-      right: 220px; /* Distance from the right edge of the container */
+      position: absolute;
+      top: -1px;
+      right: 220px;
     }
 
     .button {
-      text-decoration: none; /* Remove underline from link */
+      text-decoration: none;
     }
-  
-    div.op {
+
+    .op {
       text-align: center;
       font-size: 30px;
       color: coral;
     }
 
-    div.ol {
+    .ol {
       background-color: red;
     }
-   
   </style>
 </head>
 <body>
@@ -113,48 +110,44 @@
     <a href="Copyright.html">Copyright Policy &copy;</a>
   </div>
 
-  <div class="shell-btn">
+  <div style="position: absolute; top: 0; right: 10px;">
     <a href="login.html">
-      <button id="shell-btn"><font color="white">Sign in</font></button>
+      <button id="shell-btn">Sign in</button>
     </a>
   </div>
 
-  <div class="shell">
+  <div style="position: absolute; top: 0; right: 220px;">
     <a href="registraition.html">
-      <button id="shell"><font color="black">Sign Up</font></button>
+      <button id="shell">Sign Up</button>
     </a>
   </div>
- <font face="Montserrat">
-  <h1>Turn your volume UP!</h1>
-  <h1>Welcome to Asteriod!</h1>
 
- <center>
+  <div style="text-align: center;">
+    <h1>Turn your volume UP!</h1>
+    <h1>Welcome to Asteriod!</h1>
     <a href="start.html" class="button">
-      <button onclick="nok()" class="button" color="coral"><font color="black">Listen to Musics </font></button>
-     <div class="ol">
-      <h3><font face="Montserrat" font color="black">All Features will not be availabel if you do not sign in</font></h3>
-      </div>
-      </a>
-      </center>
+      <button onclick="nok()" class="button">Listen to Music</button>
+    </a>
+    <div class="ol">
+      <h3>All Features will not be available if you do not sign in</h3>
+    </div>
   </div>
+
   <div class="op">
     <h3>About</h3>
     <h4>Welcome to Asteriod8!</h4>
     <p>
-      At Asteriod8, we're passionate about music and connecting listeners with the perfect tunes to soundtrack their lives. Whether you're looking for the latest hits, underground gems, 
-      or timeless classics, we've got you covered. Our mission is simple: to provide a seamless and enjoyable music listening experience for everyone. With an extensive library spanning multiple genres, artists, and eras, there's something here for every mood and occasion.
+      At Asteriod8, we're passionate about music and connecting listeners with the perfect tunes to soundtrack their lives. Whether you're looking for the latest hits, underground gems, or timeless classics, we've got you covered. Our mission is simple: to provide a seamless and enjoyable music listening experience for everyone. With an extensive library spanning multiple genres, artists, and eras, there's something here for every mood and occasion.
       But we're more than just a music platform. We're a community of music lovers, united by our shared love for melody and rhythm. Discover new artists, share your favorite tracks, and connect with fellow enthusiasts who share your musical tastes.
       So whether you're studying, working out, or simply unwinding after a long day, let Asteriod8 be your ultimate destination for all things music. Join us on this sonic journey and let the music speak to your soul. Turn up the volume and let the music play!
     </p>
   </div>
-  </font>
 
-<script>
-function nok() {
-localStorage.setItem("currentUser", "null");
-}
-
-</script>
+  <script>
+    function nok() {
+      localStorage.setItem("currentUser", "null");
+    }
+  </script>
   
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
