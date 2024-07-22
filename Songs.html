@@ -79,25 +79,24 @@
     }
   </script>
 
-  <!-- Firebase SDKs -->
-  <script type="module">
-    // Import the functions you need from the SDKs you need
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
-      authDomain: "asteroid-92576.firebaseapp.com",
-      projectId: "asteroid-92576",
-      storageBucket: "asteroid-92576.appspot.com",
-      messagingSenderId: "200976920431",
-      appId: "1:200976920431:web:6f56a336597e5c397c829a"
-    };
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
+    authDomain: "asteroid-92576.firebaseapp.com",
+    projectId: "asteroid-92576",
+    storageBucket: "asteroid-92576.appspot.com",
+    messagingSenderId: "200976920431",
+    appId: "1:200976920431:web:6f56a336597e5c397c829a"
+  };
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-  </script>
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
 </body>
 </html>
