@@ -36,103 +36,11 @@
     <div id="videosList"></div>
   </center>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      loadVideos();
-      document.getElementById('uploadForm').addEventListener('submit', upload);
-    });
-
-    function loadVideos() {
-      const request = indexedDB.open('MyDatabase', 1);
-
-      request.onupgradeneeded = function(event) {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains('videos')) {
-          db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
-        }
-      };
-
-      request.onsuccess = function(event) {
-        const db = event.target.result;
-        const transaction = db.transaction(['videos'], 'readonly');
-        const store = transaction.objectStore('videos');
-        const getAllRequest = store.getAll();
-
-        getAllRequest.onsuccess = function(event) {
-          const videos = event.target.result;
-          const videosList = document.getElementById('videosList');
-          videosList.innerHTML = '';
-
-          videos.forEach(function(video) {
-            const videoContainer = document.createElement('div');
-            videoContainer.className = 'video-container';
-            videoContainer.innerHTML = `
-              <h2>${video.title}</h2>
-              <video controls>
-                <source src="${video.data}" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
-            `;
-            videosList.appendChild(videoContainer);
-          });
-        };
-
-        getAllRequest.onerror = function(event) {
-          console.error('Error retrieving videos from IndexedDB:', event);
-        };
-      };
-
-      request.onerror = function(event) {
-        console.error('Error opening IndexedDB:', event);
-      };
-    }
-
-    function upload(event) {
-      event.preventDefault();
-
-      const title = document.getElementById('title').value;
-      const videoFile = document.getElementById('videoFile').files[0];
-
-      const reader = new FileReader();
-      reader.onload = function() {
-        const data = reader.result;
-
-        const request = indexedDB.open('MyDatabase', 1);
-        request.onsuccess = function(event) {
-          const db = event.target.result;
-          const transaction = db.transaction(['videos'], 'readwrite');
-          const store = transaction.objectStore('videos');
-          const video = { title, data };
-          store.add(video);
-
-          transaction.oncomplete = function() {
-            console.log('Video added to the database');
-            loadVideos(); // Reload videos to show the new addition
-          };
-
-          transaction.onerror = function(event) {
-            console.error('Error adding video to the database:', event);
-          };
-        };
-
-        request.onerror = function(event) {
-          console.error('Error opening IndexedDB:', event);
-        };
-      };
-
-      reader.onerror = function(event) {
-        console.error('Error reading file:', event);
-      };
-
-      reader.readAsDataURL(videoFile);
-    }
-  </script>
-
   <!-- Firebase App (the core Firebase SDK) -->
   <script type="module">
-    // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
     // Your web app's Firebase configuration
     const firebaseConfig = {
@@ -146,7 +54,52 @@
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
+    const storage = getStorage(app);
     const db = getFirestore(app);
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadVideos();
+      document.getElementById('uploadForm').addEventListener('submit', upload);
+    });
+
+    async function loadVideos() {
+      const videosList = document.getElementById('videosList');
+      videosList.innerHTML = '';
+
+      const querySnapshot = await getDocs(collection(db, "videos"));
+      querySnapshot.forEach((doc) => {
+        const video = doc.data();
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'video-container';
+        videoContainer.innerHTML = `
+          <h2>${video.title}</h2>
+          <video controls>
+            <source src="${video.url}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        `;
+        videosList.appendChild(videoContainer);
+      });
+    }
+
+    async function upload(event) {
+      event.preventDefault();
+
+      const title = document.getElementById('title').value;
+      const videoFile = document.getElementById('videoFile').files[0];
+
+      const videoRef = ref(storage, 'videos/' + videoFile.name);
+      await uploadBytes(videoRef, videoFile);
+      const videoURL = await getDownloadURL(videoRef);
+
+      await addDoc(collection(db, "videos"), {
+        title: title,
+        url: videoURL
+      });
+
+      console.log('Video uploaded and added to Firestore');
+      loadVideos(); // Reload videos to show the new addition
+    }
   </script>
 </body>
 </html>
