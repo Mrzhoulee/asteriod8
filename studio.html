@@ -36,57 +36,9 @@
     <div id="videosList"></div>
   </center>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      loadVideos();
-      document.getElementById('uploadForm').addEventListener('submit', upload);
-    });
-
-    async function loadVideos() {
-      const videosList = document.getElementById('videosList');
-      videosList.innerHTML = '';
-
-      const querySnapshot = await getDocs(collection(db, "videos"));
-      querySnapshot.forEach((doc) => {
-        const video = doc.data();
-        const videoContainer = document.createElement('div');
-        videoContainer.className = 'video-container';
-        videoContainer.innerHTML = `
-          <h2>${video.title}</h2>
-          <video controls>
-            <source src="${video.url}" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        `;
-        videosList.appendChild(videoContainer);
-      });
-    }
-
-    async function upload(event) {
-      event.preventDefault();
-
-      const title = document.getElementById('title').value;
-      const videoFile = document.getElementById('videoFile').files[0];
-
-      const videoRef = ref(storage, 'videos/' + videoFile.name);
-      await uploadBytes(videoRef, videoFile);
-      const videoURL = await getDownloadURL(videoRef);
-
-      await addDoc(collection(db, "videos"), {
-        title: title,
-        url: videoURL
-      });
-
-      console.log('Video uploaded and added to Firestore');
-      alert('Video uploaded successfully');
-      loadVideos(); // Reload videos to show the new addition
-    }
-  </script>
-
-  <!-- Firebase App (the core Firebase SDK) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
     const firebaseConfig = {
@@ -101,6 +53,64 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadVideos();
+      document.getElementById('uploadForm').addEventListener('submit', upload);
+    });
+
+    async function loadVideos() {
+      const videosList = document.getElementById('videosList');
+      videosList.innerHTML = '';
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "videos"));
+        querySnapshot.forEach((doc) => {
+          const video = doc.data();
+          const videoContainer = document.createElement('div');
+          videoContainer.className = 'video-container';
+          videoContainer.innerHTML = `
+            <h2>${video.title}</h2>
+            <video controls>
+              <source src="${video.url}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          `;
+          videosList.appendChild(videoContainer);
+        });
+      } catch (error) {
+        console.error("Error loading videos: ", error);
+      }
+    }
+
+    async function upload(event) {
+      event.preventDefault();
+
+      const title = document.getElementById('title').value;
+      const videoFile = document.getElementById('videoFile').files[0];
+
+      if (!videoFile) {
+        alert('Please select a video file');
+        return;
+      }
+
+      try {
+        const videoRef = ref(storage, 'videos/' + videoFile.name);
+        await uploadBytes(videoRef, videoFile);
+        const videoURL = await getDownloadURL(videoRef);
+
+        await addDoc(collection(db, "videos"), {
+          title: title,
+          url: videoURL
+        });
+
+        console.log('Video uploaded and added to Firestore');
+        alert('Video uploaded successfully');
+        loadVideos(); // Reload videos to show the new addition
+      } catch (error) {
+        console.error("Error uploading video: ", error);
+      }
+    }
   </script>
 </body>
 </html>
