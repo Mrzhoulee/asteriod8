@@ -28,62 +28,10 @@
     <div id="videosList"></div>
   </center>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      loadVideos();
-    });
-
-    function loadVideos() {
-      const request = indexedDB.open('MyDatabase', 1);
-
-      request.onupgradeneeded = function(event) {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains('videos')) {
-          db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
-        }
-      };
-
-      request.onsuccess = function(event) {
-        const db = event.target.result;
-        const transaction = db.transaction(['videos'], 'readonly');
-        const store = transaction.objectStore('videos');
-        const getAllRequest = store.getAll();
-
-        getAllRequest.onsuccess = function(event) {
-          const videos = event.target.result;
-          const videosList = document.getElementById('videosList');
-          videosList.innerHTML = '';
-
-          videos.forEach(function(video) {
-            const videoContainer = document.createElement('div');
-            videoContainer.className = 'video-container';
-            videoContainer.innerHTML = `
-              <h2>${video.title}</h2>
-              <video controls>
-                <source src="${video.data}" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
-            `;
-            videosList.appendChild(videoContainer);
-          });
-        };
-
-        getAllRequest.onerror = function(event) {
-          console.error('Error retrieving videos from IndexedDB:', event);
-        };
-      };
-
-      request.onerror = function(event) {
-        console.error('Error opening IndexedDB:', event);
-      };
-    }
-  </script>
-
   <!-- Firebase App (the core Firebase SDK) -->
   <script type="module">
-    // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
     // Your web app's Firebase configuration
     const firebaseConfig = {
@@ -98,6 +46,30 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadVideos();
+    });
+
+    async function loadVideos() {
+      const videosList = document.getElementById('videosList');
+      videosList.innerHTML = '';
+
+      const querySnapshot = await getDocs(collection(db, "videos"));
+      querySnapshot.forEach((doc) => {
+        const video = doc.data();
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'video-container';
+        videoContainer.innerHTML = `
+          <h2>${video.title}</h2>
+          <video controls>
+            <source src="${video.url}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        `;
+        videosList.appendChild(videoContainer);
+      });
+    }
   </script>
 </body>
 </html>
