@@ -36,27 +36,7 @@
     <div id="videosList"></div>
   </center>
 
-  <!-- Firebase App (the core Firebase SDK) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
-      authDomain: "asteroid-92576.firebaseapp.com",
-      projectId: "asteroid-92576",
-      storageBucket: "asteroid-92576.appspot.com",
-      messagingSenderId: "200976920431",
-      appId: "1:200976920431:web:6f56a336597e5c397c829a"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const storage = getStorage(app);
-    const db = getFirestore(app);
-
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
       loadVideos();
       document.getElementById('uploadForm').addEventListener('submit', upload);
@@ -98,8 +78,29 @@
       });
 
       console.log('Video uploaded and added to Firestore');
+      alert('Video uploaded successfully');
       loadVideos(); // Reload videos to show the new addition
     }
+  </script>
+
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
+      authDomain: "asteroid-92576.firebaseapp.com",
+      projectId: "asteroid-92576",
+      storageBucket: "asteroid-92576.appspot.com",
+      messagingSenderId: "200976920431",
+      appId: "1:200976920431:web:6f56a336597e5c397c829a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
   </script>
 </body>
 </html>
