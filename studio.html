@@ -29,7 +29,6 @@
       appId: "1:200976920431:web:6f56a336597e5c397c829a"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
@@ -44,7 +43,7 @@
           const storageRef = ref(storage, 'videos/' + videoFile.name);
           await uploadBytes(storageRef, videoFile);
           const videoURL = await getDownloadURL(storageRef);
-
+          
           await addDoc(collection(db, "videos"), {
             title: title,
             url: videoURL
