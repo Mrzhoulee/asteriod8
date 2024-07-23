@@ -28,11 +28,9 @@
     <div id="videosList"></div>
   </center>
 
-  <!-- Firebase App (the core Firebase SDK) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-    import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
@@ -45,7 +43,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     document.addEventListener('DOMContentLoaded', function() {
       loadVideos();
@@ -55,21 +52,38 @@
       const videosList = document.getElementById('videosList');
       videosList.innerHTML = '';
 
-      const querySnapshot = await getDocs(collection(db, "videos"));
-      querySnapshot.forEach((doc) => {
-        const video = doc.data();
-        const videoContainer = document.createElement('div');
-        videoContainer.className = 'video-container';
-        videoContainer.innerHTML = `
-          <h2>${video.title}</h2>
-          <video controls>
-            <source src="${video.url}" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        `;
-        videosList.appendChild(videoContainer);
-      });
+      try {
+        const querySnapshot = await getDocs(collection(db, "videos"));
+        querySnapshot.forEach((doc) => {
+          const video = doc.data();
+          const videoContainer = document.createElement('div');
+          videoContainer.className = 'video-container';
+          videoContainer.innerHTML = `
+            <h2>${video.title}</h2>
+            <video controls>
+              <source src="${video.url}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          `;
+          videosList.appendChild(videoContainer);
+        });
+      } catch (error) {
+        console.error("Error loading videos: ", error);
+      }
     }
+  </script>
+  
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
+      authDomain: "asteroid-92576.firebaseapp.com",
+      projectId: "asteroid-92576",
+      storageBucket: "asteroid-92576.appspot.com",
+      messagingSenderId: "200976920431",
+      appId: "1:200976920431:web:6f56a336597e5c397c829a"
+    };
+    const app = initializeApp(firebaseConfig);
   </script>
 </body>
 </html>
