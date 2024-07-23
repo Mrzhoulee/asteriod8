@@ -29,6 +29,7 @@
       appId: "1:200976920431:web:6f56a336597e5c397c829a"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
@@ -43,7 +44,7 @@
           const storageRef = ref(storage, 'videos/' + videoFile.name);
           await uploadBytes(storageRef, videoFile);
           const videoURL = await getDownloadURL(storageRef);
-          
+
           await addDoc(collection(db, "videos"), {
             title: title,
             url: videoURL
@@ -56,19 +57,6 @@
         }
       }
     });
-  </script>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    const firebaseConfig = {
-      apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
-      authDomain: "asteroid-92576.firebaseapp.com",
-      projectId: "asteroid-92576",
-      storageBucket: "asteroid-92576.appspot.com",
-      messagingSenderId: "200976920431",
-      appId: "1:200976920431:web:6f56a336597e5c397c829a"
-    };
-    const app = initializeApp(firebaseConfig);
   </script>
 </body>
 </html>
