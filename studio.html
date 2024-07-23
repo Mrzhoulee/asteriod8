@@ -3,42 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Studio</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      color: #333;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-    h1 {
-      margin-top: 20px;
-    }
-    .video-container {
-      display: inline-block;
-      margin: 10px;
-    }
-  </style>
+  <title>Upload Video</title>
 </head>
 <body>
-  <center>
-    <h1>Upload Video</h1>
-    <form id="uploadForm">
-      <label for="title">Title:</label>
-      <input type="text" id="title" name="title" required><br><br>
-      <label for="videoFile">Select video:</label>
-      <input type="file" id="videoFile" name="videoFile" accept="video/mp4" required><br><br>
-      <input type="submit" value="Upload">
-    </form>
-    <h1>My Videos</h1>
-    <div id="videosList"></div>
-  </center>
+  <h1>Upload Video</h1>
+  <form id="uploadForm">
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" required>
+    <label for="video">Select video:</label>
+    <input type="file" id="video" name="video" accept="video/*" required>
+    <button type="submit">Upload</button>
+  </form>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
     const firebaseConfig = {
@@ -54,63 +33,42 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    document.addEventListener('DOMContentLoaded', function() {
-      loadVideos();
-      document.getElementById('uploadForm').addEventListener('submit', upload);
-    });
-
-    async function loadVideos() {
-      const videosList = document.getElementById('videosList');
-      videosList.innerHTML = '';
-
-      try {
-        const querySnapshot = await getDocs(collection(db, "videos"));
-        querySnapshot.forEach((doc) => {
-          const video = doc.data();
-          const videoContainer = document.createElement('div');
-          videoContainer.className = 'video-container';
-          videoContainer.innerHTML = `
-            <h2>${video.title}</h2>
-            <video controls>
-              <source src="${video.url}" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
-          `;
-          videosList.appendChild(videoContainer);
-        });
-      } catch (error) {
-        console.error("Error loading videos: ", error);
-      }
-    }
-
-    async function upload(event) {
-      event.preventDefault();
-
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
       const title = document.getElementById('title').value;
-      const videoFile = document.getElementById('videoFile').files[0];
+      const videoFile = document.getElementById('video').files[0];
 
-      if (!videoFile) {
-        alert('Please select a video file');
-        return;
+      if (title && videoFile) {
+        try {
+          const storageRef = ref(storage, 'videos/' + videoFile.name);
+          await uploadBytes(storageRef, videoFile);
+          const videoURL = await getDownloadURL(storageRef);
+          
+          await addDoc(collection(db, "videos"), {
+            title: title,
+            url: videoURL
+          });
+
+          alert('Video uploaded successfully!');
+        } catch (error) {
+          console.error("Error uploading video: ", error);
+          alert('Error uploading video: ' + error.message);
+        }
       }
+    });
+  </script>
 
-      try {
-        const videoRef = ref(storage, 'videos/' + videoFile.name);
-        await uploadBytes(videoRef, videoFile);
-        const videoURL = await getDownloadURL(videoRef);
-
-        await addDoc(collection(db, "videos"), {
-          title: title,
-          url: videoURL
-        });
-
-        console.log('Video uploaded and added to Firestore');
-        alert('Video uploaded successfully');
-        loadVideos(); // Reload videos to show the new addition
-      } catch (error) {
-        console.error("Error uploading video: ", error);
-      }
-    }
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
+      authDomain: "asteroid-92576.firebaseapp.com",
+      projectId: "asteroid-92576",
+      storageBucket: "asteroid-92576.appspot.com",
+      messagingSenderId: "200976920431",
+      appId: "1:200976920431:web:6f56a336597e5c397c829a"
+    };
+    const app = initializeApp(firebaseConfig);
   </script>
 </body>
 </html>
