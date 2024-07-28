@@ -1,8 +1,8 @@
 [
   {
-    "origin": ["https://asteriod8.com"],
-    "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
-    "responseHeader": ["Content-Type", "Authorization"],
+    "origin": ["*"],
+    "method": ["GET", "POST", "PUT", "DELETE"],
+    "responseHeader": ["Content-Type"],
     "maxAgeSeconds": 3600
   }
 ]
