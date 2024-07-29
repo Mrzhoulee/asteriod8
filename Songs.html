@@ -1,90 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" href="/astei.jpg" type="image/jpeg">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Songs</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      color: #333;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-    h1 {
-      margin-top: 20px;
-    }
-    .video-container {
-      display: inline-block;
-      margin: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded Songs</title>
 </head>
 <body>
-  <center>
-    <h1>My Videos</h1>
-    <div id="videosList"></div>
-  </center>
+    <h1>Uploaded Songs</h1>
+    <div id="songList"></div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js"></script>
+    <script src="index.js"></script>
+    <script>
+        // Initialize Firebase (this should be in index.js)
+        firebase.initializeApp(firebaseConfig);
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
-      authDomain: "asteroid-92576.firebaseapp.com",
-      projectId: "asteroid-92576",
-      storageBucket: "asteroid-92576.appspot.com",
-      messagingSenderId: "200976920431",
-      appId: "1:200976920431:web:6f56a336597e5c397c829a"
-    };
+        // Retrieve and display uploaded files
+        function displayUploadedFiles() {
+            const storageRef = firebase.storage().ref('videos');
+            storageRef.listAll().then((result) => {
+                const songList = document.getElementById('songList');
+                result.items.forEach((itemRef) => {
+                    itemRef.getDownloadURL().then((url) => {
+                        const audioElement = document.createElement('audio');
+                        audioElement.src = url;
+                        audioElement.controls = true;
+                        songList.appendChild(audioElement);
+                    });
+                });
+            }).catch((error) => {
+                console.error("Error retrieving files:", error);
+            });
+        }
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    document.addEventListener('DOMContentLoaded', function() {
-      loadVideos();
-    });
-
-    async function loadVideos() {
-      const videosList = document.getElementById('videosList');
-      videosList.innerHTML = '';
-
-      try {
-        const querySnapshot = await getDocs(collection(db, "videos"));
-        querySnapshot.forEach((doc) => {
-          const video = doc.data();
-          const videoContainer = document.createElement('div');
-          videoContainer.className = 'video-container';
-          videoContainer.innerHTML = `
-            <h2>${video.title}</h2>
-            <video controls>
-              <source src="${video.url}" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
-          `;
-          videosList.appendChild(videoContainer);
-        });
-      } catch (error) {
-        console.error("Error loading videos: ", error);
-      }
-    }
-  </script>
-  
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    const firebaseConfig = {
-      apiKey: "AIzaSyB0R2hZpSHViKEHzxDXL0zq8VHTtkyZOJ4",
-      authDomain: "asteroid-92576.firebaseapp.com",
-      projectId: "asteroid-92576",
-      storageBucket: "asteroid-92576.appspot.com",
-      messagingSenderId: "200976920431",
-      appId: "1:200976920431:web:6f56a336597e5c397c829a"
-    };
-    const app = initializeApp(firebaseConfig);
-  </script>
+        displayUploadedFiles();
+    </script>
 </body>
 </html>
