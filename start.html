@@ -7,11 +7,7 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <style>
     /* Global styles */
-    body {
-      display: flex;
-      justfy-content: center;
-      align-items: center;
-      
+    body, html {
       margin: 0;
       padding: 0;
       font-family: 'Montserrat', sans-serif;
@@ -72,7 +68,6 @@
     }
 
     .container {
-      filter: url(#gooey);
       width: 150px;
       height: 150px;
       border-radius: 50%;
@@ -99,80 +94,7 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
-.container .circle {
-position: relative;
-min-width: 300px;
-height: 300px;
-background: coral;
-}
 
-    .container .circle:before {
-    content: '';
-    position: absoulte;
-    top: -50px
-    left: -50px;
-    right: -50px;
-    bottom: 50px;
-    border-radius: 50%;
-    z-index: -1;
-    filter: blur(50px);
-    }
-
-       .container .circle .circle1:before
-    .container .circle .circle1:before{
- background: linear-gradient(90deg,coral,peach);
-      
-    }
-     .container .circle .circle2:before
-    .container .circle .circle2:before{
- background: linear-gradient(90deg,coral,peach);
-      
-    }
-
-
-       .container .circle .circle1 {
-        animation: 1 5s linear infinite;
-       }
-@keyframes animate1{
-  0%
-{
-  trasnform: translateX(0) rotate(0deg);
-}
- 30%
-  {
-  trasnform: translateX(250) rotate(240deg);
-}
-60%
-  {
-  trasnform: translateX(250) rotate(480deg);
-}
-100%
-  {
-  trasnform: translateX(0) rotate(720deg);
-}
-  
-}
-
-    @keyframes animate2{
-  0%
-{
-  trasnform: translateX(0) rotate(0deg);
-}
- 30%
-  {
-  trasnform: translateX(-250) rotate(-240deg);
-}
-60%
-  {
-  trasnform: translateX(-250) rotate(-480deg);
-}
-100%
-  {
-  trasnform: translateX(0) rotate(-720deg);
-}
-  
-}
-    
     button:hover {
       background-color: #ff9a76;
     }
@@ -275,38 +197,11 @@ background: coral;
     .sode .w3-sidebar {
       margin-top: 50px; /* Adjust top margin to position below navigation */
     }
-
-  svg {
-  width: 0;
-  height: 0;
-  }
-    * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-    }
   </style>
 </head>
 <body>
-  <div class="container"></div>
-  <div class="circle cirle1"></div>
-    <div class="circle cirle2"></div>
-    <div class="circle cirle3"></div>
-      <div class="circle cirle4"></div>
-        <div class="circle cirle5"></div>
-          <div class="circle cirle6"></div>
-  <svg>
-    <filter id="gooey">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="10" />
-      <feColorMatrix value="
-        1 0 0 0
-        0 1 0 0
-        0 0 1 0
-        0 0 0 20 -10
-        " />
-    </filter>
-</svg>
-<div class="sode">
+  
+  <div class="sode">
     <div class="w3-sidebar w3-light-grey w3-bar-block">
       <a href="Premium.html" class="w3-bar-item w3-button">SCOPE</a>
       <a href="pat.html" class="w3-bar-item w3-button">My Playlist</a>
@@ -344,7 +239,6 @@ background: coral;
     </div>
     <h2><a href="Premium.html"><button>Get SCOPE</button></a></h2>
     <h2>SCOPE is free until November 2025! Unlock Now!</h2>
-    <h1><font face="Montserrat" font color="coral">TELEPORT<br>|<br>V</font></h1>
         <div id="premiumContent">
         <h2>SCOPE CONTENT</h2>
         <p>This content is only available to SCOPE users.</p>
