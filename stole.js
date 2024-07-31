@@ -70,6 +70,3 @@
     }
 
     gameLoop();
-  </script>
-</body>
-</html>
