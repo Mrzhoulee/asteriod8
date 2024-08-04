@@ -206,13 +206,47 @@ div.tran:hover {
 width: 300px;
 height: 300px;
 }
-    
+    body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #136a13;
+            color: #fff;
+            box-sizing: border-box;
+            position: fixed;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            box-sizing: border-box;
+            margin-left: 200px;
+            text-align: justify;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px;
+        }
+
+        .sidebar a:hover {
+            background-color: #2980b9;
+        }
   </style>
 </head>
 <body>
   
-  <div class="sode">
-    <div class="w3-sidebar w3-light-grey w3-bar-block">
+  <div class="container">
+    <div class="sidebar">
       <a href="Premium.html" class="w3-bar-item w3-button">SCOPE</a>
       <a href="pat.html" class="w3-bar-item w3-button">My Playlist</a>
       <a href="pl.html" class="w3-bar-item w3-button">ASTEROID PLAYLISTS</a>
