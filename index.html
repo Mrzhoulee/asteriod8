@@ -123,7 +123,7 @@
   </div>
 
   <div style="position: absolute; top: 0; right: 220px;">
-    <a href="login.html">
+    <a href="registration.html">
       <button id="shell-btn"><font color="white" face="Montserrat">Sign Up</font></button>
     </a>
   </div>
@@ -131,23 +131,8 @@
   <div style="text-align: center;">
     <h1><font face="Montserrat" font color="coral">Listen To musics</font></h1>
     <h1 class="damn"><font face="montserrat" font color="light blue"><i>But in a better way</i></font></h1>
-    <a href="start.html" class="button">
-    </a>
   
-    <div style="
-      background-color: coral;
-      color: coral;
-      place-self: center;
-      text-align: center;
-      align-self: center;
-      width: 500px;
-      height: 80px;
-      border-radius: 5px;
-      border: none;
-      padding: 10px;
-      font-weight: bold;
-      font-family: 'Montserrat', sans-serif;
-    ">
+
         
       <center><button onclick="nok()" id="container"><h2><font face="Montserrat" color="black"><b>Listen to Music</b></font></h2></button></div></center>
       
@@ -169,6 +154,7 @@
   <script>
     function nok() {
       localStorage.setItem("currentUser", "null");
+      window.location.href = "start.html";
     }
   </script>
   
