@@ -52,17 +52,7 @@
       color: white;
     }
 
-    button {
-      background-color: coral;
-      color: black;
-      width: 500px;
-      height: 80px;
-      border-radius: 5px;
-      border: none;
-      padding: 10px;
-      font-weight: bold;
-      font-family: 'Montserrat', sans-serif;
-    }
+
 
     #shell-btn {
       background-color: black;
@@ -71,7 +61,7 @@
       height: 80px;
       border-radius: 15%;
       position: absolute;
-      top: -1px;
+      top: 0px;
       right: 10px;
     }
 
@@ -81,7 +71,7 @@
       height: 80px;
       border-radius: 15%;
       position: absolute;
-      top: -1px;
+      top: 0px;
       left: 210px;
     }
 
@@ -116,13 +106,13 @@
     <a href="Copyright.html">Copyright Policy &copy;</a>
   </div>
 
-  <div style="position: absolute; top: 0; right: 100px;">
+  <div style="position: absolute; top: 0; right: 10px;">
     <a href="login.html">
       <button id="shell-btn"><font color="white">Sign in</font></button>
     </a>
   </div>
 
-  <div style="position: absolute; top: 0; right: 300px; width: 190px; height:80px;">
+  <div style="position: absolute; top: 0; right: 0px; width: 210px; height:80px;">
     <a href="registraition.html">
       <button id="shell">Sign up</button>
     </a>
@@ -132,7 +122,19 @@
     <h1><font face="Montserrat" font color="coral">Listen To musics</font></h1>
     <h1 class="damn"><font face="montserrat" font color="light blue"><i>But in a better way</i></font></h1>
     <a href="start.html" class="button">
-      <button onclick="nok()" class="button">Listen to Music</button>
+      
+      <div style="
+      background-color: coral;
+      color: black;
+      width: 500px;
+      height: 80px;
+      border-radius: 5px;
+      border: none;
+      padding: 10px;
+      font-weight: bold;
+      font-family: 'Montserrat', sans-serif;
+    "
+      <button onclick="nok()">Listen to Music</button></div>
     </a>
     <div class="ol">
       <h3>All Features will not be available if you do not sign in</h3>
