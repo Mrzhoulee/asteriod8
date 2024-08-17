@@ -245,6 +245,23 @@ h<!DOCTYPE html>
         .sidebar a:hover {
             background-color: coral;
         }
+
+    .glow {
+  font-size: 80px;
+  color: #fff;
+  text-align: center;
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes glow {
+  from {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073, 0 0 40px #e60073, 0 0 50px #e60073, 0 0 60px #e60073, 0 0 70px #e60073;
+  }
+  
+  to {
+    text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
+  }
+}
   </style>
 </head>
 <body>
@@ -275,9 +292,11 @@ h<!DOCTYPE html>
     <h2>SCOPE is free until November 2025! Unlock Now!</h2>
         <div id="premiumContent">
         <h2>SCOPE CONTENT</h2>
+          <div style="text-center;">
         <p>This content is only available to SCOPE users.</p>
           <a href="Pre.html"><font face="Montserrat" font color="coral">Already a SCOPE User?, Log in now!</font></a>
-          <h1><font face="Montserrat" font color="coral">Dont worry, the songs are at the bottom not long!</font></h1>
+          <span style="text-align: center;"><h1 class="glow"><font face="Montserrat" font color="coral">Dont worry, the songs are at the bottom not long!</font></h1></span>
+          </div>
     </div>
   </div>
   <div class="Artist">
