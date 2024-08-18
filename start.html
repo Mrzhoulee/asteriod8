@@ -263,6 +263,14 @@
      height: 800px;
     }
 
+    #Dark{
+    background-color: black;
+    }
+
+    #Light {
+    background-color: white;
+    }
+
     .glow {
   font-size: 50px;
   color: #fff;
@@ -282,7 +290,7 @@
   </style>
 </head>
 <body>
-  
+  <div id="body">
   <div class="container">
     <div class="sidebar">
      <a href="studio.html" class="w3-bar-item w3-button"><span class="material-symbols-outlined">add_circle</span> UPLOAD</a>
@@ -290,7 +298,8 @@
       <a href="pat.html" class="w3-bar-item w3-button"><font color="coral">My Playlist</font></a>
       <a href="pl.html" class="w3-bar-item w3-button"><font color="coral">ASTEROID PLAYLISTS</font></a>
       <a class="active" class="w3-bar-item w3-button href="#top">Home</a>
-   
+     
+     
     <h5 id="user">
     </div>
   </div>
@@ -301,6 +310,9 @@
   <a href="tt.html">Times Tables Rocket</a>
   <a href="Copyright.html">Copyright Policy &copy;</a>
    <a href="studio.html" class="w3-bar-item w3-button"><span class="material-symbols-outlined">add_circle</span> UPLOAD</a>
+   <h6>Themes</h6>
+   <a id="Dark" href="#" onclick="Dark();">Dark</a>
+       <a id="Light" href="#" onclick="White();">Light</a>
 </div>
 <div style="text-align:center;">
 <div class="content">
@@ -499,10 +511,19 @@ tr:nth-child(even) {
     <button onclick="playPause()">Play/Pause</button>
   </div>
 </div>
+  </div>
 
 <script>
   // Replace these variables with your actual song details
+function Dark(){
+ document.getElementById("body").style.backgroundColor = "black";
+}
+}
 
+  function White(){
+ document.getElementById("body").style.backgroundColor = "white";
+}
+}
 
   var audio = document.getElementById("audioPlayer");
   var songTitleElement = document.getElementById("songTitle");
