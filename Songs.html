@@ -7,7 +7,8 @@
 </head>
 <body>
     <h1>Uploaded Songs</h1>
-    <div id="songList"></div>
+    <ul id="songList"></ul>
+    <ul id="users"></ul>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js"></script>
@@ -15,7 +16,9 @@
     <script>
         // Initialize Firebase (this should be in index.js)
         firebase.initializeApp(firebaseConfig);
-
+        function displayArtist() {
+        let users = localStorage.getItem('users');
+        }
         // Retrieve and display uploaded files
         function displayUploadedFiles() {
             const storageRef = firebase.storage().ref('videos');
