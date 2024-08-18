@@ -327,6 +327,17 @@
           <a href="Pre.html"><font face="Montserrat" font color="coral">Already a SCOPE User?, Log in now!</font></a>
              </div>
           </center>
+             <div id="contactForm" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Please give us a review of your experience</h2>
+            <form id="contactFormElement" action="mailto:contactasteroidbussiness@gmail.com" method="post" enctype="text/plain">
+                <label for="message">Message:</label><br>
+                <textarea id="message" name="message" rows="4" required></textarea><br><br>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
           <span style="text-align: center;"><center><h3 class="glow"><font face="Montserrat">TRENDS🔥</font></h3></center></span>
                  <div class="scrollable-container">
     <div class="tran">
@@ -515,6 +526,38 @@ tr:nth-child(even) {
   }
 </script>
     <script>
+
+
+       // Timer countdown
+        let timeLeft = 60;
+        const timerElement = document.getElementById('timer');
+        const contactForm = document.getElementById('contactForm');
+
+        const countdown = setInterval(() => {
+            timeLeft--;
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                contactForm.style.display = 'block';
+            }
+        }, 1000);
+
+        // Close the modal
+        document.querySelector('.close').addEventListener('click', () => {
+            contactForm.style.display = 'none';
+        });
+
+        // Close the modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target == contactForm) {
+                contactForm.style.display = 'none';
+            }
+        };
+
+      
         // Check if user has premium status
         window.onload = function() {
             let isPremiumUser = localStorage.getItem("premiumUser");
