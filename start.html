@@ -345,17 +345,35 @@
           <a href="Pre.html"><font face="Montserrat" font color="coral">Already a SCOPE User?, Log in now!</font></a>
              </div>
           </center>
-             <div id="contactForm" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Please give us a review of your experience</h2>
-            <form id="contactFormElement" action="mailto:contactasteroidbussiness@gmail.com" method="post" enctype="text/plain">
-                <label for="message">Review message:</label><br>
-                <textarea id="message" name="message" rows="4" required></textarea><br><br>
-                <button type="submit">Send</button>
-            </form>
-        </div>
-    </div>
+<form
+  action="https://formspree.io/f/mdknlzwo"
+  method="POST"
+>
+  <label for="rating">
+    Your Rating /10
+    <input
+      type="number"
+      id="rating"
+      name="rating"
+      min="0"
+      max="10"
+      required
+    >
+  </label>
+  <br>
+  <label for="message">
+    Your message:
+    <textarea
+      id="message"
+      name="message"
+      rows="4"
+      required
+    ></textarea>
+  </label>
+  <br>
+  <!-- Add any other form fields here -->
+  <button type="submit">Send</button>
+</form>
           <span style="text-align: center;"><center><h3 class="glow"><font face="Montserrat">TRENDS🔥</font></h3></center></span>
                  <div class="scrollable-container">
     <div class="tran">
