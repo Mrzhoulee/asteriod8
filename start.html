@@ -267,7 +267,7 @@
     background-color: black;
     }
 
-    #Light {
+    #White {
     background-color: white;
     }
 
@@ -298,6 +298,9 @@
       <a href="pat.html" class="w3-bar-item w3-button"><font color="coral">My Playlist</font></a>
       <a href="pl.html" class="w3-bar-item w3-button"><font color="coral">ASTEROID PLAYLISTS</font></a>
       <a class="active" class="w3-bar-item w3-button href="#top">Home</a>
+       <h6>Themes</h6>
+   <a id="Dark" href="#Dark" onclick="Dark();">Dark</a>
+       <a id="White" href="#White" onclick="White();">Light</a>
      
      
     <h5 id="user">
@@ -310,9 +313,7 @@
   <a href="tt.html">Times Tables Rocket</a>
   <a href="Copyright.html">Copyright Policy &copy;</a>
    <a href="studio.html" class="w3-bar-item w3-button"><span class="material-symbols-outlined">add_circle</span> UPLOAD</a>
-   <h6>Themes</h6>
-   <a id="Dark" href="#" onclick="Dark();">Dark</a>
-       <a id="Light" href="#" onclick="White();">Light</a>
+  
 </div>
 <div style="text-align:center;">
 <div class="content">
@@ -516,14 +517,16 @@ tr:nth-child(even) {
 <script>
   // Replace these variables with your actual song details
 function Dark(){
- document.getElementById("body").style.backgroundColor = "black";
-}
+document.body.style.backgroundColor = "Black";
+
+
 }
 
   function White(){
- document.getElementById("body").style.backgroundColor = "white";
+document.body.style.backgroundColor = "White";
+
 }
-}
+
 
   var audio = document.getElementById("audioPlayer");
   var songTitleElement = document.getElementById("songTitle");
