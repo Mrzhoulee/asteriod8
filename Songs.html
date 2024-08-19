@@ -14,6 +14,25 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js"></script>
     <script src="index.js"></script>
     <script>
+        
+     let ads = ['%40Karl%20FEASTABLE%20GUMMY%20ANNOUNCEMENT!!%20%40MrBeast.mp3', 'air up_ Not a Water Bottle (English).mp3', 'The New Kid  Doritos Commercial.mp3'];
+     (function () {
+     var ele;
+     var timer;
+     var sec = 0;
+     Math.random(ads);
+     ads.play;
+     timer = setInterval(()=>{
+         ele.innerHTML = '00'+sec;
+         sec++;
+     },1000)
+     })()
+
+
+        if sec == 15 {
+        ads.pause;
+        }
+        
         // Initialize Firebase (this should be in index.js)
         firebase.initializeApp(firebaseConfig);
         function displayArtist() {
