@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium</title>
@@ -25,10 +28,19 @@
         .li {
             color:coral;
         }
+
+
+        .boder {
+         border-style: solid;
+         border-radius: 10%;
+         border-color: black;
+         background-color: grey;
+        }
     </style>
     <table>
-        <center>
-            <font color="coral">
+        
+            <font color="coral" face="Montserrat">
+            <div class="boder" onclick="vip()">
         <h1>(🔥POPULAR) VIP👑 PREMIUM FAMILY</h1>
         <h2>Get Premium for 1 full year cancle anytime for 10 users</h2>
         <li>✔️VIP👑 TITLE </li>
@@ -37,27 +49,44 @@
         <LI>✔️GET PREMIUM FOR 1 FULL YEAR CANCLE ANYTIME</LI>
         <li>✔️Open other apps asteroid will still be playing</li>
         <li>50% off for BOOSTING songs uploads and posts</li>
+            </div>
     </table>
 <center>
     <table>
+        <div class="boder" onclick="duo()">
         <h1>DUO PREMIUM FOR 2 USERS</h1>
         <h2>Get Premium for 3 Months cancle ANYTIME</h2>
         <li>✔️PREMIUM TITLE 🅿️</li>
         <li>✔️SKIP 90% OF THE ADS</li>
         <li>✔️Open other apps asteroid will still be playing</li>
         <li>✔️ 20% off for BOOSTING songs uploads and posts</li>
-
+        </div>
     </table>
     </center>
     <center>
     <table>
+        <div class="boder" onclick="combo()">
         <h1>COMBO FOR 1 USER</h1>
         <h2>Get Premium for 1 month Cancle ANYTIME</h2>
         <li>✔️SKIP 60% of ADS</li>
         <li>✔️COMBO TITLE ©️</li>
         <li>✔️Open other apps asteroid will still be playing</li>
+        </div>
     </table>
 </font>
 </center>
+    <script>
+        function vip() {
+        window.location.href = "vip.html";
+        }
+
+                function duo() {
+        window.location.href = "duo.html";
+        }
+
+                function combo() {
+        window.location.href = "combo.html";
+        }
+    </script>
 </body>
 </html>
