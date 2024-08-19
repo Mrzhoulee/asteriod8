@@ -15,7 +15,13 @@
     </nav>
     <input type="text" id="des" placeholder="Post here" />
     <input type="file" id="file" />
-    <button onclick="po()"></button>
-    <script src="upload.js"></script>
+    <button onclick="po()">POST</button>
+    <script src="upload.js">
+        function po(){
+ var des = localStorage.setItem('des') = des;
+ var file = localStorage.setItem('file') = file;
+ var post = (des + file);
+}
+    </script>
 </body>
 </html>
