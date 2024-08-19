@@ -9,12 +9,31 @@
     <h1>Uploaded Songs</h1>
     <ul id="songList"></ul>
     <ul id="users"></ul>
+    <style>
+        #mainAudio {
+  display: none;
+}
+
+    </style>
+<audio id="mainAudio" preload="auto" onclick="playAds()">
+  <source src="path/to/your/audiofile.mp3" type="audio/mpeg" onclick="playAds()">
+  Your browser does not support the audio element.
+</audio>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js"></script>
     <script src="index.js"></script>
     <script>
-        
+
+window.addEventListener('load', () => {
+  const mainAudio = document.getElementById('mainAudio');
+  mainAudio.play().catch(error => {
+    console.error('Error playing audio:', error);
+  });
+});
+
+
+     function playAds() {
      let ads = ['%40Karl%20FEASTABLE%20GUMMY%20ANNOUNCEMENT!!%20%40MrBeast.mp3', 'air up_ Not a Water Bottle (English).mp3', 'The New Kid  Doritos Commercial.mp3'];
      (function () {
      var ele;
@@ -32,7 +51,7 @@
         if sec == 15 {
         ads.pause;
         }
-        
+     }
         // Initialize Firebase (this should be in index.js)
         firebase.initializeApp(firebaseConfig);
         function displayArtist() {
