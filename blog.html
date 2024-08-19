@@ -16,11 +16,25 @@
    </style> 
    <center>
       <a href="upload.html">><button>POST</button></a>
-    <ul id="post"></ul>
-    <div id="post"></div>
+    <ul id="posts"></ul>
+    <div id="posts"></div>
     </center>
     <script>
-      let post = localStorage.getItem("post");
+     var des = localStorage.getItem('des');
+    var fileBase64 = localStorage.getItem('file');
+
+   var postsDiv = document.getElementById("posts");
+       if (des) {
+            var postHtml = `<p>${des}</p>`;
+            
+            if (fileBase64) {
+                postHtml += `<img src="${fileBase64}" alt="Uploaded file" />`;
+            }
+            
+            postsDiv.innerHTML = postHtml;
+        } else {
+            postsDiv.innerHTML = '<p>No posts available.</p>';
+        }
     </script>
 </body>
 </html>
