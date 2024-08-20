@@ -40,7 +40,11 @@ div.progress {
       color: black;
       font-family: "Montserrat", sans-serif;
       }
-    
+
+    .alert {
+    transparent: 0;
+    background-color: coral;
+    }
   </style>
 </head>
 <body>
@@ -51,12 +55,15 @@ div.progress {
       <span class="fileText"></span>
       <input type="text" id="title" placeholder="Enter Title" required>
       <input type="file" class="inputFile" id="fileInp" onchange="getFile(event)" accept="video/mp4, audio/mpeg" required />
+      <input type="text" id="album" placeholder="Enter your custom Album" required>
       <br>
       <input type="radio" id="Public" name="Public" value="Public" checked>
       <label for="Public">Public</label><br>
       <button onclick="upload()" class="upload-btn" type="button">Upload</button>
     </form>
-
+     <div class="alert">
+       <h2>Your Song is uploaded Successfully, GOOD LUCK😊</h2>
+     </div>
        </div>
   <font face="Montserrat font color="black><h2>Paid per digit💵</h2></font>
   <div class="batto">
@@ -95,77 +102,33 @@ div.progress {
   </div>
   <div class="uploadPercentage">0%</div>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Ensure the element exists before adding event listeners
-      var uploadBtn = document.getElementById('upload-btn');
-      if (uploadBtn) {
-        uploadBtn.addEventListener('click', upload);
-      } else {
-        //enter the else code here:
-      }
-    });
-   var fileText = document.querySelector(".fileText");
-   var uploadPercentage = document.querySelector(".uploadPercentage");
-   var progress = document.querySelector(".progress");
-   var percentVal;
-   function getFile(e){
-   fileItem = e.target.files[0];
-   fileName = fileItem.name;
-   fileText.innerHTML = fileName;
-   }
-    function upload() {
-      const videoInput = document.getElementById('fileInp');
-      const titleInput = document.getElementById('title').value;
-      const isPublic = document.getElementById('Public').checked;
-      const file = videoInput.files[0];
+    
+        function po() {
+           let currentUser = localStorage.getItem('currentUser');
+            var current = document.getElementbyId('currentUser').value;
+            var title = document.getElementById('title').value;
+            var fileInp = document.getElementById('fileInp');
+            
+            // Convert the file to a Base64 string
+            var fileInp = fileInp.files[0];
+            var reader = new FileReader();
+            
+            reader.onload = function(event) {
+                var fileBase64 = event.target.result;
 
-      if (!file) {
-        alert('Please select a file to upload.');
-        return;
-      }
+                // Save description and file data to localStorage
+                localStorage.setItem('fileInp', fileInp);
+                localStorage.setItem('title', title);
+                localStorage.setItem('album', album);
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const videoData = e.target.result;
-
-        // Save video data to IndexedDB
-        const request = indexedDB.open('MyDatabase', 1);
-
-        request.onupgradeneeded = function(event) {
-          const db = event.target.result;
-          if (!db.objectStoreNames.contains('videos')) {
-            db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
-          }
-        };
-
-        request.onsuccess = function(event) {
-          const db = event.target.result;
-          const transaction = db.transaction(['videos'], 'readwrite');
-          const store = transaction.objectStore('videos');
-          const addRequest = store.add({
-            title: titleInput,
-            data: videoData,
-            public: isPublic
-          });
-
-          addRequest.onsuccess = function() {
-            alert('Video uploaded successfully!');
-            document.getElementById('uploadForm').reset();
-          };
-
-          addRequest.onerror = function(event) {
-            console.error('Error saving video to IndexedDB:', event);
-            alert('Failed to upload video.');
-          };
-        };
-
-        request.onerror = function(event) {
-          console.error('Error opening IndexedDB:', event);
-        };
-      };
-
-      reader.readAsDataURL(file);
-    }
+                // Optionally, you could redirect to blog.html or provide feedback
+                
+            };
+            
+            if (!fileInp) {
+            alert('Please select a file in order to upload'); // Read the file as Base64
+            } 
+        }
   </script>
     
 
