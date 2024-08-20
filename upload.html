@@ -19,6 +19,8 @@
     
     <script>
         function po() {
+           let currentUser = localStorage.getItem('currentUser');
+            var current = document.getElementbyId('currentUser').value;
             var des = document.getElementById('des').value;
             var fileInput = document.getElementById('file');
             
@@ -32,12 +34,13 @@
                 // Save description and file data to localStorage
                 localStorage.setItem('des', des);
                 localStorage.setItem('file', fileBase64);
+                localStorage.setItem('currentUser', current);
 
                 // Optionally, you could redirect to blog.html or provide feedback
                 window.location.href = 'blog.html';
             };
             
-            if (file) {
+            if (!file) {
                 reader.readAsDataURL(file);  // Read the file as Base64
             } else {
                 // If no file is selected, just save the description
