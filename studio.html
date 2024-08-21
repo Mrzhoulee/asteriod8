@@ -1,140 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
-  <header>
-    
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-        <script src="./index.js"></script>
-  </header>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteroid Teams Media Studio</title>
   <style>
- body {
-  text-align: center;
-  align-items: center;
-  place-items: center;
- }
+    body {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
 
- div.bar {
-  height: 50px;
-  width: 500px;
-  background-color: grey;
-  position: fixed;
-  top: 220px;
-  right: 450px;
-}
+    div.bar {
+      height: 50px;
+      width: 500px;
+      background-color: grey;
+      position: fixed;
+      top: 220px;
+      right: 450px;
+    }
 
-div.progress {
-  background: linear-gradient(12deg, red, blue);
-  height: 100%;
-  width: 1%;
-}
+    div.progress {
+      background: linear-gradient(12deg, red, blue);
+      height: 100%;
+      width: 1%;
+    }
 
-  
-           .batto {
+    .batto {
       background-color: coral;
       color: black;
       font-family: "Montserrat", sans-serif;
-      position: absoulte;
+      position: absolute;
       top: 350px;
-      }
+    }
 
     .alert {
-    transparent: 0;
-    background-color: coral;
+      opacity: 0;
+      background-color: coral;
     }
   </style>
 </head>
 <body>
-  <center>
-    <h1>Asteroid Teams Studio</h1>
-    <h2>Upload Media</h2>
-    <form id="uploadForm">
-      <span class="fileText"></span>
-      <input type="text" id="title" placeholder="Enter Title" required>
-      <input type="file" class="inputFile" id="fileInp" onchange="getFile(event)" accept="video/mp4, audio/mpeg" required />
-      <input type="text" id="album" placeholder="Enter your custom Album" required>
-      <br>
-      <input type="radio" id="Public" name="Public" value="Public" checked>
-      <label for="Public">Public</label><br>
-      <button onclick="upload()" class="upload-btn" type="button">Upload</button>
-    </form>
-     <div class="alert">
-       <h2>Your Song is uploaded Successfully, GOOD LUCK😊</h2>
-     </div>
-       </div>
-  <font face="Montserrat font color="black><h2>Paid per digit💵</h2></font>'
-    <section>
-  <div class="batto">
-  <table>
-
-    <tr>
-      <th>Followers</th>
-      <th>Paid</th>
-    </tr>
-
-    <tr>
-      <td>100-999</td>
-      <td>$10-$99</td>
-    </tr>
-    <tr>
-    <td>1,000 - 9,999</td>
-    <td>$100 - $999</td>
-    </tr>
-    
-        <tr>
-    <td>10,000 - 99,999</td>
-    <td>$1000 - $9,999</td>
-    </tr>
-
-    <tr>
-      <td>1,000,000 - 9,999,999</td>
-      <td>$100,000 - $999,9999</td>
-    </tr>
-    
-  </table>
+  <h1>Asteroid Teams Studio</h1>
+  <h2>Upload Media</h2>
+  <form id="uploadForm">
+    <span class="fileText"></span>
+    <input type="text" id="title" placeholder="Enter Title" required>
+    <input type="file" class="inputFile" id="fileInp" onchange="getFile(event)" accept="video/mp4, audio/mpeg" required />
+    <input type="text" id="album" placeholder="Enter your custom Album" required>
+    <br>
+    <input type="radio" id="Public" name="Public" value="Public" checked>
+    <label for="Public">Public</label><br>
+    <button onclick="upload()" class="upload-btn" type="button">Upload</button>
+  </form>
+  <div class="alert">
+    <h2>Your Song is uploaded Successfully, GOOD LUCK😊</h2>
   </div>
-    </section>
-  </center>
 
   <div class="bar">
     <div class="progress"></div>
   </div>
   <div class="uploadPercentage">0%</div>
-    <script>
-    
-        function upload() {
-           let currentUser = localStorage.getItem('currentUser');
-          var fileInp = document.getElementbyId('fileInp')
-            var title = document.getElementbyId('title').value;
-            var album = document.getElementbyId('album').value;
-            
-            // Convert the file to a Base64 string
-            var fileInp = fileInp.files[0];
-            var reader = new FileReader();
-            
-            reader.onload = function(event) {
-                var fileInp = event.target.result;
 
-                // Save description and file data to localStorage
-                localStorage.setItem('fileInp', fileInp);
-                localStorage.setItem('title', title);
-                localStorage.setItem('album', album);
-                 alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
-                // Optionally, you could redirect to blog.html or provide feedback
-                
-            };
-            
-            if (!fileInp) {
-            alert('Please select a file in order to upload'); // Read the file as Base64
-            } 
-        }
+  <aside>
+    <div class="batto">
+      <h2>Paid per digit💵</h2>
+      <table>
+        <tr>
+          <th>Followers</th>
+          <th>Paid</th>
+        </tr>
+        <tr>
+          <td>100-999</td>
+          <td>$10-$99</td>
+        </tr>
+        <tr>
+          <td>1,000 - 9,999</td>
+          <td>$100 - $999</td>
+        </tr>
+        <tr>
+          <td>10,000 - 99,999</td>
+          <td>$1000 - $9,999</td>
+        </tr>
+        <tr>
+          <td>1,000,000 - 9,999,999</td>
+          <td>$100,000 - $999,999</td>
+        </tr>
+      </table>
+    </div>
+  </aside>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="./index.js"></script>
+
+  <script>
+    function upload() {
+      let currentUser = localStorage.getItem('currentUser');
+      var fileInp = document.getElementById('fileInp');
+      var title = document.getElementById('title').value;
+      var album = document.getElementById('album').value;
+
+      // Convert the file to a Base64 string
+      var file = fileInp.files[0];
+      var reader = new FileReader();
+
+      reader.onload = function(event) {
+        var fileContent = event.target.result;
+
+        // Save description and file data to localStorage
+        localStorage.setItem('fileInp', fileContent);
+        localStorage.setItem('title', title);
+        localStorage.setItem('album', album);
+        alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
+      };
+
+      if (file) {
+        reader.readAsDataURL(file);
+      } else {
+        alert('Please select a file in order to upload');
+      }
+    }
   </script>
-    
-
 </body>
 </html>
