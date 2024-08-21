@@ -19,12 +19,13 @@
        }
    </style> 
    <center>
-      <a href="upload.html">><button>POST</button></a>
+      <a href="upload.html"><button>POST</button></a>
+       <ul id="posts?></ul>
     <div id="posts"></div>
     </center>
     <script>
      var des = localStorage.getItem('des');
-    var fileBase64 = localStorage.getItem('file');
+    var fileBase64 = localStorage.getItem('fileBase64');
 
    var postsDiv = document.getElementById("posts");
        if (des) {
