@@ -1,29 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Blog</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            height: 100%;
+            width: 100%;
+        }
+        #post {
+            color: white;
+        }
+        img {
+            max-width: 100%; /* Ensure image fits within the viewport */
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-   <style>
-    body {
-        background-color: black;
-        height: 100%;
-        width: 100%;
-    }
-   </style> 
-   <center>
-      <a href="upload.html"><button>POST</button></a>
-       <!-- Changed ID to post-list -->
-<div id="post"></div> <!-- Changed ID to post-content -->
+    <center>
+        <a href="upload.html"><button>POST</button></a>
+        <div id="post"></div>
+    </center>
+    <script>
+        // Retrieve data from localStorage
+        var des = localStorage.getItem('des');
+        var fileBase64 = localStorage.getItem('fileBase64');
 
-<script>
-  let post = des + " " + fileInp;
-  var post = localStorage.getItem("post");
-  let post = document.getElementById("post");
-</script>
-
+        // Display content
+        var postDiv = document.getElementById('post');
+        if (fileBase64) {
+            postDiv.innerHTML = des + "<br><img src='" + fileBase64 + "' alt='Uploaded File'>";
+        } else if (des) {
+            postDiv.innerHTML = des;
+        } else {
+            postDiv.innerHTML = "No posts available.";
+        }
+    </script>
 </body>
 </html>
