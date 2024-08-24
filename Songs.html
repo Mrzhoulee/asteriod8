@@ -9,57 +9,45 @@
     <h1>Uploaded Songs</h1>
     <ul id="songList"></ul>
     <ul id="users"></ul>
-    <style>
-
-
-    </style>
-
-
     <div id="upload"></div>
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js"></script>
-    <script src="index.js"></script>
+
+
     <script>
         // Retrieve values from localStorage
         var title = localStorage.getItem('title');
         var fileBase = localStorage.getItem('fileBase');
         var album = localStorage.getItem('album');
-        // Combine the values into a single string
-        var upload = title + " " + fileBase + " " + album;
 
-// Update the innerHTML of the element with id 'upload'
-document.getElementById('upload').textContent = upload;
+        // Display title and album
+        var uploadDiv = document.getElementById('upload');
+        uploadDiv.innerHTML = `<h2>${title}</h2><p>${album}</p>`;
 
-
-        
-     function playAds() {
-    var ads = ['%40Karl%20FEASTABLE%20GUMMY%20ANNOUNCEMENT!!%20%40MrBeast.mp3', 'air up_ Not a Water Bottle (English).mp3', 'The New Kid  Doritos Commercial.mp3'];
-    var audio = new Audio(ads[0]);
-    audio.play();
-    setTimeout(() => audio.pause(), 15000); // Pause after 15 seconds
-}
-
-     
-     (function () {
-     var ele;
-     var timer;
-     var sec = 0;
-     Math.random(ads);
-     ads.play;
-     timer = setInterval(()=>{
-         ele.innerHTML = '00'+sec;
-         sec++;
-     },1000)
-     })()
-
-
-        if sec == 15 {
-        ads.pause;
+        // Display the file as a media element
+        if (fileBase) {
+            var mediaElement = document.createElement('audio');
+            mediaElement.controls = true;
+            mediaElement.src = fileBase;
+            uploadDiv.appendChild(mediaElement);
+        } else {
+            uploadDiv.innerHTML += '<p>No media file available.</p>';
         }
-     }
-        var audio = new Audio('path/to/audio.mp3');
-audio.play();
-// Pause with audio.pause() as needed
+
+        function playAds() {
+            let ads = ['%40Karl%20FEASTABLE%20GUMMY%20ANNOUNCEMENT!!%20%40MrBeast.mp3', 'air up_ Not a Water Bottle (English).mp3', 'The New Kid  Doritos Commercial.mp3'];
+            var ele = document.getElementById('upload');
+            let timer;
+            let sec = 0;
+
+            function updateTimer() {
+                ele.innerHTML = '00' + sec;
+                sec++;
+                if (sec >= 15) {
+                    clearInterval(timer);
+                }
+            }
+
+            timer = setInterval(updateTimer, 1000);
+        }
 
         // Initialize Firebase (this should be in index.js)
     </script>
