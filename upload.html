@@ -18,20 +18,10 @@
     <button onclick="po()">POST</button>
     
     <script>
-     
-        
-        function addPost(des, fileInp) {
-            // Create a new list item
-            var listItem = document.createElement('li');
-            // Set the content of the list item
-            listItem.textContent = des + " " + fileInp;
-            // Append the new list item to the <ul>
-            var postList = document.getElementById('post');
-            postList.appendChild(listItem);
-        }
-
-        
         function po() {
+            const loti = document.createElement("li");
+            loti.innerHTML = fileInp, des;
+            document.body.appendChild(loti);
             // Get the description value
             var des = document.getElementById('des').value;
  
@@ -49,10 +39,9 @@
                     localStorage.setItem('des', des);
                     localStorage.setItem('fileBase64', fileBase64); // Store the file as Base64
                     localStorage.setItem('post', des + " " + fileBase64);
+
                     alert("POST Upload successfully! GOOD LUCK!");
                     window.location.href = 'blog.html';
-                    const list = document.querySelector('ol');
-                    list.append(Object.assign(document.createElement('li'), {textContent: des, fileContent: fileBase64}));
                 };
 
                 reader.readAsDataURL(file); // Read the file as Base64
@@ -68,4 +57,3 @@
     </script>
 </body>
 </html>
-
