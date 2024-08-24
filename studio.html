@@ -99,10 +99,12 @@
 
   <script>
     function upload() {
+    const oli = document.createElement("ol");
     var title = document.getElementById('title').value;
     var fileBase = document.getElementById('fileBase').files[0];
     var album = document.getElementById('album').value;
-
+    oli.innerHTML = fileInp, title, album;
+    document.body.appendChild(oli);
     if (fileBase) {
         var reader = new FileReader();
 
