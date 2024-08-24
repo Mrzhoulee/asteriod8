@@ -28,11 +28,18 @@
         var upload = title + " " + fileBase + " " + album;
 
 // Update the innerHTML of the element with id 'upload'
-document.getElementById('upload').innerHTML = upload;
+document.getElementById('upload').textContent = upload;
+
 
         
      function playAds() {
-     let ads = ['%40Karl%20FEASTABLE%20GUMMY%20ANNOUNCEMENT!!%20%40MrBeast.mp3', 'air up_ Not a Water Bottle (English).mp3', 'The New Kid  Doritos Commercial.mp3'];
+    var ads = ['%40Karl%20FEASTABLE%20GUMMY%20ANNOUNCEMENT!!%20%40MrBeast.mp3', 'air up_ Not a Water Bottle (English).mp3', 'The New Kid  Doritos Commercial.mp3'];
+    var audio = new Audio(ads[0]);
+    audio.play();
+    setTimeout(() => audio.pause(), 15000); // Pause after 15 seconds
+}
+
+     
      (function () {
      var ele;
      var timer;
@@ -50,6 +57,10 @@ document.getElementById('upload').innerHTML = upload;
         ads.pause;
         }
      }
+        var audio = new Audio('path/to/audio.mp3');
+audio.play();
+// Pause with audio.pause() as needed
+
         // Initialize Firebase (this should be in index.js)
     </script>
 </body>
