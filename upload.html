@@ -17,27 +17,29 @@
     <input type="file" id="file" />
     <button onclick="po()">POST</button>
     
-    <script src="upload.js">
+    <script>
         function po() {
             
            let currentUser = localStorage.getItem('currentUser');
             var current = document.getElementbyId('currentUser').value;
             var des = document.getElementById('des').value;
             var fileInput = document.getElementById('file');
+            var post = (file + des).value;
             
             // Convert the file to a Base64 string
             var file = fileInput.files[0];
             var reader = new FileReader();
             
             reader.onload = function(event) {
-                var fileBase64 = event.target.result;
+                var file = event.target.result;
 
                 // Save description and file data to localStorage
                 localStorage.setItem('des', des);
                 localStorage.setItem('file', file);
-                localStorage.setItem('currentUser', current);
-
-
+                localStorage.setItem('currentUser', current); 
+                localStorage.setItem('post', post);
+                alert("Post Uploade!");
+ 
                 // Optionally, you could redirect to blog.html or provide feedback
                 window.location.href = 'blog.html';
             };
