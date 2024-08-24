@@ -10,9 +10,7 @@
     <ul id="songList"></ul>
     <ul id="users"></ul>
     <style>
-        #mainAudio {
-  display: none;
-}
+
 
     </style>
 
@@ -22,15 +20,11 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js"></script>
     <script src="index.js"></script>
     <script>
-
-
-        
-
-localStorage.getItem('title').value;
-localStorage.getItem('fileInp').value;
-localStorage.getItem('album').value;
-var upload = (title + fileInp + album);
-var upload = document.getElementById('upload');
+       let title = localStorage.getItem('title').value;
+       let fileBase = localStorage.getItem('fileBase').value;
+        let album = localStorage.getItem('album').value;
+        var upload = (title + fileInp + album);
+        document.getElementById('upload').innerHTML = upload;
         
      function playAds() {
      let ads = ['%40Karl%20FEASTABLE%20GUMMY%20ANNOUNCEMENT!!%20%40MrBeast.mp3', 'air up_ Not a Water Bottle (English).mp3', 'The New Kid  Doritos Commercial.mp3'];
