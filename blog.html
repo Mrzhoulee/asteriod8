@@ -27,26 +27,34 @@
 
     </center>
     <script>
-        // Retrieve data from localStorage
-        var des = localStorage.getItem('des');
-        var fileBase64 = localStorage.getItem('fileBase64');
-        function addPost(des, fileInp) {
+        
+             function addPost(des, fileBase64) {
             // Create a new list item
             var listItem = document.createElement('li');
+            
+            // Create content for the list item
+            var content = des;
+            if (fileBase64) {
+                content += "<br><img src='" + fileBase64 + "' alt='Uploaded File'>";
+            }
+            
             // Set the content of the list item
-            listItem.textContent = des + " " + fileInp;
+            listItem.innerHTML = content;
+            
             // Append the new list item to the <ul>
             var postList = document.getElementById('post');
             postList.appendChild(listItem);
-}
-        // Display content
-        var postDiv = document.getElementById('post');
-        if (fileBase64) {
-            postDiv.innerHTML = des + "<br><img src='" + fileBase64 + "' alt='Uploaded File'>";
-        } else if (des) {
-            postDiv.innerHTML = des;
+        }
+
+        // Retrieve data from localStorage
+        var des = localStorage.getItem('des');
+        var fileBase64 = localStorage.getItem('fileBase64');
+
+        // Display content if available
+        if (des || fileBase64) {
+            addPost(des, fileBase64);
         } else {
-            postDiv.innerHTML = "No posts available.";
+            document.getElementById('post').innerHTML = "No posts available.";
         }
     </script>
 </body>
