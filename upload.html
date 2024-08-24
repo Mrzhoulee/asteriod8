@@ -19,32 +19,26 @@
     
     <script>
         function po() {
-            
-           let currentUser = localStorage.getItem('currentUser');
-            var current = document.getElementbyId('currentUser').value;
             var des = document.getElementById('des').value;
-            var fileInput = document.getElementById('file');
-            var post = (file + des).value;
+            var fileInp = document.getElementById('file');
             
             // Convert the file to a Base64 string
-            var file = fileInput.files[0];
+            var fileInp = fileInp.files[0];
             var reader = new FileReader();
             
             reader.onload = function(event) {
-                var file = event.target.result;
+                var fileInp = event.target.result;
 
                 // Save description and file data to localStorage
                 localStorage.setItem('des', des);
-                localStorage.setItem('file', file);
-                localStorage.setItem('currentUser', current); 
-                localStorage.setItem('post', post);
-                alert("Post Uploade!");
- 
+                localStorage.setItem('fileInp', fileInp);
+                alert("POST Upload successfully! GOOD LUCK!");
+
                 // Optionally, you could redirect to blog.html or provide feedback
                 window.location.href = 'blog.html';
             };
             
-            if (!file) {
+            if (file) {
                 reader.readAsDataURL(file);  // Read the file as Base64
             } else {
                 // If no file is selected, just save the description
