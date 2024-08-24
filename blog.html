@@ -17,14 +17,11 @@
    <center>
       <a href="upload.html"><button>POST</button></a>
        <!-- Changed ID to post-list -->
-<div id="post-list"></div> <!-- Changed ID to post-content -->
+<div id="post"></div> <!-- Changed ID to post-content -->
 
 <script>
-  let post = localStorage.getItem("post");
-  if (post) {
-      // Assuming 'post' is a string, append it to the post-list or post-content
-      document.getElementById('post-list').innerHTML = post; // Adjust based on your needs
-  }
+  var post = localStorage.getItem("post");
+  var post = document.getElementById("post");
 </script>
 
 </body>
