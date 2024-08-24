@@ -32,8 +32,7 @@
 
         
         function po() {
-            const list = document.querySelector('ol');
-            list.append(Object.assign(document.createElement('li'), {textContent: des, fileContent: fileBase64}));
+          
             // Get the description value
             var des = document.getElementById('des').value;
  
@@ -51,7 +50,8 @@
                     localStorage.setItem('des', des);
                     localStorage.setItem('fileBase64', fileBase64); // Store the file as Base64
                     localStorage.setItem('post', des + " " + fileBase64);
-
+                    const list = document.querySelector('ol');
+                    list.append(Object.assign(document.createElement('li'), {textContent: des, fileContent: fileBase64}));
                     alert("POST Upload successfully! GOOD LUCK!");
                     window.location.href = 'blog.html';
                 };
