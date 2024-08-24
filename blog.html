@@ -23,12 +23,11 @@
 <body>
     <center>
         <a href="upload.html"><button>POST</button></a>
-               <ol id="post"></ol>
+               <ol></ol>
 
     </center>
     <script>
-        const list = document.querySelector('ol');
-        list.append(Object.assign(document.createElement('li'), {textContent: des, fileContent: fileBase64}));
+     
         
              function addPost(des, fileBase64) {
             // Create a new list item
@@ -51,7 +50,8 @@
         // Retrieve data from localStorage
         var des = localStorage.getItem('des');
         var fileBase64 = localStorage.getItem('fileBase64');
-
+        const list = document.querySelector('ol');
+        let poa = list.append(Object.assign(document.createElement('li'), {textContent: des, fileContent: fileBase64}));
         // Display content if available
         if (des || fileBase64) {
             addPost(des, fileBase64);
