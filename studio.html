@@ -48,7 +48,7 @@
   <form id="uploadForm">
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
-    <input type="file" class="inputFile" id="fileBase" onchange="getFile(event)" accept="video/mp4, audio/mpeg" required />
+    <input type="file" class="inputFile" id="fileBase" onchange="getFunction(event)" accept="video/mp4, audio/mpeg" required />
     <input type="text" id="album" placeholder="Enter your custom Album" required>
     <br>
     <input type="radio" id="Public" name="Public" value="Public" checked>
@@ -113,7 +113,6 @@
             localStorage.setItem('title', title);
             localStorage.setItem('fileBase', fileBase); // Store as Base64
             localStorage.setItem('album', album);
-
             alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
             window.location.href = 'Songs.html';
         };
