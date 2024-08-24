@@ -18,8 +18,7 @@
     <button onclick="po()">POST</button>
     
     <script>
-        const list = document.querySelector('ol');
-        list.append(Object.assign(document.createElement('li'), {textContent: des, fileContent: fileBase64}));
+     
         
         function addPost(des, fileInp) {
             // Create a new list item
@@ -33,7 +32,8 @@
 
         
         function po() {
-          
+            const list = document.querySelector('ol');
+            list.append(Object.assign(document.createElement('li'), {textContent: des, fileContent: fileBase64}));
             // Get the description value
             var des = document.getElementById('des').value;
  
