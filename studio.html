@@ -48,7 +48,7 @@
   <form id="uploadForm">
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
-    <input type="file" class="inputFile" id="fileInp" onchange="getFunction(event)" accept="video/mp4, audio/mpeg" required />
+    <input type="file" class="inputFile" id="fileInp" onchange="getFunction(event)" accept="video/mp4, audio/mpeg" required/>
     <input type="text" id="album" placeholder="Enter your custom Album" required>
     <br>
     <input type="radio" id="Public" name="Public" value="Public" checked>
@@ -95,7 +95,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-  <script src="./index.js"></script>
+
 
   <script>
     function upload() {
@@ -105,7 +105,7 @@
       var album = document.getElementById('album').value;
 
       // Convert the file to a Base64 string
-      var fileInput = document.getElementById('fileBase'); // Get the file input element
+      var fileInp = document.getElementById('fileBase'); // Get the file input element
       var fileBase = fileInput.files[0]; 
       var reader = new FileReader();
 
@@ -117,6 +117,7 @@
         localStorage.setItem('title', title);
         localStorage.setItem('album', album);
         alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
+        window.location.href = "Songs.html";
       };
 
       if (file) {
