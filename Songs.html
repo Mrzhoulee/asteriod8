@@ -9,79 +9,51 @@
     <h1>Uploaded Songs</h1>
     <ul id="songList"></ul>
     <ul id="users"></ul>
-    <div id="upload"></div>
+    <ol id="upload"></ol>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js"></script>
     <script src="index.js"></script>
     <script>
-  
-        function addSong(title, album, fileBase) {
-            // Create a new div for each song
-            var songDiv = document.createElement('div');
-            songDiv.className = 'song-item';
+        // Retrieve values from localStorage
+        const list = document.querySelector('ol');
+        list.append(Object.assign(document.createElement('li'), {textContent: title, textContent: album, fileContent: fileBase}));
+        var title = localStorage.getItem('title');
+        var fileBase = localStorage.getItem('fileBase');
+        var album = localStorage.getItem('album');
 
-            // Create content for the song
-            var songContent = `<h2>${title}</h2><p>${album}</p>`;
-            if (fileBase) {
-                songContent += `<audio controls src="${fileBase}"></audio>`;
-            } else {
-                songContent += '<p>No media file available.</p>';
-            }
+        // Display title and album
+        var uploadDiv = document.getElementById('upload');
+        uploadDiv.innerHTML = `<h2>${title}</h2><p>${album}</p>`;
 
-            // Set the content of the song div
-            songDiv.innerHTML = songContent;
-
-            // Append the new song div to the container
-            var songsContainer = document.getElementById('songs');
-            songsContainer.appendChild(songDiv);
-        }
-
-        function loadSongs() {
-            // Retrieve values from localStorage
-            var titles = JSON.parse(localStorage.getItem('titles') || '[]');
-            var albums = JSON.parse(localStorage.getItem('albums') || '[]');
-            var fileBases = JSON.parse(localStorage.getItem('fileBases') || '[]');
-
-            // Add each song to the page
-            for (var i = 0; i < titles.length; i++) {
-                addSong(titles[i], albums[i], fileBases[i]);
-            }
+        // Display the file as a media element
+        if (fileBase) {
+            var mediaElement = document.createElement('audio');
+            mediaElement.controls = true;
+            mediaElement.src = fileBase;
+            uploadDiv.appendChild(mediaElement);
+        } else {
+            uploadDiv.innerHTML += '<p>No media file available.</p>';
         }
 
         function playAds() {
             let ads = ['%40Karl%20FEASTABLE%20GUMMY%20ANNOUNCEMENT!!%20%40MrBeast.mp3', 'air up_ Not a Water Bottle (English).mp3', 'The New Kid  Doritos Commercial.mp3'];
-            let index = 0;
-            let adDuration = 15; // Duration in seconds for each ad
-            let adContainer = document.createElement('div');
-            document.body.insertBefore(adContainer, document.body.firstChild); // Insert ads before other content
+            var ele = document.getElementById('upload');
+            let timer;
+            let sec = 0;
 
-            function showAd() {
-                if (index < ads.length) {
-                    let adElement = document.createElement('audio');
-                    adElement.src = ads[index];
-                    adElement.controls = true;
-                    adElement.autoplay = true;
-                    adContainer.innerHTML = ''; // Clear previous ad
-                    adContainer.appendChild(adElement);
-
-                    setTimeout(() => {
-                        index++;
-                        showAd(); // Show the next ad
-                    }, adDuration * 1000); // Show each ad for the specified duration
-                } else {
-                    adContainer.innerHTML = ''; // Clear ads when done
+            function updateTimer() {
+                ele.innerHTML = '00' + sec;
+                sec++;
+                if (sec >= 15) {
+                    clearInterval(timer);
                 }
             }
 
-            showAd(); // Start showing ads
+            timer = setInterval(updateTimer, 1000);
         }
 
-        // Initialize the song list
-        loadSongs();
-
-        // Start playing ads
-        playAds();
+        // Initialize Firebase (this should be in index.js)
     </script>
 </body>
 </html>
