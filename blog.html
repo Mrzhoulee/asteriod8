@@ -24,89 +24,22 @@
     <center>
         <a href="upload.html"><button>POST</button></a>
                <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
-        <ul id="post"></ul>
+
     </center>
     <script>
         // Retrieve data from localStorage
         var des = localStorage.getItem('des');
         var fileBase64 = localStorage.getItem('fileBase64');
 
+
+        
+    
+        var lit = document.createElement('li');
+        lit.textContent = des + " " + fileBase64;
+        post.appendChild(lit);
+
+
+        
         // Display content
         var postDiv = document.getElementById('post');
         if (fileBase64) {
