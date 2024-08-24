@@ -99,8 +99,6 @@
 
   <script> 
     function upload() {
-      const list = document.querySelector('ol');
-      list.append(Object.assign(document.createElement('li'), {textContent: title, textContent: album, fileContent: fileBase}));
       let currentUser = localStorage.getItem('currentUser');
       var fileBase = document.getElementById('fileBase').innerHTML = fileBase;
       var title = document.getElementById('title').innerHTML = title;
@@ -117,6 +115,8 @@
         localStorage.setItem('fileBase', fileBase);
         localStorage.setItem('title', title);
         localStorage.setItem('album', album);
+        const list = document.querySelector('ol');
+      list.append(Object.assign(document.createElement('li'), {textContent: title, textContent: album, fileContent: fileBase}));
         alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
       };
 
