@@ -48,7 +48,7 @@
   <form id="uploadForm">
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
-    <input type="file" class="inputFile" id="fileBase" onchange="getFunction(event)" accept="video/mp4, audio/mpeg" required />
+    <input type="file" class="inputFile" id="fileBase" accept="video/mp4, audio/mpeg" required />
     <input type="text" id="album" placeholder="Enter your custom Album" required>
     <br>
     <input type="radio" id="Public" name="Public" value="Public" checked>
@@ -103,7 +103,7 @@
     var title = document.getElementById('title').value;
     var fileBase = document.getElementById('fileBase').files[0];
     var album = document.getElementById('album').value;
-    oli.innerHTML = fileInp, title, album;
+    oli.innerHTML = fileInp + ", " + title + ", " + album;
     document.body.appendChild(oli);
     if (fileBase) {
         var reader = new FileReader();
