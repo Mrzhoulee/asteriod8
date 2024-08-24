@@ -97,12 +97,12 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="./index.js"></script>
 
-  <script>
+  <script> 
     function upload() {
       let currentUser = localStorage.getItem('currentUser');
-      var fileBase = document.getElementById('fileBase');
-      var title = document.getElementById('title').value;
-      var album = document.getElementById('album').value;
+      var fileBase = document.getElementById('fileBase').innerHTML = fileBase;
+      var title = document.getElementById('title').innerHTML = title;
+      var album = document.getElementById('album').innerHTML = album;
 
       // Convert the file to a Base64 string
       var fileBase = fileBase.files[0];
@@ -118,6 +118,7 @@
         alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
       };
 
+      
       if (file) {
         reader.readAsDataURL(file);
       } else {
