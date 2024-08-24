@@ -117,6 +117,11 @@
             localStorage.setItem('album', album);
             alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
             window.location.href = 'Songs.html';
+          var downloadLink = document.createElement('a');
+          downloadLink.href = fileBase;
+          downloadLink.download = title + ".mp3"; // or ".mp4" depending on the file type
+          downloadLink.textContent = "Download";
+          uploadDiv.appendChild(downloadLink);
         };
 
         reader.readAsDataURL(fileBase); // Convert file to Base64
