@@ -48,7 +48,7 @@
   <form id="uploadForm">
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
-    <input type="file" class="inputFile" id="fileBase" onchange="getFile(event)" accept="video/mp4, audio/mpeg" required />
+    <input type="file" class="inputFile" id="fileBase" accept="video/mp4, audio/mpeg" required />
     <input type="text" id="album" placeholder="Enter your custom Album" required>
     <br>
     <input type="radio" id="Public" name="Public" value="Public" checked>
@@ -99,31 +99,35 @@
 
   <script>
     function upload() {
-    var title = document.getElementById('title').value;
-    var fileBase = document.getElementById('fileBase').files[0];
-    var album = document.getElementById('album').value;
+      var title = document.getElementById('title').value;
+      var fileBase = document.getElementById('fileBase').files[0];
+      var album = document.getElementById('album').value;
 
-    if (fileBase) {
+      if (fileBase) {
         var reader = new FileReader();
 
         reader.onload = function(event) {
-            var fileContent = event.target.result;
+          var fileContent = event.target.result;
 
-            // Store data in localStorage
+          // Store data in localStorage
+          try {
             localStorage.setItem('title', title);
             localStorage.setItem('fileBase', fileContent); // Store as Base64
             localStorage.setItem('album', album);
 
             alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
             window.location.href = 'Songs.html';
+          } catch (e) {
+            alert('Failed to upload. The file may be too large for localStorage.');
+            console.error(e);
+          }
         };
 
         reader.readAsDataURL(fileBase); // Convert file to Base64
-    } else {
+      } else {
         alert('Please select a file in order to upload');
+      }
     }
-}
-
   </script>
 </body>
 </html>
