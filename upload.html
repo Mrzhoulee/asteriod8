@@ -17,8 +17,9 @@
     <input type="file" id="file" />
     <button onclick="po()">POST</button>
     
-    <script>
+    <script src="upload.js">
         function po() {
+            
            let currentUser = localStorage.getItem('currentUser');
             var current = document.getElementbyId('currentUser').value;
             var des = document.getElementById('des').value;
@@ -33,8 +34,9 @@
 
                 // Save description and file data to localStorage
                 localStorage.setItem('des', des);
-                localStorage.setItem('file', fileBase64);
+                localStorage.setItem('file', fileInp);
                 localStorage.setItem('currentUser', current);
+
 
                 // Optionally, you could redirect to blog.html or provide feedback
                 window.location.href = 'blog.html';
