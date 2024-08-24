@@ -30,16 +30,15 @@
         // Retrieve data from localStorage
         var des = localStorage.getItem('des');
         var fileBase64 = localStorage.getItem('fileBase64');
-
-
-        
-    
-        var lit = document.createElement('li');
-        lit.textContent = des + " " + fileBase64;
-        post.appendChild(lit);
-
-
-        
+        function addPost(des, fileInp) {
+            // Create a new list item
+            var listItem = document.createElement('li');
+            // Set the content of the list item
+            listItem.textContent = des + " " + fileInp;
+            // Append the new list item to the <ul>
+            var postList = document.getElementById('post');
+            postList.appendChild(listItem);
+}
         // Display content
         var postDiv = document.getElementById('post');
         if (fileBase64) {
