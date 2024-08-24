@@ -14,37 +14,46 @@
         </ul>
     </nav>
     <input type="text" id="des" placeholder="Post here" />
-    <input type="file" id="file" />
+    <input type="file" id="fileInp" />
     <button onclick="po()">POST</button>
     
     <script>
         function po() {
+            // Get the description value
             var des = document.getElementById('des').value;
-            var fileInp = document.getElementById('file');
-            var post = (file + des);
-            
-            // Convert the file to a Base64 string
-            var fileInp = fileInp.files[0];
-            var reader = new FileReader();
-            
-            reader.onload = function(event) {
-                var fileInp = event.target.result;
 
-                // Save description and file data to localStorage
-                localStorage.setItem('des', des);
-                localStorage.setItem('fileInp', fileInp);
-                localStorage.setItem('post', post);
-                alert("POST Upload successfully! GOOD LUCK!");
-
-                // Optionally, you could redirect to blog.html or provide feedback
-                window.location.href = 'blog.html';
-            };
+            // Get the file input element
+            var fileInp = document.getElementById('fileInp');
             
-            if (file) {
-                reader.readAsDataURL(file);  // Read the file as Base64
+            // Check if a file was selected
+            if (fileInp.files.length > 0) {
+                var file = fileInp.files[0];
+                var reader = new FileReader();
+
+                reader.onload = function(event) {
+                    var fileBase64 = event.target.result;
+
+                    // Combine the description and file content
+                    var post = des + " " + fileBase64;
+
+                    // Store them in localStorage
+                    localStorage.setItem('des', des);
+                    localStorage.setItem('fileInp', fileBase64); // Store the file as Base64
+                    localStorage.setItem('post', post);
+
+                    alert("POST Upload successfully! GOOD LUCK!");
+                    window.location.href = 'blog.html';
+                };
+
+                // Read the file as Base64
+                reader.readAsDataURL(file);
             } else {
                 // If no file is selected, just save the description
+                var post = des;
                 localStorage.setItem('des', des);
+                localStorage.setItem('post', post);
+                
+                alert("POST Upload successfully! GOOD LUCK!");
                 window.location.href = 'blog.html';
             }
         }
