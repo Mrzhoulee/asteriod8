@@ -15,10 +15,7 @@
 }
 
     </style>
-<audio id="mainAudio" preload="auto" onclick="playAds()">
-  <source src="path/to/your/audiofile.mp3" type="audio/mpeg" onclick="playAds()">
-  Your browser does not support the audio element.
-</audio>
+
 
     <div id="upload"></div>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
@@ -26,18 +23,14 @@
     <script src="index.js"></script>
     <script>
 
-window.addEventListener('load', () => {
-  const mainAudio = document.getElementById('mainAudio');
-  mainAudio.play().catch(error => {
-    console.error('Error playing audio:', error);
-  });
-});
 
-var title = localStorage.getItem('title').value;
-var fileInp = localStorage.getItem('fileInp').value;
-var album = localStorage.getItem('album').value;
+        
+
+localStorage.getItem('title').value;
+localStorage.getItem('fileInp').value;
+localStorage.getItem('album').value;
 var upload = (title + fileInp + album);
-document.getElementById('upload');
+var upload = document.getElementById('upload');
         
      function playAds() {
      let ads = ['%40Karl%20FEASTABLE%20GUMMY%20ANNOUNCEMENT!!%20%40MrBeast.mp3', 'air up_ Not a Water Bottle (English).mp3', 'The New Kid  Doritos Commercial.mp3'];
@@ -59,29 +52,6 @@ document.getElementById('upload');
         }
      }
         // Initialize Firebase (this should be in index.js)
-        firebase.initializeApp(firebaseConfig);
-        function displayArtist() {
-        let users = localStorage.getItem('users');
-        }
-        // Retrieve and display uploaded files
-        function displayUploadedFiles() {
-            const storageRef = firebase.storage().ref('videos');
-            storageRef.listAll().then((result) => {
-                const songList = document.getElementById('songList');
-                result.items.forEach((itemRef) => {
-                    itemRef.getDownloadURL().then((url) => {
-                        const audioElement = document.createElement('audio');
-                        audioElement.src = url;
-                        audioElement.controls = true;
-                        songList.appendChild(audioElement);
-                    });
-                });
-            }).catch((error) => {
-                console.error("Error retrieving files:", error);
-            });
-        }
-
-        displayUploadedFiles();
     </script>
 </body>
 </html>
