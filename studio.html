@@ -48,7 +48,7 @@
   <form id="uploadForm">
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
-    <input type="file" class="inputFile" id="fileBase" accept="video/mp4, audio/mpeg" required />
+    <input type="file" class="inputFile" id="fileBase" onchange="getFile(event)" accept="video/mp4, audio/mpeg" required />
     <input type="text" id="album" placeholder="Enter your custom Album" required>
     <br>
     <input type="radio" id="Public" name="Public" value="Public" checked>
@@ -97,37 +97,34 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="./index.js"></script>
 
-  <script>
-    function upload() {
-      var title = document.getElementById('title').value;
-      var fileBase = document.getElementById('fileBase').files[0];
-      var album = document.getElementById('album').value;
+  <script> 
+        function upload() {
+            var title = document.getElementById('title').value;
+            var fileBase = document.getElementById('fileBase').files[0];
+            var album = document.getElementById('album').value;
 
-      if (fileBase) {
-        var reader = new FileReader();
+            if (fileBase) {
+                var reader = new FileReader();
 
-        reader.onload = function(event) {
-          var fileContent = event.target.result;
+                reader.onload = function(event) {
+                    var fileContent = event.target.result;
+                    // Create a new list item
+                    var listItem = document.createElement('li');
+                    listItem.innerHTML = `<h2>${title}</h2><p>${album}</p>`;
+                    
+                    // Append to the media list
+                    var mediaList = document.getElementById('mediaList');
+                    mediaList.appendChild(listItem);
+                    
+                    // Optional: Clear the form
+                    document.getElementById('uploadForm').reset();
+                };
 
-          // Store data in localStorage
-          try {
-            localStorage.setItem('title', title);
-            localStorage.setItem('fileBase', fileContent); // Store as Base64
-            localStorage.setItem('album', album);
-
-            alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
-            window.location.href = 'Songs.html';
-          } catch (e) {
-            alert('Failed to upload. The file may be too large for localStorage.');
-            console.error(e);
-          }
-        };
-
-        reader.readAsDataURL(fileBase); // Convert file to Base64
-      } else {
-        alert('Please select a file in order to upload');
-      }
-    }
+                reader.readAsDataURL(fileBase); // Convert file to Base64
+            } else {
+                alert('Please select a file in order to upload');
+            }
+        }
   </script>
 </body>
 </html>
