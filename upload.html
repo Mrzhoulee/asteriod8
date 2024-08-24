@@ -23,35 +23,29 @@
             var des = document.getElementById('des').value;
 
             // Get the file input element
-            var fileInp = document.getElementById('fileInp');
+            var fileInput = document.getElementById('fileInp');
             
-            // Check if a file was selected
-            if (fileInp.files.length > 0) {
-                var file = fileInp.files[0];
+            if (fileInput.files.length > 0) {
+                var file = fileInput.files[0];
                 var reader = new FileReader();
 
                 reader.onload = function(event) {
-                    var fileBase64 = event.target.result;
+                    var fileBase64 = event.target.result; // Base64 encoded string
 
-                    // Combine the description and file content
-                    var post = des + " " + fileBase64;
-
-                    // Store them in localStorage
+                    // Store the description and Base64 file content in localStorage
                     localStorage.setItem('des', des);
-                    localStorage.setItem('fileInp', fileBase64); // Store the file as Base64
-                    localStorage.setItem('post', post);
+                    localStorage.setItem('fileBase64', fileBase64); // Store the file as Base64
+                    localStorage.setItem('post', des + " " + fileBase64);
 
                     alert("POST Upload successfully! GOOD LUCK!");
                     window.location.href = 'blog.html';
                 };
 
-                // Read the file as Base64
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(file); // Read the file as Base64
             } else {
                 // If no file is selected, just save the description
-                var post = des;
                 localStorage.setItem('des', des);
-                localStorage.setItem('post', post);
+                localStorage.setItem('post', des);
                 
                 alert("POST Upload successfully! GOOD LUCK!");
                 window.location.href = 'blog.html';
@@ -60,3 +54,4 @@
     </script>
 </body>
 </html>
+
