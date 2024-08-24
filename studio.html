@@ -97,34 +97,33 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="./index.js"></script>
 
-  <script> 
+  <script>
     function upload() {
-      let currentUser = localStorage.getItem('currentUser');
-      var fileBase = document.getElementById('fileBase').files[0]
-      var title = document.getElementById('title').value
-      var album = document.getElementById('album').value;
+    var title = document.getElementById('title').value;
+    var fileBase = document.getElementById('fileBase').files[0];
+    var album = document.getElementById('album').value;
 
-      // Convert the file to a Base64 string
-      var fileBase = fileBase.files[0];
-      var reader = new FileReader();
+    if (fileBase) {
+        var reader = new FileReader();
 
-      reader.onload = function(event) {
-        var fileContent = event.target.result;
+        reader.onload = function(event) {
+            var fileContent = event.target.result;
 
-        // Save description and file data to localStorage
-        localStorage.setItem('fileBase', fileBase);
-        localStorage.setItem('title', title);
-        localStorage.setItem('album', album);
-        alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
-      };
+            // Store data in localStorage
+            localStorage.setItem('title', title);
+            localStorage.setItem('fileBase', fileContent); // Store as Base64
+            localStorage.setItem('album', album);
 
-      
-      if (file) {
-        reader.readAsDataURL(file);
-      } else {
+            alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
+            window.location.href = 'Songs.html';
+        };
+
+        reader.readAsDataURL(fileBase); // Convert file to Base64
+    } else {
         alert('Please select a file in order to upload');
-      }
     }
+}
+
   </script>
 </body>
 </html>
