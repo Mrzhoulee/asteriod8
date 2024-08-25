@@ -95,41 +95,60 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-  <script src="./index.js"></script>
 
   <script>
     function upload() {
-    const oli = document.createElement("ol");
-    var title = document.getElementById('title').value;
-    var fileBase = document.getElementById('fileBase').files[0];
-    var album = document.getElementById('album').value;
-    oli.innerHTML = fileInp + ", " + title + ", " + album;
-    document.body.appendChild(oli);
-    if (fileBase) {
-        var reader = new FileReader();
+const request = indexedDB.open("uploads", 1);
 
-        reader.onload = function(event) {
-            var fileContent = event.target.result;
+request.onerror = function (event) {
+    console.error('Uploading failed fix indexedDB');
+    console.error(event);
+};
 
-            // Store data in localStorage
-            localStorage.setItem('title', title);
-            localStorage.setItem('fileBase', fileBase); // Store as Base64
-            localStorage.setItem('album', album);
-            alert('Your Song is successfully Uploaded, GOOD LUCK!😊');
-            window.location.href = 'Songs.html';
-          var downloadLink = document.createElement('a');
-          downloadLink.href = fileBase;
-          downloadLink.download = title + ".mp3"; // or ".mp4" depending on the file type
-          downloadLink.textContent = "Download";
-          uploadDiv.appendChild(downloadLink);
-        };
-
-        reader.readAsDataURL(fileBase); // Convert file to Base64
-    } else {
-        alert('Please select a file in order to upload');
+request.onupgradeneeded = function () {
+    const db = request.result;
+    if (!db.objectStoreNames.contains("SongL")) {
+        const songs = db.createObjectStore("SongL", { keyPath: "id" });
+        songs.createIndex("title", "title", { unique: false });
+        songs.createIndex("fileBase", "fileBase", { unique: false });
+        songs.createIndex("album", "album", { unique: false });
     }
-}
+};
 
+request.onsuccess = function () {
+    const db = request.result;
+    const transaction = db.transaction("SongL", "readwrite");
+    const store = transaction.objectStore("SongL");
+
+    const title = document.getElementById("title").value;
+    const fileBase = document.getElementById("fileBase").files[0];
+    const album = document.getElementById("album").value;
+    
+    if (!fileBase) {
+        console.error("No file selected.");
+        return;
+    }
+
+    const newFile = {
+        id: Date.now(), // Unique ID for the new entry
+        title: title,
+        fileBase: fileBase.name, // Store the file name, not the file object itself
+        album: album,
+        type: fileBase.type
+    };
+
+    const addRequest = store.add(newFile);
+
+    addRequest.onsuccess = function () {
+        console.log('File added to IndexedDB');
+        document.querySelector('.alert').style.opacity = 1; // Show success alert
+    };
+
+    addRequest.onerror = function () {
+        console.error('Error adding file to IndexedDB');
+    };
+};
+    }
   </script>
 </body>
 </html>

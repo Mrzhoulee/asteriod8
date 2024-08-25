@@ -1,55 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uploaded Songs</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Songs</title>
+  <style>
+    /* Your CSS here */
+  </style>
 </head>
 <body>
-    <h1>Uploaded Songs</h1>
-    <ul id="songList"></ul>
-    <ul id="users"></ul>
-    <div id="upload"></div>
+  <h1>Uploaded Songs</h1>
+  <ul id="songList"></ul>
 
+  <script>
+    const request = indexedDB.open("uploads", 1);
 
-    <script>
-        // Retrieve values from localStorage
-        var title = localStorage.getItem('title');
-        var fileBase = localStorage.getItem('fileBase');
-        var album = localStorage.getItem('album');
+    request.onerror = function (event) {
+        console.error('Error opening IndexedDB:', event);
+    };
 
-        // Display title and album
-        var uploadDiv = document.getElementById('upload');
-        uploadDiv.innerHTML = `<h2>${title}</h2><p>${album}</p>`;
+    request.onsuccess = function (event) {
+        const db = event.target.result;
+        const transaction = db.transaction(["SongL"], "readonly");
+        const store = transaction.objectStore("SongL");
+        const request = store.openCursor();
 
-        // Display the file as a media element
-        if (fileBase) {
-            var mediaElement = document.createElement('audio');
-            mediaElement.controls = true;
-            mediaElement.src = fileBase;
-            uploadDiv.appendChild(mediaElement);
-        } else {
-            uploadDiv.innerHTML += '<p>No media file available.</p>';
-        }
-
-        function playAds() {
-            let ads = ['%40Karl%20FEASTABLE%20GUMMY%20ANNOUNCEMENT!!%20%40MrBeast.mp3', 'air up_ Not a Water Bottle (English).mp3', 'The New Kid  Doritos Commercial.mp3'];
-            var ele = document.getElementById('upload');
-            let timer;
-            let sec = 0;
-
-            function updateTimer() {
-                ele.innerHTML = '00' + sec;
-                sec++;
-                if (sec >= 15) {
-                    clearInterval(timer);
-                }
+        request.onsuccess = function(event) {
+            const cursor = event.target.result;
+            if (cursor) {
+                const songItem = cursor.value;
+                const li = document.createElement('li');
+                li.textContent = `Title: ${songItem.title}, Album: ${songItem.album}, File: ${songItem.fileBase}`;
+                document.getElementById('songList').appendChild(li);
+                cursor.continue();
+            } else {
+                console.log('No more entries.');
             }
+        };
 
-            timer = setInterval(updateTimer, 1000);
-        }
-
-        // Initialize Firebase (this should be in index.js)
-    </script>
+        request.onerror = function(event) {
+            console.error('Error reading from IndexedDB:', event);
+        };
+    };
+  </script>
 </body>
 </html>
