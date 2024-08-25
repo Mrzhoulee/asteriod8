@@ -132,7 +132,7 @@ request.onsuccess = function () {
     const newFile = {
         id: Date.now(), // Unique ID for the new entry
         title: title,
-        fileBase: fileBase.name, // Store the file name, not the file object itself
+        fileBase: fileBase.objectStore, // Store the file name, not the file object itself
         album: album,
         type: fileBase.type
     };
