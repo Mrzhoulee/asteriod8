@@ -102,6 +102,7 @@
     </style>
 </head>
 <body>  
+    <div class="g-signin2" data-onsuccess="onSignIn" data-width="240" data-height="40" data-longtitle="true"></div>
     <div class="text">
         <h1>Sign Up</h1>
     </div>
@@ -125,6 +126,30 @@
         <a href="login.html"><button><b>Sign In</b></button></a>
     </div>
     <script>
+        function onSignIn(googleUser) {
+  // Handle the signed-in user
+  var profile = googleUser.getBasicProfile();
+  console.log('ID: ' + profile.getId());
+  console.log('Name: ' + profile.getName());
+  console.log('Image URL: ' + profile.getImageUrl());
+  console.log('Email: ' + profile.getEmail());
+}
+
+function onFailure(error) {
+  console.error('Error:', error);
+}
+
+window.gapi.load('auth2', function() {
+  window.gapi.auth2.init({
+    client_id: 'YOUR_CLIENT_ID'
+  }).then(function() {
+    var googleSignIn = window.gapi.auth2.getAuthInstance();
+    googleSignIn.signIn().then(onSignIn, onFailure);
+  });
+});
+
+
+        
         function saveData() {
             let name = document.getElementById("name").value;
             let email = document.getElementById("email").value;
@@ -146,5 +171,6 @@
             }
         }
     </script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 </body>
 </html>
