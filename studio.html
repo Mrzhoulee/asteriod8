@@ -48,12 +48,12 @@
   <form id="uploadForm">
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
-    <input type="file" class="inputFile" id="fileBase" accept="video/mp4, audio/mpeg" required />
+    <input type="file" class="inputFile" id="fileInp" accept="video/mp4, audio/mpeg" required multiple/>
     <input type="text" id="album" placeholder="Enter your custom Album" required>
     <br>
     <input type="radio" id="Public" name="Public" value="Public" checked>
     <label for="Public">Public</label><br>
-    <button onclick="upload()" class="upload-btn" type="button">Upload</button>
+    <button id="btn" class="upload-btn" type="button">Upload</button>
   </form>
   <div class="alert">
     <h2>Your Song is uploaded Successfully, GOOD LUCK😊</h2>
@@ -92,63 +92,58 @@
     </div>
   </aside>
 
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 
-  <script>
-    function upload() {
-const request = indexedDB.open("uploads", 1);
 
-request.onerror = function (event) {
-    console.error('Uploading failed fix indexedDB');
-    console.error(event);
-};
-
-request.onupgradeneeded = function () {
-    const db = request.result;
-    if (!db.objectStoreNames.contains("SongL")) {
-        const songs = db.createObjectStore("SongL", { keyPath: "id" });
-        songs.createIndex("title", "title", { unique: false });
-        songs.createIndex("fileBase", "fileBase", { unique: false });
-        songs.createIndex("album", "album", { unique: false });
-    }
-};
-
-request.onsuccess = function () {
-    const db = request.result;
-    const transaction = db.transaction("SongL", "readwrite");
-    const store = transaction.objectStore("SongL");
-
-    const title = document.getElementById("title").value;
-    const fileBase = document.getElementById("fileBase").files[0];
-    const album = document.getElementById("album").value;
-    
-    if (!fileBase) {
-        console.error("No file selected.");
-        return;
-    }
-
-    const newFile = {
-        id: Date.now(), // Unique ID for the new entry
-        title: title,
-        fileBase: fileBase.objectStore, // Store the file name, not the file object itself
-        album: album,
-        type: fileBase.type
+  <script type="module">
+    import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11'
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
+    import { getStorage, ref, uploadBytes} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
+      authDomain: "asteroid-cdc13.firebaseapp.com",
+      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+      projectId: "asteroid-cdc13",
+      storageBucket: "asteroid-cdc13.appspot.com",
+      messagingSenderId: "793353824502",
+      appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+      measurementId: "G-GV72TMNNGR"
     };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
 
-    const addRequest = store.add(newFile);
 
-    addRequest.onsuccess = function () {
-        console.log('File added to IndexedDB');
-        document.querySelector('.alert').style.opacity = 1; // Show success alert
-    };
+    const storage = getStorage(app);
+    document.getElementById("btn").addEventListener('click', ()=>{
+      const fileInp = document.getElementById("fileInp").files;
+      const album = document.getElementById("album").value;
+      const title = document.getElementById("title").value;
+      for(let y=0; y<fileInp.length; y++){
+      console.log(album + "/" + title + "/" + fileInp[y].name)
+      uploadBytes(ref(storage, album + "/" + title + "/" + fileInp[y].name),snapshot=>{
+        Swal.fire({
+  title: "Upload Songs",
+  text: "SONG UPLOADED SUCCESSFULLY!!!",
+  icon: "success"
+});
+      })
+      }
+    })
+    var y = 0;
+setInterval(()=>{
+console.log(y)
+y+=1
+document.getElementsByClassName('progress')[0].style.width = (y*10)+"%"
 
-    addRequest.onerror = function () {
-        console.error('Error adding file to IndexedDB');
-    };
-};
-    }
+},1000)
   </script>
 </body>
 </html>
