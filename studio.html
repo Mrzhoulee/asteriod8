@@ -1,45 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteroid Teams Media Studio</title>
   <style>
     body {
+      background-color: antiquewhite;
       text-align: center;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      font-family: "Montserrat", sans-serif;
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
     }
-
-    div.bar {
+    .upload-btn {
+      width: 90px;
+      height: 40px;
+      background-color: coral;
+      color: black;
+      border-radius: 10%;
+      transition: ease-in 0.5s;
+    }
+    .upload-btn:hover {
+      width: 140px;
+      height: 90px;
+      background-color: lightsalmon;
+      font-size: large;
+    }
+    .bar {
       height: 50px;
       width: 500px;
       background-color: grey;
-      position: fixed;
-      top: 220px;
-      right: 450px;
+      position: relative;
     }
-
-    div.progress {
+    .progress {
       background: linear-gradient(12deg, red, blue);
-      height: 100%;
-      width: 1%;
+      position: relative;
+      width: 0;
     }
-
-    .batto {
-      background-color: coral;
-      color: black;
-      font-family: "Montserrat", sans-serif;
-      position: absolute;
-      top: 350px;
-    }
-
     .alert {
       opacity: 0;
       background-color: coral;
+    }
+    .alertBox {
+      background-color: lightcoral;
+      width: 500px;
+      height: 100px;
+      visibility: hidden;
+      border-radius: 10%;
+      text-align: center;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none; /* Allow clicks to pass through the canvas */
     }
   </style>
 </head>
@@ -47,7 +71,7 @@
 <body>
   <h1>Asteroid Teams Studio</h1>
   <h2>Upload Media</h2>
-  <form id="uploadForm">
+  <form id="uploadForm" class="formUpload">
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
     <input type="file" class="inputFile" id="fileInp" accept="video/mp4, audio/mpeg" required multiple />
@@ -55,16 +79,21 @@
     <br>
     <input type="radio" id="Public" name="Public" value="Public" checked>
     <label for="Public">Public</label><br>
-    <button id="btn" class="upload-btn" type="button">Upload</button>
+    <button id="btn" class="upload-btn" type="button"><b>Upload</b></button>
+    <aside>
+    <button id="Boostpost" class="upload-btn" type="button"><b>BOOST POST</b></button>
+    </aside>
   </form>
-  <div class="alert">
-    <h2>Your Song is uploaded Successfully, GOOD LUCK😊</h2>
+
+  <div class="alertBox" id="alertBox">
+    <h1><b>Your Song is uploaded Successfully, GOOD LUCK😊</b></h1>
   </div>
 
   <div class="bar">
     <div class="progress"></div>
   </div>
-  <div class="uploadPercentage">0%</div>
+  
+  <canvas id="can"></canvas>
 
   <aside>
     <div class="batto">
@@ -93,51 +122,63 @@
       </table>
     </div>
   </aside>
+<script>
+     button.addEventListener('click', ()=>{
+    let progress = document.getElementById("progress");
+    const interval = setInterval(()=>{
+      if (progress = 100){
+        clearInterval(interval);
+      } else{
+        progress += 5;
+        progressBar.style.width = progress + '%';
+      }
+    }, 1000);
+      
+   });
+</script>
+  <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+  <script>
+    const button = document.getElementById('btn');
+    const canvas = document.getElementById('can');
+    const jsConfetti = new JSConfetti();
+    const boost = document.getElementById("Boostpost");
 
 
+    boost.addEventListener('click', ()=>{
+      window.location.href = "boost.html"
+    })
 
-  <script type="module">
-    // Import the functions you need from the SDKs you need
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-    // TODO: Add SDKs for Firebase products that you want to use
-    // https://firebase.google.com/docs/web/setup#available-libraries
-
-    // Your web app's Firebase configuration
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-    const firebaseConfig = {
-      apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
-      authDomain: "asteroid-cdc13.firebaseapp.com",
-      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
-      projectId: "asteroid-cdc13",
-      storageBucket: "asteroid-cdc13.appspot.com",
-      messagingSenderId: "793353824502",
-      appId: "1:793353824502:web:3ac24821911d14773ba4d7",
-      measurementId: "G-GV72TMNNGR"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    var filey = (fileInp, album, title);
-    const storage = getStorage(app);
-    document.getElementById("btn").addEventListener('click', () => {
+    // Ensure canvas is full-screen
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  
+    button.addEventListener('click', async () => {
       const fileInp = document.getElementById("fileInp").files;
       const album = document.getElementById("album").value;
       const title = document.getElementById("title").value;
-      for (let y = 0; y < fileInp.length; y++) {
-        console.log(album + "/" + title + "/" + fileInp[y].name)
-        uploadBytes(ref(storage, album + "/" + title + "/" + fileInp[y].name), snapshot => {
-          console.log(title + "/" + album + "/" + fileInp[y].name)
-          getDownloadURL(snapshot.ref).then((downloadURL)=>{
-            console.log(downloadURL);
-            localStorage.setItem("a", downloadURL);
-          })
-        })
-      }
-    })
-  </script>
-</body>
+  
+      // Show alert on button click
+      document.getElementById("alertBox").style.visibility = "visible"; 
+  
+      // Add confetti explosion
+      jsConfetti.addConfetti({
+        emojis: ['🌈', '⚡️', '💥', '✨', '💫', '🌸'],
+      });
+ 
 
+
+      let i = 0;
+      while (i < fileInp.length) {
+        const response = await uploadBytes(ref(storage, album + "/" + title + "/" + fileInp[i].name), fileInp[i]);
+        const downloadURL = await getDownloadURL(response.ref);
+        localStorage.setItem(title + album + 'a', downloadURL);
+        i++;
+      }
+    });
+  </script>  
+</body>
 </html>
