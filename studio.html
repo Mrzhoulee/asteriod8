@@ -185,11 +185,15 @@
       canvas.height = window.innerHeight;
     });
 
-    getDownloadURL(ref(storage, "1/1/Guns N' Roses - Knockin' On Heaven's Door (Lyrics) (1).mp3"))
-    .then((url)=>{
-      console.log(url);
-    })
- 
+    // getDownloadURL(ref(storage, "1/1/Guns N' Roses - Knockin' On Heaven's Door (Lyrics) (1).mp3"))
+    // .then((url)=>{
+    //   console.log(url);
+    // })
+
+
+    // localStorage.setItem('a', JSON.stringify({
+        
+    //   }))
     btn.addEventListener('click', async () => {
       const fileInp = document.getElementById("fileInp").files;
       const album = document.getElementById("album").value;
@@ -202,14 +206,20 @@
       jsConfetti.addConfetti({
         emojis: ['🌈', '⚡️', '💥', '✨', '💫', '🌸'],
       });
- 
 
+ 
 
       let i = 0;
       while (i < fileInp.length) {
         const response = await uploadBytes(ref(storage, album + "/" + title + "/" + fileInp[i].name), fileInp[i]);
         const downloadURL = await getDownloadURL(response.ref);
-        localStorage.setItem(title + album + 'a', downloadURL);
+        // localStorage.setItem(title + album + 'a', downloadURL);
+        let gaga = JSON.parse(localStorage.getItem('a'))
+gaga[title + '/' + album] = {
+    fileInp: downloadURL,
+    title: title
+}
+localStorage.setItem('a',JSON.stringify(gaga))
         i++;
         console.log("cccccc");
       }
