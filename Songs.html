@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,41 +9,58 @@
     /* Your CSS here */
   </style>
 </head>
+
 <body>
   <h1>Uploaded Songs</h1>
 
 
-  <audio controls="controls">
-    <source id="a" scr="" type="audio/mpeg">
-</audio>
+
+
+  <div id="ab"></div>
 
   <script type="module">
     // Import the functions you need from the SDKs you need
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
-      import { getDownloadURL, ref, uploadBytes, getStorage} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
-    
-      // Your web app's Firebase configuration
-      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-      const firebaseConfig = {
-        apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
-        authDomain: "asteroid-cdc13.firebaseapp.com",
-        databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
-        projectId: "asteroid-cdc13",
-        storageBucket: "asteroid-cdc13.appspot.com",
-        messagingSenderId: "793353824502",
-        appId: "1:793353824502:web:3ac24821911d14773ba4d7",
-        measurementId: "G-GV72TMNNGR"
-      };
-    
-      // Initialize Firebase
-      
-        let tmp = localStorage.getItem("a")
-        document.getElementById("a").src = JSON.parse(tmp)["test/"]["fileInp"]
-        console.log(JSON.parse(tmp)["test/"]["fileInp"])
-      
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
+    import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
+      authDomain: "asteroid-cdc13.firebaseapp.com",
+      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+      projectId: "asteroid-cdc13",
+      storageBucket: "asteroid-cdc13.appspot.com",
+      messagingSenderId: "793353824502",
+      appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+      measurementId: "G-GV72TMNNGR"
+    };
+
+    // Initialize Firebase
+
+    //define (tmp) as the key "a" in localStorage as people upload the the song infos 
+    let tmp = localStorage.getItem("a")
+    let cde = ""
+    Object.values(JSON.parse(tmp)).forEach(item => {
+      //gets only the values of (tmp) for all items(elements) here:
+      cde += `
+      //arrange the different values to each element:
+
+      <p>${item['title']}</p>
+    <audio controls="controls">
+    <source src="${item["fileInp"]}" type="audio/mpeg">
+  </audio>
+  `
+    })
+    document.getElementById("ab").innerHTML = cde
+
+    console.log(JSON.parse(tmp)["test/"]["fileInp"])
+
+
   </script>
 </body>
+
 </html>

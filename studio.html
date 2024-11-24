@@ -217,7 +217,8 @@
         let gaga = JSON.parse(localStorage.getItem('a'))
 gaga[title + '/' + album] = {
     fileInp: downloadURL,
-    title: title
+    title: title,
+    album : album
 }
 localStorage.setItem('a',JSON.stringify(gaga))
         i++;
