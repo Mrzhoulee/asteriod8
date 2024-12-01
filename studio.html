@@ -76,6 +76,7 @@
     <input type="text" id="title" placeholder="Enter Title" required>
     <input type="file" class="inputFile" id="fileInp" accept="video/mp4, audio/mpeg" required multiple />
     <input type="text" id="album" placeholder="Enter your custom Album" required>
+    <input type="text" id="artist" placeholder="Enter the Song Artist" class="text" required>
     <br>
     <input type="radio" id="Public" name="Public" value="Public" checked>
     <label for="Public">Public</label><br>
@@ -200,6 +201,7 @@
       const fileInp = document.getElementById("fileInp").files;
       const album = document.getElementById("album").value;
       const title = document.getElementById("title").value;
+      const artist = document.getElementById("artist").value;
       console.log("hello");
       // Show alert on button click
       document.getElementById("alertBox").style.visibility = "visible"; 
@@ -213,15 +215,16 @@
 
       let i = 0;
       while (i < fileInp.length) {
-        const response = await uploadBytes(ref(storage, album + "/" + title + "/" + fileInp[i].name), fileInp[i]);
+        const response = await uploadBytes(ref(storage, album + "/" + title + "/" + artist + "/" + fileInp[i].name), fileInp[i]);
         const downloadURL = await getDownloadURL(response.ref);
         
         let gaga = JSON.parse(localStorage.getItem('a'))
         console.log(title + "/" + album)
-gaga[title + "/" + album] = {
+gaga[title + "/" + album + "/" + artist] = {
     fileInp: downloadURL,
     title: title,
-    album : album
+    album : album,
+    artist: artist
 }
 
 localStorage.setItem('a',JSON.stringify(gaga))

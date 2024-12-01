@@ -1,6 +1,10 @@
-<!doctype HTML>
+<!DOCTYPE html>
 <html>
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=stop_circle" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=play_circle" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -40,7 +44,7 @@
     }
 
     .topnav a {
-      float: left;
+      /* float: left; */
       color: #f2f2f2;
       text-align: center;
       padding: 14px 16px;
@@ -233,7 +237,7 @@
             width: 200px;
             height: 100%;
             background-color: black;
-            float: right;
+            /* float: right; */
             box-sizing: border-box;
             position: fixed;
            text-align: right;
@@ -275,6 +279,46 @@
     padding: 0;
     }
 
+
+    audio{
+      border-radius: 10%;
+      background: #000;
+      color: coral;
+      text-align: center;
+    }
+
+  #at-at{
+    background-color: black;
+    color: coral;
+  }
+
+  
+.material-symbols-outlined {
+  color: coral;
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+
+
+#pause{
+  color: coral;
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+
+
+#play{
+  color: coral;
+}
+
+
+
     .glow {
   font-size: 50px;
   color: #fff;
@@ -315,8 +359,6 @@
   <a class="active" href="#top">Home</a>
   <a href="pat.html">My Playlist</a>
   <a href="login.html">Sign In</a>
-  <a href="tt.html">Times Tables Rocket</a>
-  <a href="Copyright.html">Copyright Policy &copy;</a>
    <a href="studio.html" class="w3-bar-item w3-button"><span class="material-symbols-outlined">add_circle</span> UPLOAD</a>
   
 </div>
@@ -325,26 +367,29 @@
   <h1>Welcome to Asteroid!</h1>
   <h2>This is the <b>START OF HAPPINESS!</b></h2>
 <center>
-<div style="border-style: solid; border-color: coral;">
+<div style="border: solid; border-color: coral; width: 1000px;">
+  <div style="border: 5px solid coral">
     <a href="Premium.html"><button><font color="Coral">Get SCOPE for free</font></button></a>
-    <h2>SCOPE is free until November 2025! Unlock Now!</h2>
+    <h2>Spaces is free until November 2025! Unlock Now!</h2>
 
     
   <ul>
     <li>✔️Games</li>
     <li>✔️Live concert</li>
     <li>✔️Art draw pad(COMING SOON)</li>
-    <li>✔️SCOPE titles in blog</li>
+    <li>✔️Spaces titles in blog</li>
   </ul>
  
         <div id="premiumContent">
-        <h2>SCOPE CONTENT</h2>
+        <h2>Spaces</h2>
           <center>
              <div style="text-center;">
                   <p>This content is only available to SCOPE users.</p>
-          <a href="Pre.html"><font face="Montserrat" font color="coral">Already a SCOPE User?, Log in now!</font></a>
+          <a href="Pre.html"><font face="Montserrat" font color="coral">Already a Spaces User?, Log in now!</font></a>
              </div>
+            </div>
           </center>
+        </div>
           <h3><font face="Montserrat" color="coral">Please rate our platform for our development</font></h3>
 <form
   action="https://formspree.io/f/mdknlzwo"
@@ -380,9 +425,82 @@
     <div class="tran">
     <h1>Songs Menu</h1>
      
-  <iframe src="https://www.asteriod8.com/Songs.html" width="100%" height="800"></iframe>
+    <center>
+   
+      <font face="Montserrat" color="coral"><h1>NEW HITS 🔥</h1></font>
+    
+    
+    
+    
+      <div id="ab"></div>
+    </div>
+    </center>
+      
+      <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
+        import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+    
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
+          authDomain: "asteroid-cdc13.firebaseapp.com",
+          databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+          projectId: "asteroid-cdc13",
+          storageBucket: "asteroid-cdc13.appspot.com",
+          messagingSenderId: "793353824502",
+          appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+          measurementId: "G-GV72TMNNGR"
+        };
+    
+        // Initialize Firebase
+    
+        //define (tmp) as the key "a" in localStorage as people upload the the song infos 
+        let tmp = localStorage.getItem("a")
+        let cde = ""
+        Object.values(JSON.parse(tmp)).forEach(item => {
+          //gets only the values of (tmp) for all items(elements) here:
+          cde += `
+    
+          <div style="border: 5px solid coral; width: 400px; margin: 20px; border-radius: 5%; padding: 5px;">
+          <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${item['title']}</h3><center></font> <span>Album:</span> ${item["album"]} <b>By:</b> ${item['artist']}</p></font>
+            <div style="background-color: black; color: black; border-radius: 5%;">
+        
+            <audio id="at-at">
+        <source src="${item["fileInp"]}" type="audio/mpeg">
+      </audio>
+    
+      <div class="haha"> 
+     
+    <p class="fa fa-play-circle" id="play"></p>
+    
+    
+    
+        
+        <p class="fa fa-pause-circle-o" id="pause"></p>
+        </div>
+      </div>
+      </div>
+      `
+        })
+        document.getElementById("ab").innerHTML = cde
+        document.getElementById("play").addEventListener("click",()=>{
+          document.getElementById("at-at").play()
+        })
+    
+        document.getElementById("pause").addEventListener("click",()=>{
+          document.getElementById("at-at").pause()
+        })
+        console.log(JSON.parse(tmp)["test/"]["fileInp"])
+    
+    
+      </script>
 
-</div>
+
 </div>
 </div>
           </div>
