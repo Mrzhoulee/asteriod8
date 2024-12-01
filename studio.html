@@ -168,6 +168,8 @@
     const analytics = getAnalytics(app);
     const storage = getStorage(app);
     
+
+    let gaga = {}
     const canvas = document.getElementById('can');
     const jsConfetti = new JSConfetti();
     const boost = document.getElementById("Boostpost");
@@ -213,17 +215,19 @@
       while (i < fileInp.length) {
         const response = await uploadBytes(ref(storage, album + "/" + title + "/" + fileInp[i].name), fileInp[i]);
         const downloadURL = await getDownloadURL(response.ref);
-        // localStorage.setItem(title + album + 'a', downloadURL);
+        
         let gaga = JSON.parse(localStorage.getItem('a'))
-gaga[title + '/' + album] = {
+        console.log(title + "/" + album)
+gaga[title + "/" + album] = {
     fileInp: downloadURL,
     title: title,
     album : album
 }
+
 localStorage.setItem('a',JSON.stringify(gaga))
         i++;
         console.log("cccccc");
-      }
+      } 
     });
   </script>  
 </body>
