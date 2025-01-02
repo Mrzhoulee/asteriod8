@@ -369,7 +369,7 @@
 <center>
 <div style="border: solid; border-color: coral; width: 1000px;">
   <div style="border: 5px solid coral">
-    <a href="Premium.html"><button><font color="Coral">Get Spaces for free</font></button></a>
+    <a href="Premium.html"><button><font color="Coral">Get SCOPE for free</font></button></a>
     <h2>Spaces is free until November 2025! Unlock Now!</h2>
 
     
@@ -384,7 +384,7 @@
         <h2>Spaces</h2>
           <center>
              <div style="text-center;">
-                  <p>This content is only available to Spaces users.</p>
+                  <p>This content is only available to SCOPE users.</p>
           <a href="Pre.html"><font face="Montserrat" font color="coral">Already a Spaces User?, Log in now!</font></a>
              </div>
             </div>
@@ -441,7 +441,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
         import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-        // TODO: Add SDKs for Firebase products that you want to use
+       
+        import { getDatabase , ref as ref2, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
         // https://firebase.google.com/docs/web/setup#available-libraries
     
         // Your web app's Firebase configuration
@@ -456,22 +457,25 @@
           appId: "1:793353824502:web:3ac24821911d14773ba4d7",
           measurementId: "G-GV72TMNNGR"
         };
-    
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
         // Initialize Firebase
-    
+        onValue(ref2(database, "SONGS/"), (snapshot)=>{
+          console.log(Object.values(snapshot.val()))
+      
         //define (tmp) as the key "a" in localStorage as people upload the the song infos 
-        let tmp = localStorage.getItem("a")
+        let tmp = Object.values(snapshot.val())
         let cde = ""
-        Object.values(JSON.parse(tmp)).forEach(item => {
+        tmp.forEach(item => {
           //gets only the values of (tmp) for all items(elements) here:
           cde += `
     
           <div style="border: 5px solid coral; width: 400px; margin: 20px; border-radius: 5%; padding: 5px;">
-          <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${item['title']}</h3><center></font> <span>Album:</span> ${item["album"]} <b>By:</b> ${item['artist']}</p></font>
+          <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
             <div style="background-color: black; color: black; border-radius: 5%;">
         
             <audio id="at-at">
-        <source src="${item["fileInp"]}" type="audio/mpeg">
+        <source src="${Object.values(Object.values(item)[0])[0]["fileInp"]}" type="audio/mpeg">
       </audio>
     
       <div class="haha"> 
@@ -496,6 +500,8 @@
           document.getElementById("at-at").pause()
         })
         console.log(JSON.parse(tmp)["test/"]["fileInp"])
+      })
+
     
     
       </script>

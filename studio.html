@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteroid Teams Media Studio</title>
@@ -20,6 +22,7 @@
       height: 100vh;
       overflow: hidden;
     }
+
     .upload-btn {
       width: 90px;
       height: 40px;
@@ -28,27 +31,32 @@
       border-radius: 10%;
       transition: ease-in 0.5s;
     }
+
     .upload-btn:hover {
       width: 140px;
       height: 90px;
       background-color: lightsalmon;
       font-size: large;
     }
+
     .bar {
       height: 50px;
       width: 500px;
       background-color: grey;
       position: relative;
     }
+
     .progress {
       background: linear-gradient(12deg, red, blue);
       position: relative;
       width: 0;
     }
+
     .alert {
       opacity: 0;
       background-color: coral;
     }
+
     .alertBox {
       background-color: lightcoral;
       width: 500px;
@@ -57,13 +65,15 @@
       border-radius: 10%;
       text-align: center;
     }
+
     canvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      pointer-events: none; /* Allow clicks to pass through the canvas */
+      pointer-events: none;
+      /* Allow clicks to pass through the canvas */
     }
   </style>
 </head>
@@ -82,7 +92,7 @@
     <label for="Public">Public</label><br>
     <button id="btn" class="upload-btn" type="button"><b>Upload</b></button>
     <aside>
-    <button id="Boostpost" class="upload-btn" type="button"><b>BOOST POST</b></button>
+      <button id="Boostpost" class="upload-btn" type="button"><b>BOOST POST</b></button>
     </aside>
   </form>
 
@@ -93,7 +103,7 @@
   <div class="bar">
     <div class="progress"></div>
   </div>
-  
+
   <canvas id="can"></canvas>
 
   <aside>
@@ -123,21 +133,21 @@
       </table>
     </div>
   </aside>
-<script>
-  const button = document.getElementById('btn')
-     button.addEventListener('click', ()=>{
-    let progress = document.getElementById("progress");
-    const interval = setInterval(()=>{
-      if (progress = 100){
-        clearInterval(interval);
-      } else{
-        progress += 5;
-        progressBar.style.width = progress + '%';
-      }
-    }, 1000);
-      
-   });
-</script>
+  <script>
+    const button = document.getElementById('btn')
+    button.addEventListener('click', () => {
+      let progress = document.getElementById("progress");
+      const interval = setInterval(() => {
+        if (progress = 100) {
+          clearInterval(interval);
+        } else {
+          progress += 5;
+          progressBar.style.width = progress + '%';
+        }
+      }, 1000);
+
+    });
+  </script>
 
 
 
@@ -147,11 +157,12 @@
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+    import { getDatabase, ref as ref2, update, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
     import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
     // TODO: Add SDKs for Firebase products that you want to use
     // https://firebase.google.com/docs/web/setup#available-libraries
-  
-    // Your web app's Firebase configuration
+
+    // Your web app's Firebase configurationx
     // For Firebase JS SDK v7.20.0 and later, measurementId is optional
     const firebaseConfig = {
       apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
@@ -163,20 +174,21 @@
       appId: "1:793353824502:web:3ac24821911d14773ba4d7",
       measurementId: "G-GV72TMNNGR"
     };
-  
+
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const storage = getStorage(app);
-    
+    const database = getDatabase(app);
+
 
     let gaga = {}
     const canvas = document.getElementById('can');
     const jsConfetti = new JSConfetti();
     const boost = document.getElementById("Boostpost");
 
-    const btn =  document.getElementById("btn");
-    boost.addEventListener('click', ()=>{
+    const btn = document.getElementById("btn");
+    boost.addEventListener('click', () => {
       window.location.href = "boost.html"
     })
 
@@ -195,7 +207,10 @@
 
 
     // localStorage.setItem('a', JSON.stringify({
-        
+
+    onValue(ref2(database, "SONGS/"), (snapshot) => {
+      console.log(snapshot.val())
+    })
     //   }))
     btn.addEventListener('click', async () => {
       const fileInp = document.getElementById("fileInp").files;
@@ -204,34 +219,40 @@
       const artist = document.getElementById("artist").value;
       console.log("hello");
       // Show alert on button click
-      document.getElementById("alertBox").style.visibility = "visible"; 
-  
+      document.getElementById("alertBox").style.visibility = "visible";
+
       // Add confetti explosion
       jsConfetti.addConfetti({
         emojis: ['🌈', '⚡️', '💥', '✨', '💫', '🌸'],
       });
 
- 
+
 
       let i = 0;
       while (i < fileInp.length) {
         const response = await uploadBytes(ref(storage, album + "/" + title + "/" + artist + "/" + fileInp[i].name), fileInp[i]);
         const downloadURL = await getDownloadURL(response.ref);
-        
-        let gaga = JSON.parse(localStorage.getItem('a'))
-        console.log(title + "/" + album)
-gaga[title + "/" + album + "/" + artist] = {
-    fileInp: downloadURL,
-    title: title,
-    album : album,
-    artist: artist
-}
 
-localStorage.setItem('a',JSON.stringify(gaga))
+        let gaga = [];
+        console.log(title + "/" + album + "/" + fileInp)
+        gaga["SONGS/" + title + "/" + album + "/" + artist] = {
+          fileInp: downloadURL,
+          title: title,
+          album: album,
+          artist: artist
+        }
+
+        update(ref2(database), gaga)
         i++;
         console.log("cccccc");
-      } 
+      }
+
+     
+    
     });
-  </script>  
+
+
+  </script>
 </body>
+
 </html>
