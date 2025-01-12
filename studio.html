@@ -233,16 +233,18 @@
         const response = await uploadBytes(ref(storage, album + "/" + title + "/" + artist + "/" + fileInp[i].name), fileInp[i]);
         const downloadURL = await getDownloadURL(response.ref);
 
-        let gaga = [];
-        console.log(title + "/" + album + "/" + fileInp)
-        gaga["SONGS/" + title + "/" + album + "/" + artist] = {
+        let gaga = {};
+        console.log(title + "/" + album + "/" + fileInp[i].name)
+        gaga[title] = {}
+        gaga[title][album] = {}
+        gaga[title][album][artist] = {
           fileInp: downloadURL,
           title: title,
           album: album,
           artist: artist
         }
-
-        update(ref2(database), gaga)
+        console.log(gaga);
+        update(ref2(database, "SONGS"), gaga)
         i++;
         console.log("cccccc");
       }
