@@ -101,6 +101,10 @@
     <img src="file:///C:/Users/HP/Downloads/MicrosoftWindows.Client.CBS_cw5n1h2txyewy!InputApp/DiscordTypingGIF.gif" alt="Description of GIF" />
   </div>
 
+  <div class="alertBox" id="ooaa">
+    <h1><b>Your Song is Successfully uploaded!</b></h1>
+  </div>
+
   <div class="bar">
     <div class="progress"></div>
   </div>
@@ -228,6 +232,8 @@
       // Show alert on button click
       document.getElementById("alertBox").style.visibility = "visible";
 
+
+
       // Add confetti explosion
       jsConfetti.addConfetti({
         emojis: ['🌈', '⚡️', '💥', '✨', '💫', '🌸'],
@@ -241,7 +247,14 @@
         const downloadURL = await getDownloadURL(response.ref);
 
         let gaga = {};
-        console.log(title + "/" + album + "/" + fileInp[i].name)
+      
+        let rec = title + "/" + album + "/" + fileInp[i].name;
+        if (rec) {
+    console.log("Loading finished");
+    console.log(rec);  // Log the stored message
+    document.getElementById("ooaa").style.visibility = "visible";
+    document.getElementById("alertBox").style.visibility = "hidden";
+}
         gaga[title] = {}
         gaga[title][album] = {}
         gaga[title][album][artist] = {
@@ -259,6 +272,8 @@
      
     
     });
+
+
 
 
   </script>
