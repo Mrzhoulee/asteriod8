@@ -386,55 +386,23 @@
         UPLOAD</a>
 
     </div>
+    
+  <div style="position: absolute; top: 0; right: 10px;">
+    <a href="login.html">
+      <button id="shell-btn"><font color="white" face="Montserrat">Sign in</font></button>
+    </a>
+  </div>
+
+  <div style="position: absolute; top: 0; right: 220px;">
+    <a href="registraition.html">
+      <button id="shell-btn"><font color="white" face="Montserrat">Sign Up</font></button>
+    </a>
+  </div>
+
     <div style="text-align:center;">
       <div class="content">
-        <h1>Welcome to Asteroid!</h1>
-        <h2>This is the <b>START OF HAPPINESS!</b></h2>
-        <center>
-          <div style="border: solid; border-color: coral; width: 1000px;">
-            <div style="border: 5px solid coral">
-              <a href="Premium.html"><button>
-                  <font color="Coral">Get SCOPE for free</font>
-                </button></a>
-              <h2>Spaces is free until November 2025! Unlock Now!</h2>
 
-
-              <ul>
-                <li>✔️Games</li>
-                <li>✔️Live concert</li>
-                <li>✔️Art draw pad(COMING SOON)</li>
-                <li>✔️Spaces titles in blog</li>
-              </ul>
-
-              <div id="premiumContent">
-                <h2>Spaces</h2>
-                <center>
-                  <div style="text-center;">
-                    <p>This content is only available to SCOPE users.</p>
-                    <a href="Pre.html">
-                      <font face="Montserrat" font color="coral">Already a Spaces User?, Log in now!</font>
-                    </a>
-                  </div>
-              </div>
-        </center>
-      </div>
-      <h3>
-        <font face="Montserrat" color="coral">Please rate our platform for our development</font>
-      </h3>
-      <form action="https://formspree.io/f/mdknlzwo" method="POST">
-        <label for="rating">
-          Your Rating /10
-          <input type="number" id="rating" name="rating" min="0" max="10" required>
-        </label>
-        <br>
-        <label for="message">
-          Your message:
-          <textarea id="message" name="message" rows="4" required></textarea>
-        </label>
-        <br>
-        <!-- Add any other form fields here -->
-        <button type="submit">Send</button>
-      </form>
+  
       <span style="text-align: center;">
         <center>
           <h3 class="glow">
@@ -451,6 +419,11 @@
             <font face="Montserrat" color="coral">
               <h1>NEW HITS 🔥</h1>
             </font>
+            <div class="search-container">
+              <input type="text" id="searchInput" placeholder="Search..." />
+              <button onclick="performSearch()">Search</button>
+            </div>
+
 
 
 
@@ -460,6 +433,7 @@
         </center>
 
         <script type="module">
+
           // Import the functions you need from the SDKs you need
           import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
           import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
@@ -519,21 +493,21 @@
       </div>
       </div>
       `
-      console.log(Object.values(Object.values(item)[0])[0]['title'])
-            document.getElementById("ab").innerHTML = cde
-            document.getElementById("play_" + Object.values(Object.values(item)[0])[0]['title']).addEventListener("click", () => {
-             console.log("a")
-              document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).play()
-            console.log("b")
+              console.log(Object.values(Object.values(item)[0])[0]['title'])
+              document.getElementById("ab").innerHTML = cde
+              document.getElementById("play_" + Object.values(Object.values(item)[0])[0]['title']).addEventListener("click", () => {
+                console.log("a")
+                document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).play()
+                console.log("b")
+              })
+
+              // document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).addEventListener("click", () => {
+              //   document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).pause()
+              // })
+              // console.log(JSON.parse(tmp)["test/"]["fileInp"])
+              // console.log(Object.values(Object.values(item)[0])[0]['title']);
             })
 
-            // document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).addEventListener("click", () => {
-            //   document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).pause()
-            // })
-            // console.log(JSON.parse(tmp)["test/"]["fileInp"])
-            // console.log(Object.values(Object.values(item)[0])[0]['title']);
-            })
-           
           })
 
 
@@ -567,37 +541,65 @@
   <div class="tran">
     <h2><a href="pat.html"><button>View My SAVED SONGS❤️</button></a></h2>
   </div>
+  <center>
+    <div style="border: solid; border-color: coral; width: 1000px;">
+      <div style="border: 5px solid coral">
+        <a href="Premium.html"><button>
+            <font color="Coral">Get SCOPE for free</font>
+          </button></a>
+        <h2>Spaces is free until November 2025! Unlock Now!</h2>
+
+
+        <ul>
+          <li>✔️Games</li>
+          <li>✔️Live concert</li>
+          <li>✔️Art draw pad(COMING SOON)</li>
+          <li>✔️Spaces titles in blog</li>
+        </ul>
+
+        <div id="premiumContent">
+          <h2>Spaces</h2>
+          <center>
+            <div style="text-center;">
+              <p>This content is only available to SCOPE users.</p>
+              <a href="Pre.html">
+                <font face="Montserrat" font color="coral">Already a Spaces User?, Log in now!</font>
+              </a>
+            </div>
+        </div>
+  </center>
+</div>
+<h3>
+  <font face="Montserrat" color="coral">Please rate our platform for our development</font>
+</h3>
+<form action="https://formspree.io/f/mdknlzwo" method="POST">
+  <label for="rating">
+    Your Rating /10
+    <input type="number" id="rating" name="rating" min="0" max="10" required>
+  </label>
+  <br>
+  <label for="message">
+    Your message:
+    <textarea id="message" name="message" rows="4" required></textarea>
+  </label>
+  <br>
+  <!-- Add any other form fields here -->
+  <button type="submit">Send</button>
+</form>
   <div class="feedback">
     <center>
       <h1>
-        <font face="Montserrat" font color="black">Want a feed back to us about anything?, Feel free to contact our call
-          center!
+        <font face="Montserrat" font color="black"> Want to contact us, feel free to email us!
       </h1>
       <a href="mailto:contactasteroidbussiness@gmail.com" style="text-decoration: none;">
         <button type="button">
           <font face="Montserrat" color="coral">Conact our call center</font>
         </button>
       </a>
-      <h1>
-        <font face="Montserrat" font color="black">Have an issue?, Feel free to contact our Admin!
-      </h1>
-      <a href="mailto:contactasteroidbussiness@gmail.com?subject=I have an issue with asteroid"
-        style="text-decoration: none;">
-        <button type="button">
-          <font color="coral">Report issue</font>
-        </button>
-      </a>
+      
 
       <h1>
-        <font face="Montserrat" font color="black">Want a request any feature?, Feel free to contact our Music
-          department!
-      </h1>
-      <a href="mailto:contactasteroidbussiness@gmail.com? subject=I would like to request a feature"
-        style="text-decoration: none;">
-        <button type="button">
-          <font color="coral">Email our developers</font>
-        </button>
-      </a>
+
 
     </center>
   </div>
@@ -723,6 +725,33 @@
         audio.pause();
       }
     }
+    function performSearch() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const resultsContainer = document.getElementById('ab');
+
+        // Clear previous results
+        resultsContainer.innerHTML = '';
+
+        // Loop through the items and manually check if each one contains the search term
+        let resultsFound = false;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].toLowerCase().includes(searchTerm)) {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('result-item');
+                resultDiv.textContent = items[i];
+                resultsContainer.appendChild(resultDiv);
+                resultsFound = true;
+            }
+        }
+
+        // If no results are found, display a message
+        if (!resultsFound) {
+            resultsContainer.innerText = 'No matching results found.';
+        }
+    }
+    const items = [title];
+
+
   </script>
   <script>
 
