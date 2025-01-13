@@ -97,7 +97,8 @@
   </form>
 
   <div class="alertBox" id="alertBox">
-    <h1><b>Your Song is uploaded Successfully, GOOD LUCK😊</b></h1>
+    <h1><b>Your Song is being uploaded, Please wait...</b></h1>
+    <img src="file:///C:/Users/HP/Downloads/MicrosoftWindows.Client.CBS_cw5n1h2txyewy!InputApp/DiscordTypingGIF.gif" alt="Description of GIF" />
   </div>
 
   <div class="bar">
@@ -180,8 +181,14 @@
     const analytics = getAnalytics(app);
     const storage = getStorage(app);
     const database = getDatabase(app);
+    let users = localStorage.getItem("users");
+    let currentUser = localStorage.getItem("currentuser");
+    if (users){
 
-
+    } else {
+      alert("User is not signed in");
+      window.location.href = "login.html";
+    }
     let gaga = {}
     const canvas = document.getElementById('can');
     const jsConfetti = new JSConfetti();

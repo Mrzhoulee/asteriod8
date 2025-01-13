@@ -134,12 +134,12 @@ window.gapi.load('auth2', function() {
             let password = document.getElementById("password").value;
             let user_records = JSON.parse(localStorage.getItem("users")) || [];
 
-            let user = user_records.find((v) => v.email === email && v.password === password);
+            var user = user_records.find((v) => v.email === email && v.password === password);
 
             if (user) {
                 alert("Log in Successful!");
-                localStorage.setItem("currentUser", email);
-
+                let currentUser = localStorage.getItem("currentUser");
+                window.location.href = "index.html";
                 // Set the user's premium status based on their stored record
                 if (user.isPremiumUser) {
                     localStorage.setItem("isPremiumUser", "true");
@@ -147,7 +147,7 @@ window.gapi.load('auth2', function() {
                     localStorage.setItem("isPremiumUser", "false");
                 }
 
-                window.location.href = "start.html";
+                window.location.href = "index.html";
             } else {
                 alert("Incorrect Username or Password");
             }

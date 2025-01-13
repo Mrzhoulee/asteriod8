@@ -386,89 +386,86 @@
         UPLOAD</a>
 
     </div>
+    
+  <div style="position: absolute; top: 0; right: 10px;">
+    <a href="login.html">
+      <button id="shell-btn"><font color="white" face="Montserrat">Sign in</font></button>
+    </a>
+  </div>
 
-    <div style="position: absolute; top: 0; right: 10px;">
-      <a href="login.html">
-        <button id="shell-btn">
-          <font color="white" face="Montserrat">Sign in</font>
-        </button>
-      </a>
-    </div>
-
-    <div style="position: absolute; top: 0; right: 220px;">
-      <a href="registraition.html">
-        <button id="shell-btn">
-          <font color="white" face="Montserrat">Sign Up</font>
-        </button>
-      </a>
-    </div>
+  <div style="position: absolute; top: 0; right: 220px;">
+    <a href="registraition.html">
+      <button id="shell-btn"><font color="white" face="Montserrat">Sign Up</font></button>
+    </a>
+  </div>
 
     <div style="text-align:center;">
       <div class="content">
 
+  
+      <span style="text-align: center;">
+        <center>
+          <h3 class="glow">
+            <font face="Montserrat">TRENDS🔥</font>
+          </h3>
+        </center>
+      </span>
+      <div class="scrollable-container">
+        <div class="tran">
+          <h1>Songs Menu</h1>
 
-        <span style="text-align: center;">
           <center>
-            <h3 class="glow">
-              <font face="Montserrat">TRENDS🔥</font>
-            </h3>
-          </center>
-        </span>
-        <div class="scrollable-container">
-          <div class="tran">
-            <h1>Songs Menu</h1>
 
-            <center>
-
-              <font face="Montserrat" color="coral">
-                <h1>NEW HITS 🔥</h1>
-              </font>
+            <font face="Montserrat" color="coral">
+              <h1>NEW HITS 🔥</h1>
+            </font>
+            <div class="search-container">
+              <input type="text" id="searchInput" placeholder="Search..." />
+              <button onclick="performSearch()">Search</button>
+            </div>
 
 
 
 
 
-              <div id="searchbar">
-                <input type="text" id="input" placeholder="Search songs...">
-              </div>
-              <div id="ab"></div>
-          </div>
-          </center>
+            <div id="ab"></div>
+        </div>
+        </center>
 
-          <script type="module">
+        <script type="module">
 
-            // Import the functions you need from the SDKs you need
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-            import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
-            import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+          // Import the functions you need from the SDKs you need
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+          import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
+          import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
 
-            import { getDatabase, ref as ref2, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
-            // https://firebase.google.com/docs/web/setup#available-libraries
+          import { getDatabase, ref as ref2, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+          // https://firebase.google.com/docs/web/setup#available-libraries
 
-            // Your web app's Firebase configuration
-            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-            const firebaseConfig = {
-              apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
-              authDomain: "asteroid-cdc13.firebaseapp.com",
-              databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
-              projectId: "asteroid-cdc13",
-              storageBucket: "asteroid-cdc13.appspot.com",
-              messagingSenderId: "793353824502",
-              appId: "1:793353824502:web:3ac24821911d14773ba4d7",
-              measurementId: "G-GV72TMNNGR"
-            };
-            const app = initializeApp(firebaseConfig);
-            const database = getDatabase(app);
-            // Initialize Firebase
-            onValue(ref2(database, "SONGS/"), (snapshot) => {
-              console.log(Object.values(snapshot.val()))
+          // Your web app's Firebase configuration
+          // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+          const firebaseConfig = {
+            apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
+            authDomain: "asteroid-cdc13.firebaseapp.com",
+            databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+            projectId: "asteroid-cdc13",
+            storageBucket: "asteroid-cdc13.appspot.com",
+            messagingSenderId: "793353824502",
+            appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+            measurementId: "G-GV72TMNNGR"
+          };
+          const app = initializeApp(firebaseConfig);
+          const database = getDatabase(app);
+          // Initialize Firebase
+          onValue(ref2(database, "SONGS/"), (snapshot) => {
+            console.log(Object.values(snapshot.val()))
 
-              //define (tmp) as the key "a" in localStorage as people upload the the song infos 
-              let tmp = Object.values(snapshot.val())
-              let cde = ""
-              tmp.forEach(item => {
-                //gets only the values of (tmp) for all items(elements) here:
-                cde += `
+            //define (tmp) as the key "a" in localStorage as people upload the the song infos 
+            let tmp = Object.values(snapshot.val())
+            let cde = ""
+            tmp.forEach(item => {
+              //gets only the values of (tmp) for all items(elements) here:
+              cde += `
     
           <div style="border: 5px solid coral; width: 400px; margin: 20px; border-radius: 5%; padding: 5px;">
           <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
@@ -496,63 +493,32 @@
       </div>
       </div>
       `
-                console.log(Object.values(Object.values(item)[0])[0]['title'])
-                document.getElementById("ab").innerHTML = cde
-                document.getElementById("play_" + Object.values(Object.values(item)[0])[0]['title']).addEventListener("click", () => {
-                  console.log("a")
-                  document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).play()
-                  console.log("b")
-                })
-
-                // document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).addEventListener("click", () => {
-                //   document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).pause()
-                // })
-                // console.log(JSON.parse(tmp)["test/"]["fileInp"])
-                // console.log(Object.values(Object.values(item)[0])[0]['title']);
+              console.log(Object.values(Object.values(item)[0])[0]['title'])
+              document.getElementById("ab").innerHTML = cde
+              document.getElementById("play_" + Object.values(Object.values(item)[0])[0]['title']).addEventListener("click", () => {
+                console.log("a")
+                document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).play()
+                console.log("b")
               })
 
+              // document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).addEventListener("click", () => {
+              //   document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).pause()
+              // })
+              // console.log(JSON.parse(tmp)["test/"]["fileInp"])
+              // console.log(Object.values(Object.values(item)[0])[0]['title']);
             })
 
-
-            localStorage.getItem("CurrentUser");
-    
-            // Get the search input element
-document.getElementById("input").addEventListener("input", (e) => {
-  // Get the value of the input (trim spaces, convert to lowercase)
-  const query = e.target.value.trim().toLowerCase();
-  
-  // Get all song elements inside the 'ab' div
-  const songs = document.querySelectorAll("#ab .song");
-
-  // If there is some input, filter songs
-  if (query && query.length > 0) {
-    songs.forEach(song => {
-      // Check if the song's text contains the query (case-insensitive)
-      const songTitle = song.textContent.toLowerCase();
-      if (songTitle.includes(query)) {
-        song.style.display = "block";  // Show song if it matches
-      } else {
-        song.style.display = "none";   // Hide song if it doesn't match
-      }
-    });
-  } else {
-    // If there is no query, show all songs
-    songs.forEach(song => {
-      song.style.display = "block";
-    });
-  }
-});
-
-  
-            
-
-          </script>
+          })
 
 
-        </div>
+
+        </script>
+
+
       </div>
     </div>
-    </center>
+  </div>
+  </center>
   </div>
   </div>
   </div>
@@ -602,24 +568,24 @@ document.getElementById("input").addEventListener("input", (e) => {
             </div>
         </div>
   </center>
-  </div>
-  <h3>
-    <font face="Montserrat" color="coral">Please rate our platform for our development</font>
-  </h3>
-  <form action="https://formspree.io/f/mdknlzwo" method="POST">
-    <label for="rating">
-      Your Rating /10
-      <input type="number" id="rating" name="rating" min="0" max="10" required>
-    </label>
-    <br>
-    <label for="message">
-      Your message:
-      <textarea id="message" name="message" rows="4" required></textarea>
-    </label>
-    <br>
-    <!-- Add any other form fields here -->
-    <button type="submit">Send</button>
-  </form>
+</div>
+<h3>
+  <font face="Montserrat" color="coral">Please rate our platform for our development</font>
+</h3>
+<form action="https://formspree.io/f/mdknlzwo" method="POST">
+  <label for="rating">
+    Your Rating /10
+    <input type="number" id="rating" name="rating" min="0" max="10" required>
+  </label>
+  <br>
+  <label for="message">
+    Your message:
+    <textarea id="message" name="message" rows="4" required></textarea>
+  </label>
+  <br>
+  <!-- Add any other form fields here -->
+  <button type="submit">Send</button>
+</form>
   <div class="feedback">
     <center>
       <h1>
@@ -630,7 +596,7 @@ document.getElementById("input").addEventListener("input", (e) => {
           <font face="Montserrat" color="coral">Conact our call center</font>
         </button>
       </a>
-
+      
 
       <h1>
 
@@ -760,28 +726,28 @@ document.getElementById("input").addEventListener("input", (e) => {
       }
     }
     function performSearch() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      const resultsContainer = document.getElementById('ab');
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const resultsContainer = document.getElementById('ab');
 
-      // Clear previous results
-      resultsContainer.innerHTML = '';
+        // Clear previous results
+        resultsContainer.innerHTML = '';
 
-      // Loop through the items and manually check if each one contains the search term
-      let resultsFound = false;
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].toLowerCase().includes(searchTerm)) {
-          const resultDiv = document.createElement('div');
-          resultDiv.classList.add('result-item');
-          resultDiv.textContent = items[i];
-          resultsContainer.appendChild(resultDiv);
-          resultsFound = true;
+        // Loop through the items and manually check if each one contains the search term
+        let resultsFound = false;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].toLowerCase().includes(searchTerm)) {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('result-item');
+                resultDiv.textContent = items[i];
+                resultsContainer.appendChild(resultDiv);
+                resultsFound = true;
+            }
         }
-      }
 
-      // If no results are found, display a message
-      if (!resultsFound) {
-        resultsContainer.innerText = 'No matching results found.';
-      }
+        // If no results are found, display a message
+        if (!resultsFound) {
+            resultsContainer.innerText = 'No matching results found.';
+        }
     }
     const items = [title];
 

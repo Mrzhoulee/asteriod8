@@ -116,9 +116,10 @@
         <a href="login.html"><button><b>Sign In</b></button></a>
     </div>
     <script>
+        var CurrentUser = (email, nick_name);
         var nick_name = document.getElementById("name").value;
         function saveData() {
-          
+          localStorage.setItem("CurrentUser", CurrentUser)
             let name = document.getElementById("name").value;
             let email = document.getElementById("email").value;
             let password = document.getElementById("password").value;
@@ -127,7 +128,7 @@
 
             if (user_records.some((v) => v.email === email)) {
                 alert("Account Created successfully!");
-                window.location.href = "start.html";
+                window.location.href = "index.html";
             } else {
                 user_records.push({
                     "name": name,
