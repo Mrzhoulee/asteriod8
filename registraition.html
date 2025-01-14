@@ -116,10 +116,10 @@
         <a href="login.html"><button><b>Sign In</b></button></a>
     </div>
     <script>
-        var CurrentUser = (email, nick_name);
+        var CurrentUser = (email + "/" + nick_name);
         var nick_name = document.getElementById("name").value;
         function saveData() {
-          localStorage.setItem("CurrentUser", CurrentUser)
+          localStorage.setItem("CurrentUser", null);
             let name = document.getElementById("name").value;
             let email = document.getElementById("email").value;
             let password = document.getElementById("password").value;

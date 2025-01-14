@@ -186,9 +186,9 @@
     const storage = getStorage(app);
     const database = getDatabase(app);
     let users = localStorage.getItem("users");
-    let currentUser = localStorage.getItem("currentuser");
-    if (users){
-
+    let CurrentUser = localStorage.getItem("CurrentUser");
+    if (CurrentUser.value !== null){
+    
     } else {
       alert("User is not signed in");
       window.location.href = "login.html";

@@ -2,6 +2,7 @@
 <html>
 
 <head>
+  <title>Asteroid - Better Music Experience</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=stop_circle" />
@@ -436,7 +437,6 @@
           </center>
 
           <script type="module">
-
             // Import the functions you need from the SDKs you need
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
             import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
@@ -514,37 +514,47 @@
             })
 
 
-            localStorage.getItem("CurrentUser");
-    
+            var CurrentUser = localStorage.getItem("CurrentUser");
+
             // Get the search input element
-document.getElementById("input").addEventListener("input", (e) => {
-  // Get the value of the input (trim spaces, convert to lowercase)
-  const query = e.target.value.trim().toLowerCase();
-  
-  // Get all song elements inside the 'ab' div
-  const songs = document.querySelectorAll("#ab .song");
+            document.getElementById("input").addEventListener("input", (e) => {
+              // Get the value of the input (trim spaces, convert to lowercase)
+              const query = e.target.value.trim().toLowerCase();
 
-  // If there is some input, filter songs
-  if (query && query.length > 0) {
-    songs.forEach(song => {
-      // Check if the song's text contains the query (case-insensitive)
-      const songTitle = song.textContent.toLowerCase();
-      if (songTitle.includes(query)) {
-        song.style.display = "block";  // Show song if it matches
-      } else {
-        song.style.display = "none";   // Hide song if it doesn't match
-      }
-    });
-  } else {
-    // If there is no query, show all songs
-    songs.forEach(song => {
-      song.style.display = "block";
-    });
-  }
-});
+              // Get all song elements inside the 'ab' div
+              const songs = document.querySelectorAll("#ab .song");
 
-  
-            
+              // If there is some input, filter songs
+              if (query && query.length > 0) {
+                songs.forEach(song => {
+                  // Check if the song's text contains the query (case-insensitive)
+                  const songTitle = song.textContent.toLowerCase();
+                  if (songTitle.includes(query)) {
+                    song.style.display = "block";  // Show song if it matches
+                  } else {
+                    song.style.display = "none";   // Hide song if it doesn't match
+                  }
+                });
+              } else {
+                // If there is no query, show all songs
+                songs.forEach(song => {
+                  song.style.display = "block";
+                });
+              }
+            });
+
+            if(CurrentUser !== null){
+            localStorage.setItem("CurrentUser", email + "/" + password);
+            } else {
+              localStorage.setItem("CurrentUser", null);
+            }
+
+     
+
+
+
+
+
 
           </script>
 
