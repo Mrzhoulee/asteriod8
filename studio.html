@@ -187,22 +187,12 @@
     const database = getDatabase(app);
     let users = localStorage.getItem("users");
     let CurrentUser = localStorage.getItem("CurrentUser");
-
-
-
+    if (CurrentUser.value !== null){
     
-    // Check the current user's premium status
-    let currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-    if (currentUser){
-       
     } else {
-        alert("User is not signed in.");
+      alert("User is not signed in");
       window.location.href = "login.html";
     }
-
-
-    
     let gaga = {}
     const canvas = document.getElementById('can');
     const jsConfetti = new JSConfetti();
