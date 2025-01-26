@@ -187,12 +187,17 @@
     const database = getDatabase(app);
     let users = localStorage.getItem("users");
     let CurrentUser = localStorage.getItem("CurrentUser");
-    if (CurrentUser.value !== null){
-    
-    } else {
-      alert("User is not signed in");
-      window.location.href = "login.html";
-    }
+    var currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
+
+if (currentUser === null) {
+    alert("User is not signed in.");
+    window.location.href = "login.html";
+} else {
+    // Assuming 'currentUser' is an object with properties 'name' and 'email'
+    let welcomeMessage = "Welcome " + currentUser.name; // or use currentUser.email if you want to show the email
+    alert(welcomeMessage);
+}
+
     let gaga = {}
     const canvas = document.getElementById('can');
     const jsConfetti = new JSConfetti();

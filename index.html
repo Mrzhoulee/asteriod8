@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
-
+<html><script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 <head>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=heart_plus" />
+  <link rel="manifest" href="/manifest.json">
   <title>Asteroid - Better Music Experience</title>
-    <link rel="icon" type="image/x-icon" href="astei.jpg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=stop_circle" />
@@ -352,9 +352,12 @@
         text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
       }
     }
+
   </style>
 </head>
 
+
+<script>navigator.serviceWorker.register("asteriod8-main/service-worker.js")</script>
 <body>
   <div id="body">
     <div class="container">
@@ -443,7 +446,7 @@
             import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
             import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
 
-            import { getDatabase, ref as ref2, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+            import { getDatabase, ref as ref2, onValue, update} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
             // https://firebase.google.com/docs/web/setup#available-libraries
 
             // Your web app's Firebase configuration
@@ -486,6 +489,9 @@
         document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]['title']}').play()
     })()" id="play_${Object.values(Object.values(item)[0])[0]['title']}"></p>
     
+    <p class="material-symbols-outlined" style="color: coral;">
+      <button id="save_${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}">heart_plus</button>
+</p>
     
     
         
@@ -497,6 +503,8 @@
       </div>
       </div>
       `
+
+
                 console.log(Object.values(Object.values(item)[0])[0]['title'])
                 document.getElementById("ab").innerHTML = cde
                 document.getElementById("play_" + Object.values(Object.values(item)[0])[0]['title']).addEventListener("click", () => {
@@ -504,7 +512,11 @@
                   document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).play()
                   console.log("b")
                 })
+                console.log("save_" + Object.values(Object.values(item)[0])[0]['title'].replace(" ", ""))
+                document.getElementById("save_" + Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")).addEventListener("click", () => {
+                  console.log("a")
 
+                })
                 // document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).addEventListener("click", () => {
                 //   document.getElementById("gaga_" + Object.values(Object.values(item)[0])[0]['title']).pause()
                 // })
@@ -544,13 +556,17 @@
               }
             });
 
-            if(CurrentUser !== null){
-            localStorage.setItem("CurrentUser", email + "/" + password);
+            let email = localStorage.getItem("email");
+
+
+            localStorage.setItem("CurrentUser", null);
+            if (CurrentUser !== null) {
+              localStorage.setItem("CurrentUser", email);
             } else {
               localStorage.setItem("CurrentUser", null);
             }
 
-     
+
 
 
 

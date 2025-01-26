@@ -125,7 +125,8 @@
             let password = document.getElementById("password").value;
             console.log(name + email + password);
             let user_records = JSON.parse(localStorage.getItem("users")) || [];
-
+            localStorage.setItem("email", email)
+            localStorage.setItem("password", password)
             if (user_records.some((v) => v.email === email)) {
                 alert("Account Created successfully!");
                 window.location.href = "index.html";

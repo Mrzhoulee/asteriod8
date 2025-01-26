@@ -1,15 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-7BM505N9L0"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-7BM505N9L0');
-</script>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id"
+        content="793353824502-lev9l8rli2v813bi4ie48qs4bf1pm0nk.apps.googleusercontent.com">
+    <!-- To integrate Google Sign-in -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-7BM505N9L0');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In</title>
@@ -67,7 +80,8 @@
             width: 100%;
         }
 
-        .btn-primary, .btn-signup {
+        .btn-primary,
+        .btn-signup {
             background-color: black;
             color: coral;
             border: none;
@@ -79,7 +93,8 @@
             margin-bottom: 10px;
         }
 
-        .btn-primary:hover, .btn-signup:hover {
+        .btn-primary:hover,
+        .btn-signup:hover {
             background-color: coral;
             color: black;
         }
@@ -87,52 +102,136 @@
         .hidden {
             display: none;
         }
+
+        .google-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            border: 1px solid #dfdfdf;
+            border-radius: 4px;
+            color: #333333;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .google-btn img {
+            width: 30px;
+            margin-right: 10px;
+        }
+
+        .google-btn:hover {
+            background-color: #f1f1f1;
+        }
+
+
+        #google-sign-in {
+            border-radius: 5%;
+            width: 200px;
+            height: 50px;
+            background-color: white;
+
+        }
     </style>
 </head>
+
 <body>
-    <div class="g-signin2" data-onsuccess="onSignIn" data-width="240" data-height="40" data-longtitle="true"></div>
+
+
     <div class="container">
         <div class="card">
             <h1>Sign In</h1>
             <form id="loginForm">
                 <input type="text" class="form-control" id="email" name="email" placeholder="Enter Your Email">
-                <input type="password" class="form-control" id="password" name="password" placeholder="Enter Your Password">
+                <input type="password" class="form-control" id="password" name="password"
+                    placeholder="Enter Your Password">
+
+
+                <center>
+                    <a href="forgot.html">Forgot Password</a>
+
+                </center>
+             
                 <button type="button" onclick="handleLogin()" class="btn-primary">Sign In</button>
                 <a href="registraition.html"><button type="button" class="btn-signup">Sign Up</button></a>
-                <button id="secondButton" class="btn btn-secondary hidden"><a href="start.html">OPEN HOME PAGE</a></button>
+                <button id="secondButton" class="btn btn-secondary hidden"><a href="start.html">OPEN HOME
+                        PAGE</a></button>
             </form>
+            <button id="google-sign-in">Continue with <i style="color: green;" class="fa-brands fa-google"></i></button>
         </div>
     </div>
 
-    <script>
-        function onSignIn(googleUser) {
-  // Handle the signed-in user
-  var profile = googleUser.getBasicProfile();
-  console.log('ID: ' + profile.getId());
-  console.log('Name: ' + profile.getName());
-  console.log('Image URL: ' + profile.getImageUrl());
-  console.log('Email: ' + profile.getEmail());
-}
+    <script type="module">
 
-function onFailure(error) {
-  console.error('Error:', error);
-}
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
 
-window.gapi.load('auth2', function() {
-  window.gapi.auth2.init({
-    client_id: 'YOUR_CLIENT_ID'
-  }).then(function() {
-    var googleSignIn = window.gapi.auth2.getAuthInstance();
-    googleSignIn.signIn().then(onSignIn, onFailure);
-  });
-});
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
+            authDomain: "asteroid-cdc13.firebaseapp.com",
+            databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+            projectId: "asteroid-cdc13",
+            storageBucket: "asteroid-cdc13.firebasestorage.app",
+            messagingSenderId: "793353824502",
+            appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+            measurementId: "G-GV72TMNNGR"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
 
 
 
 
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
+        document.getElementById("google-sign-in").addEventListener("click", (e) => {
         
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    // The signed-in user info.
+                    const user = result.user;
+                    console.log(user)
+                    localStorage.setItem("email", user["email"])
+                    localStorage.setItem("CurrentUser", user["email"])
+                    // IdP data available using getAdditionalUserInfo(result)
+                    // ...
+                }).catch((error) => {
+                    // Handle Errors here.
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    // The email of the user's account used.
+                    const email = error.customData.email;
+                    // The AuthCredential type that was used.
+                    const credential = GoogleAuthProvider.credentialFromError(error);
+                    // ...
+                });
+        })
+
+
+
+
+
+
+
         function handleLogin() {
+
+
+
+
             let email = document.getElementById("email").value;
             let password = document.getElementById("password").value;
             let user_records = JSON.parse(localStorage.getItem("users")) || [];
@@ -155,8 +254,17 @@ window.gapi.load('auth2', function() {
             } else {
                 alert("Incorrect Username or Password");
             }
+
+
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    console.log('User logged in:', user);
+                    window.location.href = 'dashboard.html'; // redirect on successful login
+                })
         }
     </script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 </body>
+
 </html>
