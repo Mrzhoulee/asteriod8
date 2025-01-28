@@ -70,22 +70,22 @@ color: #67708f;
 
 <script>
 
-  document.addEventListener("DOMContentLoaded", function() {
-    // Check the current user's premium status
-    let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-    if (currentUser) {
-        checkPremiumStatus(currentUser);
-        updateStatusMessage(currentUser.isPremiumUser);
-    } else {
-        alert("User is not signed in.");
-      window.location.href = "login.html";
-    }
-});
+
+var currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
+
+if (currentUser === null) {
+    alert("User is not signed in.");
+    window.location.href = "login.html";
+} else {
+    // Assuming 'currentUser' is an object with properties 'name' and 'email'\
+    checkPremiumStatus(currentUser);
+    updateStatusMessage(currentUser.isPremiumUser);
+}
   
 function myFunc() {
   document.getElementById("demo").innerHTML = "Username = Preuser, Password =  User102049 ";
-alert("Your SCOPE USERNAME AND PASSWORD IS SUCCESSFULLY CREATED FOR YOU!👌")
+alert("Your SCOPE USERNAME AND PASSWORD IS SUCCESSFULLY CREATED FOR YOU!")
 }
 
 function purchasePremium() {
