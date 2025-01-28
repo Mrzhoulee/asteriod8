@@ -186,17 +186,7 @@
     const storage = getStorage(app);
     const database = getDatabase(app);
     let users = localStorage.getItem("users");
-    let CurrentUser = localStorage.getItem("CurrentUser");
-    var currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
 
-if (currentUser === null) {
-    alert("User is not signed in.");
-    window.location.href = "login.html";
-} else {
-    // Assuming 'currentUser' is an object with properties 'name' and 'email'
-    let welcomeMessage = "Welcome " + currentUser.name; // or use currentUser.email if you want to show the email
-    alert(welcomeMessage);
-}
 
     let gaga = {}
     const canvas = document.getElementById('can');
@@ -280,6 +270,14 @@ if (currentUser === null) {
 
 
 
+    var currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
+
+if (currentUser === null) {
+    alert("User is not signed in.");
+    window.location.href = "login.html";
+} else {
+
+}
 
   </script>
 </body>
