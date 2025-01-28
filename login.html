@@ -134,6 +134,29 @@
             background-color: white;
 
         }
+
+        .google-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border: 1px solid #dfdfdf;
+    border-radius: 4px;
+    color: #333333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.google-btn img {
+    width: 30px;
+    margin-right: 10px;
+}
+
+.google-btn:hover {
+    background-color: #f1f1f1;
+}
     </style>
 </head>
 
@@ -159,7 +182,7 @@
                 <button id="secondButton" class="btn btn-secondary hidden"><a href="start.html">OPEN HOME
                         PAGE</a></button>
             </form>
-            <button id="google-sign-in">Continue with <i style="color: green;" class="fa-brands fa-google"></i></button>
+            <button id="google-sign-in"><span style="font-size: medium;">Continue With </span><img src="search.png" width="20" height="20"></button>
         </div>
     </div>
 
