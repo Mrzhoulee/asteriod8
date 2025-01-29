@@ -354,6 +354,8 @@
       }
     }
 
+    
+
   </style>
 </head>
 
@@ -438,9 +440,7 @@
 
 
 
-              <div id="searchbar">
-                <input type="text" id="input" placeholder="Search songs...">
-              </div>
+              <input type="text" id="myInput" onkeyup="searcher()" placeholder="Search for names.." title="Search a song...">
               <div id="ab"></div>
           </div>
           </center>
@@ -472,14 +472,20 @@
             onValue(ref2(database, "SONGS/"), (snapshot) => {
               console.log(Object.values(snapshot.val()))
 
+
+    
+
               //define (tmp) as the key "a" in localStorage as people upload the the song infos 
               let tmp = Object.values(snapshot.val())
               let cde = ""
               tmp.forEach(item => {
                 //gets only the values of (tmp) for all items(elements) here:
                 cde += `
+                <div id="songer">
+                <div style="margin: 0; padding: 0;">
     
-          <div style="border: 5px solid coral; width: 400px; margin: 20px; border-radius: 5%; padding: 5px;">
+                          <div id="musicContainer">
+          <div style="border: 5px solid coral; width: 400px; border-radius: 5%;">
           <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
             <div style="background-color: black; color: black; border-radius: 5%;">
         
@@ -488,21 +494,26 @@
       </audio>
     
       <div class="haha"> 
-      
+        <p id="save_${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}"></p>
     <p class="fa fa-play-circle" style="color: coral;" onclick="(()=>{
       console.log('ABABABA')
         document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]['title']}').play()
     })()" id="play_${Object.values(Object.values(item)[0])[0]['title']}"></p>
     
-    <p class="material-symbols-outlined" style="color: coral;">
-      <p id="save_${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}">heart_plus</p>
-</p>
+   
+    
 
-<button href="policy.html">
+
+<a href="policy.html">
   
-    <span class="material-symbols-outlined" style="color: coral;">
+    <p class="material-symbols-outlined" style="color: coral;">
     flag
-</span>
+</p>
+</a>
+  <button onclick="save_the_song">
+<p class="material-symbols-outlined">
+heart_plus
+</p>
 </button>
     
     
@@ -514,7 +525,13 @@
         </div>
       </div>
       </div>
+          </div>
+        </div>
+        </div>
       `
+
+
+ 
 
 
                 console.log(Object.values(Object.values(item)[0])[0]['title'])
@@ -765,6 +782,29 @@
   </div>
 
   <script>
+//continue save_song
+    function save_the_song(){
+      const savior = saved_songs.createElement("div");
+      var songer = document.getElementById("songer")
+      savior.innerHTML += `
+      
+                <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
+            <div style="background-color: black; color: black; border-radius: 5%;">
+        
+            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}">
+        <source src="${Object.values(Object.values(item)[0])[0]["fileInp"]}" type="audio/mpeg">
+      </audio>
+    
+      <div class="haha"> 
+        <p id="save_${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}"></p>
+    <p class="fa fa-play-circle" style="color: coral;" onclick="(()=>{
+      console.log('ABABABA')
+        document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]['title']}').play()
+    })()" id="play_${Object.values(Object.values(item)[0])[0]['title']}"></p>
+    
+      
+      `
+    }
     // Replace these variables with your actual song details
     function Dark() {
       document.body.style.backgroundColor = "Black";
