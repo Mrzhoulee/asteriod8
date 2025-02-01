@@ -182,7 +182,7 @@
                 <button id="secondButton" class="btn btn-secondary hidden"><a href="start.html">OPEN HOME
                         PAGE</a></button>
             </form>
-            <button id="google-sign-in"><span style="font-size: medium;">Continue With </span><img src="search.png" width="20" height="20"></button>
+            <button onclick="OMG()" id="google-sign-in"><span style="font-size: medium;">Continue With </span><img src="search.png" width="20" height="20"></button>
         </div>
     </div>
 
@@ -218,7 +218,7 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        document.getElementById("google-sign-in").addEventListener("click", (e) => {
+        function OMG(){
         
             signInWithPopup(auth, provider)
                 .then((result) => {
@@ -242,8 +242,7 @@
                     // The AuthCredential type that was used.
                     const credential = GoogleAuthProvider.credentialFromError(error);
                     // ...
-                });
-        })
+                }
 
 
 
