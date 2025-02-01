@@ -465,7 +465,7 @@
         </span></a>
       <a href="studio.html" class="w3-bar-item w3-button"><span class="material-symbols-outlined">add_circle</span>
         UPLOAD</a>
-      <button id="google-sign-in"><span style="font-size: medium;">Continue With </span><img src="search.png" width="20" height="20"></button>
+      <button onclick="OMG()" id="google-sign-in"><span style="font-size: medium;">Continue With </span><img src="search.png" width="20" height="20"></button>
     </div>
 
 
@@ -529,11 +529,14 @@
             };
             const app = initializeApp(firebaseConfig);
             const database = getDatabase(app);
+
+               const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
             // Initialize Firebase
             onValue(ref2(database, "SONGS/"), (snapshot) => {
               console.log(Object.values(snapshot.val()))
 
-
+              
     
 
               //define (tmp) as the key "a" in localStorage as people upload the the song infos 
@@ -659,10 +662,9 @@ heart_plus
 
 
 
-                    const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+   
 
-        document.getElementById("google-sign-in").addEventListener("click", (e) => {
+        function OMG(){
         
             signInWithPopup(auth, provider)
                 .then((result) => {
@@ -687,7 +689,7 @@ heart_plus
                     const credential = GoogleAuthProvider.credentialFromError(error);
                     // ...
                 });
-        })
+        }
 
 
 
