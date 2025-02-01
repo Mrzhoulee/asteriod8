@@ -20,6 +20,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id"
+        content="793353824502-lev9l8rli2v813bi4ie48qs4bf1pm0nk.apps.googleusercontent.com">
+    <!-- To integrate Google Sign-in -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
   <style>
     /* Global styles */
     body,
@@ -354,7 +370,60 @@
       }
     }
 
-    
+            .google-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            border: 1px solid #dfdfdf;
+            border-radius: 4px;
+            color: #333333;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .google-btn img {
+            width: 30px;
+            margin-right: 10px;
+        }
+
+        .google-btn:hover {
+            background-color: #f1f1f1;
+        }
+
+
+        #google-sign-in {
+            border-radius: 5%;
+            width: 200px;
+            height: 50px;
+            background-color: white;
+
+        }
+
+        .google-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border: 1px solid #dfdfdf;
+    border-radius: 4px;
+    color: #333333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.google-btn img {
+    width: 30px;
+    margin-right: 10px;
+}
+
+.google-btn:hover {
+    background-color: #f1f1f1;
+}
 
   </style>
 </head>
@@ -399,21 +468,13 @@
 
     </div>
 
-    <div style="position: absolute; top: 0; right: 10px;">
-      <a href="login.html">
-        <button id="shell-btn">
-          <font color="white" face="Montserrat">Sign in</font>
-        </button>
-      </a>
-    </div>
 
-    <div style="position: absolute; top: 0; right: 220px;">
-      <a href="registraition.html">
-        <button id="shell-btn">
-          <font color="white" face="Montserrat">Sign Up</font>
-        </button>
+      <a href="login.html">
+      
+         <button id="google-sign-in"><span style="font-size: medium;">Continue With </span><img src="search.png" width="20" height="20"></button>
+        
       </a>
-    </div>
+  
 
     <div style="text-align:center;">
       <div class="content">
