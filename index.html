@@ -1,10 +1,6 @@
 <!DOCTYPE html>
-<html>
-  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<html><script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 <head>
-  <script src="https://accounts.google.com/gsi/client?hl=fr" async></script>
-<div class="g_id_signin" data-locale="fr">
-</div>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=flag" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=heart_plus" />
   <link rel="manifest" href="/manifest.json">
@@ -400,7 +396,7 @@
       <a href="studio.html" class="w3-bar-item w3-button"><span class="material-symbols-outlined">add_circle</span>
         UPLOAD</a>
 
-       <button id="google-sign-in"><span style="font-size: medium;">Continue With </span><img src="search.png" width="20" height="20"></button>
+
     </div>
 
     <div style="position: absolute; top: 0; right: 10px;">
@@ -454,7 +450,7 @@
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
             import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
             import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-            import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+
             import { getDatabase, ref as ref2, onValue, update} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
             // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -476,36 +472,6 @@
             onValue(ref2(database, "SONGS/"), (snapshot) => {
               console.log(Object.values(snapshot.val()))
 
-                      const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
-        document.getElementById("google-sign-in").addEventListener("click", =>{
-             signInWithPopup(auth, provider)
-                .then((result) => {
-                    // This gives you a Google Access Token. You can use it to access the Google API.
-                    const credential = GoogleAuthProvider.credentialFromResult(result);
-                    const token = credential.accessToken;
-                    // The signed-in user info.
-                    const user = result.user;
-                    console.log(user)
-                    localStorage.setItem("email", user["email"])
-                    localStorage.setItem("CurrentUser", user["email"])
-                    window.location.href = "index.html";
-                    // IdP data available using getAdditionalUserInfo(result)
-                    // ...
-                }).catch((error) => {
-                    // Handle Errors here.
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    // The email of the user's account used.
-                    const email = error.customData.email;
-                    // The AuthCredential type that was used.
-                    const credential = GoogleAuthProvider.credentialFromError(error);
-                    // ...
-                }
-        })
-        
-         
 
     
 
@@ -952,7 +918,6 @@ heart_plus
       }
     };
   </script>
-     <script src="https://apis.google.com/js/platform.js" async defer></script>
 </body>
 
 </html>

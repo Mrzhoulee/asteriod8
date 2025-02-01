@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             background-color: black;
@@ -90,6 +91,61 @@
             background-color: black;
             color: coral;
         }
+
+        .google-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            border: 1px solid #dfdfdf;
+            border-radius: 4px;
+            color: #333333;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .google-btn img {
+            width: 30px;
+            margin-right: 10px;
+        }
+
+        .google-btn:hover {
+            background-color: #f1f1f1;
+        }
+
+
+        #google-sign-in {
+            border-radius: 5%;
+            width: 200px;
+            height: 50px;
+            background-color: white;
+
+        }
+
+        .google-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border: 1px solid #dfdfdf;
+    border-radius: 4px;
+    color: #333333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.google-btn img {
+    width: 30px;
+    margin-right: 10px;
+}
+
+.google-btn:hover {
+    background-color: #f1f1f1;
+}
     </style>
 </head>
 <body>  
@@ -110,12 +166,71 @@
             <div class="text-center">
                 <button type="button" onclick="saveData()" class="btn-primary"><b>Sign Up</b></button>
             </div>
+            <div style="position: relative; top: 10px;">
+            <center>
+                <button id="google-sign-in"><span style="font-size: medium; ">Sign Up with <i class="fa-brands fa-google"></i></span></button>
+            </center>
+        </div>
         </div>
     </div>
     <div class="sign">
         <a href="login.html"><button><b>Sign In</b></button></a>
     </div>
-    <script>
+    <script type="module">
+                // Import the functions you need from the SDKs you need
+                import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
+            authDomain: "asteroid-cdc13.firebaseapp.com",
+            databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+            projectId: "asteroid-cdc13",
+            storageBucket: "asteroid-cdc13.firebasestorage.app",
+            messagingSenderId: "793353824502",
+            appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+            measurementId: "G-GV72TMNNGR"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        document.getElementById("google-sign-in").addEventListener("click", (e) => {
+        
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    // The signed-in user info.
+                    const user = result.user;
+                    console.log(user)
+                    localStorage.setItem("email", user["email"])
+                    localStorage.setItem("CurrentUser", user["email"])
+                    window.location.href = "index.html";
+                    // IdP data available using getAdditionalUserInfo(result)
+                    // ...
+                }).catch((error) => {
+                    // Handle Errors here.
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    // The email of the user's account used.
+                    const email = error.customData.email;
+                    // The AuthCredential type that was used.
+                    const credential = GoogleAuthProvider.credentialFromError(error);
+                    // ...
+                });
+        })
+
         var CurrentUser = (email + "/" + nick_name);
         var nick_name = document.getElementById("name").value;
         function saveData() {
