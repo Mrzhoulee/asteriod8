@@ -2,6 +2,9 @@
 <html>
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 <head>
+  <script src="https://accounts.google.com/gsi/client?hl=fr" async></script>
+<div class="g_id_signin" data-locale="fr">
+</div>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=flag" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=heart_plus" />
   <link rel="manifest" href="/manifest.json">
@@ -21,23 +24,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap" rel="stylesheet">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=pause_circle" />
-    <meta name="google-signin-scope" content="profile email">
-    <meta name="google-signin-client_id"
-        content="793353824502-lev9l8rli2v813bi4ie48qs4bf1pm0nk.apps.googleusercontent.com">
-    <!-- To integrate Google Sign-in -->
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
   <style>
     /* Global styles */
     body,
@@ -372,60 +358,7 @@
       }
     }
 
-            .google-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 20px;
-            background-color: #ffffff;
-            border: 1px solid #dfdfdf;
-            border-radius: 4px;
-            color: #333333;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .google-btn img {
-            width: 30px;
-            margin-right: 10px;
-        }
-
-        .google-btn:hover {
-            background-color: #f1f1f1;
-        }
-
-
-        #google-sign-in {
-            border-radius: 5%;
-            width: 200px;
-            height: 50px;
-            background-color: white;
-
-        }
-
-        .google-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px;
-    background-color: #ffffff;
-    border: 1px solid #dfdfdf;
-    border-radius: 4px;
-    color: #333333;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.google-btn img {
-    width: 30px;
-    margin-right: 10px;
-}
-
-.google-btn:hover {
-    background-color: #f1f1f1;
-}
+    
 
   </style>
 </head>
@@ -466,16 +399,25 @@
         </span></a>
       <a href="studio.html" class="w3-bar-item w3-button"><span class="material-symbols-outlined">add_circle</span>
         UPLOAD</a>
-      <button onclick="OMG()" id="google-sign-in"><span style="font-size: medium;">Continue With </span><img src="search.png" width="20" height="20"></button>
+
+       <button id="google-sign-in"><span style="font-size: medium;">Continue With </span><img src="search.png" width="20" height="20"></button>
     </div>
 
+    <div style="position: absolute; top: 0; right: 10px;">
+      <a href="login.html">
+        <button id="shell-btn">
+          <font color="white" face="Montserrat">Sign in</font>
+        </button>
+      </a>
+    </div>
 
-
-      
-         
-        
-      
-  
+    <div style="position: absolute; top: 0; right: 220px;">
+      <a href="registraition.html">
+        <button id="shell-btn">
+          <font color="white" face="Montserrat">Sign Up</font>
+        </button>
+      </a>
+    </div>
 
     <div style="text-align:center;">
       <div class="content">
@@ -530,14 +472,41 @@
             };
             const app = initializeApp(firebaseConfig);
             const database = getDatabase(app);
-
-               const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
             // Initialize Firebase
             onValue(ref2(database, "SONGS/"), (snapshot) => {
               console.log(Object.values(snapshot.val()))
 
-              
+                      const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        document.getElementById("google-sign-in").addEventListener("click", =>{
+             signInWithPopup(auth, provider)
+                .then((result) => {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    // The signed-in user info.
+                    const user = result.user;
+                    console.log(user)
+                    localStorage.setItem("email", user["email"])
+                    localStorage.setItem("CurrentUser", user["email"])
+                    window.location.href = "index.html";
+                    // IdP data available using getAdditionalUserInfo(result)
+                    // ...
+                }).catch((error) => {
+                    // Handle Errors here.
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    // The email of the user's account used.
+                    const email = error.customData.email;
+                    // The AuthCredential type that was used.
+                    const credential = GoogleAuthProvider.credentialFromError(error);
+                    // ...
+                }
+        })
+        
+         
+
     
 
               //define (tmp) as the key "a" in localStorage as people upload the the song infos 
@@ -662,35 +631,6 @@ heart_plus
 
 
 
-
-   
-
-        function OMG(){
-        
-            signInWithPopup(auth, provider)
-                .then((result) => {
-                    // This gives you a Google Access Token. You can use it to access the Google API.
-                    const credential = GoogleAuthProvider.credentialFromResult(result);
-                    const token = credential.accessToken;
-                    // The signed-in user info.
-                    const user = result.user;
-                    console.log(user)
-                    localStorage.setItem("email", user["email"])
-                    localStorage.setItem("CurrentUser", user["email"])
-                    window.location.href = "index.html";
-                    // IdP data available using getAdditionalUserInfo(result)
-                    // ...
-                }).catch((error) => {
-                    // Handle Errors here.
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    // The email of the user's account used.
-                    const email = error.customData.email;
-                    // The AuthCredential type that was used.
-                    const credential = GoogleAuthProvider.credentialFromError(error);
-                    // ...
-                });
-        }
 
 
 
@@ -1012,6 +952,7 @@ heart_plus
       }
     };
   </script>
+     <script src="https://apis.google.com/js/platform.js" async defer></script>
 </body>
 
 </html>
