@@ -1,41 +1,47 @@
 <!DOCTYPE html>
-<html><script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<html>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+  crossorigin="anonymous"></script>
+
 <head>
-  <meta name="google-adsense-account" content="ca-pub-9005824789597666">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
   <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9005824789597666"
-     crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script>
   <link rel="shortcut icon" href="astei.jpg" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-  integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-  crossorigin="anonymous" referrerpolicy="no-referrer" />
-<meta name="google-signin-scope" content="profile email">
-<meta name="google-signin-client_id"
-  content="793353824502-lev9l8rli2v813bi4ie48qs4bf1pm0nk.apps.googleusercontent.com">
-<!-- To integrate Google Sign-in -->
-<script src="https://apis.google.com/js/platform.js" async defer></script>
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <meta name="google-signin-scope" content="profile email">
+  <meta name="google-signin-client_id"
+    content="793353824502-lev9l8rli2v813bi4ie48qs4bf1pm0nk.apps.googleusercontent.com">
+  <!-- To integrate Google Sign-in -->
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 
-<!-- Google tag (gtag.js) -->
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag() { dataLayer.push(arguments); }
-  gtag('js', new Date());
+  <!-- Google tag (gtag.js) -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-  gtag('config', 'G-7BM505N9L0');
-</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign In</title>
-<link rel="stylesheet" href="style.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=flag" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=heart_plus" />
+    gtag('config', 'G-7BM505N9L0');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=flag" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=heart_plus" />
   <link rel="manifest" href="/manifest.json">
   <title>Asteroid - Better Music Experience</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -386,14 +392,12 @@
         text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
       }
     }
-
-    
-
   </style>
 </head>
 
 
 <script>navigator.serviceWorker.register("asteriod8-main/service-worker.js")</script>
+
 <body>
   <div id="body">
     <div class="container">
@@ -424,7 +428,7 @@
       <a href="pat.html">My Playlist</a>
       <a href="login.html">Sign In</a>
       <a href="policy.html">Report Content<span class="material-symbols-outlined">
-        flag
+          flag
         </span></a>
       <a href="studio.html" class="w3-bar-item w3-button"><span class="material-symbols-outlined">add_circle</span>
         UPLOAD</a>
@@ -435,12 +439,13 @@
 
 
     <div style="position: absolute; top: 0; right: 90px;">
-      
-        
-          <button style="background-color: white;" id="google-sign-in"><span style="font-size: medium;">Continue With <i class="fa-brands fa-google"></i> </span></button>
-        
-        
-      
+
+
+      <button style="background-color: white;" id="google-sign-in"><span style="font-size: medium;">Continue With <i
+            class="fa-brands fa-google"></i> </span></button>
+
+
+
     </div>
 
 
@@ -449,18 +454,15 @@
     <div style="text-align:center;">
       <div class="content">
 
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9005824789597666"
-     crossorigin="anonymous"></script>
-<!-- adtester -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-9005824789597666"
-     data-ad-slot="7183521291"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+        <script async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9005824789597666"
+          crossorigin="anonymous"></script>
+        <!-- adtester -->
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9005824789597666"
+          data-ad-slot="7183521291" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
 
         <span style="text-align: center;">
           <center>
@@ -483,18 +485,34 @@
 
 
 
-              <input type="text" id="myInput" onkeyup="searcher()" placeholder="Search for names.." title="Search a song...">
+              <input type="text" id="myInput" onkeyup="searcher()" placeholder="Search for names.."
+                title="Search a song...">
               <div id="ab"></div>
+
+              <div class="fixed bg-black w-screen h-80 block"></div>
           </div>
+          <div style="
+          position: fixed;
+          background-color: #000;
+          width: 100%;
+          height: 100px;
+          display: block;
+          bottom: 0;
+          left: 0;
+          box-shadow: 5px 5px 20px coral;">
+          
+        </div>
           </center>
 
           <script type="module">
+
+
             // Import the functions you need from the SDKs you need
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
             import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
             import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
             import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-            import { getDatabase, ref as ref2, onValue, update} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+            import { getDatabase, ref as ref2, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
             // https://firebase.google.com/docs/web/setup#available-libraries
 
             // Your web app's Firebase configuration
@@ -516,12 +534,12 @@
               console.log(Object.values(snapshot.val()))
 
               const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+              const provider = new GoogleAuthProvider();
 
-        document.getElementById("google-sign-in").addEventListener("click", (e) => {
-        console.log("HHAHAHAH");
-            signInWithPopup(auth, provider)
-                .then((result) => {
+              document.getElementById("google-sign-in").addEventListener("click", (e) => {
+                console.log("HHAHAHAH");
+                signInWithPopup(auth, provider)
+                  .then((result) => {
                     // This gives you a Google Access Token. You can use it to access the Google API.
                     const credential = GoogleAuthProvider.credentialFromResult(result);
                     const token = credential.accessToken;
@@ -533,7 +551,7 @@
                     window.location.href = "index.html";
                     // IdP data available using getAdditionalUserInfo(result)
                     // ...
-                }).catch((error) => {
+                  }).catch((error) => {
                     // Handle Errors here.
                     const errorCode = error.code;
                     const errorMessage = error.message;
@@ -542,10 +560,10 @@
                     // The AuthCredential type that was used.
                     const credential = GoogleAuthProvider.credentialFromError(error);
                     // ...
-                });
-        })
+                  });
+              })
 
-    
+
 
               //define (tmp) as the key "a" in localStorage as people upload the the song infos 
               let tmp = Object.values(snapshot.val())
@@ -603,7 +621,7 @@ heart_plus
       `
 
 
- 
+
 
 
                 console.log(Object.values(Object.values(item)[0])[0]['title'])
@@ -667,7 +685,7 @@ heart_plus
               localStorage.setItem("CurrentUser", null);
             }
 
-          
+
 
 
 
@@ -855,8 +873,8 @@ heart_plus
   </div>
 
   <script>
-//continue save_song
-    function save_the_song(){
+    //continue save_song
+    function save_the_song() {
       const savior = saved_songs.createElement("div");
       var songer = document.getElementById("songer")
       savior.innerHTML += `
