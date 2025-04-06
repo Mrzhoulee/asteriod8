@@ -392,6 +392,10 @@
         text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
       }
     }
+
+    .lol > .material-symbols-outlined{
+      font-size: 70px !important;
+    }
   </style>
 </head>
 
@@ -491,7 +495,7 @@
 
               <div class="fixed bg-black w-screen h-80 block"></div>
           </div>
-          <div style="
+          <div class="lol" style="
           position: fixed;
           background-color: #000;
           width: 100%;
@@ -499,8 +503,16 @@
           display: block;
           bottom: 0;
           left: 0;
-          box-shadow: 5px 5px 20px coral;">
-          
+          font-size: 70px !important;
+          box-shadow: 5px 5px 20px coral;
+          text-align: center;">
+          <h3 id="tata">SELECT A SONG</h3>
+          <i class="material-symbols-outlined" >
+            play_circle
+          </i>
+          <i class="material-symbols-outlined">
+            pause_circle
+          </i>
         </div>
           </center>
 
@@ -571,7 +583,7 @@
               tmp.forEach(item => {
                 //gets only the values of (tmp) for all items(elements) here:
                 cde += `
-                <div id="songer">
+                <div id="songer" >
                 <div style="margin: 0; padding: 0;">
     
                           <div id="musicContainer">
@@ -586,6 +598,8 @@
       <div class="haha"> 
         <p id="save_${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}"></p>
     <p class="fa fa-play-circle" style="color: coral;" onclick="(()=>{
+                  console.log('test')
+                  document.getElementById('tata').innerHTML = '${Object.values(Object.values(item)[0])[0]['title']}'
       console.log('ABABABA')
         document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]['title']}').play()
     })()" id="play_${Object.values(Object.values(item)[0])[0]['title']}"></p>
