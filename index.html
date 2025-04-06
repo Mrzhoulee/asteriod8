@@ -393,7 +393,7 @@
       }
     }
 
-    .lol > .material-symbols-outlined{
+    .lol>.material-symbols-outlined {
       font-size: 70px !important;
     }
   </style>
@@ -506,14 +506,20 @@
           font-size: 70px !important;
           box-shadow: 5px 5px 20px coral;
           text-align: center;">
-          <h3 id="tata">SELECT A SONG</h3>
-          <i class="material-symbols-outlined" >
-            play_circle
-          </i>
-          <i class="material-symbols-outlined">
-            pause_circle
-          </i>
-        </div>
+            <h3 id="tata">SELECT A SONG</h3>
+            <i style="cursor: pointer; user-select: none;" onclick="(()=>{
+               console.log(window.action)
+               document.getElementById('gaga_' + window.action).play()
+            })()" class="material-symbols-outlined">
+              play_circle
+            </i>
+            <i onclick="(()=>{
+              console.log(window.action)
+              document.getElementById('gaga_' + window.action).pause()
+           })()" class="material-symbols-outlined">
+              pause_circle
+            </i>
+          </div>
           </center>
 
           <script type="module">
@@ -600,7 +606,9 @@
     <p class="fa fa-play-circle" style="color: coral;" onclick="(()=>{
                   console.log('test')
                   document.getElementById('tata').innerHTML = '${Object.values(Object.values(item)[0])[0]['title']}'
-      console.log('ABABABA')
+      console.log('yewf4fed34r4')
+      window.action = '${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}'
+      console.log(window.action)
         document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]['title']}').play()
     })()" id="play_${Object.values(Object.values(item)[0])[0]['title']}"></p>
     
