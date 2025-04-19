@@ -4,6 +4,7 @@
   crossorigin="anonymous"></script>
 
 <head>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=artist" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-7BM505N9L0"></script>
 <script>
@@ -13,8 +14,13 @@
 
   gtag('config', 'G-7BM505N9L0');
 </script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=artist" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=artist" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=artist" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Geologica:wght@100..900&family=Jost:ital,wght@0,100..900;1,100..900&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -82,6 +88,8 @@
       float: center;
       align-items: center;
     }
+
+
 
 
     .material-symbols-outlined {
@@ -484,6 +492,13 @@
     }
 
 
+
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+    }
+
+
     #pause {
       color: coral;
       font-variation-settings:
@@ -520,6 +535,17 @@
     .lol>.material-symbols-outlined {
       font-size: 70px !important;
     }
+
+   
+  .material-symbols-outlined {
+    font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 48;
+    font-family: 'Material Symbols Outlined';
+  }
+</style>
   </style>
 </head>
 
@@ -538,7 +564,7 @@
         <a href="pat.html" class="w3-bar-item w3-button">
           <font color="coral">My Playlist</font>
         </a>
-        <a class="active" class="w3-bar-item w3-button href=" #top">Home</a>
+        <a class="active" class="w3-bar-item w3-button href=">Home</a>
         <div style="border-style: solid; border-color:coral; text-align: center;">
           <h6 class="w3-bar-item w3-button">Themes</h6>
           <a id="Dark" href="#Dark" class="w3-bar-item w3-button href=" onclick="Dark();">Dark</a>
@@ -554,12 +580,18 @@
     <div class="topnav">
       <a class="active" href="#top">Home</a>
       <a href="pat.html">My Playlist</a>
-      <a href="login.html">Sign In</a>
       <a href="policy.html">Report Content<span class="material-symbols-outlined">
           flag
         </span></a>
       <a href="studio.html" class="w3-bar-item w3-button"><span class="material-symbols-outlined">add_circle</span>
         UPLOAD</a>
+        <div  id="openProfileWindow" >
+        <span class="material-symbols-outlined">
+          artist
+          </span> PROFILE
+        </div>
+       
+        
 
 
     </div>
@@ -642,6 +674,14 @@
           <script type="module">
 
 
+
+
+
+document.getElementById("openProfileWindow").addEventListener("click", () =>{
+  console.log("HELLO")
+  
+})
+
             // Import the functions you need from the SDKs you need
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
             import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
@@ -684,6 +724,8 @@
                     localStorage.setItem("email", user["email"])
                     localStorage.setItem("CurrentUser", user["email"])
                     window.location.href = "index.html";
+                    var fullName = user.profile?.name
+                    
                     // IdP data available using getAdditionalUserInfo(result)
                     // ...
                   }).catch((error) => {
