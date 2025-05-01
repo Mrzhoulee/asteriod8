@@ -122,9 +122,43 @@
 
 
     /* Top navigation bar */
-    .topnav {
+     .topnav {
       overflow: hidden;
       background-color: #333;
+    }
+
+    .topnavMobile {
+      display: none;
+      background-color: #000;
+      width: 100%;
+      position: fixed;
+      z-index: 900;
+      top: 0px;
+      left: 0px;
+
+      &>button {
+        text-align: left;
+        margin: 0;
+        float: left;
+        padding-left: 75px;
+        border-radius: 0;
+      }
+    }
+
+    @media only screen and (max-width:600px) {
+      .topnav {
+        display: none;
+      }
+            .topnavMobile {
+        display: block;
+      }
+      .content {
+        padding-top: 70px !important;
+      }
+      .content > p{
+        font-size: 20px !important;
+        color: coral;
+      }
     }
 
     .topnav a {
@@ -630,6 +664,29 @@
 
 
 
+    </div>
+
+
+        <div class="topnavMobile">
+      <button id="gg"><span class="material-symbols-outlined">
+          menu
+        </span></button>
+    </div>
+
+    <div id="turtle">
+     <a href="studio.html"><font face="Montserrat"><h3>Upload</h3></font></a> 
+      <a href="policy.html"><font face="Montserrat"><h3>Report</h3></font></a>
+    <a href="pat.html"><font face="Montserrat"><h3>Playlist</h3></font></a>
+      <a href="profile"><font face="Montserrat"><h3>Profile</h3></font></a>
+ 
+
+
+        <button style="background-color: white;" id="google-sign-in-mobile"><span style="font-size: medium; display: block;">Continue With <i
+              class="fa-brands fa-google"></i> </span></button>
+
+
+
+ 
     </div>
 
 
