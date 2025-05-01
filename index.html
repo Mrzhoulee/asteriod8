@@ -802,6 +802,24 @@ heart_plus
           </div>
           </center>
 
+
+             <script>
+      var toggle = "none"
+      document.getElementById("gg").addEventListener('click',() =>{
+        console.log("jjsjsjsjjsjsjsjsjjsjjsjsjsj", toggle, toggle.includes("none"));
+        if (toggle.includes("block")){
+          document.getElementById("turtle").style.display = "none";
+        } else {
+          document.getElementById("turtle").style.display = "block";
+        }
+        toggle = toggle.includes("none")?"block":"none"
+      })
+
+
+      document.getElementById("google-sign-in-mobile").addEventListener('click', ()=>{
+        document.getElementById("google-sign-in").click()
+      })
+    </script>
           <script type="module">
 
 
