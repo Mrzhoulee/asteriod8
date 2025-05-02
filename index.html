@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
@@ -602,6 +603,12 @@
       display: none;
       width: 100%;
     }
+
+    .stw{
+      background-color: #000;
+      color: coral;
+      border-radius: 5%;
+    }
 </style>
   </style>
 </head>
@@ -690,59 +697,6 @@
           </center>
         </span>
 
-
-        
-        <div id="songer" >
-                <div style="margin: 0; padding: 0;">
-    
-                          <div id="musicContainer">
-          <div style="border: 5px solid coral; width: 400px; border-radius: 5%;">
-          <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>Dancing in the Kitchen</h3><center></font> <span>Album: 70s BRINGBACK</span> 70s BRINGBACK<b>By:The Time Travellers</b>The Time Travellers</p></font>
-            <div style="background-color: black; color: black; border-radius: 5%;">
-        
-            <audio id="gaga_Dancing in The Kitchen">
-        <source src="https://firebasestorage.googleapis.com/v0/b/asteroid-cdc13.appspot.com/o/70s%20BRINGBACK%2FDancing%20in%20The%20Kitchen%2FThe%20Time%20Travellers%2FDancing%20in%20the%20Kitchen.mp3?alt=media&token=7f95da4b-307a-424c-b374-726ce0673f1d" type="audio/mpeg">
-      </audio>
-    
-      <div class="haha"> 
-        <p id="save_The Time Travellers"></p>
-    <p class="fa fa-play-circle" style="color: coral;" onclick="(()=>{
-                  console.log('test')
-                  document.getElementById('tata').innerHTML = '${Object.values(Object.values(item)[0])[0]['title']}'
-      console.log('yewf4fed34r4')
-      window.action = '${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}'
-      console.log(window.action)
-        document.getElementById('gaga_Dancing in The Kitchen').play()
-    })()" id="play_Dancing in The Kitchen"></p>
-    
-   
-    
-
-
-<a href="policy.html">
-  
-    <p class="material-symbols-outlined" style="color: coral;">
-    flag
-</p>
-</a>
-  <button onclick="save_the_song">
-<p class="material-symbols-outlined">
-heart_plus
-</p>
-</button>
-    
-    
-        
-        <p class="fa fa-pause-circle-o"  style="color: coral;" font color="coral" onclick="(()=>{
-      console.log('ABABABA')
-        document.getElementById('gaga_Dancing in The Kitchen').pause()
-    })()" id="pause_Dancing in The Kitchen"></p>
-        </div>
-      </div>
-      </div>
-          </div>
-        </div>
-        </div>
       
         <div class="scrollable-container">
           <div class="tran">
@@ -754,6 +708,45 @@ heart_plus
                 <h1>NEW HITS 🔥</h1>
               </font>
               
+              <font face="Montserrat"><h2>SONG OF THE WEEK</h2></font>
+              <div id="musicContainer">
+                <div style="border: 5px solid black; width: 400px; border-radius: 5%;">
+                <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>Dancing In the Kitchen</h3></p></font>
+                  <div style="background-color: black; color: black; border-radius: 5%;">
+             
+
+                 
+
+     
+                
+ 
+                  
+                  
+          <audio id="audio5" src="https://files.catbox.moe/mcxtc8.mp3" preload="auto"></audio>
+          <button style="background-color: #000; color: coral;" onclick="play()">PLAY</button>
+          <button style="background-color: #000; color: coral;" onclick="pause()">PAUSE</button>
+      
+      
+      <a href="policy.html">
+        
+          <p class="material-symbols-outlined" style="color: blak;">
+          flag
+      </p>
+      </a>
+        <button onclick="save_the_song">
+      <p class="material-symbols-outlined">
+      heart_plus
+      </p>
+      </button>
+          
+          
+              
+            
+              </div>
+            </div>
+            </div>
+     
+      
               <div class="yotpo-widget-instance" data-yotpo-instance-id="1093429"></div>
               <div id="ab"></div>
               <a href="https://www.producthunt.com/products/asteroid-2?utm_source=badge-follow&utm_medium=badge&utm_souce=badge-asteroid&#0045;2" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/follow.svg?product_id=1053310&theme=light" alt="Asteroid - Enjoy&#0032;music&#0032;and&#0032;video&#0032;with&#0032;no&#0032;ads&#0044;&#0032;no&#0032;interruptions&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
@@ -770,6 +763,7 @@ heart_plus
           font-size: 70px !important;
           box-shadow: 5px 5px 20px coral;
           text-align: center;">
+
             <h3 id="tata">SELECT A SONG</h3>
             <i style="cursor: pointer; user-select: none;" onclick="(()=>{
                console.log(window.action)
@@ -788,6 +782,16 @@ heart_plus
 
 
              <script>
+
+const audio5 = document.getElementById("audio5")
+function play(){
+audio5.play();
+}
+
+
+function pause(){
+audio5.pause();
+}
       var toggle = "none"
       document.getElementById("gg").addEventListener('click',() =>{
         console.log("jjsjsjsjjsjsjsjsjjsjjsjsjsj", toggle, toggle.includes("none"));
