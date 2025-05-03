@@ -643,7 +643,7 @@
     <div style="position: absolute; top: 0; right: 90px;">
 
 
-      <button style="background-color: white;" id="google-sign-in"><span style="font-size: medium;">Continue With <i
+      <button style="background-color: white;" id="google-sign-in"><span id="gcd" style="font-size: medium;">Continue With <i
             class="fa-brands fa-google"></i> </span></button>
 
 
@@ -665,7 +665,7 @@
  
 
 
-        <button style="background-color: white;" id="google-sign-in-mobile"><span style="font-size: medium; display: block;">Continue With <i
+        <button style="background-color: white;" id="google-sign-in-mobile"><span id="gcm" style="font-size: medium; display: block;">Continue With <i
               class="fa-brands fa-google"></i> </span></button>
 
 
@@ -843,7 +843,7 @@ document.getElementById("openProfileWindow").addEventListener("click", () =>{
               const provider = new GoogleAuthProvider();
 
               document.getElementById("google-sign-in").addEventListener("click", (e) => {
-                console.log("HHAHAHAH");
+                console.log("gcm_ready");
                 signInWithPopup(auth, provider)
                   .then((result) => {
                     // This gives you a Google Access Token. You can use it to access the Google API.
@@ -854,8 +854,10 @@ document.getElementById("openProfileWindow").addEventListener("click", () =>{
                     console.log(user)
                     localStorage.setItem("email", user["email"])
                     localStorage.setItem("CurrentUser", user["email"])
-                    window.location.href = "index.html";
-                    var fullName = user.profile?.name
+                    var fullName = user.displayName;
+                    document.getElementById("gcm").innerHTML = fullName;
+                    document.getElementById("gcd").innerHTML = fullName;
+                   
                     
                     // IdP data available using getAdditionalUserInfo(result)
                     // ...
@@ -870,6 +872,7 @@ document.getElementById("openProfileWindow").addEventListener("click", () =>{
                     // ...
                   });
               })
+
 
 
 
