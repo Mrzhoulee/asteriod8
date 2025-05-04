@@ -4,6 +4,9 @@
   crossorigin="anonymous"></script>
 
 <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Asteroid is a music universe for everyone, with no ads and no interruptions">
@@ -160,7 +163,14 @@
       }
     }
 
-    @media only screen and (max-width:600px) {
+    @media only screen and (max-width:800px) {
+
+      #ab {
+        width: 100%;
+        position: relative;
+        background-color: black;
+      }
+
       .topnav {
         display: none;
       }
@@ -171,17 +181,15 @@
 
       .content {
         padding-top: 70px !important;
+        margin-left: 0px;
       }
 
       .content>p {
         font-size: 20px !important;
         color: coral;
       }
-      #ab{
-        margin: 0 !important;
-        padding: 0;
-        border: 0 solid;
-      }
+
+      
     }
 
     .topnav a {
@@ -379,7 +387,7 @@
     }
 
     /* Scrollable container */
-    .scrollable-container {
+    /* .scrollable-container {
       width: 180000px;
       height: 800px;
       overflow-y: auto;
@@ -387,7 +395,7 @@
       margin-top: 20px;
       background-color: #1e1e1e;
       border-radius: 10px;
-    }
+    } */
 
     .scrollable-container ul {
       list-style-type: none;
@@ -574,9 +582,10 @@
 
 
     .glow {
-      font-size: 50px;
-      color: #fff;
+      font-size: 35px;
+      color: white;
       text-align: center;
+      font-family: "Cal Sans", sans-serif !important;
       animation: glow 1s ease-in-out infinite alternate;
     }
 
@@ -623,6 +632,31 @@
       background-color: #000;
       color: coral;
       border-radius: 5%;
+    }
+
+    .yotpo-headline{
+      color: coral !important;
+    }
+
+    .yotpo-reviews-icon-text{
+      color: coral !important;
+    }
+
+    .yotpo-body-text{
+      color: coral !important;
+    }
+
+    .yotpo-title-text{
+      color: coral !important;
+    }
+
+    .yotpo-new-review-btn{
+      background-color: coral !important;
+      color: #000 !important;
+    }
+
+    .yotpo-empty-state{
+      display: none !important;
     }
   </style>
   </style>
@@ -712,14 +746,15 @@
     <div class="content">
 
 
-      <h1 style="font-size: 30;" class=".kanit-extrabold-italic">Discover music on Asteroid
-        without ads or any interruptions!</h1>
+      <h1 style="font-size: 20px;" class=".kanit-extrabold-italic">Discover music on Asteroid<br>
+         without ads or any interruptions!</h1>
 
       <span style="text-align: center;">
         <center>
-          <h3 class="glow">
-            <font face="Montserrat">TRENDS🔥</font>
-          </h3>
+          <font face="Cal sans"><h5 class="glow">
+            Start Listening — No Ads, No Limits.
+          </h5>
+        </font>
         </center>
       </span>
 
@@ -731,12 +766,12 @@
 
       <div class="scrollable-container">
         <div class="tran">
-          <h1>Songs Menu</h1>
+        
 
           <center>
 
             <font face="Montserrat" color="coral">
-              <h1>NEW HITS 🔥</h1>
+            
             </font>
 
 
@@ -746,13 +781,13 @@
             </font>
             <div id="musicContainer">
               <div style="border: 5px solid black; width: 400px; border-radius: 5%;">
-                <font face="Montserrat" color="coral">
+             
                   <p>
-                    <font color="lightcoral">
+                    
                       <center>
                         <h3>Dancing In the Kitchen</h3>
                   </p>
-                </font>
+         
                 <div style="background-color: black; color: black; border-radius: 5%;">
 
 
@@ -934,12 +969,12 @@
 
             //define (tmp) as the key "a" in localStorage as people upload the the song infos 
             let tmp = Object.values(snapshot.val())
-            let cde = document.getElementById("ab").innerHTML +"<h1>aaa</h1>"
-            tmp = []
+            let cde = ""
+            document.getElementById("ab").innerHTML = cde
             tmp.forEach(item => {
               //gets only the values of (tmp) for all items(elements) here:
               cde += `
-                <div id="songer" class="aaa">
+                <div id="songer" class="ssda">
                 <div style="margin: 0; padding: 0;">
     
                           <div id="musicContainer">
@@ -1077,7 +1112,7 @@ heart_plus
   </div>
   <div class="Artist">
     <h1>
-      <font face="Montserrat" font color="black">Want to be an Artist?, Upload Songs NOW!</font>
+      <font face="Montserrat" font color="black">a Want to be an Artist?, Upload Songs NOW!</font>
     </h1>
     <font face="Montserrat" font color="black">
       <p>Get followers and Saves❤️ to get money NOW! THE MORE FOLLOWERS THAT YOU GET, THE MORE MONEY YOU GET! <font
@@ -1279,6 +1314,28 @@ heart_plus
 
   <script>
     //continue save_song
+    function save_the_song() {
+      const savior = saved_songs.createElement("div");
+      var songer = document.getElementById("songer")
+      savior.innerHTML += `
+      
+                <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
+            <div style="background-color: black; color: black; border-radius: 5%;">
+        
+            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}">
+        <source src="${Object.values(Object.values(item)[0])[0]["fileInp"]}" type="audio/mpeg">
+      </audio>
+    
+      <div class="haha"> 
+        <p id="save_${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}"></p>
+    <p class="fa fa-play-circle" style="color: coral;" onclick="(()=>{
+      console.log('ABABABA')
+        document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]['title']}').play()
+    })()" id="play_${Object.values(Object.values(item)[0])[0]['title']}"></p>
+    
+      
+      `
+    }
     // Replace these variables with your actual song details
     function Dark() {
       document.body.style.backgroundColor = "Black";
