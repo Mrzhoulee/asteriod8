@@ -934,11 +934,12 @@
 
             //define (tmp) as the key "a" in localStorage as people upload the the song infos 
             let tmp = Object.values(snapshot.val())
-            let cde = ""
+            let cde = document.getElementById("ab").innerHTML +"<h1>aaa</h1>"
+            tmp = []
             tmp.forEach(item => {
               //gets only the values of (tmp) for all items(elements) here:
               cde += `
-                <div id="songer" >
+                <div id="songer" class="aaa">
                 <div style="margin: 0; padding: 0;">
     
                           <div id="musicContainer">
@@ -1278,28 +1279,6 @@ heart_plus
 
   <script>
     //continue save_song
-    function save_the_song() {
-      const savior = saved_songs.createElement("div");
-      var songer = document.getElementById("songer")
-      savior.innerHTML += `
-      
-                <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
-            <div style="background-color: black; color: black; border-radius: 5%;">
-        
-            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}">
-        <source src="${Object.values(Object.values(item)[0])[0]["fileInp"]}" type="audio/mpeg">
-      </audio>
-    
-      <div class="haha"> 
-        <p id="save_${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}"></p>
-    <p class="fa fa-play-circle" style="color: coral;" onclick="(()=>{
-      console.log('ABABABA')
-        document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]['title']}').play()
-    })()" id="play_${Object.values(Object.values(item)[0])[0]['title']}"></p>
-    
-      
-      `
-    }
     // Replace these variables with your actual song details
     function Dark() {
       document.body.style.backgroundColor = "Black";
