@@ -84,8 +84,14 @@
   <form id="uploadForm" class="formUpload">
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
-    <input type="file" class="inputFile" id="fileInp" accept="video/mp4, audio/mpeg" required multiple />
-    <input type="text" id="album" placeholder="Enter your custom Album" required>
+    <input type="file" class="inputFile" id="fileInp" accept="video/mp4, audio/mpeg" required />
+    <div style="border: 5px; border-style: solid; border-color: black; padding: 5px; margin: 20px;">
+      Album
+      <input type="radio" id="ALLBUM" value="Album" name="yy" />
+      Singles
+      <input type="radio" id="Singles" value="Singles" name="yy" />
+    </div>
+    <input type="text" id="album" placeholder="Enter your custom Album">
     <input type="text" id="artist" placeholder="Enter the Song Artist" class="text" required>
     <br>
     <input type="radio" id="Public" name="Public" value="Public" checked>
@@ -98,7 +104,6 @@
 
   <div class="alertBox" id="alertBox">
     <h1><b>Your Song is being uploaded, Please wait...</b></h1>
-    <img src="file:///C:/Users/HP/Downloads/MicrosoftWindows.Client.CBS_cw5n1h2txyewy!InputApp/DiscordTypingGIF.gif" alt="Description of GIF" />
   </div>
 
   <div class="alertBox" id="ooaa">
@@ -144,7 +149,7 @@
     // Your web app's Firebase configurationx
     // For Firebase JS SDK v7.20.0 and later, measurementId is optional
     const firebaseConfig = {
-      apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
+      apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
       authDomain: "asteroid-cdc13.firebaseapp.com",
       databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
       projectId: "asteroid-cdc13",
@@ -160,6 +165,15 @@
     const storage = getStorage(app);
     const database = getDatabase(app);
     let users = localStorage.getItem("users");
+
+document.getElementById("Singles").addEventListener('click', () => {
+    document.getElementById("album").style.display = "none";
+});
+
+
+document.getElementById("ALLBUM").addEventListener('click', () => {
+    document.getElementById("album").style.display = "block";
+});
 
 
     let gaga = {}
@@ -209,21 +223,54 @@
       });
 
 
-
+      const Singles = document.getElementById("Singles")
+      const ALLBUM = document.getElementById("ALLBUM")
       let i = 0;
+
+      if (Singles) {
+        while (i < fileInp.length) {
+          const response = await uploadBytes(ref(storage, title + "/" + artist + "/" + fileInp[i].name), fileInp[i]);
+          const downloadURL = await getDownloadURL(response.ref);
+
+          let gaga = {};
+
+          let rec = title + "/" + fileInp[i].name;
+          if (rec) {
+            console.log("Loading finished");
+            console.log(rec);  // Log the stored message
+            document.getElementById("ooaa").style.visibility = "visible";
+            document.getElementById("alertBox").style.visibility = "hidden";
+          }
+          gaga[title] = {}
+          gaga[title][artist] = {
+            fileInp: downloadURL,
+            title: title,
+            artist: artist
+          }
+          console.log(gaga);
+          update(ref2(database, "SONGS"), gaga)
+          i++;
+          console.log("cccccc");
+        }
+
+
+      }
+
+
+    if (ALLBUM) {
       while (i < fileInp.length) {
         const response = await uploadBytes(ref(storage, album + "/" + title + "/" + artist + "/" + fileInp[i].name), fileInp[i]);
         const downloadURL = await getDownloadURL(response.ref);
 
         let gaga = {};
-      
+
         let rec = title + "/" + album + "/" + fileInp[i].name;
         if (rec) {
-    console.log("Loading finished");
-    console.log(rec);  // Log the stored message
-    document.getElementById("ooaa").style.visibility = "visible";
-    document.getElementById("alertBox").style.visibility = "hidden";
-}
+          console.log("Loading finished");
+          console.log(rec);  // Log the stored message
+          document.getElementById("ooaa").style.visibility = "visible";
+          document.getElementById("alertBox").style.visibility = "hidden";
+        }
         gaga[title] = {}
         gaga[title][album] = {}
         gaga[title][album][artist] = {
@@ -238,20 +285,20 @@
         console.log("cccccc");
       }
 
-     
-    
+
+    }
     });
 
 
 
     var currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
 
-if (CurrentUser == null) {
-    alert("User is not signed in.");
-    window.location.href = "index.html";
-} else {
+    if (CurrentUser == null) {
+      alert("User is not signed in.");
+      window.location.href = "index.html";
+    } else {
 
-}
+    }
 
   </script>
 </body>
