@@ -1,0 +1,17 @@
+{
+  "name": "Asteroid - Better Music Experience",
+  "theme_color": "#ff7f50",
+  "background_color": "#000000",
+  "short_name": "Asteroid",
+  "id": "asteroidpwa",
+  "description": "Asteroid is a music sharing platform with no ads",
+  "start_url": "https://asteroid8.net/index.html",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "astei.jpg",
+      "sizes": "192x192",
+      "type": "image/jpg"
+    }
+  ]
+}
