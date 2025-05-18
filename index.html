@@ -197,24 +197,28 @@
       
     }
 
-    .topnav a {
-      /* float: left; */
-      color: #f2f2f2;
-      text-align: center;
-      padding: 14px 16px;
-      text-decoration: none;
-      font-size: 17px;
-      transition: background-color 0.3s;
-    }
+.sidenav {
+  height: 100%;
+  width: 220px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  padding-top: 20px;
+}
 
-    .topnav a:hover {
-      background-color: #555;
-    }
+.sidenav a {
+  padding: 10px 20px;
+  text-decoration: none;
+  font-size: 18px;
+  color: white;
+  display: block;
+}
 
-    .topnav a.active {
-      background-color: #F87954;
-      color: white;
-    }
+.sidenav a:hover {
+  background-color: #575757;
+}
+
 
     /* Main content styling */
     .content {
@@ -377,7 +381,7 @@
     /* Button styling */
     button {
       background-color: black;
-      color: black;
+      color: white;
       width: 180px;
       height: 50px;
       border-radius: 25px;
@@ -676,35 +680,22 @@
 
 <body>
 
-  </div>
-  <div class="topnav">
-    <a class="active" href="#top">Home</a>
-    <a href="pat.html">My Playlist</a>
-    <a href="policy.html">Report Content<span class="material-symbols-outlined">
-        flag
-      </span></a>
-      <a href="Asteroid Terms.html">Terms and Policies</a>
-    <a href="studio.html" class="w3-bar-item w3-button"><span class="material-symbols-outlined">add_circle</span>
-      UPLOAD</a>
-    <div id="openProfileWindow">
-      <a href="profile.html"> <span class="material-symbols-outlined">
-          artist
-        </span> PROFILE
-      </a>
-    </div>
-
-
-
-
-  </div>
+<div class="sidenav">
+  <a href="#top">Home</a>
+  <a href="pat.html">My Playlist</a>
+  <a href="policy.html">Report Content <span class="material-symbols-outlined">flag</span></a>
+  <a href="Asteroid Terms.html">Terms and Policies</a>
+  <a href="studio.html"><span class="material-symbols-outlined">add_circle</span> UPLOAD</a>
+  <a href="profile.html"><span class="material-symbols-outlined">artist</span> PROFILE</a>
+</div>
 
 
 
   <div style="position: absolute; top: 0; right: 90px;">
 
 
-    <button style="background-color: white;" id="google-sign-in"><span id="gcd" style="font-size: medium;">Continue With
-        <i class="fa-brands fa-google"></i> </span></button>
+    <button style="background-color: white;" id="google-sign-in"><span id="gcd" style="font-size: medium;"><font color="black">Continue With
+        <i class="fa-brands fa-google"></i> </font></span></button>
 
 
 
@@ -742,7 +733,7 @@
 
 
     <button style="background-color: white;" id="google-sign-in-mobile"><span id="gcm"
-        style="font-size: medium; display: block;">Continue With <i class="fa-brands fa-google"></i> </span></button>
+        style="font-size: medium; display: block;"><font color="black">Continue With <i class="fa-brands fa-google"></i> </font></span></button>
 
 
 
@@ -768,24 +759,19 @@
         </center>
       </span>
 
-      <video autoplay muted loop id="bgVideo">
-        <source src="pcloud_552088188_3_202505_1_vqe_mhd-20250503233504-287352-55e94-out.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-      
 
       <div class="scrollable-container">
         <div class="tran">
         
 
-          <center>
+       
 
             <font face="Montserrat" color="coral">
             
             </font>
 
 
-
+<center>
                         <font face="Montserrat" color="coral">
               <h2>Artists of The Month</h2>
 
@@ -794,153 +780,60 @@
   <li>Papa Josh</li>
   <li>DJ CHRIS CONCEPTS</li>
 </ul> 
-            </font
+           
             </font>
+            </center>
+<div style="
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  background-color: #111;
+  padding: 10px;
+  gap: 20px;
+  color: white;
+">
 
+  <h2 style="flex-basis: 100%; font-family: Montserrat;">SONGS OF THE WEEK (5)</h2>
 
-            <font face="Montserrat">
-              <h2>SONGS OF THE WEEK (5)</h2>
-            </font>
-            <div id="musicContainer" class="msc">
-              <div style="border: 5px solid black; width: 400px; border-radius: 5%;">
-             
-                  <p>
-                    
-                      <center>
-                        <h3>Flowers</h3>
-                  </p>
-         
-                <div style="background-color: black; color: black; border-radius: 5%;">
-                  <audio id="audio1" src="https://files.catbox.moe/i9blzc.wav" preload="auto"></audio>
-                  <button style="background-color: #000; color: coral;" onclick="play1()">PLAY</button>
-                  <button style="background-color: #000; color: coral;" onclick="pause1()">PAUSE</button>
-                  <a href="policy.html">
+  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Flowers</h3>
+    <audio id="audio1" src="https://files.catbox.moe/i9blzc.wav" preload="auto"></audio>
+    <button onclick="play1()">PLAY</button>
+    <button onclick="pause1()">PAUSE</button>
+  </div>
 
-                    <p class="material-symbols-outlined" style="color: blak;">
-                      flag
-                    </p>
-                  </a>
-                  <button onclick="save_the_song">
-                    <p class="material-symbols-outlined">
-                      heart_plus
-                    </p>
-                  </button>
+  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Wolf</h3>
+    <audio id="audio2" src="https://files.catbox.moe/oxnxve.wav" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
+  </div>
 
-                </div>
-              </div>
+  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Full Circle</h3>
+    <audio id="audio3" src="https://files.catbox.moe/ed7stj.wav" preload="auto"></audio>
+    <button onclick="play3()">PLAY</button>
+    <button onclick="pause3()">PAUSE</button>
+  </div>
 
+  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Release me Clean</h3>
+    <audio id="audio4" src="https://files.catbox.moe/03yd2o.mp3" preload="auto"></audio>
+    <button onclick="play4()">PLAY</button>
+    <button onclick="pause4()">PAUSE</button>
+  </div>
 
-                        <div id="musicContainer" class="msc">
-              <div style="border: 5px solid black; width: 400px; border-radius: 5%;">
-             
-                  <p>
-                    
-                      <center>
-                        <h3>Wolf</h3>
-                  </p>
-         
-                <div style="background-color: black; color: black; border-radius: 5%;">
-                  <audio id="audio2" src="https://files.catbox.moe/oxnxve.wav" preload="auto"></audio>
-                  <button style="background-color: #000; color: coral;" onclick="play2()">PLAY</button>
-                  <button style="background-color: #000; color: coral;" onclick="pause2()">PAUSE</button>
-                  <a href="policy.html">
+  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Check me Out</h3>
+    <audio id="audio5" src="https://files.catbox.moe/st2kn8.mp3" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+  </div>
 
-                    <p class="material-symbols-outlined" style="color: blak;">
-                      flag
-                    </p>
-                  </a>
-                  <button onclick="save_the_song">
-                    <p class="material-symbols-outlined">
-                      heart_plus
-                    </p>
-                  </button>
+</div>
 
-                </div>
-              </div>
-
-                     <div id="musicContainer" class="msc">
-              <div style="border: 5px solid black; width: 400px; border-radius: 5%;">
-             
-                  <p>
-                    
-                      <center>
-                        <h3>Full Circle</h3>
-                  </p>
-         
-                <div style="background-color: black; color: black; border-radius: 5%;">
-                  <audio id="audio3" src="https://files.catbox.moe/ed7stj.wav" preload="auto"></audio>
-                  <button style="background-color: #000; color: coral;" onclick="play3()">PLAY</button>
-                  <button style="background-color: #000; color: coral;" onclick="pause3()">PAUSE</button>
-                  <a href="policy.html">
-
-                    <p class="material-symbols-outlined" style="color: blak;">
-                      flag
-                    </p>
-                  </a>
-                  <button onclick="save_the_song">
-                    <p class="material-symbols-outlined">
-                      heart_plus
-                    </p>
-                  </button>
-                </div>
-              </div>
-
-                                       <div id="musicContainer" class="msc">
-              <div style="border: 5px solid black; width: 400px; border-radius: 5%;">
-
-                                               <h3>Release me Clean</h3>
-                  </p>
-         
-                <div style="background-color: black; color: black; border-radius: 5%;">
-                  <audio id="audio4" src="https://files.catbox.moe/03yd2o.mp3" preload="auto"></audio>
-                  <button style="background-color: #000; color: coral;" onclick="play4()">PLAY</button>
-                  <button style="background-color: #000; color: coral;" onclick="pause4()">PAUSE</button>
-                  <a href="policy.html">
-
-                    <p class="material-symbols-outlined" style="color: blak;">
-                      flag
-                    </p>
-                  </a>
-                  <button onclick="save_the_song">
-                    <p class="material-symbols-outlined">
-                      heart_plus
-                    </p>
-                  </button>
-                </div>
-              </div>
-
-
-                                                         <div id="musicContainer" class="msc">
-              <div style="border: 5px solid black; width: 400px; border-radius: 5%;">
-
-                                                  <h3>Check me Out</h3>
-                  </p>
-         
-                <div style="background-color: black; color: black; border-radius: 5%;">
-                  <audio id="audio5" src="https://files.catbox.moe/st2kn8.mp3" preload="auto"></audio>
-                  <button style="background-color: #000; color: coral;" onclick="play5()">PLAY</button>
-                  <button style="background-color: #000; color: coral;" onclick="pause5()">PAUSE</button>
-                  <a href="policy.html">
-
-                    <p class="material-symbols-outlined" style="color: blak;">
-                      flag
-                    </p>
-                  </a>
-                  <button onclick="save_the_song">
-                    <p class="material-symbols-outlined">
-                      heart_plus
-                    </p>
-                  </button>
-                </div>
-              </div>
-
-
-                  
-
-                </div>
-              </div>
-            </div>
-
+<center>
 
             <div class="yotpo-widget-instance" data-yotpo-instance-id="1093429"></div>
             <a href="https://www.producthunt.com/products/asteroid-2?utm_source=badge-follow&utm_medium=badge&utm_souce=badge-asteroid&#0045;2"
@@ -950,7 +843,7 @@
               style="width: 250px; height: 54px;" width="250" height="54" /></a>
             <a href="https://www.producthunt.com/products/asteroid-2/reviews?utm_source=badge-product_review&utm_medium=badge&utm_souce=badge-asteroid&#0045;2" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1053310&theme=light" alt="Asteroid - Enjoy&#0032;music&#0032;and&#0032;video&#0032;with&#0032;no&#0032;ads&#0044;&#0032;no&#0032;interruptions&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
             <div id="ab"></div>
-
+</center>
             <div class="fixed bg-black w-screen h-80 block"></div>
         </div>
         <div class="lol" style="
@@ -979,7 +872,7 @@
             pause_circle
           </i>
         </div>
-        </center>
+     
 
 
         <script>
@@ -1373,7 +1266,7 @@ heart_plus
     </h5>
   </font>
   <div class="feedback">
-    <center>
+
       <h1>
         <font face="Montserrat" font color="black"> Want to contact us, feel free to email us!
       </h1>
