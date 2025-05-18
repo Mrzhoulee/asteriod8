@@ -882,24 +882,25 @@ const audio3 = document.getElementById("audio3");
 const audio4 = document.getElementById("audio4");
 const audio5 = document.getElementById("audio5");
 
+          console.log("885")
           
           function play1() {
-            audio1.play();
+            audio5.play();
           }
 
 
           function pause1() {
-            audio1.pause();
+            audio5.pause();
           }
 
                    
           function play2() {
-            audio2.play();
+            audio4.play();
           }
 
 
           function pause2() {
-            audio2.pause();
+            audio4.pause();
           }
 
                   
@@ -909,17 +910,17 @@ const audio5 = document.getElementById("audio5");
 
 
           function pause3() {
-            audio3.pause();
+            audio2.pause();
           }
 
                     
           function play4() {
-            audio4.play();
+            audio1.play();
           }
 
 
           function pause4() {
-            audio4.pause();
+            audio1.pause();
           }
 
                     function play5() {
@@ -930,6 +931,8 @@ const audio5 = document.getElementById("audio5");
           function pause5() {
             audio5.pause();
           }
+
+          console.log("934")
           var toggle = "none"
           document.getElementById("gg").addEventListener('click', () => {
             console.log("jjsjsjsjjsjsjsjsjjsjjsjsjsj", toggle, toggle.includes("none"));
@@ -941,22 +944,16 @@ const audio5 = document.getElementById("audio5");
             toggle = toggle.includes("none") ? "block" : "none"
           })
 
+          
+          console.log("947")
 
           document.getElementById("google-sign-in-mobile").addEventListener('click', () => {
             document.getElementById("google-sign-in").click()
           })
         </script>
         <script type="module">
-
-
-
-
-
-          document.getElementById("openProfileWindow").addEventListener("click", () => {
-            console.log("HELLO")
-
-          })
-
+          console.log("955")
+console.log("960");
           // Import the functions you need from the SDKs you need
           import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
           import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
@@ -967,16 +964,17 @@ const audio5 = document.getElementById("audio5");
 
           // Your web app's Firebase configuration
           // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-          const firebaseConfig = {
-            apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
-            authDomain: "asteroid-cdc13.firebaseapp.com",
-            databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com/",
-            projectId: "asteroid-cdc13",
-            storageBucket: "asteroid-cdc13.appspot.com",
-            messagingSenderId: "793353824502",
-            appId: "1:793353824502:web:3ac24821911d14773ba4d7",
-            measurementId: "G-GV72TMNNGR"
-          };
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+  authDomain: "asteroid-cdc13.firebaseapp.com",
+  databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+  projectId: "asteroid-cdc13",
+  storageBucket: "asteroid-cdc13.appspot.com",
+  messagingSenderId: "793353824502",
+  appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+  measurementId: "G-GV72TMNNGR"
+};
           const app = initializeApp(firebaseConfig);
           const database = getDatabase(app);
           // Initialize Firebase
@@ -996,6 +994,7 @@ const audio5 = document.getElementById("audio5");
                   // The signed-in user info.
                   const user = result.user;
                   console.log(user)
+                  console.log("google-sign-in-clicked")
                   localStorage.setItem("email", user["email"]);
                   localStorage.setItem("CurrentUser", user["email"]);
                   localStorage.setItem("fullName", user["displayName"]);
@@ -1028,6 +1027,7 @@ const audio5 = document.getElementById("audio5");
             //define (tmp) as the key "a" in localStorage as people upload the the song infos 
             let tmp = Object.values(snapshot.val())
             let cde = ""
+            console.log("hahahahah")
             document.getElementById("ab").innerHTML = cde
             tmp.forEach(item => {
               //gets only the values of (tmp) for all items(elements) here:
