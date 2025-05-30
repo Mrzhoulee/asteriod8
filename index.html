@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
@@ -694,7 +695,7 @@
   <div style="position: absolute; top: 0; right: 90px;">
 
 <div style="color: black">
-    <button style="background-color: white;" id="google-sign-in"><span id="gcd" style="font-size: medium;"><font color="black">Continue With
+    <button style="background-color: white;" id="google-sign-in"><span id="gcd" style="font-size: medium; color: black;"><font color="black">Continue With
         <i class="fa-brands fa-google"></i> </font></span></button>
 
 </div>
@@ -1023,6 +1024,11 @@ const firebaseConfig = {
 
 
 
+                            function NextSong(){
+            console.log("aphazera")
+            document.getElementById("gaga_${Object.values(Object.values(item)[0])[0]['Across_Worlds']}").play();
+          }
+
 
             //define (tmp) as the key "a" in localStorage as people upload the the song infos 
             let tmp = Object.values(snapshot.val())
@@ -1040,7 +1046,7 @@ const firebaseConfig = {
           <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
             <div style="background-color: black; color: black; border-radius: 5%;">
         
-            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}">
+            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}" onended="NextSong()">
         <source src="${Object.values(Object.values(item)[0])[0]["fileInp"]}" type="audio/mpeg">
       </audio>
     
@@ -1109,6 +1115,8 @@ heart_plus
             })
 
           })
+
+          
 
 
           var CurrentUser = localStorage.getItem("CurrentUser");
@@ -1380,7 +1388,7 @@ heart_plus
                 <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
             <div style="background-color: black; color: black; border-radius: 5%;">
         
-            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}">
+            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}" onended="NextSong()">
         <source src="${Object.values(Object.values(item)[0])[0]["fileInp"]}" type="audio/mpeg">
       </audio>
     
@@ -1495,6 +1503,9 @@ heart_plus
         document.getElementById("premiumContent").style.display = "block";
       }
     };
+
+    
+
   </script>
 
 
