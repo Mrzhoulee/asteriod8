@@ -1,4 +1,6 @@
 
+
+
 <!DOCTYPE html>
 <html>
 <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
@@ -854,20 +856,34 @@
   </div>
 
 </div>
+        <div class="feedback">
 
+      <h1>
+        <font face="Montserrat" font color="black"> Want to contact us? feel free to email us!</font>
+          <font face="Montserrat" font color="coral"><h2 id="Copied" style="visibility: hidden; background-color: #000;"> Email Copied to Clipboard</h2></font>
+          
+      </h1>
+     <center>
+        <button type="button" id="copyEmail">
+          <font face="Montserrat" color="coral">Copy Email</font>
+        </button>
+      </a>
+</center>
+
+      <h1>
+
+
+    </center>
+  </div>
 <center>
 
-      <!-- TrustBox widget - Review Collector -->
-<div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="6840348657d508c3820044ed" data-style-height="52px" data-style-width="100%">
-  <a href="https://www.trustpilot.com/review/asteroid8.net" target="_blank" rel="noopener">Trustpilot</a>
-</div>
-<!-- End TrustBox widget -->
-           
+
             <a href="https://www.producthunt.com/products/asteroid-2/reviews?utm_source=badge-product_review&utm_medium=badge&utm_souce=badge-asteroid&#0045;2" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1053310&theme=light" alt="Asteroid - Enjoy&#0032;music&#0032;and&#0032;video&#0032;with&#0032;no&#0032;ads&#0044;&#0032;no&#0032;interruptions&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
             <div id="ab"></div>
 </center>
             <div class="fixed bg-black w-screen h-80 block"></div>
         </div>
+
         <div class="lol" style="
           position: fixed;
           background-color: #000;
@@ -896,6 +912,12 @@
         </div>
 
         <script> 
+
+                  document.getElementById('copyEmail').addEventListener('click', ()=>{
+            navigator.clipboard.writeText("asteroidcontactbussiness@gmail.com");
+            document.getElementById('Copied').style.visibility =  "visible";
+          })
+
 	document.addEventListener('DOMContentLoaded', function() {
 		const trustpilot_invitation = {
    			recipientEmail: 'john@gmail.com',
@@ -915,6 +937,9 @@
             tp('register', 'kHOOIyiBHcbxqOu0');
 </script>
         <script>
+
+
+
 const audio1 = document.getElementById("audio1");
 const audio2 = document.getElementById("audio2");
 const audio3 = document.getElementById("audio3");
@@ -1293,30 +1318,16 @@ heart_plus
 
     </h5>
   </font>
-  <div class="feedback">
-
-      <h1>
-        <font face="Montserrat" font color="black"> Want to contact us, feel free to email us!
-      </h1>
-      <a href="mailto:contactasteroidbussiness@gmail.com" style="text-decoration: none;">
-        <button type="button">
-          <font face="Montserrat" color="coral">Conact our call center</font>
-        </button>
-      </a>
-
-
-      <h1>
-
-
-    </center>
-  </div>
+  
   </div>
 
   </div>
   <style>
-    div.feedback {
+  .feedback {
       background-color: coral;
-      width: 100%
+      height: 300px;
+      display: block;
+      padding: 50px;
     }
 
 
