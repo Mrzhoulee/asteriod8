@@ -133,10 +133,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
   <style>
     /* Global styles */
      body,
     html {
+      opacity: 1;
       margin: 0;
       padding: 0;
       font-family: 'Montserrat', sans-serif;
@@ -193,13 +197,15 @@
     }
 
     @media only screen and (max-width:800px) {
-	          .sidenav{
+      .sidenav{
         visibility: hidden;
       }
 
       .sidepo{
         visibility: hidden;
       }
+      
+
       #ab {
         width: 100%;
         position: relative;
@@ -257,7 +263,9 @@
 
     h1,
     h2 {
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Poppins', sans-serif;
+        font-weight: 900;
+        font-style: normal;
       text-align: center;
     }
 
@@ -710,15 +718,182 @@
 <script>navigator.serviceWorker.register("asteriod8-main/service-worker.js")</script>
 
 <body>
+<div id="loader"></div>
+<style>
 
+    /* HTML: <div class="loader"></div> */
+#loader {
+  background-color: #000;
+  width: 60px;
+  display: none;
+  z-index: 2;
+  inset: 0;
+  opacity: 1;
+  aspect-ratio: 2;
+  --_g: no-repeat radial-gradient(circle closest-side,#ffffff 90%,#0000);
+  background: 
+    var(--_g) 0%   50%,
+    var(--_g) 50%  50%,
+    var(--_g) 100% 50%;
+  background-size: calc(100%/3) 50%;
+  animation: l3 0.8s infinite linear;
+}
+@keyframes l3 {
+    20%{background-position:0%   0%, 50%  50%,100%  50%}
+    40%{background-position:0% 100%, 50%   0%,100%  50%}
+    60%{background-position:0%  50%, 50% 100%,100%   0%}
+    80%{background-position:0%  50%, 50%  50%,100% 100%}
+}
+
+
+
+  
+  .poppins-thin {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.poppins-extralight {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.poppins-light {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-medium {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.poppins-semibold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.poppins-bold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.poppins-extrabold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.poppins-black {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.poppins-thin-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.poppins-extralight-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: italic;
+}
+
+.poppins-light-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.poppins-regular-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.poppins-medium-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.poppins-semibold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.poppins-bold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.poppins-extrabold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: italic;
+}
+
+.poppins-black-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: italic;
+}
+
+
+.shitter {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 900;
+  color: white;
+  box-sizing: border-box;
+}
+
+.artist-list {
+  display: flex;
+  gap: 30px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  justify-content: flex-start;
+}
+
+.artist {
+  display: flex;
+  flex-direction: column; /* image above text */
+  align-items: center;
+  text-align: center;
+}
+
+.artist img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+</style>
 <div class="sidenav">
   <a href="#top" class="sidepo">Home</a>
   <a href="pat.html" class="sidepo">My Playlist</a>
   <a href="policy.html" class="sidepo">Report Content <span class="material-symbols-outlined">flag</span></a>
   <a href="Asteroid Terms.html" class="sidepo">Terms and Policies</a>
   <a href="studio.html" class="sidepo"><span class="material-symbols-outlined">add_circle</span> UPLOAD</a>
-  <a href="profile.html" class="sidepo"><span class="material-symbols-outlined">artist</span> PROFILE</a>\
-<a href="1O.html" class="sidepo">Live Concerts</a>
+  <a href="profile.html" class="sidepo"><span class="material-symbols-outlined">artist</span> PROFILE</a>
 </div>
 
 
@@ -761,16 +936,11 @@
         <h3>Profile</h3>
       </font>
     </a>
-	  	<a href="1O.html">
-			<font face="Montserrat">
-				<h3>Live Concerts</h3>
-			</font>
-		</a>
 
 
 
     <button style="background-color: white;" id="google-sign-in-mobile"><span id="gcm"
-        style="font-size: medium; display: block;"><font color="black">Continue With <i class="fa-brands fa-google"></i> </font></span></button>
+        style="font-size: medium; display: block;"><font color="black" face="Montserrat""><b>Continue With</b><i class="fa-brands fa-google"></i> </font></span></button>
 
 
 
@@ -780,46 +950,49 @@
 
 
 
-  <div style="text-align:center;">
+
+
+       
+
+           
+         
+
+
+
+                 <div class="shitter">     
+                   <font color="white"> 
+              <h2>Artists of The Month</h2>
+
+                                    <ul class="artist-list">
+                            
+
+        <img src="https://i.postimg.cc/v8kpXbNZ/v5-5.jpg" width="100" height="100" style="border-radius: 75%;">  
+  <li class="artist">Cmay</li>
+ 
+
+       <img src="https://i.postimg.cc/WbZxHCB6/v5-6.png" width="100" height="100" style="border-radius: 75%;">
+         <li class="artist">Papa Josh</li>
+
+<img src="https://i.postimg.cc/kgdL3w9r/v5-7.png" width="100" height="100" style="border-radius: 75%;">
+  <li class="artist">DJ CHRIS CONCEPTS</li>
+</ul> 
+</font>
+
+    
+            </div>
+             <div style="text-align:center;">
     <div class="content">
+<center>
+  <div style="  font-family: 'Poppins', sans-serif; font-weight: 900; color: white;">
+  <h2>Updated Playlists</h2>
+  </div>
+<img src="https://i.postimg.cc/JhrgtnGP/v10-17.png" style="width: 1000px; height: 500px; border: #fff solid 5px;">
 
-
-      <h1 style="font-size: 20px;" class=".kanit-extrabold-italic">Discover music on Asteroid<br>
-         without ads or any interruptions!</h1>
-
-      <span style="text-align: center;">
-        <center>
-          <font face="Cal sans"><h5 class="glow">
-            Start Listening — No Ads, No Limits.
-          </h5>
-        </font>
-        </center>
-      </span>
-
+</center>
 
       <div class="scrollable-container">
         <div class="tran">
         
-
-       
-
-            <font face="Montserrat" color="coral">
-            
-            </font>
-
-
-<center>
-                        <font face="Montserrat" color="coral">
-              <h2>Artists of The Month</h2>
-
-          <font color="coral">                            <ul>
-  <li>Cmay</li>
-  <li>Papa Josh</li>
-  <li>DJ CHRIS CONCEPTS</li>
-</ul> 
-           
-            </font>
-            </center>
 <div style="
   display: flex;
   flex-wrap: wrap;
@@ -835,7 +1008,6 @@
 
   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
     <h3>Flowers</h3>
-	  <h3>By Cmay</h3>
     <audio id="audio1" src="https://files.catbox.moe/i9blzc.wav" preload="auto"></audio>
     <button onclick="play1()">PLAY</button>
     <button onclick="pause1()">PAUSE</button>
@@ -843,7 +1015,6 @@
 
   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
     <h3>Wolf</h3>
-	    <h3>By Cmay</h3>
     <audio id="audio2" src="https://files.catbox.moe/oxnxve.wav" preload="auto"></audio>
     <button onclick="play2()">PLAY</button>
     <button onclick="pause2()">PAUSE</button>
@@ -851,7 +1022,6 @@
 
   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
     <h3>Full Circle</h3>
-	    <h3>By Cmay</h3>
     <audio id="audio3" src="https://files.catbox.moe/ed7stj.wav" preload="auto"></audio>
     <button onclick="play3()">PLAY</button>
     <button onclick="pause3()">PAUSE</button>
@@ -859,7 +1029,6 @@
 
   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
     <h3>Release me Clean</h3>
-	    <h3>By Papa Josh</h3>
     <audio id="audio4" src="https://files.catbox.moe/03yd2o.mp3" preload="auto"></audio>
     <button onclick="play4()">PLAY</button>
     <button onclick="pause4()">PAUSE</button>
@@ -867,7 +1036,6 @@
 
   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
     <h3>Check me Out</h3>
-	    <h3>By DJ CHRIS CONCEPTS</h3>
     <audio id="audio5" src="https://files.catbox.moe/st2kn8.mp3" preload="auto"></audio>
     <button onclick="play5()">PLAY</button>
     <button onclick="pause5()">PAUSE</button>
@@ -939,10 +1107,10 @@
            
   <a href="https://www.producthunt.com/products/asteroid-2/reviews?utm_source=badge-product_review&utm_medium=badge&utm_souce=badge-asteroid&#0045;2" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1053310&theme=light" alt="Asteroid - Enjoy&#0032;music&#0032;and&#0032;video&#0032;with&#0032;no&#0032;ads&#0044;&#0032;no&#0032;interruptions&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
-
-
+<font color="white" face="Montserrat"">
+<h2>New songs you don't want to miss</h2>
   <div id="ab"></div>
-           
+           </font>
 </center>
             <div class="fixed bg-black w-screen h-80 block"></div>
         </div>
@@ -975,6 +1143,8 @@
         </div>
 
         <script> 
+        
+
 
                   document.getElementById('copyEmail').addEventListener('click', ()=>{
             navigator.clipboard.writeText("asteroidcontactbussiness@gmail.com");
@@ -1191,7 +1361,12 @@ const firebaseConfig = {
     
 
 
-
+<a href="policy.html">
+  
+    <p class="material-symbols-outlined" style="color: coral;">
+    flag
+</p>
+</a>
   <button onclick="save_the_song">
 <p class="material-symbols-outlined">
 heart_plus
@@ -1298,10 +1473,7 @@ heart_plus
   </div>
   </div>
 
-  <center>
-
-  </center>
-  </div>
+ 
   <h3>
     <font face="Montserrat" color="coral">Please rate our platform for our development</font>
   </h3>
@@ -1582,6 +1754,10 @@ heart_plus
         document.getElementById("premiumContent").style.display = "block";
       }
     };
+
+
+
+
   </script>
 </body>
 
