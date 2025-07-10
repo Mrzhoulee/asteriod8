@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
@@ -1190,22 +1191,22 @@ const audio5 = document.getElementById("audio5");
           console.log("885")
           
           function play1() {
-            audio5.play();
+            audio1.play();
           }
 
 
           function pause1() {
-            audio5.pause();
+            audio1.pause();
           }
 
                    
           function play2() {
-            audio4.play();
+            audio2.play();
           }
 
 
           function pause2() {
-            audio4.pause();
+            audio2.pause();
           }
 
                   
@@ -1215,17 +1216,17 @@ const audio5 = document.getElementById("audio5");
 
 
           function pause3() {
-            audio2.pause();
+            audio3.pause();
           }
 
                     
           function play4() {
-            audio1.play();
+            audio4.play();
           }
 
 
           function pause4() {
-            audio1.pause();
+            audio4.pause();
           }
 
                     function play5() {
@@ -1713,21 +1714,8 @@ heart_plus
 
 
     // Timer countdown
-    let timeLeft = 60;
-    const timerElement = document.getElementById('timer');
-    const contactForm = document.getElementById('contactForm');
+ 
 
-    // const countdown = setInterval(() => {
-    //   timeLeft--;
-    //   let minutes = Math.floor(timeLeft / 60);
-    //   let seconds = timeLeft % 60;
-    //   timerElement.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
-    //   if (timeLeft <= 0) {
-    //     clearInterval(countdown);
-    //     contactForm.style.display = 'block';
-    //   }
-    // }, 1000);
 
     // Close the modal
     document.querySelector('.close').addEventListener('click', () => {
