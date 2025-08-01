@@ -716,7 +716,7 @@
 </head>
 
 
-<script>navigator.serviceWorker.register("asteriod8-main/service-worker.js")</script>
+<!-- <script>navigator.serviceWorker.register("asteriod8-main/service-worker.js")</script> -->
 
 <body>
 <div id="loader"></div>
@@ -1251,22 +1251,24 @@ const audio5 = document.getElementById("audio5");
           })
 
           
-          console.log("947")
+          console.log("940")
 
           document.getElementById("google-sign-in-mobile").addEventListener('click', () => {
             document.getElementById("google-sign-in").click()
           })
+          console.log("941")
         </script>
         <script type="module">
           console.log("955")
 console.log("960");
           // Import the functions you need from the SDKs you need
-          import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-          import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
-          import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-          import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-          import { getDatabase, ref as ref2, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
-	  import { getPerformance } from "firebase/performance";
+     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
+  import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+  import { getDatabase, ref as ref2, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+  import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
+
           // https://firebase.google.com/docs/web/setup#available-libraries
 
           // Your web app's Firebase configuration
@@ -1330,18 +1332,34 @@ const firebaseConfig = {
 
 
 
-                            function NextSong(){
-            console.log("aphazera")
-            document.getElementById("gaga_${Object.values(Object.values(item)[0])[0]['Across_Worlds']}").play();
-          }
-
 
             //define (tmp) as the key "a" in localStorage as people upload the the song infos 
             let tmp = Object.values(snapshot.val())
             let cde = ""
             console.log("hahahahah")
-            document.getElementById("ab").innerHTML = cde
             tmp.forEach(item => {
+              
+                      window.handleKKK = function (){
+  console.log('shqhqwqwbuqwubuqwb');   
+  var shuffleList = Object.values(snapshot.val());
+  console.log("shuffle list:", shuffleList);
+  let shuffleLength = shuffleList.length;
+  console.log("shuffle length:", shuffleLength);
+  let ns = Math.floor(Math.random() * shuffleLength) + 1;
+  console.log("nsssss:", ns);
+   let nsn = Object.values(snapshot.val())[ns];
+   console.log(nsn);
+   const url = Object.values(Object.values(nsn)[0])[0]['fileInp'];
+   console.log(url)
+   const audio = new Audio(url);
+   audio.play();
+
+   audio.onended = function (){
+    handleKKK();
+   }
+}
+
+
               //gets only the values of (tmp) for all items(elements) here:
               cde += `
                 <div id="songer" class="ssda">
@@ -1352,7 +1370,7 @@ const firebaseConfig = {
           <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
             <div style="background-color: black; color: black; border-radius: 5%;">
         
-            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}" onended="NextSong()">
+            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}" onended="handleKKK()">
         <source src="${Object.values(Object.values(item)[0])[0]["fileInp"]}" type="audio/mpeg">
       </audio>
     
@@ -1626,29 +1644,7 @@ heart_plus
   </div>
 
   <script>
-    //continue save_song
-    function save_the_song() {
-      const savior = saved_songs.createElement("div");
-      var songer = document.getElementById("songer")
-      savior.innerHTML += `
-      
-                <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
-            <div style="background-color: black; color: black; border-radius: 5%;">
-        
-            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}" onended="NextSong()">
-        <source src="${Object.values(Object.values(item)[0])[0]["fileInp"]}" type="audio/mpeg">
-      </audio>
-    
-      <div class="haha"> 
-        <p id="save_${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}"></p>
-    <p class="fa fa-play-circle" style="color: coral;" onclick="(()=>{
-      console.log('ABABABA')
-        document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]['title']}').play()
-    })()" id="play_${Object.values(Object.values(item)[0])[0]['title']}"></p>
-    
-      
-      `
-    }
+
     // Replace these variables with your actual song details
     function Dark() {
       document.body.style.backgroundColor = "Black";
@@ -1665,13 +1661,13 @@ heart_plus
     var audio = document.getElementById("audioPlayer");
     var songTitleElement = document.getElementById("songTitle");
     var artistNameElement = document.getElementById("artistName");
-    var songImgElement = document.getElementById("songImg");
+    //var songImgElement = document.getElementById("songImg");
 
     // Set initial song details
     songTitleElement.textContent = songTitle;
     artistNameElement.textContent = artistName;
-    songImgElement.src = songImgSrc;
-    audio.src = songUrl;
+    //songImgElement.src = songImgSrc;
+    //audio.src = songUrl;
 
     // Function to play or pause the audio
     function playPause() {
@@ -1706,7 +1702,7 @@ heart_plus
         resultsContainer.innerText = 'No matching results found.';
       }
     }
-    const items = [title];
+    //const items = [title];
 
 
   </script>
@@ -1718,9 +1714,9 @@ heart_plus
 
 
     // Close the modal
-    document.querySelector('.close').addEventListener('click', () => {
-      contactForm.style.display = 'none';
-    });
+    // document.querySelector('.close').addEventListener('click', () => {
+    //   contactForm.style.display = 'none';
+    // });
 
     // Close the modal when clicking outside of it
     window.onclick = function (event) {
