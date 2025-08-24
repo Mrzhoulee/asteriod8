@@ -210,7 +210,11 @@ label {
     const storage = getStorage(app);
     const database = getDatabase(app);
     let users = localStorage.getItem("users");
-
+          let email = localStorage.getItem("email");
+    let safeEmail = email.replace(/[.#$[\]]/g, "_");
+    if(email == "" || email == null){
+      window.location.href = "index.html";
+    }
 
 
     
@@ -329,5 +333,6 @@ if (CurrentUser == null) {
 
   </script>
 </body>
+
 
 </html>
