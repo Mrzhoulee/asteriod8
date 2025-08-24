@@ -245,6 +245,9 @@ label {
 
     // localStorage.setItem('a', JSON.stringify({
 
+       if(!email){
+      window.location.href = "index.html";
+    }
     onValue(ref2(database, "SONGS/"), (snapshot) => {
       console.log(snapshot.val())
     })
@@ -336,3 +339,4 @@ if (CurrentUser == null) {
 
 
 </html>
+
