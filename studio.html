@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;500;600;700;800;900&display=swap"
@@ -12,16 +13,21 @@
   <style>
     body {
       background-color: antiquewhite;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
       font-family: "Montserrat", sans-serif;
       margin: 0;
       height: 100vh;
       overflow: hidden;
     }
+
+ input {
+  display: inline-block;
+  vertical-align: 50px /* Optional: aligns elements vertically */
+}
+
+label {
+  margin-right: 5px; /* Optional: adds spacing between label and input */
+}
+
 
     .upload-btn {
       width: 90px;
@@ -52,6 +58,15 @@
       width: 0;
     }
 
+
+.inline-container h3,
+  .inline-container input {
+    display: inline-block;
+    vertical-align: middle; /* Align elements vertically */
+    margin-right: 10px; /* Add some space between them */
+  }
+
+
     .alert {
       opacity: 0;
       background-color: coral;
@@ -65,7 +80,15 @@
       border-radius: 10%;
       text-align: center;
     }
-
+    
+    .ht5 {
+      background-color: lightcoral;
+      width: 800px;
+      height: 100px;
+      visibility: hidden;
+      border-radius: 10%;
+      text-align: center;
+    }
     canvas {
       position: fixed;
       top: 0;
@@ -79,36 +102,62 @@
 </head>
 
 <body>
+    <div style="position: absolute; top: 0; right: 90px;">
+
+<div style="color: black">
+    <button style="background-color: white;" id="google-sign-in"><span id="gcd" style="font-size: medium; color: black;"><font color="black">Continue With
+        <i class="fa-brands fa-google"></i> </font></span></button>
+
+</div>
+
+  </div>
+<center>
   <h1>Asteroid Teams Studio</h1>
   <h2>Upload Media</h2>
+
   <form id="uploadForm" class="formUpload">
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
     <input type="file" class="inputFile" id="fileInp" accept="video/mp4, audio/mpeg" required multiple />
     <input type="text" id="album" placeholder="Enter your custom Album" required>
     <input type="text" id="artist" placeholder="Enter the Song Artist" class="text" required>
-    <br>
-    <input type="radio" id="Public" name="Public" value="Public" checked>
-    <label for="Public">Public</label><br>
+    <center>
     <button id="btn" class="upload-btn" type="button"><b>Upload</b></button>
-    <aside>
-      <button id="Boostpost" class="upload-btn" type="button"><b>BOOST POST</b></button>
-    </aside>
+    <button id="Boostpost" class="upload-btn" type="button"><b>BOOST POST</b></button>
+    </center>
+<div class="inline-container">
+  <input type="checkbox" id="agreement" required>
+  <label for="agreement">
+    I confirm that I am the rightful owner of <span id="titlelol"></span>, 
+    or have full legal rights to upload it. 
+    If I do not, I accept all liability and Asteroid may remove this content 
+    and suspend my account.
+  </label>
+</div>
+
+  </center>
   </form>
 
+<center>
   <div class="alertBox" id="alertBox">
     <h1><b>Your Song is being uploaded, Please wait...</b></h1>
-    <img src="file:///C:/Users/HP/Downloads/MicrosoftWindows.Client.CBS_cw5n1h2txyewy!InputApp/DiscordTypingGIF.gif" alt="Description of GIF" />
+   
+  </div>
+  <div class="alertBox" id="alt1">
+    <h1><b>Please fill out the  song information</b></h1>
   </div>
 
   <div class="alertBox" id="ooaa">
     <h1><b>Your Song is Successfully uploaded!</b></h1>
   </div>
 
+    <div class="ht5" id="alt2">
+    <h1><b>If your song is a single then enter "Singles" in the album form instead of leaving it blank. </b></h1>
+  </div>
   <div class="bar">
     <div class="progress"></div>
   </div>
-
+</center>
   <canvas id="can"></canvas>
 
 
@@ -137,6 +186,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
     import { getDatabase, ref as ref2, update, onValue, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
     import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
     // TODO: Add SDKs for Firebase products that you want to use
     // https://firebase.google.com/docs/web/setup#available-libraries
@@ -161,6 +211,9 @@
     const database = getDatabase(app);
     let users = localStorage.getItem("users");
 
+
+
+    
 
     let gaga = {}
     const canvas = document.getElementById('can');
@@ -193,10 +246,31 @@
     })
     //   }))
     btn.addEventListener('click', async () => {
+      let agreement = document.getElementById("agreement");
+          let email = localStorage.getItem("email");
+    let safeEmail = email.replace(/[.#$[\]]/g, "_");
+      if(agreement.checked){
+        firebase.database().ref("agreements/" + safeEmail).set({
+  email: email,
+  agreement: true,
+  songTitle: document.getElementById("titlelol").textContent,
+  timestamp: Date.now()
+});
+      }
       const fileInp = document.getElementById("fileInp").files;
       const album = document.getElementById("album").value;
       const title = document.getElementById("title").value;
       const artist = document.getElementById("artist").value;
+    
+            if(album=="" && title != "" && artist != "" && fileInp != "") {
+          document.getElementById("alt2").style.visibility = "visible";
+        } 
+      if (title == "" || album == "" && artists == "" && fileInp == ""){
+        document.getElementById("alt1").style.visibility = "visible";
+
+      }else{
+      document.getElementById("titlelol").innerText = title;
+
       console.log("hello");
       // Show alert on button click
       document.getElementById("alertBox").style.visibility = "visible";
@@ -239,7 +313,7 @@
       }
 
      
-    
+      }
     });
 
 
