@@ -210,11 +210,7 @@ label {
     const storage = getStorage(app);
     const database = getDatabase(app);
     let users = localStorage.getItem("users");
-          let email = localStorage.getItem("email");
-    let safeEmail = email.replace(/[.#$[\]]/g, "_");
-    if(email == "" || email == null){
-      window.location.href = "index.html";
-    }
+    let email = localStorage.getItem("email");
 
 
     
@@ -245,9 +241,11 @@ label {
 
     // localStorage.setItem('a', JSON.stringify({
 
-       if(!email){
+        if(!email){
+          alert('User is not Signed in');
       window.location.href = "index.html";
     }
+
     onValue(ref2(database, "SONGS/"), (snapshot) => {
       console.log(snapshot.val())
     })
@@ -325,14 +323,6 @@ label {
 
 
 
-    var currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
-
-if (CurrentUser == null) {
-    alert("User is not signed in.");
-    window.location.href = "index.html";
-} else {
-
-}
 
   </script>
 </body>
