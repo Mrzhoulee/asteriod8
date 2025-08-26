@@ -126,7 +126,7 @@ label {
     <button id="Boostpost" class="upload-btn" type="button"><b>BOOST POST</b></button>
     </center>
 <div class="inline-container">
-  <input type="checkbox" id="agreement" required>
+  <input type="checkbox" id="agreement">
   <label for="agreement">
     I confirm that I am the rightful owner of <span id="titlelol"></span>, 
     or have full legal rights to upload it. 
@@ -270,7 +270,7 @@ label {
             if(album=="" && title != "" && artist != "" && fileInp != "") {
           document.getElementById("alt2").style.visibility = "visible";
         } 
-      if (title == "" || album == "" && artists == "" && fileInp == ""){
+      if (title == "" || album == "" && artist == "" && fileInp == ""){
         document.getElementById("alt1").style.visibility = "visible";
 
       }else{
