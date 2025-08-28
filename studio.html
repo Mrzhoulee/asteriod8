@@ -185,7 +185,7 @@ label {
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-    import { getDatabase, ref as ref2, update, onValue, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getDatabase, ref as ref2, set, update, onValue, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
     import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
     // TODO: Add SDKs for Firebase products that you want to use
@@ -251,22 +251,26 @@ label {
     })
     //   }))
     btn.addEventListener('click', async () => {
-      let agreement = document.getElementById("agreement");
-          let email = localStorage.getItem("email");
-    let safeEmail = email.replace(/[.#$[\]]/g, "_");
-      if(agreement.checked){
-        firebase.database().ref("agreements/" + safeEmail).set({
-  email: email,
-  agreement: true,
-  songTitle: document.getElementById("titlelol").textContent,
-  timestamp: Date.now()
-});
-      }
       const fileInp = document.getElementById("fileInp").files;
       const album = document.getElementById("album").value;
       const title = document.getElementById("title").value;
       const artist = document.getElementById("artist").value;
     
+            let agreement = document.getElementById("agreement");
+          let email = localStorage.getItem("email");
+    let safeEmail = email.replace(/[.#$[\]]/g, "_");
+      if(agreement.checked){
+   
+        
+ set(ref2(database, 'agreements/' + safeEmail), {
+  email: email,
+  agreement: true,
+  songtitle: title,
+  timestamp: Date.now()
+});
+
+
+      }
             if(album=="" && title != "" && artist != "" && fileInp != "") {
           document.getElementById("alt2").style.visibility = "visible";
         } 
@@ -312,7 +316,7 @@ label {
           artist: artist
         }
         console.log(gaga);
-        update(ref2(database, "SONGS"), gaga);
+        update(ref2(database, "SONGS"), gaga); 
         i++;
         console.log("cccccc");
       }
