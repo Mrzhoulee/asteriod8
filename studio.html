@@ -150,6 +150,9 @@ label {
   <div class="alertBox" id="ooaa">
     <h1><b>Your Song is Successfully uploaded!</b></h1>
   </div>
+    <div class="alertBox" id="alt5">
+    <h1><b>The agreement checkbox is required.</b></h1>
+  </div>
 
     <div class="ht5" id="alt2">
     <h1><b>If your song is a single then enter "Singles" in the album form instead of leaving it blank. </b></h1>
@@ -255,10 +258,31 @@ label {
       const album = document.getElementById("album").value;
       const title = document.getElementById("title").value;
       const artist = document.getElementById("artist").value;
-    
             let agreement = document.getElementById("agreement");
           let email = localStorage.getItem("email");
     let safeEmail = email.replace(/[.#$[\]]/g, "_");
+// Case 1: all fields filled but agreement not ticked
+if (!agreement.checked) {
+  btn.disabled = true;
+  document.getElementById("alt5").style.visibility = "visible";
+} else {
+  btn.disabled = false;
+}
+
+// Check missing fields
+if (!album || !title || !artist || fileInp.length === 0) {
+  document.getElementById("alt1").style.visibility = "visible";
+}
+
+// Check only album missing (example alt2 logic)
+if (!album && title && artist && fileInp.length > 0) {
+  document.getElementById("alt2").style.visibility = "visible";
+}
+
+// If everything is filled and agreement checked, proceed to upload
+if (album && title && artist && fileInp.length > 0 && agreement.checked) {
+  document.getElementById("titlelol").innerText = title;
+
       if(agreement.checked){
    
         
@@ -271,14 +295,10 @@ label {
 
 
       }
-            if(album=="" && title != "" && artist != "" && fileInp != "") {
-          document.getElementById("alt2").style.visibility = "visible";
-        } 
-      if (title == "" || album == "" && artist == "" && fileInp == ""){
-        document.getElementById("alt1").style.visibility = "visible";
 
-      }else{
-      document.getElementById("titlelol").innerText = title;
+      // ✅ If we got here → everything is valid
+document.getElementById("btn").disabled = false;
+document.getElementById("titlelol").innerText = title;
 
       console.log("hello");
       // Show alert on button click
