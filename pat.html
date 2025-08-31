@@ -157,12 +157,6 @@
         function loadPlaylist() {
             var currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
 
-if (currentUser === null) {
-    alert("User is not signed in.");
-    window.location.href = "index.html";
-} else {
-     // Assuming 'currentUser' is an object with properties 'name' and 'email'
-}
             let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
             let playlist = userPlaylists[currentUser] || [];
 
