@@ -1027,7 +1027,7 @@
   <div style="  font-family: 'Poppins', sans-serif; font-weight: 900; color: white;">
   <h2>Updated Playlists</h2>
   </div>
-<img src="https://i.postimg.cc/JhrgtnGP/v10-17.png" style="border: #fff solid 5px;">
+<img onclick="publiclist" src="https://i.postimg.cc/JhrgtnGP/v10-17.png" style="border: #fff solid 5px;">
 </div>
 </center>
 
@@ -1154,6 +1154,13 @@
   <a href="https://www.producthunt.com/products/asteroid-2/reviews?utm_source=badge-product_review&utm_medium=badge&utm_souce=badge-asteroid&#0045;2" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1053310&theme=light" alt="Asteroid - Enjoy&#0032;music&#0032;and&#0032;video&#0032;with&#0032;no&#0032;ads&#0044;&#0032;no&#0032;interruptions&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
 <font color="white" face="Montserrat"">
+  <input 
+  type="text" 
+  id="searchInput" 
+  placeholder="Search songs..." 
+  style="width: 80%; padding: 10px; margin: 20px; font-size: 16px;"
+>
+
 <h2 id="ghgh">New songs you don't want to miss</h2>
   <div id="ab"></div>
            </font>
@@ -1164,7 +1171,6 @@
         <div class="lol" style="
           position: fixed;
           background-color: #000;
-		  color: coral;
           width: 100%;
           height: 100px;
           display: block;
@@ -1219,7 +1225,9 @@
         <script>
 
 
-
+document.getElementById("playlists").addEventListener('click', ()=>{
+  window.location.href = "hiphop.html";
+})
 const audio1 = document.getElementById("audio1");
 const audio2 = document.getElementById("audio2");
 const audio3 = document.getElementById("audio3");
@@ -1400,6 +1408,7 @@ const firebaseConfig = {
 
               //gets only the values of (tmp) for all items(elements) here:
               cde += `
+              <div class="sssh" data-title="${Object.values(Object.values(item)[0])[0]['title'].toLowerCase()}">
                 <div id="songer" class="ssda">
                 <div style="margin: 0; padding: 0;">
     
@@ -1449,6 +1458,7 @@ heart_plus
       </div>
       </div>
           </div>
+        </div>
         </div>
         </div>
       `
@@ -1668,30 +1678,7 @@ heart_plus
         audio.pause();
       }
     }
-    function performSearch() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      const resultsContainer = document.getElementById('ab');
-
-      // Clear previous results
-      resultsContainer.innerHTML = '';
-
-      // Loop through the items and manually check if each one contains the search term
-      let resultsFound = false;
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].toLowerCase().includes(searchTerm)) {
-          const resultDiv = document.createElement('div');
-          resultDiv.classList.add('result-item');
-          resultDiv.textContent = items[i];
-          resultsContainer.appendChild(resultDiv);
-          resultsFound = true;
-        }
-      }
-
-      // If no results are found, display a message
-      if (!resultsFound) {
-        resultsContainer.innerText = 'No matching results found.';
-      }
-    }
+  
     //const items = [title];
 
 
@@ -1737,9 +1724,28 @@ heart_plus
 
 
 
+              document.getElementById("searchInput").addEventListener('input', (e)=>{
+            const query = e.target.value.toLowerCase();
+            const songgh = document.querySelectorAll('#ab .sssh')
+
+            songgh.forEach(song =>{
+              const title = song.getAttribute("data-title");
+              const queryWords = query.split(/\s+/); // split into words
+
+              function checkti(word){
+                return title.includes(word);
+              }
+              const matches = queryWords.every(checkti);
+
+              if(matches){
+                song.style.display = "block";
+              } else {
+                song.style.display = "none";
+              }
+            })
+          })
   </script>
 </body>
 
 </html>
-
 
