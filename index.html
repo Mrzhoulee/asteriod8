@@ -193,7 +193,7 @@
       }
     }
 
-    @media only screen and (max-width:1200px) {
+    @media only screen and (max-width:1366px) {
       .sidenav{
         visibility: hidden;
       }
@@ -921,7 +921,6 @@
   <a href="policy.html" class="sidepo">Report Content <span class="material-symbols-outlined">flag</span></a>
   <a href="Asteroid Terms.html" class="sidepo">Terms and Policies</a>
   <a href="studio.html" class="sidepo"><span class="material-symbols-outlined">add_circle</span> UPLOAD</a>
-  <a href="profile.html" class="sidepo"><span class="material-symbols-outlined">artist</span> PROFILE</a>
 	<a href="1O.html">Live Concerts</a>
 </div>
 
@@ -962,11 +961,7 @@
         <h3>Playlist</h3>
       </font>
     </a>
-    <a href="profile.html">
-      <font face="Montserrat">
-        <h3>Profile</h3>
-      </font>
-    </a>
+
 
 	      <a href="1O.html">
       <font face="Montserrat">
@@ -1088,43 +1083,92 @@
   </div>
 
 </div>
+<style>
+  .category {
+    text-align: center;
+    display: relative;
+    margin: 10px;
+  }
+
+  .category img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5%;
+    display: block;
+    margin: auto;
+  }
+
+  .category p {
+    margin-top: 8px;
+    color: coral;
+    font-family: Montserrat, sans-serif;
+    font-size: 14px;
+  }
+</style>
+
 <center>
-  <h1><b><font face="Montserrat" color="white">Discover</font></b></h1>
-<div style="border-radius: 5%; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%; max-width: 960px; margin: auto; padding: 5px; box-sizing: border-box; flex: left;">
+  <h1><b class="smt"><font face="Montserrat" color="white">Discover</font></b></h1>
 
-  <button onclick="window.location.href = 'sad.html'" style="border:none; padding:0; background:none; cursor:pointer; width:150px; height:150px; overflow:hidden; border-radius:5%;">
-    <img src="https://i.postimg.cc/NMHJZdy9/333a233d39bf8f564108f8d4826b384b.jpg" alt="Pop" 
-         style="width:150px; height:150px; object-fit: cover; border-radius:5%; display:block;">
+  <div style="border-radius: 5%; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; width: 100%; max-width: 960px; margin: auto; padding: 10px; box-sizing: border-box;">
 
-  </button>
-         <b><font face="Montserrat" color="coral">Sad vibes</font></b>
-  <button onclick="window.location.href = 'chill.html'" style="border:none; padding:0; background:none; cursor:pointer; width:150px; height:150px; overflow:hidden; border-radius:5%;">
-    <img src="https://i.postimg.cc/BbfY32Dh/images-9.jpg" alt="Rock" 
-         style="width:150px; height:150px; object-fit: cover; border-radius:5%; display:block;">
-  </button>
-           <b><font face="Montserrat" color="coral">Chill Mood</font></b>
-  <button onclick="window.location.href = 'workout.html'" style="border:none; padding:0; background:none; cursor:pointer; width:150px; height:150px; overflow:hidden; border-radius:5%;">
-    <img src="https://i.postimg.cc/RCwpRb52/istock-478624695.avif" alt="Classical" 
-         style="width:150px; height:150px; object-fit: cover; border-radius:5%; display:block;">
-                  <b><font face="Montserrat" color="coral">Sad Vibes</font></b>
-  </button>
-         <b><font face="Montserrat" color="coral">WORKOUT MODE</font></b>
-  <button onclick="window.location.href = 'hiphop.html'" style="border:none; padding:0; background:none; cursor:pointer; width:150px; height:150px; overflow:hidden; border-radius:5%;">
-    <img src="https://i.postimg.cc/bvdF9ypR/rap-and-hip-hop-wall-art.jpg" alt="Hip-Hop" 
-         style="width:150px; height:150px; object-fit: cover; border-radius:5%; display:block;">
-  </button>
-         <b><font face="Montserrat" color="coral">Hip-Hop Style</font></b>
-  <button onclick="window.location.href = 'soul.html'" style="border:none; padding:0; background:none; cursor:pointer; width:150px; height:150px; overflow:hidden; border-radius:5%;">
-    <img src="https://i.postimg.cc/vmj2PJmw/soul-vs-rnb-main-jpg.webp" alt="Soul RnB" 
-         style="width:150px; height:150px; object-fit: cover; border-radius:5%; display:block;">
-  </button>
-         <b><font face="Montserrat" color="coral">Soul Mood</font></b>
-  <button onclick="window.location.href = 'edm.html'" style="border:none; padding:0; background:none; cursor:pointer; width:150px; height:150px; overflow:hidden; border-radius:5%;">
-    <img src="https://i.postimg.cc/3NjLxWF3/tutorial-create-edm-free-header-1400x1050.jpg" alt="EDM" 
-         style="width:150px; height:150px; object-fit: cover; border-radius:5%; display:block;">
-  </button>
-         <b><font face="Montserrat" color="coral">DANCE MUSIC</font></b>
-</div>
+    <!-- Sad Vibes -->
+    <div class="category">
+      <button onclick="window.location.href = 'sad.html'" style="border:none; padding:0; background:none; cursor:pointer;">
+        <img src="https://i.postimg.cc/NMHJZdy9/333a233d39bf8f564108f8d4826b384b.jpg" alt="Sad Vibes"
+             style="width:100px; height:100px; object-fit: cover; border-radius:5%; display:block; margin:auto;">
+      </button>
+      <p class="smt" style="color:coral; font-family:Montserrat; margin-top:8px;">Sad Vibes</p>
+    </div>
+
+    <!-- Chill Mood -->
+    <div class="category">
+      <button onclick="window.location.href = 'chill.html'" style="border:none; padding:0; background:none; cursor:pointer;">
+        <img src="https://i.postimg.cc/BbfY32Dh/images-9.jpg" alt="Chill Mood"
+             style="width:100px; height:100px; object-fit: cover; border-radius:5%; display:block; margin:auto;">
+      </button>
+      <p class="smt" style="color:coral; font-family:Montserrat; margin-top:8px;">Chill Mood</p>
+    </div>
+
+    <!-- Workout Mode -->
+    <div class="category">
+      <button onclick="window.location.href = 'workout.html'" style="border:none; padding:0; background:none; cursor:pointer;">
+        <img src="https://i.postimg.cc/RCwpRb52/istock-478624695.avif" alt="Workout Mode"
+             style="width:100px; height:100px; object-fit: cover; border-radius:5%; display:block; margin:auto;">
+      </button>
+      <p class="smt" style="color:coral; font-family:Montserrat; margin-top:8px;">Workout Mode</p>
+    </div>
+
+    <!-- Hip-Hop Style -->
+    <div class="category">
+      <button onclick="window.location.href = 'hiphop.html'" style="border:none; padding:0; background:none; cursor:pointer;">
+        <img src="https://i.postimg.cc/bvdF9ypR/rap-and-hip-hop-wall-art.jpg" alt="Hip-Hop Style"
+             style="width:100px; height:100px; object-fit: cover; border-radius:5%; display:block; margin:auto;">
+      </button>
+      <p class="smt" style="color:coral; font-family:Montserrat; margin-top:8px;">Hip-Hop Style</p>
+    </div>
+
+    <!-- Soul Mood -->
+    <div class="category">
+      <button onclick="window.location.href = 'soul.html'" style="border:none; padding:0; background:none; cursor:pointer;">
+        <img src="https://i.postimg.cc/vmj2PJmw/soul-vs-rnb-main-jpg.webp" alt="Soul Mood"
+             style="width:100px; height:100px; object-fit: cover; border-radius:5%; display:block; margin:auto;">
+      </button>
+      <p class="smt" style="color:coral; font-family:Montserrat; margin-top:8px;">Soul Mood</p>
+    </div>
+
+    <!-- Dance Music -->
+    <div class="category">
+      <button onclick="window.location.href = 'edm.html'" style="border:none; padding:0; background:none; cursor:pointer;">
+        <img src="https://i.postimg.cc/3NjLxWF3/tutorial-create-edm-free-header-1400x1050.jpg" alt="Dance Music"
+             style="width:100px; height:100px; object-fit: cover; border-radius:5%; display:block; margin:auto;">
+      </button>
+      <p class="smt" style="color:coral; font-family:Montserrat; margin-top:8px;">Dance Music</p>
+    </div>
+
+  </div>
+</center>
+
 </center>
 
         <div class="feedback">
@@ -1338,45 +1382,41 @@ const firebaseConfig = {
 
             const auth = getAuth(app);
             const provider = new GoogleAuthProvider();
+       // Detect mobile
+if (/Mobi|Android/i.test(navigator.userAgent)) {
+  // Handle redirect result for mobile
+  getRedirectResult(auth)
+    .then((result) => {
+      if (result) {
+        const user = result.user;
+        localStorage.setItem("email", user.email);
+        localStorage.setItem("fullName", user.displayName);
+        localStorage.setItem("pfp", user.photoURL);
+        document.getElementById("gcm").innerHTML = user.displayName;
+        document.getElementById("gcd").innerHTML = user.displayName;
+      }
+    })
+    .catch((error) => console.log(error));
 
-            document.getElementById("google-sign-in").addEventListener("click", (e) => {
-              console.log("gcm_ready");
-              signInWithPopup(auth, provider)
-                .then((result) => {
-                  // This gives you a Google Access Token. You can use it to access the Google API.
-                  const credential = GoogleAuthProvider.credentialFromResult(result);
-                  const token = credential.accessToken;
-                  // The signed-in user info.
-                  const user = result.user;
-                  console.log(user)
-                  console.log("google-sign-in-clicked")
-                  localStorage.setItem("email", user["email"]);
-                  localStorage.setItem("CurrentUser", user["email"]);
-                  localStorage.setItem("fullName", user["displayName"]);
-                  localStorage.setItem("pfp", user.imageUrl);
-                  localStorage.setItem("pfp", user.photoURL); // 
-                  var fullName = user.displayName;
-                  document.getElementById("gcm").innerHTML = fullName;
-                  document.getElementById("gcd").innerHTML = fullName;
-                  console.log("Photo URL:", user.photoURL);
-
-
-
-                  // IdP data available using getAdditionalUserInfo(result)
-                  // ...
-                }).catch((error) => {
-                  // Handle Errors here.
-                  const errorCode = error.code;
-                  const errorMessage = error.message;
-                  // The email of the user's account used.
-                  const email = error.customData.email;
-                  // The AuthCredential type that was used.
-                  const credential = GoogleAuthProvider.credentialFromError(error);
-                  // ...
-                });
-            })
-
-
+  // Mobile click: redirect
+  document.getElementById("google-sign-in").addEventListener("click", () => {
+    signInWithRedirect(auth, provider);
+  });
+} else {
+  // Desktop click: popup
+  document.getElementById("google-sign-in").addEventListener("click", () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        localStorage.setItem("email", user.email);
+        localStorage.setItem("fullName", user.displayName);
+        localStorage.setItem("pfp", user.photoURL);
+        document.getElementById("gcm").innerHTML = user.displayName;
+        document.getElementById("gcd").innerHTML = user.displayName;
+      })
+      .catch((error) => console.log(error));
+  });
+}
 
 
             //define (tmp) as the key "a" in localStorage as people upload the the song infos 
@@ -1619,6 +1659,10 @@ heart_plus
       color: black;
       font-family: "Montserrat", sans-serif;
     }
+
+    .smt{
+      font-size: medium;
+    }
   </style>
 
 
@@ -1748,5 +1792,4 @@ heart_plus
 </body>
 
 </html>
-
 
