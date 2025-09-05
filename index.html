@@ -193,7 +193,7 @@
       }
     }
 
-    @media only screen and (max-width:1366px) {
+    @media only screen and (max-width:1200px) {
       .sidenav{
         visibility: hidden;
       }
@@ -921,6 +921,7 @@
   <a href="policy.html" class="sidepo">Report Content <span class="material-symbols-outlined">flag</span></a>
   <a href="Asteroid Terms.html" class="sidepo">Terms and Policies</a>
   <a href="studio.html" class="sidepo"><span class="material-symbols-outlined">add_circle</span> UPLOAD</a>
+  <a href="profile.html" class="sidepo"><span class="material-symbols-outlined">artist</span> PROFILE</a>
 	<a href="1O.html">Live Concerts</a>
 </div>
 
@@ -961,7 +962,11 @@
         <h3>Playlist</h3>
       </font>
     </a>
-
+    <a href="profile.html">
+      <font face="Montserrat">
+        <h3>Profile</h3>
+      </font>
+    </a>
 
 	      <a href="1O.html">
       <font face="Montserrat">
@@ -1170,7 +1175,6 @@
 </center>
 
 </center>
-
         <div class="feedback">
 
       <h1>
@@ -1382,41 +1386,45 @@ const firebaseConfig = {
 
             const auth = getAuth(app);
             const provider = new GoogleAuthProvider();
-       // Detect mobile
-if (/Mobi|Android/i.test(navigator.userAgent)) {
-  // Handle redirect result for mobile
-  getRedirectResult(auth)
-    .then((result) => {
-      if (result) {
-        const user = result.user;
-        localStorage.setItem("email", user.email);
-        localStorage.setItem("fullName", user.displayName);
-        localStorage.setItem("pfp", user.photoURL);
-        document.getElementById("gcm").innerHTML = user.displayName;
-        document.getElementById("gcd").innerHTML = user.displayName;
-      }
-    })
-    .catch((error) => console.log(error));
 
-  // Mobile click: redirect
-  document.getElementById("google-sign-in").addEventListener("click", () => {
-    signInWithRedirect(auth, provider);
-  });
-} else {
-  // Desktop click: popup
-  document.getElementById("google-sign-in").addEventListener("click", () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        localStorage.setItem("email", user.email);
-        localStorage.setItem("fullName", user.displayName);
-        localStorage.setItem("pfp", user.photoURL);
-        document.getElementById("gcm").innerHTML = user.displayName;
-        document.getElementById("gcd").innerHTML = user.displayName;
-      })
-      .catch((error) => console.log(error));
-  });
-}
+            document.getElementById("google-sign-in").addEventListener("click", (e) => {
+              console.log("gcm_ready");
+              signInWithPopup(auth, provider)
+                .then((result) => {
+                  // This gives you a Google Access Token. You can use it to access the Google API.
+                  const credential = GoogleAuthProvider.credentialFromResult(result);
+                  const token = credential.accessToken;
+                  // The signed-in user info.
+                  const user = result.user;
+                  console.log(user)
+                  console.log("google-sign-in-clicked")
+                  localStorage.setItem("email", user["email"]);
+                  localStorage.setItem("CurrentUser", user["email"]);
+                  localStorage.setItem("fullName", user["displayName"]);
+                  localStorage.setItem("pfp", user.imageUrl);
+                  localStorage.setItem("pfp", user.photoURL); // 
+                  var fullName = user.displayName;
+                  document.getElementById("gcm").innerHTML = fullName;
+                  document.getElementById("gcd").innerHTML = fullName;
+                  console.log("Photo URL:", user.photoURL);
+
+
+
+                  // IdP data available using getAdditionalUserInfo(result)
+                  // ...
+                }).catch((error) => {
+                  // Handle Errors here.
+                  const errorCode = error.code;
+                  const errorMessage = error.message;
+                  // The email of the user's account used.
+                  const email = error.customData.email;
+                  // The AuthCredential type that was used.
+                  const credential = GoogleAuthProvider.credentialFromError(error);
+                  // ...
+                });
+            })
+
+
 
 
             //define (tmp) as the key "a" in localStorage as people upload the the song infos 
@@ -1658,10 +1666,6 @@ heart_plus
       background-color: coral;
       color: black;
       font-family: "Montserrat", sans-serif;
-    }
-
-    .smt{
-      font-size: medium;
     }
   </style>
 
