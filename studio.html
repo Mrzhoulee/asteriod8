@@ -83,7 +83,7 @@ label {
 
 
     .google-sign-in{
-
+      display: block;
     }
     .ht5 {
       background-color: lightcoral;
@@ -106,7 +106,12 @@ label {
 </head>
 
 <body>
+
+  <div style="position: absolute; top: 5px; left: 90px;">
+    <a href="index.html"><button style="width: 200px !important; height: 45px !important; font-size: large; border-radius: 10%; background-color: black; color: coral;">Back</button></a>
+  </div>
     <div style="position: absolute; top: 0; right: 90px; ">
+
 
 <div style="color: black">
     <button style="background-color: white;" id="google-sign-in"><span id="gcm" style="font-size: medium; color: black;"><font color="black">Continue With
@@ -122,7 +127,7 @@ label {
   <form id="uploadForm" class="formUpload">
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
-    <input type="file" class="inputFile" id="fileInp" accept="video/mp4, audio/mpeg" required multiple />
+    <input type="file" class="inputFile" id="fileInp" accept="audio/mpeg" required />
     <input type="text" id="album" placeholder="Enter your custom Album" required>
     <input type="text" id="artist" placeholder="Enter the Song Artist" class="text" required>
     <center>
@@ -426,7 +431,6 @@ document.getElementById("titlelol").innerText = title;
 
 
 </html>
-
 
 
 

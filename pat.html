@@ -126,7 +126,11 @@
     </style>
 </head>
 <body>
+    
     <div class="playlist-container">
+            <div style="position: relative;">
+    <a href="index.html"><button style="width: 200px !important; height: 45px !important; font-size: large; border-radius: 10%; background-color: black; color: coral;">Home</button></a>
+</div>
         <h1>My Playlist</h1>
         <div id="playlist"></div>
     </div>
@@ -157,7 +161,13 @@
         function loadPlaylist() {
             var currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
 
-       let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
+if (currentUser === null) {
+    alert("User is not signed in.");
+    window.location.href = "index.html";
+} else {
+     // Assuming 'currentUser' is an object with properties 'name' and 'email'
+}
+            let userPlaylists = JSON.parse(localStorage.getItem("userPlaylists")) || {};
             let playlist = userPlaylists[currentUser] || [];
 
             let playlistDiv = document.getElementById("playlist");
