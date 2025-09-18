@@ -102,14 +102,24 @@ label {
       pointer-events: none;
       /* Allow clicks to pass through the canvas */
     }
+
+
+    @media only screen and (max-width:1200px){
+      .hellothere{
+      position: absolute;
+      top: 400px;
+      left: 180px;
+      }
+    }
   </style>
 </head>
 
 <body>
-
-  <div style="position: absolute; top: 400px; left: 180px;">
+<div class="hellothere">
+  <div style="position: absolute; top: 0px; left: 90px;">
     <a href="index.html"><button style="width: 200px !important; height: 45px !important; font-size: large; border-radius: 10%; background-color: black; color: coral;">Back</button></a>
   </div>
+</div>
     <div style="position: absolute; top: 0; right: 90px; ">
 
 
@@ -431,6 +441,7 @@ document.getElementById("titlelol").innerText = title;
 
 
 </html>
+
 
 
 
