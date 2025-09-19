@@ -272,6 +272,7 @@
   left: 0;
   background-color: #111;
   padding-top: 20px;
+  visibility: hidden;
 }
 
 .sidenav a {
@@ -886,23 +887,28 @@
   font-weight: 900;
   font-style: italic;
 }
-
-
 .shitter {
   font-family: 'Poppins', sans-serif;
   font-weight: 900;
   color: white;
-  box-sizing: border-box;
+  text-align: center;
 }
 
 .artist-list {
   display: flex;
+  justify-content: center; /* centers the whole row */
   gap: 30px;
   list-style: none;
   padding: 0;
   margin: 0;
-  justify-content: flex-start;
 }
+
+.artist {
+  display: flex;
+  flex-direction: column; /* stack image and name vertically */
+  align-items: center;    /* center both horizontally */
+}
+
 
 .artist {
   display: flex;
@@ -1002,31 +1008,32 @@
          
 
 
+<div class="shitter">     
+  <h2 id="at1">Artists of The Month</h2>
 
-                 <div class="shitter">     
-                   <font color="white"> 
-              <h2 id="at1">Artists of The Month</h2>
-
-                                    <ul class="artist-list">
-                            
-
-        <img src="https://i.postimg.cc/v8kpXbNZ/v5-5.jpg" width="70" height="70" style="border-radius: 75%;">  
-  <li class="artist">Cmay</li>
- 
-
-       <img src="https://i.postimg.cc/WbZxHCB6/v5-6.png" width="70" height="70" style="border-radius: 75%;">
-         <li class="artist">Papa Josh</li>
-
-<img src="https://i.postimg.cc/kgdL3w9r/v5-7.png" width="70" height="70" style="border-radius: 75%;">
-  <li class="artist">DJ CHRIS CONCEPTS</li>
-</ul> 
-					   
-
-<img src="https://i.postimg.cc/kXhr37RQ/temp-Imaget6sljk.avif" width="70" height="70" style="border-radius: 75%;">
-  <li class="artist">The Cavemen</li>
-</ul> 
+  <ul class="artist-list">
+    <li class="artist">
+      <img src="https://i.postimg.cc/v8kpXbNZ/v5-5.jpg" width="70" height="70" style="border-radius: 75%;">  
+      <p>Cmay</p>
+    </li>
+    <li class="artist">
+      <img src="https://i.postimg.cc/WbZxHCB6/v5-6.png" width="70" height="70" style="border-radius: 75%;">  
+      <p>Papa Josh</p>
+    </li>
+    <li class="artist">
+      <img src="https://i.postimg.cc/kXhr37RQ/temp-Imaget6sljk.avif" width="70" height="70" style="border-radius: 75%;">  
+      <p>The Cavemen</p>
+    </li>
+    <li class="artist">
+      <img src="https://i.postimg.cc/kgdL3w9r/v5-7.png" width="70" height="70" style="border-radius: 75%;">  
+      <p>DJ CHRIS CONCEPTS</p>
+    </li>
+  </ul>
+</div>
+<div style="position: relative !important; top: 65px";>
           <div style="visibility: hidden;">
-            <h2 id="at2">Artists of the Month</h2>
+            <h2 id="at2"><font color="white">Artists of The Month</font></h2>
+            </div>
             </div>
 </font>
 
@@ -1886,7 +1893,6 @@ heart_plus
 </body>
 
 </html>
-
 
 
 
