@@ -195,6 +195,7 @@
 @media only screen and (max-width: 1080px) {
     .hellobased {
         display: none !important;
+        visibility: hidden;
     }
 }
 
@@ -999,11 +1000,9 @@
 
 
 
-
-       
-
            
          
+
 
 
 <div class="shitter">     
@@ -1011,87 +1010,74 @@
 
   <ul class="artist-list">
     <li class="artist">
-      <img src="https://i.postimg.cc/v8kpXbNZ/v5-5.jpg" width="70" height="70" style="border-radius: 75%;">  
+      <img id="Cmay" src="https://i.postimg.cc/v8kpXbNZ/v5-5.jpg" width="70" height="70" style="border-radius: 75%;">  
       <p>Cmay</p>
     </li>
 
 	    <ul class="artist-list">
     <li class="artist">
-      <img src="https://i.postimg.cc/FRzB9Cff/image.png" width="70" height="70" style="border-radius: 75%;">  
+      <img id="Skizi" src="https://i.postimg.cc/FRzB9Cff/image.png" width="70" height="70" style="border-radius: 75%;">  
       <p>Skizi</p>
     </li>
 
 	
 	      <li class="artist">
-      <img src="https://i.postimg.cc/9MZZ3QDM/image.png" width="70" height="70" style="border-radius: 75%;">  
+      <img id="47" src="https://i.postimg.cc/9MZZ3QDM/image.png" width="70" height="70" style="border-radius: 75%;">  
       <p>Fourty Seven</p>
     </li>
     <li class="artist">
-      <img src="https://i.postimg.cc/WbZxHCB6/v5-6.png" width="70" height="70" style="border-radius: 75%;">  
+      <img id="PJ" src="https://i.postimg.cc/WbZxHCB6/v5-6.png" width="70" height="70" style="border-radius: 75%;">  
       <p>Papa Josh</p>
     </li>
     <li class="artist">
-      <img src="https://i.postimg.cc/kXhr37RQ/temp-Imaget6sljk.avif" width="70" height="70" style="border-radius: 75%;">  
+      <img id="Cavemen" src="https://i.postimg.cc/kXhr37RQ/temp-Imaget6sljk.avif" width="70" height="70" style="border-radius: 75%;">  
       <p>The Cavemen</p>
     </li>
     <li class="artist">
-      <img src="https://i.postimg.cc/kgdL3w9r/v5-7.png" width="70" height="70" style="border-radius: 75%;">  
+      <img id="DCC" src="https://i.postimg.cc/kgdL3w9r/v5-7.png" width="70" height="70" style="border-radius: 75%;">  
       <p>DJ CHRIS CONCEPTS</p>
     </li>
   </ul>
 </div>
-<div style="position: relative !important; top: 65px";>
-          <div style="visibility: hidden;">
-            <h2 id="at2"><font color="white">Artists of The Month</font></h2>
-            </div>
-            </div>
-</font>
 
+<div id="ov2" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="po2" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
     
-            </div>
-  
-             <div style="text-align:center;">
-    <div class="content">
 <center>
-  <div id="playlists">
-  <div style="  font-family: 'Poppins', sans-serif; font-weight: 900; color: white;">
-  <h2>New Playlists</h2>
-  </div>
-<img onclick="publiclist" src="https://i.postimg.cc/JhrgtnGP/v10-17.png" style="border: #fff solid 5px;">
-</div>
-</center>
-
-      <div class="scrollable-container">
-        <div class="tran">
-        
-<div style="
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: flex-start;
-  background-color: #111;
-  padding: 10px;
-  gap: 20px;
-  color: white;
-">
-	<div class="hellobased">
-
-  <h2 style="flex-basis: 100%; font-family: Montserrat;">SONGS OF THE WEEK (5)</h2>
-
-  <div style="border: 5px solid black; border-radius: 5%; padding: 10px;">
-    <h3>Flowers</h3>
-	  <h3>Cmay</h3>
-    <audio id="audio1" src="https://files.catbox.moe/i9blzc.wav" preload="auto"></audio>
-    <button onclick="play1()">PLAY</button>
-    <button onclick="pause1()">PAUSE</button>
-  </div>
-
-		    <h3>Bsf</h3>
+  <h1>Skizi</h1>
+  <a href="https://linktr.ee/_Skizii?utm_source=linktree_admin_share"><h5>Visit Skizi's Linktree</h5></a>
+   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Bsf</h3>
 	  <h3>Skizi</h3>
-    <audio id="audio1" src="https://files.catbox.moe/6p3ulh.mp3" preload="auto"></audio>
-    <button onclick="play1()">PLAY</button>
-    <button onclick="pause1()">PAUSE</button>
+    <audio id="audio2" src="https://files.catbox.moe/6p3ulh.mp3" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
   </div>
+  </center>
+  </div>
+</div>
+</div>
+
+<div id="ov3" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="po3" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>fourty seven</h1>
+  <a href="https://www.youtube.com/channel/UCIdCInr3Vg7PDZvE9SsBwog"><h5>Visit fourty seven's Youtube Channel</h5></a>
 		  <div style="border: 5px solid black; border-radius: 5%; padding: 10px;">
     <h3>Kelly</h3>
 	  <h3>Fourty Seven</h3>
@@ -1100,7 +1086,51 @@
     <button onclick="pause1()">PAUSE</button>
   </div>
 
-  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+  </center>
+  </div>
+</div>
+</div>
+
+<div id="ov4" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="po4" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>fourty seven</h1>
+  <a href="https://www.youtube.com/channel/UCIdCInr3Vg7PDZvE9SsBwog"><h5>Visit fourty seven's Youtube Channel</h5></a>
+		  <div style="border: 5px solid black; border-radius: 5%; padding: 10px;">
+    <h3>Kelly</h3>
+	  <h3>Fourty Seven</h3>
+    <audio id="audio1" src="https://files.catbox.moe/14dw2x.mp3" preload="auto"></audio>
+    <button onclick="play1()">PLAY</button>
+    <button onclick="pause1()">PAUSE</button>
+  </div>
+
+  </center>
+  </div>
+</div>
+</div>
+<!--Cmay-->
+<div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="popup" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>Cmay</h1>
+  <a href="https://www.youtube.com/channel/UCgyba-b-DmkH4sHnROSNHgA"><h5>Visit Cmay's Youtube Channel</h5></a>
+   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
     <h3>Wolf</h3>
 	  <h3>Cmay</h3>
     <audio id="audio2" src="https://files.catbox.moe/oxnxve.wav" preload="auto"></audio>
@@ -1114,35 +1144,82 @@
     <audio id="audio3" src="https://files.catbox.moe/ed7stj.wav" preload="auto"></audio>
     <button onclick="play3()">PLAY</button>
     <button onclick="pause3()">PAUSE</button>
+  </div>  <div style="border: 5px solid black; border-radius: 5%; padding: 10px;">
+    <h3>Flowers</h3>
+	  <h3>Cmay</h3>
+    <audio id="audio1" src="https://files.catbox.moe/i9blzc.wav" preload="auto"></audio>
+    <button onclick="play1()">PLAY</button>
+    <button onclick="pause1()">PAUSE</button>
+  </center>
   </div>
+</div>
+</div>
 
-  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
-    <h3>Release me (Clean)</h3>
+
+<div id="po6" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="ov6" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>Papa Josh</h1>
+  <a href="https://www.youtube.com/watch?v=Dh_o54SyqzM"><h5>Watch Papa Josh's music video called Release me</h5></a>
+   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Release me (clean)</h3>
 	  <h3>Papa Josh</h3>
-    <audio id="audio4" src="https://files.catbox.moe/03yd2o.mp3" preload="auto"></audio>
-    <button onclick="play4()">PLAY</button>
-    <button onclick="pause4()">PAUSE</button>
+    <audio id="audio2" src="https://files.catbox.moe/03yd2o.mp3" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
   </div>
-
-  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
-    <h3>Check me Out</h3>
-	  <h3>DJ CHRIS CONCEPTS</h3>
-    <audio id="audio5" src="https://files.catbox.moe/st2kn8.mp3" preload="auto"></audio>
-    <button onclick="play5()">PLAY</button>
-    <button onclick="pause5()">PAUSE</button>
+  </center>
   </div>
+</div>
+</div>
 
 
+<div id="po5" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="ov5" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>Papa Josh</h1>
+  <a href="https://www.youtube.com/watch?v=Dh_o54SyqzM"><h5>Watch Papa Josh's music video called Release me</h5></a>
+   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Release me (clean)</h3>
+	  <h3>Papa Josh</h3>
+    <audio id="audio2" src="https://files.catbox.moe/03yd2o.mp3" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
+  </div>
+  </center>
+  </div>
+</div>
+</div>
 
-
-  
-  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
-    <h3>3AM</h3>
-	  <h3>$vn and CONTRV-PHONK</h3>
-    <audio id="audio5" src="https://files.catbox.moe/l2oygq.mp3" preload="auto"></audio>
-    <button onclick="play5()">PLAY</button>
-    <button onclick="pause5()">PAUSE</button>
-	  
+<div id="po7" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="ov7" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>The Cavemen </h1>
+  <a href="https://the-caveman.bandcamp.com/album/demo-sessions-vol-1"><h5>Visit The Cavemen's album called Demo Sessions Vol 1 on BandCamp</h5></a>
 	    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
     <h3>First</h3>
 	  <h3>The Cavemen</h3>
@@ -1198,12 +1275,271 @@
     <button onclick="play5()">PLAY</button>
     <button onclick="pause5()">PAUSE</button>
   </div>
-  </div>
+  </center>
   </div>
 </div>
 </div>
-		</div>
-	  </div>
+
+
+<div id="po5" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="ov5" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>Papa Josh</h1>
+  <a href="https://www.youtube.com/watch?v=Dh_o54SyqzM"><h5>Watch Papa Josh's music video called Release me</h5></a>
+   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Release me (clean)</h3>
+	  <h3>Papa Josh</h3>
+    <audio id="audio2" src="https://files.catbox.moe/03yd2o.mp3" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
+  </div>
+  </center>
+  </div>
+</div>
+</div>
+
+<div id="po8" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="ov8" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>DJ Chris Concepts</h1>
+  <a href="https://www.instagram.com/conceptschris/"><h5>Go to DJ Chris Concept's instagram</h5></a>
+
+  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Check me Out</h3>
+	  <h3>DJ CHRIS CONCEPTS</h3>
+    <audio id="audio5" src="https://files.catbox.moe/st2kn8.mp3" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+  </div>
+  </center>
+  </div>
+</div>
+</div>
+
+
+
+<div style="position: relative !important; top: 65px";>
+          <div style="visibility: hidden;">
+            <h2 id="at2"><font color="white">Artists of The Month</font></h2>
+            </div>
+            </div>
+</font>
+
+    
+            </div>
+  <script>
+  let Cmay = document.getElementById("Cmay")
+  let Skizi = document.getElementById("Skizi")
+  let fourtySeven = document.getElementById("47")
+  let PJ = document.getElementById("PJ")
+  let Cavemen = document.getElementById("Cavemen")
+  let DCC = document.getElementById("DCC")
+
+  fourtySeven.addEventListener("click", () => {
+          document.getElementById("po3").style.display = "block";
+  document.getElementById("ov3").style.display = "block";
+  })
+
+  Skizi.addEventListener("click", () => {
+      document.getElementById("po2").style.display = "block";
+  document.getElementById("ov2").style.display = "block";
+  })
+Cmay.addEventListener("click", () => {
+  document.getElementById("popup").style.display = "block";
+  document.getElementById("overlay").style.display = "block";
+  
+});
+
+PJ.addEventListener("click", () => {
+  document.getElementById("po5").style.display = "block";
+  document.getElementById("ov5").style.display = "block";
+  })
+  
+  Cavemen.addEventListener("click", () => {
+    document.getElementById("ov7").style.display = "block";
+    document.getElementById("po7").style.display = "block";
+  })
+
+  DCC.addEventListener("click", () => {
+  document.getElementById("ov8").style.display = "block";
+  document.getElementById("po8").style.display = "block";
+})
+</script>
+
+       
+
+             <div style="text-align:center;">
+    <div class="content">
+<center>
+  <div id="playlists">
+  <div style="  font-family: 'Poppins', sans-serif; font-weight: 900; color: white;">
+  <h2>New Playlists</h2>
+  </div>
+<img onclick="publiclist" src="https://i.postimg.cc/JhrgtnGP/v10-17.png" style="border: #fff solid 5px;">
+</div>
+</center>
+
+      <div class="scrollable-container">
+        <div class="tran">
+        
+<div style="
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  background-color: #111;
+  padding: 10px;
+  gap: 20px;
+  color: white;
+">
+	<div class="hellobased">
+
+   <h2 style="flex-basis: 100%; font-family: Montserrat;">SONGS OF THE WEEK (5)</h2>
+
+
+		    <h3>Bsf</h3>
+	  <h3>Skizi</h3>
+    <audio id="audio1" src="https://files.catbox.moe/6p3ulh.mp3" preload="auto"></audio>
+    <button onclick="play1()">PLAY</button>
+    <button onclick="pause1()">PAUSE</button>
+   
+		  <div style="border: 5px solid black; border-radius: 5%; padding: 10px;">
+    <h3>Kelly</h3>
+	  <h3>Fourty Seven</h3>
+    <audio id="audio1" src="https://files.catbox.moe/14dw2x.mp3" preload="auto"></audio>
+    <button onclick="play1()">PLAY</button>
+    <button onclick="pause1()">PAUSE</button>
+    </div>
+
+    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Wolf</h3>
+	  <h3>Cmay</h3>
+    <audio id="audio2" src="https://files.catbox.moe/oxnxve.wav" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
+    </div>
+
+    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Full Circle</h3>
+	  <h3>Cmay</h3>
+    <audio id="audio3" src="https://files.catbox.moe/ed7stj.wav" preload="auto"></audio>
+    <button onclick="play3()">PLAY</button>
+    <button onclick="pause3()">PAUSE</button>
+    </div>  <div style="border: 5px solid black; border-radius: 5%; padding: 10px;">
+    <h3>Flowers</h3>
+	  <h3>Cmay</h3>
+    <audio id="audio1" src="https://files.catbox.moe/i9blzc.wav" preload="auto"></audio>
+    <button onclick="play1()">PLAY</button>
+    <button onclick="pause1()">PAUSE</button>
+    </div>
+
+
+    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Release me (Clean)</h3>
+	  <h3>Papa Josh</h3>
+    <audio id="audio4" src="https://files.catbox.moe/03yd2o.mp3" preload="auto"></audio>
+    <button onclick="play4()">PLAY</button>
+    <button onclick="pause4()">PAUSE</button>
+    </div>
+
+    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Check me Out</h3>
+	  <h3>DJ CHRIS CONCEPTS</h3>
+    <audio id="audio5" src="https://files.catbox.moe/st2kn8.mp3" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+    </div>
+
+
+
+
+  
+    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>3AM</h3>
+	  <h3>$vn and CONTRV-PHONK</h3>
+    <audio id="audio5" src="https://files.catbox.moe/l2oygq.mp3" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+	  
+	    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>First</h3>
+	  <h3>The Cavemen</h3>
+    <audio id="audio5" src="https://files.catbox.moe/tudu2r.wav" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+			    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Touch your feelings</h3>
+	  <h3>The Cavemen</h3>
+    <audio id="audio5" src="https://files.catbox.moe/2hbbtl.wav" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+    </div>
+			    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Traffic lines</h3>
+	  <h3>The Cavemen</h3>
+    <audio id="audio5" src="https://files.catbox.moe/cosbi9.wav" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+    </div>
+			    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>So Cool (Delight Version)</h3>
+	  <h3>The Cavemen</h3>
+    <audio id="audio5" src="https://files.catbox.moe/ch99en.wav" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+    </div>
+			    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Kill to Survive</h3>
+	  <h3>The Cavemen</h3>
+    <audio id="audio5" src="https://files.catbox.moe/m8uvev.wav" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+    </div>
+			    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>White Sands</h3>
+	  <h3>The Cavemen</h3>
+    <audio id="audio5" src="https://files.catbox.moe/lhkv2c.wav" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+  </div>
+			    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>David</h3>
+	  <h3>The Cavemen</h3>
+    <audio id="audio5" src="https://files.catbox.moe/i891yl.wav" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+    </div>
+			    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Last</h3>
+	  <h3>The Cavemen</h3>
+    <audio id="audio5" src="https://files.catbox.moe/y72qqq.wav" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+    </div>
+    </div>
+    </div>
+  </div>
+  </div>
+		  </div>
+	    </div>
+    </div>
+    
 		
 <style>
   .category {
@@ -1917,6 +2253,7 @@ heart_plus
 </body>
 
 </html>
+
 
 
 
