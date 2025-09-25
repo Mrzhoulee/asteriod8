@@ -225,9 +225,7 @@
         visibility: hidden;
       }
       
-      #gcd{
-        visibility: hidden;
-      }
+
 
       #at1{
         visibility: hidden;
@@ -928,26 +926,38 @@
   font-size: medium;
 }
 </style>
-<div class="sidenav">
-  <a href="#top" class="sidepo">Home</a>
-  <a href="pat.html" class="sidepo">My Playlist</a>
-  <a href="policy.html" class="sidepo">Report Content <span class="material-symbols-outlined">flag</span></a>
-  <a href="Asteroid Terms.html" class="sidepo">Terms and Policies</a>
-  <a href="studio.html" class="sidepo"><span class="material-symbols-outlined">add_circle</span> UPLOAD</a>
-	<a href="1O.html">Live Concerts</a>
-</div>
 
+    <div style="position: absolute; top: 15px; right: 90px;">
 
-
-  <div style="position: absolute; top: 0; right: 90px;">
-
-<div style="color: black">
+<div style="color: black;">
     <button style="background-color: white;" id="google-sign-in"><span id="gcd" style="font-size: medium; color: black;"><font color="black">Continue With
         <i class="fa-brands fa-google"></i> </font></span></button>
 
 </div>
 
   </div>
+<div class="sidenav" id="ttt">
+  <a href="#top" class="sidepo">Home</a>
+  <a href="pat.html" class="sidepo">My Playlist</a>
+  <a href="policy.html" class="sidepo">Report Content <span class="material-symbols-outlined">flag</span></a>
+  <a href="Asteroid Terms.html" class="sidepo">Terms and Policies</a>
+  <a href="studio.html" class="sidepo"><span class="material-symbols-outlined">add_circle</span> UPLOAD</a>
+	<a href="1O.html">Live Concerts</a>
+
+
+  <br>
+  <font color="white">
+  <h3>Music Queue</h3>
+  <tr>
+    <td id="queues"></td>
+  </tr>
+  </font>
+</div>
+
+
+
+
+
 
 
 	
@@ -987,11 +997,11 @@
       </font>
     </a>
 
-<div style="display:none !important;">
+
     <button style="background-color: white;" id="google-sign-in-mobile"><span id="gcm"
         style="font-size: medium;  color:black; display: block;"><font color="black" face="Montserrat""><b>Continue With</b><i class="fa-brands fa-google"></i> </font></span></button>
 
-</div>
+
 
 
   </div>
@@ -2042,6 +2052,46 @@ const firebaseConfig = {
             let cde = ""
             console.log("hahahahah")
             tmp.forEach(item => {
+
+                            let queuelist = []
+              let onecross = document.createElement(`<span id="removetth" class="material-symbols-outlined">cancel</span>`)
+              window.queuemusic = function(fileInp,title){
+                let queueItem = document.createElement('h6');
+                queueItem.innerText = title;    
+                queueItem.style.color = "coral";
+                    // Append it to the sidenav
+    document.getElementById('ttt').appendChild(queueItem);
+
+    // Optionally, add a line break
+    document.getElementById('ttt').appendChild(document.createElement('br'));
+    let removeOne = document.getElementById('ttt').appendChild(onecross);
+document.getElementById('removetth').addEventListener('click', () => {
+  document.getElementById("ttt").innerHTML = "";
+})
+            
+
+    queuelist.push(fileInp)
+    console.log(queuelist);
+    if(queuelist != ""){
+      window.stopHandleKKK = true;
+      let tbh = queuelist[0];
+      let thh = new Audio(fileInp);
+      thh.play()
+      document.getElementById("tata").innerText = title;
+      thh.addEventListener("ended", ()=>{
+        queuelist.shift();
+        document.querySelector("#ttt h6").remove()
+        thh.pause();
+      })
+
+
+
+    } else {
+      window.stopHandleKKK = false;
+    }
+
+
+              }
               
                       window.handleKKK = function (){
   console.log('shqhqwqwbuqwubuqwb');   
@@ -2065,7 +2115,7 @@ const firebaseConfig = {
 
 
               //gets only the values of (tmp) for all items(elements) here:
-              cde += `
+               cde += `
               <div class="sssh" data-title="${Object.values(Object.values(item)[0])[0]['title'].toLowerCase()}">
                 <div id="songer" class="ssda">
                 <div style="margin: 0; padding: 0;">
@@ -2081,7 +2131,7 @@ const firebaseConfig = {
     
       <div class="haha"> 
         <p id="save_${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}"></p>
-    <p class="fa fa-play-circle" style="color: coral;" onclick="(()=>{
+    <p class="fa fa-play-circle" style="color: coral; font-size:45px;" onclick="(()=>{
                   console.log('test')
                   document.getElementById('tata').innerHTML = '${Object.values(Object.values(item)[0])[0]['title']}'
       console.log('yewf4fed34r4')
@@ -2096,19 +2146,17 @@ const firebaseConfig = {
 
 <a href="policy.html">
   
-    <p class="material-symbols-outlined" style="color: coral;">
+    <p class="material-symbols-outlined" style="color: coral; font-size: 35px;">
     flag
 </p>
 </a>
-  <button onclick="save_the_song">
-<p class="material-symbols-outlined">
-heart_plus
-</p>
+<button onclick="queuemusic('${Object.values(Object.values(item)[0])[0]["fileInp"]}', '${Object.values(Object.values(item)[0])[0]["title"]}')">
+  <p class="material-symbols-outlined">queue_music</p>
 </button>
     
     
         
-        <p class="fa fa-pause-circle-o"  style="color: coral;" font color="coral" onclick="(()=>{
+        <p class="fa fa-pause-circle-o"  style="color: coral; font-size:45px;" font color="coral" onclick="(()=>{
       console.log('ABABABA')
         document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]['title']}').pause()
     })()" id="pause_${Object.values(Object.values(item)[0])[0]['title']}"></p>
@@ -2260,10 +2308,6 @@ heart_plus
       border-collapse: collapse;
       width: 100%;
     }
-
-	  #google-sign-in{
-		  display: none;
-	  }
 
     td,
     th {
