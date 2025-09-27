@@ -1843,7 +1843,7 @@ PJ.addEventListener("click", () => {
           box-shadow: 5px 5px 20px coral;
           text-align: center;">
 
-          <h3 id="tata">SELECT A SONG</h3>
+          <h3 id="tata"><font color="coral">SELECT A SONG</font></h3>
           <i style="cursor: pointer; user-select: none;" onclick="(()=>{
                console.log(window.action)
                document.getElementById('gaga_' + window.action).play()
@@ -2086,7 +2086,7 @@ const firebaseConfig = {
           <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
             <div style="background-color: black; color: black; border-radius: 5%;">
         
-            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}" onended="handleKKK()">
+            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}" onended="handleKKK()" preload="auto">
         <source src="${Object.values(Object.values(item)[0])[0]["fileInp"]}" type="audio/mpeg">
       </audio>
     
@@ -2095,6 +2095,7 @@ const firebaseConfig = {
     <p class="fa fa-play-circle" style="color: coral; font-size:45px;" onclick="(()=>{
                   console.log('test')
                   document.getElementById('tata').innerHTML = '${Object.values(Object.values(item)[0])[0]['title']}'
+				  document.getElementById('tata').style.color = "coral";
       console.log('yewf4fed34r4')
       window.action = '${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}'
       console.log(window.action)
@@ -2415,6 +2416,7 @@ const firebaseConfig = {
 </body>
 
 </html>
+
 
 
 
