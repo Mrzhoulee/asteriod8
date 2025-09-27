@@ -2048,45 +2048,11 @@ const firebaseConfig = {
             console.log("hahahahah")
             tmp.forEach(item => {
 
-                            let queuelist = []
-              let onecross = document.createElement(`<span id="removetth" class="material-symbols-outlined">cancel</span>`)
-              window.queuemusic = function(fileInp,title){
-                let queueItem = document.createElement('h6');
-                queueItem.innerText = title;    
-                queueItem.style.color = "coral";
-                    // Append it to the sidenav
-    document.getElementById('ttt').appendChild(queueItem);
-
-    // Optionally, add a line break
-    document.getElementById('ttt').appendChild(document.createElement('br'));
-    let removeOne = document.getElementById('ttt').appendChild(onecross);
-document.getElementById('removetth').addEventListener('click', () => {
-  document.getElementById("ttt").innerHTML = "";
-})
-            
-
-    queuelist.push(fileInp)
-    console.log(queuelist);
-    if(queuelist != ""){
-      window.stopHandleKKK = true;
-      let tbh = queuelist[0];
-      let thh = new Audio(fileInp);
-      thh.play()
-      document.getElementById("tata").innerText = title;
-      thh.addEventListener("ended", ()=>{
-        queuelist.shift();
-        document.querySelector("#ttt h6").remove()
-        thh.pause();
-      })
+        
 
 
 
-    } else {
-      window.stopHandleKKK = false;
-    }
 
-
-              }
               
                       window.handleKKK = function (){
   console.log('shqhqwqwbuqwubuqwb');   
@@ -2449,6 +2415,7 @@ document.getElementById('removetth').addEventListener('click', () => {
 </body>
 
 </html>
+
 
 
 
