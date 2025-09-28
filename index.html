@@ -1033,14 +1033,15 @@
       <p>Skizi</p>
     </li>
 
+
+    	      <li class="artist">
+      <img id="TF" src="https://i.postimg.cc/QCdYM1K0/channels4-profile.jpg" width="70" height="70" style="border-radius: 75%;">  
+      <p>Terrified</p>
+    </li>
 	
 	      <li class="artist">
       <img id="47" src="https://i.postimg.cc/9MZZ3QDM/image.png" width="70" height="70" style="border-radius: 75%;">  
       <p>Fourty Seven</p>
-    </li>
-    <li class="artist">
-      <img id="PJ" src="https://i.postimg.cc/WbZxHCB6/v5-6.png" width="70" height="70" style="border-radius: 75%;">  
-      <p>Papa Josh</p>
     </li>
     <li class="artist">
       <img id="Cavemen" src="https://i.postimg.cc/kXhr37RQ/temp-Imaget6sljk.avif" width="70" height="70" style="border-radius: 75%;">  
@@ -1346,6 +1347,35 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 </div>
 
 
+<div id="po10" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="ov10" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>Terrified</h1>
+  <a href="https://www.youtube.com/@terrifiedmusic"><h5>Go to Terrified's Youtube Channel</h5></a>
+    <a href="https://music.amazon.com/artists/B0FMV6BMW2/terrified"><h5>Go to Terrified's Amazon Music Profile</h5></a>
+      <a href="music.youtube.com/channel/UCGjQ4pFlLqeIzm-bFWpCpyg"><h5>Go to Terrified's Youtube Music Channel</h5></a>
+        <a href="on.soundcloud.com/8DGWV3B2ePYSUljgCm"><h5>Go to Terrified's Soundcloud Profile</h5></a>
+          <a href="music.apple.com/us/artist/terrified/1833985183"><h5>Go to Terrified's Apple Music Profile</h5></a>
+  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>The Taste of Sorrow</h3>
+	  <h3>Terrified</h3>
+    <audio id="audio5" src="https://files.catbox.moe/jpv2t0.mp3" preload="auto"></audio>
+    <button onclick="play5()">PLAY</button>
+    <button onclick="pause5()">PAUSE</button>
+  </div>
+  </center>
+  </div>
+</div>
+</div>
+
 
 
 <div id="po9" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
@@ -1448,14 +1478,18 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
   let Cavemen = document.getElementById("Cavemen")
   let DCC = document.getElementById("DCC")
   let tlc = document.getElementById("tlc")
-
-
+  let TF = document.getElementById("TF")
   tlc.addEventListener("click", () => {
               document.getElementById("po9").style.display = "block";
   document.getElementById("ov9").style.display = "block";
   })
 
 
+
+  TF.addEventListener('click', () => {
+              document.getElementById("po10").style.display = "block";
+  document.getElementById("ov10").style.display = "block";
+  })
   fourtySeven.addEventListener("click", () => {
           document.getElementById("po3").style.display = "block";
   document.getElementById("ov3").style.display = "block";
@@ -1516,6 +1550,15 @@ PJ.addEventListener("click", () => {
 	<div class="hellobased">
 
    <h2 style="flex-basis: 100%; font-family: Montserrat;">SONGS OF THE WEEK (5)</h2>
+
+
+     <div style="border: 5px solid black; border-radius: 5%; padding: 10px;">
+    <h3>The Taste of Sorrow</h3>
+	  <h3>Terrified</h3>
+    <audio id="audio1" src="https://files.catbox.moe/jpv2t0.mp3" preload="auto"></audio>
+    <button onclick="play1()">PLAY</button>
+    <button onclick="pause1()">PAUSE</button>
+     </div>
 
 
    		  <div style="border: 5px solid black; border-radius: 5%; padding: 10px;">
@@ -2424,6 +2467,7 @@ const firebaseConfig = {
 </body>
 
 </html>
+
 
 
 
