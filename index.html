@@ -2093,7 +2093,21 @@ const firebaseConfig = {
 
         
 
+let sorg = []
+window.actual1 = function(){
+  let slet = sorg.length;
+  console.log("2099");
+  sorg.unshift(currentPlaying);
+  currentPlaying.play();
+  let slorg = sorg.slice(1)
+  console.log(slorg)
+  for(let ol = 0; ol<slorg.length; ol++){
+    slorg[ol].pause();
+  }
 
+}
+
+  
 
 
               window.turnToCoral = function() {
@@ -2131,20 +2145,23 @@ const firebaseConfig = {
           <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
             <div style="background-color: black; color: black; border-radius: 5%;">
         
-            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}" onended="handleKKK()" preload="auto">
+            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}" onplay="actual1()" onended="handleKKK()" preload="auto">
         <source src="${Object.values(Object.values(item)[0])[0]["fileInp"]}" type="audio/mpeg">
       </audio>
     
       <div class="haha"> 
         <p id="save_${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}"></p>
     <p class="fa fa-play-circle" style="color: coral; font-size:45px;" onclick="(()=>{
+
                   console.log('test')
                   document.getElementById('tata').innerHTML = '${Object.values(Object.values(item)[0])[0]['title']}'
                   turnToCoral();
       console.log('yewf4fed34r4')
       window.action = '${Object.values(Object.values(item)[0])[0]['title'].replace(" ", "")}'
       console.log(window.action)
-        document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]['title']}').play()
+      document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]['title']}').play()
+      window.currentPlaying = document.getElementById('gaga_${Object.values(Object.values(item)[0])[0]["title"]}');
+        
     })()" id="play_${Object.values(Object.values(item)[0])[0]['title']}"></p>
     
    
@@ -2467,7 +2484,6 @@ const firebaseConfig = {
 </body>
 
 </html>
-
 
 
 
