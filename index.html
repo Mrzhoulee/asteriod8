@@ -1015,6 +1015,14 @@
 <div class="shitter">     
   <h2 id="at1">Artists of The Month</h2>
 
+	    <ul class="artist-list">
+    <li class="artist">
+      <a href="#Blink">
+      <img id="Blink" src="https://i.postimg.cc/mgLjw5Ns/image.png" width="70" height="70" style="border-radius: 75%;"> 
+      </a> 
+      <p>Blink (Dyniah) </p>
+    </li>
+
   
     <ul class="artist-list">
     <li class="artist">
@@ -1070,6 +1078,47 @@
   </ul>
 </div>
 
+	  <div id="po11" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="ov11" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>Blink (Dyniah)</h1>
+  <a href="https://soundcloud.com/nerdgamer-11"><h5>Check out Blink's SoundCloud Profile</h5></a>
+   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>disappear ft. 16th oct</h3>
+	  <h3>Blink (Dyniah) </h3>
+    <audio id="audio2" src="https://u.pcloud.link/publink/show?code=XZKrDn5Zh2DzGyXbOO7jwssK0o5FWSxDLdFX" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
+
+	      <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Lullaby</h3>
+	  <h3>Blink (Dyniah) </h3>
+    <audio id="audio2" src="https://u.pcloud.link/publink/show?code=XZycDn5ZNT4gPsow0uV8tBtC6LbNS0Rixx1V" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
+
+			     <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Down (sped up)</h3>
+	  <h3>Blink (Dyniah) </h3>
+    <audio id="audio2" src="https://u.pcloud.link/publink/show?code=XZorDn5ZLCD0G1uyUm4KKG1kDjNOO4gGAM1X" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
+  </div>
+  </center>
+  </div>
+</div>
+</div>
+
+
+	  
 <div id="ov2" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
 <div id="po2" style="display:none; position:fixed; top:50%; left:50%; 
 transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
@@ -1095,6 +1144,7 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 </div>
 </div>
 
+	  
 <div id="ov3" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
 <div id="po3" style="display:none; position:fixed; top:50%; left:50%; 
 transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
@@ -1495,6 +1545,12 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
   let DCC = document.getElementById("DCC")
   let tlc = document.getElementById("tlc")
   let TF = document.getElementById("TF")
+  let Blink = document.getElementById("Blink")	
+	  
+         if(window.location.hash == "#Blink"){
+    document.getElementById("po11").style.display = "block";
+    document.getElementById("ov11").style.display = "block";
+  }
 
          if(window.location.hash == "#TF"){
     document.getElementById("po10").style.display = "block";
@@ -2573,6 +2629,7 @@ window.queuemusic = function(fileInp, title){
 </body>
 
 </html>
+
 
 
 
