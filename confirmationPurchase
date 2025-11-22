@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asteroid Confirmation</title>
+</head>
+<body>
+    <style>
+        .dm-serif-display-regular {
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.dm-serif-display-regular-italic {
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+    </style>
+
+    <center>
+        <h1>
+            <font face="dm-serif-display-regular">
+                Thank you for your purchase!
+            </font>
+        </h1>
+
+                <h3 id="OwnerMessage" style="visibility: hidden;">
+            <font face="dm-serif-display-regular">
+            </font>
+        </h3>
+    </center>
+<script>
+    
+    const fullUrl = window.location.href;
+    const LiveConcert = "31209673453";
+    const Musician = "1125568321";
+    const OwnerMessage = document.getElementById("OwnerMessage")
+    if(fullUrl.includes(LiveConcert)){
+        localStorage.setItem("SubPlanURL", LiveConcert);
+        OwnerMessage.innerText = "You Own LiveConcert+ VIP !!!";
+    }
+
+        if(fullUrl.includes(Musician)){
+        localStorage.setItem("SubPlanURT", Musician);
+        OwnerMessage.innerText = "You Own Musician+ VIP !!!";
+    }
+</script>
+</body>
+</html>
