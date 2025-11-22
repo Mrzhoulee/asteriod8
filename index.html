@@ -1054,7 +1054,7 @@
               <a href="#TF">
       <img id="TF" src="https://i.postimg.cc/QCdYM1K0/channels4-profile.jpg" width="70" height="70" style="border-radius: 75%;">  
       </a>
-      p>Terrified</p>
+      <p>Terrified</p>
     </li>
 	
 	      <li class="artist">
@@ -1639,8 +1639,8 @@ PJ.addEventListener("click", () => {
 })
 </script>
 
-       
-
+       <h1><font color="white" face="Montserrat"><b>🔥Trending Songs of the Month</b></font></h1>
+<div id="asteroidLeaderboard" style="background-color: #333; color: white;"></div>
              <div style="text-align:center;">
     <div class="content">
 <center>
@@ -2165,7 +2165,7 @@ console.log("960");
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
   import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-  import { getDatabase, ref as ref2, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+  import { getDatabase, ref as ref2, onValue, update, get, set, remove, push} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
   import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
 
           // https://firebase.google.com/docs/web/setup#available-libraries
@@ -2182,9 +2182,66 @@ const firebaseConfig = {
   messagingSenderId: "793353824502",
   appId: "1:793353824502:web:3ac24821911d14773ba4d7",
   measurementId: "G-GV72TMNNGR"
-};
-          const app = initializeApp(firebaseConfig);
-          const database = getDatabase(app);
+};const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+console.log("hello 2236");
+const songRef = ref2(database, 'songplayed');
+
+get(songRef)
+  .then((snapshot2) => {
+    const data67 = snapshot2.val();  // all songs
+    if (!data67) return;
+
+    const list67 = Object.values(data67);
+    console.log("2241", data67);
+    console.log("2242", list67);
+
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const currentMonth = monthNames[new Date().getMonth()];
+
+    list67.forEach(song => {
+      const title = song.title2;
+      const songMonth = (song.ofctime || "").trim(); // safe
+      disLeader(song, songMonth, currentMonth, list67, data67);
+    });
+  })
+  .catch(console.error);
+
+// Build leaderboard and remove old songs safely
+function disLeader(song, songMonth, currentMonth, list67, data67) {
+  const title = song.title2;
+
+  // Remove songs not in current month
+  if (songMonth.toLowerCase() !== currentMonth.toLowerCase()) {
+    const specificSongRef = ref2(database, 'songplayed/' + title);
+    remove(specificSongRef)
+      .then(() => console.log("Removed old song:", title))
+      .catch(console.error);
+    return; // no need to include old songs in leaderboard
+  }
+
+  // Count occurrences for current month
+  const matches = {};
+  list67.forEach(s => {
+    if ((s.ofctime || "").trim() === currentMonth) {
+      matches[s.title2] = (matches[s.title2] || 0) + 1;
+    }
+  });
+
+  // Sort by number of plays
+  const sorted = Object.entries(matches).sort((a, b) => b[1] - a[1]);
+
+  // Display leaderboard
+  const leaderboard = document.getElementById("asteroidLeaderboard");
+  leaderboard.innerHTML = ""; // clear old entries
+  sorted.forEach(([title, count]) => {
+    const h3 = document.createElement("h3");
+    h3.textContent = `${title} (${count} plays)`;
+    leaderboard.appendChild(h3);
+  });
+}
+
           // Initialize Firebase
           onValue(ref2(database, "SONGS/"), (snapshot) => {
             console.log(Object.values(snapshot.val()))
@@ -2243,7 +2300,21 @@ const firebaseConfig = {
 
 
 let sorg = []
-window.actual1 = function(){
+window.actual1 = function(title){
+                         const db = getDatabase(app);
+                           const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+const dxyz = new Date();
+let ofctime = month[dxyz.getMonth()];
+console.log(ofctime)
+let title2 = title.replace("gaga_", "")
+const songRef = ref2(db, 'songplayed');
+push(songRef, {
+  title2,
+  ofctime
+});
+
+
   let slet = sorg.length;
   console.log("2099");
   sorg.unshift(currentPlaying);
@@ -2324,7 +2395,7 @@ window.queuemusic = function(fileInp, title){
           <font face="Montserrat" color="coral"><p><font color="lightcoral"><center><h3>${Object.values(Object.values(item)[0])[0]['title']}</h3><center></font> <span>Album:</span> ${Object.values(Object.values(item)[0])[0]["album"]} <b>By:</b> ${Object.values(Object.values(item)[0])[0]['artist']}</p></font>
             <div style="background-color: black; color: black; border-radius: 5%;">
         
-            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}" onplay="actual1()" onended="handleKKK()" preload="auto">
+            <audio id="gaga_${Object.values(Object.values(item)[0])[0]['title']}" onplay="actual1('gaga_${Object.values(Object.values(item)[0])[0]['title']}')" onended="handleKKK()" preload="auto">
         <source src="${Object.values(Object.values(item)[0])[0]["fileInp"]}" type="audio/mpeg">
       </audio>
     
@@ -2663,7 +2734,6 @@ window.queuemusic = function(fileInp, title){
 </body>
 
 </html>
-
 
 
 
