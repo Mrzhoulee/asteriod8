@@ -833,6 +833,98 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
       
       <div id="ab"></div>
       </center>
+      <div class="snowfall-container">
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❄</div>
+  <!-- Add more snowflakes as desired -->
+</div>
+<style>
+#santa-container {
+  position: fixed;
+  top: 80px;           /* vertical position */
+  left: -250px;        /* start offscreen */
+  pointer-events: none;
+  opacity: 0;          /* hidden until animation */
+  z-index: 9999;       /* on top */
+}
+
+@keyframes santaFly {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(110vw); }
+}
+</style>
+
+<div id="santa-container">
+  <img src="—Pngtree—santa s sleigh in flight_18210198.png" width="400" height="230">
+</div>
+
+<script>
+function flySanta() {
+  const santa = document.getElementById("santa-container");
+
+  // Make visible at start
+  santa.style.opacity = "1";
+
+  // Reset any previous animation
+  santa.style.animation = "none";
+  void santa.offsetWidth; // force reflow
+
+  // Start flight: 8s from left to right
+  santa.style.animation = "santaFly 8s linear forwards";
+
+  // Instantly hide after animation ends
+  setTimeout(() => {
+    santa.style.opacity = "0";
+  }, 8000);
+}
+
+// First fly immediately
+flySanta();
+
+// Fly again every 60 seconds
+setInterval(flySanta, 10000);
+</script>
+
+
+
+
         <div class="lol" style="
           position: fixed;
           background-color: #000;
