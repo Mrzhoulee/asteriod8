@@ -218,7 +218,7 @@
     <section id="artists" style="  display: flex;        /* Line up items in a row */
   overflow-x: auto;     /* Enable sideways scroll */
   gap: 10px;            /* Space between items (optional) */
-  scroll-behavior: smooth; /* Smooth scrolling (optional) */
+  scroll-behavior: smooth; /* Smooth scrolling (optional) */ 
   white-space: nowrap;  /" class="content-section">
       <h2 class="section-title">Artists of the Month <b>(OG ARTISTS)</b></h2>
 
@@ -304,7 +304,7 @@
     </div>
     <div class="artist-card">
       <a href="#DCC">
-      <img id="#DCC"  class="artist-image" src="https://i.postimg.cc/kgdL3w9r/v5-7.png" width="70" height="70" style="border-radius: 75%;"> 
+      <img id="DCC"  class="artist-image" src="https://i.postimg.cc/kgdL3w9r/v5-7.png" width="70" height="70" style="border-radius: 75%;"> 
       </a>
       <p>DJ CHRIS CONCEPTS</p>
     </div>
@@ -463,8 +463,8 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 
 
 	
-		  	  <div id="po14" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
-<div id="ov14" style="display:none; position:fixed; top:50%; left:50%; 
+		  	  <div id="po15" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="ov15" style="display:none; position:fixed; top:50%; left:50%; 
 transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
     width: 1000px;
     height: 520px;
@@ -476,7 +476,7 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     
 <center>
   <h1>Melodic Black</h1>
-  <a href="https://syante.lovable.app/"><h5>Check out Syante's website</h5></a>
+  <a href="https://suno.com/@positivepitch5609252"><h5>Check out Melodic Black's Suno</h5></a>
    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
     <h3>Ride Slow</h3>
 	  <h3>Melodic Black</h3>
@@ -1081,6 +1081,7 @@ setInterval(flySanta, 10000);
   let Blink = document.getElementById("Blink")	
 	let SYANTE = document.getElementById("SYANTE");
 	let Mark = document.getElementById("Mark");
+	let MB = document.getElementById("MB");
 
 
 
@@ -1148,71 +1149,177 @@ setInterval(flySanta, 10000);
   }
 
 
-		    MB.addEventListener("click", () => {
-              document.getElementById("po15").style.display = "block";
-  document.getElementById("ov15").style.display = "block";
-  })
+  // Get the anchor tags that wrap the images to prevent default navigation
+  let MBLink = document.querySelector('a[href="#MB"]');
+  let MarkLink = document.querySelector('a[href="#Mark"]');
+  let SYANTELink = document.querySelector('a[href="#SYANTE"]');
+  let BlinkLink = document.querySelector('a[href="#Blink"]');
+  let tlcLink = document.querySelector('a[href="#TheLoneContraband"]');
+  let TFLink = document.querySelector('a[href="#TF"]');
+  let fourtySevenLink = document.querySelector('a[href="#47"]');
+  let SkiziLink = document.querySelector('a[href="#Skizi"]');
+  let CmayLink = document.querySelector('a[href="#Cmay"]');
+  let PJLink = document.querySelector('a[href="#PJ"]');
+  let CavemenLink = document.querySelector('a[href="#Cavemen"]');
+  let DCCLink = document.querySelector('a[href="#DCC"]');
 
-		    TCP.addEventListener("click", () => {
-              document.getElementById("po14").style.display = "block";
-  document.getElementById("ov14").style.display = "block";
-  })
+  // Function to show popup immediately
+  function showPopup(poId, ovId) {
+    const po = document.getElementById(poId);
+    const ov = document.getElementById(ovId);
+    if (po) po.style.display = "block";
+    if (ov) ov.style.display = "block";
+  }
 
-		    Mark.addEventListener("click", () => {
-              document.getElementById("po13").style.display = "block";
-  document.getElementById("ov13").style.display = "block";
-  })
+  // Function to close popup
+  function closePopup(poId, ovId) {
+    const po = document.getElementById(poId);
+    const ov = document.getElementById(ovId);
+    if (po) po.style.display = "none";
+    if (ov) ov.style.display = "none";
+  }
 
+  // Add click handlers to close popups when clicking on overlay
+  // Note: Some popups use po=overlay/ov=popup, others use ov=overlay/po=popup
+  const popupPairs = [
+    {overlay: "po11", popup: "ov11"},  // po=overlay, ov=popup
+    {overlay: "po12", popup: "ov12"},
+    {overlay: "po13", popup: "ov13"},
+    {overlay: "po15", popup: "ov15"},
+    {overlay: "ov2", popup: "po2"},    // ov=overlay, po=popup (reversed)
+    {overlay: "ov3", popup: "po3"},    // ov=overlay, po=popup (reversed)
+    {overlay: "po5", popup: "ov5"},
+    {overlay: "po7", popup: "ov7"},
+    {overlay: "po8", popup: "ov8"},
+    {overlay: "po9", popup: "ov9"},
+    {overlay: "po10", popup: "ov10"}
+  ];
 
-		    SYANTE.addEventListener("click", () => {
-              document.getElementById("po12").style.display = "block";
-  document.getElementById("ov12").style.display = "block";
-  })
-  tlc.addEventListener("click", () => {
-              document.getElementById("po9").style.display = "block";
-  document.getElementById("ov9").style.display = "block";
-  })
+  popupPairs.forEach(pair => {
+    const overlay = document.getElementById(pair.overlay);
+    const popup = document.getElementById(pair.popup);
+    if (overlay) {
+      overlay.addEventListener("click", (e) => {
+        // Close if clicking on the overlay itself (not the popup content)
+        if (e.target === overlay) {
+          overlay.style.display = "none";
+          if (popup) popup.style.display = "none";
+        }
+      });
+    }
+    // Prevent closing when clicking inside the popup
+    if (popup) {
+      popup.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+    }
+  });
 
-	    Blink.addEventListener("click", () => {
-              document.getElementById("po11").style.display = "block";
-  document.getElementById("ov11").style.display = "block";
-  })
+  // Special handling for Cmay popup
+  const cmayOverlay = document.getElementById("overlay");
+  const cmayPopup = document.getElementById("popup");
+  if (cmayOverlay) {
+    cmayOverlay.addEventListener("click", (e) => {
+      if (e.target === cmayOverlay) {
+        cmayOverlay.style.display = "none";
+        cmayPopup.style.display = "none";
+      }
+    });
+  }
+  if (cmayPopup) {
+    cmayPopup.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+  }
 
+  if (MBLink && MB) {
+    MBLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showPopup("po15", "ov15");
+    });
+  }
 
+  if (MarkLink && Mark) {
+    MarkLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showPopup("po13", "ov13");
+    });
+  }
 
-  TF.addEventListener('click', () => {
-              document.getElementById("po10").style.display = "block";
-  document.getElementById("ov10").style.display = "block";
-  })
-  fourtySeven.addEventListener("click", () => {
-          document.getElementById("po3").style.display = "block";
-  document.getElementById("ov3").style.display = "block";
-  })
+  if (SYANTELink && SYANTE) {
+    SYANTELink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showPopup("po12", "ov12");
+    });
+  }
 
-  Skizi.addEventListener("click", () => {
+  if (tlcLink && tlc) {
+    tlcLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showPopup("po9", "ov9");
+    });
+  }
+
+  if (BlinkLink && Blink) {
+    BlinkLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showPopup("po11", "ov11");
+    });
+  }
+
+  if (TFLink && TF) {
+    TFLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showPopup("po10", "ov10");
+    });
+  }
+
+  if (fourtySevenLink && fourtySeven) {
+    fourtySevenLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      // fourtySeven uses ov3 as overlay and po3 as popup (reversed)
+      document.getElementById("ov3").style.display = "block";
+      document.getElementById("po3").style.display = "block";
+    });
+  }
+
+  if (SkiziLink && Skizi) {
+    SkiziLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      // Skizi uses ov2 as overlay and po2 as popup (reversed)
+      document.getElementById("ov2").style.display = "block";
       document.getElementById("po2").style.display = "block";
-  document.getElementById("ov2").style.display = "block";
-  })
-Cmay.addEventListener("click", () => {
-  document.getElementById("popup").style.display = "block";
-  document.getElementById("overlay").style.display = "block";
-  
-});
+    });
+  }
 
-PJ.addEventListener("click", () => {
-  document.getElementById("po5").style.display = "block";
-  document.getElementById("ov5").style.display = "block";
-  })
-  
-  Cavemen.addEventListener("click", () => {
-    document.getElementById("ov7").style.display = "block";
-    document.getElementById("po7").style.display = "block";
-  })
+  if (CmayLink && Cmay) {
+    CmayLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      document.getElementById("popup").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
+    });
+  }
 
-  DCC.addEventListener("click", () => {
-  document.getElementById("ov8").style.display = "block";
-  document.getElementById("po8").style.display = "block";
-})
+  if (PJLink && PJ) {
+    PJLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showPopup("po5", "ov5");
+    });
+  }
+  
+  if (CavemenLink && Cavemen) {
+    CavemenLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showPopup("po7", "ov7");
+    });
+  }
+
+  if (DCCLink && DCC) {
+    DCCLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showPopup("po8", "ov8");
+    });
+  }
 </script>
 
 
@@ -1922,4 +2029,3 @@ window.queuemusic = function(fileInp, title){
             })
           })
   </script>
-
