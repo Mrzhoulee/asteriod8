@@ -221,7 +221,7 @@
   scroll-behavior: smooth; /* Smooth scrolling (optional) */ 
   white-space: nowrap;  /" class="content-section">
       <h2 class="section-title">Artists of the Month <b>(OG ARTISTS)</b></h2>
-
+<div id="artists-grid-8">
      <div class="artists-grid horizontal-scroll">
 
 		 
@@ -309,6 +309,7 @@
       <p>DJ CHRIS CONCEPTS</p>
     </div>
   </ul>
+  </div>
       </div>
     </section>
     <section id="hot-tracks" class="content-section">
@@ -1680,7 +1681,7 @@ window.queuemusic = function(fileInp, title){
 
               //gets only the values of (tmp) for all items(elements) here:
                cde += `
-              <div class="sssh" data-title="${Object.values(Object.values(item)[0])[0]['title'].toLowerCase()}">
+              <div class="sssh" data-title="${Object.values(Object.values(item)[0])[0]['title'].toLowerCase()}" data-artist="${Object.values(Object.values(item)[0])[0]['artist'].toLowerCase()}" data-album="${Object.values(Object.values(item)[0])[0]['album'].toLowerCase()}">
                 <div id="songer" class="ssda">
                 <div style="margin: 0; padding: 0;">
     
@@ -1742,9 +1743,10 @@ window.queuemusic = function(fileInp, title){
       console.log('1328')
       document.getElementById("ab").innerHTML = "";
       console.log("1330");
+      let cde9 = document.getElementById("artists-grid-8").innerHTML;
               console.log(Object.values(Object.values(item)[0])[0]['title'])
               console.log('1332')
-              document.getElementById("ab").innerHTML = cde
+              document.getElementById("ab").innerHTML = cde  + cde9
               console.log("1334")
               console.log(cde)
               document.getElementById("play_" + Object.values(Object.values(item)[0])[0]['title']).addEventListener("click", () => {
@@ -1784,6 +1786,25 @@ window.queuemusic = function(fileInp, title){
 
             // Get all song elements inside the 'ab' div
             const songs = document.querySelectorAll("#ab .song");
+            const artists8 = document.querySelectorAll("#artists-grid-8 .artist");
+
+            if (query && query.length > 0) {
+              artists8.forEach(song => {
+                // Check if the song's text contains the query (case-insensitive)
+                const artist8Title = song.textContent.toLowerCase();
+                if (artist8Title.includes(query)) {
+                  song.style.display = "block";  // Show song if it matches
+                } else {
+                  song.style.display = "none";   // Hide song if it doesn't match
+                }
+              });
+            } else {
+              // If there is no query, show all songs
+              artists8.forEach(song => {
+                song.style.display = "block";
+              });
+            }
+
 
             // If there is some input, filter songs
             if (query && query.length > 0) {
@@ -1803,6 +1824,10 @@ window.queuemusic = function(fileInp, title){
               });
             }
           });
+
+
+        
+
 
           let email = localStorage.getItem("email");
 
@@ -2011,13 +2036,18 @@ window.queuemusic = function(fileInp, title){
               document.getElementById("searchInput").addEventListener('input', (e)=>{
             const query = e.target.value.toLowerCase();
             const songgh = document.querySelectorAll('#ab .sssh')
+            const artistCards = document.querySelectorAll('#artists-grid-8 .artist-card')
+            const artistCardsInAb = document.querySelectorAll('#ab .artist-card')
 
+            // Search songs (by title, artist, or album)
             songgh.forEach(song =>{
-              const title = song.getAttribute("data-title");
+              const title = song.getAttribute("data-title") || "";
+              const artist = song.getAttribute("data-artist") || "";
+              const album = song.getAttribute("data-album") || "";
               const queryWords = query.split(/\s+/); // split into words
 
               function checkti(word){
-                return title.includes(word);
+                return title.includes(word) || artist.includes(word) || album.includes(word);
               }
               const matches = queryWords.every(checkti);
 
@@ -2027,5 +2057,61 @@ window.queuemusic = function(fileInp, title){
                 song.style.display = "none";
               }
             })
+
+            // Helper function to check if artist card matches query
+            function checkArtistMatch(artistCard, query) {
+              // Get artist name from <p> tag or text content
+              const artistNameElement = artistCard.querySelector('p');
+              let artistName = "";
+              
+              if (artistNameElement) {
+                artistName = artistNameElement.textContent.toLowerCase().trim();
+              } else {
+                // If no <p> tag, clone the card, remove links and images, get text
+                const clone = artistCard.cloneNode(true);
+                clone.querySelectorAll('a, img').forEach(el => el.remove());
+                artistName = clone.textContent.toLowerCase().trim().replace(/\s+/g, ' ');
+              }
+              
+              // Check if artist name matches query (supports partial matches)
+              // Also check each word in the query matches any word in artist name
+              const queryWords = query.split(/\s+/).filter(w => w.length > 0);
+              const artistWords = artistName.split(/\s+/);
+              
+              // Match if all query words are found in artist name (any order)
+              return queryWords.every(queryWord => 
+                artistWords.some(artistWord => artistWord.includes(queryWord)) || 
+                artistName.includes(queryWord)
+              );
+            }
+
+            // Search artists in artists-grid-8
+            if (query && query.length > 0) {
+              artistCards.forEach(artistCard => {
+                if (checkArtistMatch(artistCard, query)) {
+                  artistCard.style.display = "block";
+                } else {
+                  artistCard.style.display = "none";
+                }
+              });
+              
+              // Search artist cards in #ab section
+              artistCardsInAb.forEach(artistCard => {
+                if (checkArtistMatch(artistCard, query)) {
+                  artistCard.style.display = "block";
+                } else {
+                  artistCard.style.display = "none";
+                }
+              });
+            } else {
+              // If there is no query, show all artists
+              artistCards.forEach(artistCard => {
+                artistCard.style.display = "block";
+              });
+              artistCardsInAb.forEach(artistCard => {
+                artistCard.style.display = "block";
+              });
+            }
           })
   </script>
+
