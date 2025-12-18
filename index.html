@@ -2103,8 +2103,18 @@ window.queuemusic = function(fileInp, title){
                   artistCard.style.display = "none";
                 }
               });
+
+              // Move visible artist cards in #ab to the top (above songs)
+              const abContainer = document.getElementById('ab');
+              if (abContainer) {
+                const visibleArtistCards = Array.from(artistCardsInAb).filter(card => card.style.display !== 'none');
+                // Insert in reverse so original order is preserved
+                visibleArtistCards.reverse().forEach(card => {
+                  abContainer.insertBefore(card, abContainer.firstChild);
+                });
+              }
             } else {
-              // If there is no query, show all artists
+              // If there is no query, show all artists and keep default layout
               artistCards.forEach(artistCard => {
                 artistCard.style.display = "block";
               });
