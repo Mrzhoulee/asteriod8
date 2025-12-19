@@ -224,6 +224,14 @@
 <div id="artists-grid-8">
      <div class="artists-grid horizontal-scroll">
 
+
+		 				 		 		  <div class="artist-card">
+      <a href="#ADAR">
+      <img id="ADAR" class="artist-image" src="https://i.ibb.co/yLBqfbF/image.png" alt="image" border="0" width="70" height="70" style="border-radius: 75%;"> 
+      </a> 
+      <p>Adarena89</p>
+    </div> 
+
 		 
 				 		 		  <div class="artist-card">
       <a href="#MB">
@@ -462,10 +470,8 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
   </div>
    </div>
 
-
-	
-		  	  <div id="po15" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
-<div id="ov15" style="display:none; position:fixed; top:50%; left:50%; 
+	  <div id="po12" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="ov12" style="display:none; position:fixed; top:50%; left:50%; 
 transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
     width: 1000px;
     height: 520px;
@@ -476,12 +482,46 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     overflow-y: auto;  /* vertical scroll if content is too tall */">
     
 <center>
-  <h1>Melodic Black</h1>
-  <a href="https://suno.com/@positivepitch5609252"><h5>Check out Melodic Black's Suno</h5></a>
+  <h1>Syante</h1>
+  <a href="https://syante.lovable.app/"><h5>Check out Syante's website</h5></a>
    <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
-    <h3>Ride Slow</h3>
-	  <h3>Melodic Black</h3>
-    <audio id="audio2" src="https://files.catbox.moe/46mxnc.mp3" preload="auto"></audio>
+    <h3>Cold Blooded</h3>
+	  <h3>Syante</h3>
+    <audio id="audio2" src="https://files.catbox.moe/jgf8el.mp3" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
+
+	      <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Downhill</h3>
+	  <h3>Syante</h3>
+    <audio id="audio2" src="https://files.catbox.moe/a6u6ai.mp3" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
+
+
+  </center>
+  </div>
+   </div>
+
+	
+		  	  <div id="po16" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="ov16" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    color: black;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>Adarena89</h1>
+  <a href="https://www.instagram.com/adarena89?igsh=MWF0bW4xZG9tbmE2YQ%3D%3D"><h5>Check out Adarena89 Instagram</h5></a>
+   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+    <h3>Gospel Peace</h3>
+	  <h3>Adarena89</h3>
+    <audio id="audio2" src="https://files.catbox.moe/7e0cgt.mp3" preload="auto"></audio>
     <button onclick="play2()">PLAY</button>
     <button onclick="pause2()">PAUSE</button>
 
@@ -1083,9 +1123,13 @@ setInterval(flySanta, 10000);
 	let SYANTE = document.getElementById("SYANTE");
 	let Mark = document.getElementById("Mark");
 	let MB = document.getElementById("MB");
+	let ADAR = document.getElementById("ADAR");
+	
 
-
-
+	         if(window.location.hash == "#ADAR"){
+    document.getElementById("po16").style.display = "block";
+    document.getElementById("ov16").style.display = "block";
+			 }
 
 	         if(window.location.hash == "#MB"){
     document.getElementById("po15").style.display = "block";
@@ -1163,7 +1207,7 @@ setInterval(flySanta, 10000);
   let PJLink = document.querySelector('a[href="#PJ"]');
   let CavemenLink = document.querySelector('a[href="#Cavemen"]');
   let DCCLink = document.querySelector('a[href="#DCC"]');
-
+  let ADARLink = document.querySelector('a[href="ADAR"]');
   // Function to show popup immediately
   function showPopup(poId, ovId) {
     const po = document.getElementById(poId);
@@ -1193,7 +1237,8 @@ setInterval(flySanta, 10000);
     {overlay: "po7", popup: "ov7"},
     {overlay: "po8", popup: "ov8"},
     {overlay: "po9", popup: "ov9"},
-    {overlay: "po10", popup: "ov10"}
+    {overlay: "po10", popup: "ov10"},
+	  {overlay: "po16", popup: "ov16"}
   ];
 
   popupPairs.forEach(pair => {
@@ -1319,6 +1364,13 @@ setInterval(flySanta, 10000);
     DCCLink.addEventListener("click", (e) => {
       e.preventDefault();
       showPopup("po8", "ov8");
+    });
+  }
+	
+  if (ADARLink && ADAR) {
+    ADARLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showPopup("po16", "ov16");
     });
   }
 </script>
@@ -2124,5 +2176,6 @@ window.queuemusic = function(fileInp, title){
             }
           })
   </script>
+
 
 
