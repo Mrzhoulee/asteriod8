@@ -12,29 +12,68 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  width: 100%;
-  overflow: hidden; /* hides scrollbars */
+  background: black;
 }
 
-.fullscreen-video {
-  position: fixed;   /* stays on screen even if you scroll */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;     /* ensures it’s on top */
+/* Main stream layout */
+.stream-wrapper {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
 }
 
-.fullscreen-video iframe {
+/* VIDEO */
+.video-container {
+  flex: 3; /* 70% */
+  position: relative;
+}
+
+.video-container iframe {
   width: 100%;
   height: 100%;
+  border: none;
+}
+
+/* CHAT */
+.chat-container {
+  flex: 1; /* 30% */
+  border-left: 2px solid #111;
+}
+
+.chat-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* 📱 MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+  .stream-wrapper {
+    flex-direction: column;
+  }
+
+  .video-container {
+    height: 60vh;
+  }
+
+  .chat-container {
+    height: 40vh;
+    border-left: none;
+    border-top: 2px solid #111;
+  }
 }
 
   </style>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/-F1sDBnIbKo?si=_YgC3O6GmT8m1-CN" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  <div class="stream-wrapper">
+    <div class="video-container">
+<iframe width="1086" height="315" src="https://www.youtube.com/embed/Un5IlGKOeHk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="chat-container">
+  <iframe src="https://www.youtube.com/live_chat?v=Un5IlGKOeHk&embed_domain=asteroid8.net"></iframe>
+</div>
 
+</div>
 </body>
 </html>
-
 
 
