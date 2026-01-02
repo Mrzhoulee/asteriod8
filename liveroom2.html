@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=stop_circle" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room 1</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+
+
+<body>
+    <style>
+        .big-icons{
+            font-size: 75px;
+        }
+
+        .huck:hover{
+            background-color: darkgrey;
+        }
+
+/* 1. The Container (Card Style) */
+#banGlocks {
+        width: 380px;          /* Slightly wider for better spacing */
+        padding: 25px;         /* More breathing room */
+        margin: 20px auto;     /* Centers the box horizontally */
+        background: #1e1e1e;   /* Dark Grey card background matching your theme */
+        border-radius: 20px;   /* Smooth rounded corners */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Deep shadow for depth */
+        text-align: center;    /* Centers the input inside */
+        font-family: 'Montserrat', sans-serif;
+        display: none;
+    }
+
+    /* 2. The Input Field (Matching .large-input style) */
+    #pscd {
+        width: 100%;           /* Full width of the container */
+        padding: 14px;
+        box-sizing: border-box; /* Ensures padding doesn't break width */
+        
+        background: #121212;   /* Very dark background */
+        border: 2px solid #2a2a2a; /* Subtle border */
+        border-radius: 14px;   /* Rounded corners */
+        
+        color: white;          /* White text */
+        font-size: 16px;
+        font-weight: 500;
+        outline: none;         /* Removes default browser outline */
+        transition: all 0.2s ease;
+    }
+
+    /* 3. The Glow Effect on Focus */
+    #pscd:focus {
+        border-color: #ff7a3b; /* Your Orange accent color */
+        box-shadow: 0 0 12px rgba(255, 122, 59, 0.4); /* Orange Glow */
+    }
+
+    /* Optional: Placeholder styling */
+    #pscd::placeholder {
+        color: #666;
+        font-style: italic;
+    }
+
+    /* Styling for the Tick Button */
+.tick-btn {
+    background: linear-gradient(90deg, #ff3b3b, #ff7a3b); /* Matches your theme */
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.tick-btn:hover {
+    transform: scale(1.1); /* Slight grow effect on hover */
+}
+
+.tick-btn .material-symbols-outlined {
+    font-size: 24px; /* Size of the checkmark */
+}
+
+/* Ensures the input and button share the container space */
+
+    </style>
+
+
+
+<button id="tuck" onclick="document.getElementById('banGlocks').style.display = 'block';" class="huck" style="border-radius: 12.5%;">
+    <div style="color: darkred">
+        <span class="material-symbols-outlined big-icons">stop_circle</span> 
+        <h1><font face="Montserrat"><div style="align-items: center;">End <br> Stream</div></font></h1>
+    </div>
+</button>
+<br>
+<br>
+<div id="show"></div>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24
+    }
+    </style>
+
+<div id="banGlocks">
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <input id="pscd" type="text" placeholder="Please Enter the Livestream Passcode" />
+        
+        <button onclick="triggerEndStreamUI()" class="tick-btn">
+            <span class="material-symbols-outlined">
+                check_circle
+                </span>
+        </button>
+    </div>
+</div>
+ <div id="loadingPopup" style="
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(18, 18, 18, 0.95); 
+    z-index: 9999; 
+    justify-content: center; 
+    align-items: center; 
+    flex-direction: column;
+    font-family: 'Montserrat', sans-serif;
+    color: white;">
+    
+    <div class="loader-circle"></div>
+    
+    <h2 style="margin-top: 25px; letter-spacing: 1px;">Ending Stream...</h2>
+    <p style="color: #ff7a3b; font-weight: 500;">Cleaning up your room</p>
+</div>
+
+<style>
+    /* Spinner Animation */
+    .loader-circle {
+        width: 60px;
+        height: 60px;
+        border: 6px solid #2a2a2a;
+        border-top: 6px solid #ff3b3b; /* Red matching your Go Live button */
+        border-radius: 50%;
+        animation: spin-loader 1s linear infinite;
+    }
+
+    @keyframes spin-loader {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+
+    <script type="module">
+   // Attach to window so the HTML 'onclick' can find it
+
+        console.log("955")
+console.log("960");
+        // Import the functions you need from the SDKs you need
+   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
+import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { getDatabase, ref as ref2, onValue, update, get, set, remove, push} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
+console.log('1050')
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+authDomain: "asteroid-cdc13.firebaseapp.com",
+databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+projectId: "asteroid-cdc13",
+storageBucket: "asteroid-cdc13.appspot.com",
+messagingSenderId: "793353824502",
+appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+measurementId: "G-GV72TMNNGR"
+};
+
+console.log('1067') 
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+const roomPath = ref2(database, "LiveRooms/Room2");
+
+// 2. Set up the live listener
+onValue(roomPath, (snapshot) => {
+    const data = snapshot.val();
+    
+    if (snapshot.exists()) {
+        var Passt = data.passcode;
+        var embed67 = data.embed;
+        console.log(embed67)
+        let pscdVal = document.getElementById('pscd').value;
+
+        window.triggerEndStreamUI = function() {
+    const popup = document.getElementById('loadingPopup');
+    if(Passt == pscd.value){
+    // 1. Show the popup
+    popup.style.display = 'flex';
+document.getElementById("tuck").disabled = true;
+document.getElementById('tuck').style.display = "none";
+document.getElementById('pscd').style.display = "none";
+document.getElementById("banGlocks").style.display = "none";
+document.getElementById('show').style.display = "none";
+update(roomPath, {
+    embed: "",      // Set to an empty string instead of null
+    passcode: "",   // Set to an empty string instead of null
+    status: "offline" // Add a new key to keep the folder alive
+});
+    // 2. Wait 2 seconds then hide it
+    setTimeout(() => {
+        popup.style.display = 'none';
+        alert("Stream has been closed.");
+    }, 2000);
+}
+        }
+        
+        // 3. Update the UI automatically
+        // This injects the YouTube iframe code directly into your 'liveshow' div
+        document.getElementById('show').innerHTML = data.embed;
+
+    } else {
+        console.log("No live stream found at this path.");
+        document.getElementById('liveshow').innerHTML = "<h1>Room Offline</h1>";
+    }
+}, (error) => {
+    console.error("The read failed: " + error.code);
+});
+
+
+
+</script>
+</body>
+</html>

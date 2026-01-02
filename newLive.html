@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a Live Stream</title>
+</head>
+<body>
+    <script>
+
+    </script>
+    <style>
+                .large-input {
+            width: 500px;  /* Sets the width */
+            height: 50px;  /* Sets the height */
+            padding: 10px; /* Adds space inside the box, making the clickable area larger */
+
+            /* Base button */
+.btn {
+  border: none;
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
+}
+
+/* Primary (Go Live) */
+.btn.primary {
+  background: linear-gradient(90deg, #ff3b3b, #ff7a3b);
+  color: white;
+  box-shadow: 0 8px 20px rgba(255, 80, 60, 0.35);
+}
+
+.btn.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(255, 80, 60, 0.45);
+}
+
+/* Secondary (Tutorial) */
+.btn.secondary {
+  background: #1e1e1e;
+  color: #ff7a3b;
+  border: 1px dashed #ff7a3b;
+}
+
+.btn.secondary:hover {
+  opacity: 0.85;
+}
+
+/* Input */
+.large-input {
+  width: 500px;
+  max-width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid #2a2a2a;
+  background: #121212;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+.large-input::placeholder {
+  color: #888;
+}
+
+.large-input:focus {
+  border-color: #ff7a3b;
+  box-shadow: 0 0 0 2px rgba(255, 122, 59, 0.25);
+}
+
+        }
+    </style>
+    <center>
+        <button style="
+        background: linear-gradient(90deg,#ff3b3b,#ff7a3b);
+        color:white;
+        padding:14px 20px;
+        border-radius:14px;
+        border:none;
+        font-weight:600;
+        cursor:pointer;" class="btn secondary"
+        onclick="document.getElementById('fun').style.display = 'block';">
+        Open Quick Tutorial (Recommended)
+      </button>
+      <br>
+      <br>
+      <input class="large-input" id="uinp"
+  style="border:2px solid red; background:white; color:black;"
+  type="text" placeholder="Enter your Youtube Live Embed Code Here"
+/>
+
+<input class="large-input" id="passcode"
+style="border:2px solid red; background:white; color:black;"
+type="text" placeholder="Create a Live Passcode that you are going to be using. "
+/>
+<style>
+    .room-selector {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  
+    .room-option {
+      position: relative;
+    }
+  
+    .room-option input[type="radio"] {
+      display: none;
+    }
+  
+    .room-option label {
+      display: block;
+      padding: 14px 22px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      background: #1f1f1f;
+      color: #fff;
+      border: 2px solid transparent;
+      transition: all 0.25s ease;
+    }
+  
+    .room-option input[type="radio"]:checked + label {
+      background: linear-gradient(90deg, #ff3b3b, #ff7a3b);
+      border-color: #ff7a3b;
+      box-shadow: 0 0 12px rgba(255, 122, 59, 0.6);
+    }
+  
+    .room-option label:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+   
+   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getDatabase, ref as ref2, onValue, update, get} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+        authDomain: "asteroid-cdc13.firebaseapp.com",
+        databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+        projectId: "asteroid-cdc13",
+        storageBucket: "asteroid-cdc13.appspot.com",
+        messagingSenderId: "793353824502",
+        appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+        measurementId: "G-GV72TMNNGR"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Make functions global so your buttons can see them
+    window.onValue = onValue;
+    window.ref2 = ref2;
+    window.database = database;
+    window.get = get;
+
+    window.saveTheLive = function(uinp, selected) {
+        let selectes = selected.value; // Get the room value (e.g. "Room1")
+        let path = "LiveRooms/" + selectes;
+        
+        // Create the reference INSIDE the function
+        const myRef = ref2(database, path);
+
+        update(myRef, {
+            embed: uinp.value,
+            startedAt: Date.now(),
+            passcode: document.getElementById("passcode").value,
+            status: "online"
+
+        }).then(() => {
+            console.log("Updated path:", path);
+            document.getElementById('helloWorld').style.display = 'block';
+        });
+
+        // Start listening to the specific room chosen
+        onValue(myRef, (snapshot) => {
+            console.log("Current room data:", snapshot.val());
+        });
+    }
+</script>
+  <br>
+  <br>
+  <div class="room-selector">
+    <div class="room-option">
+      <input type="radio" id="liveroom1" name="Room" value="Room1" checked>
+      <label for="liveroom1">🎙️ Room 1</label>
+    </div>
+  
+    <div class="room-option">
+      <input type="radio" id="liveroom2" name="Room" value="Room2">
+      <label for="liveroom2">🎧 Room 2</label>
+    </div>
+  
+    <div class="room-option">
+      <input type="radio" id="liveroom3" name="Room" value="Room3">
+      <label for="liveroom3">🔥 Room 3</label>
+    </div>
+  
+    <div class="room-option">
+      <input type="radio" id="liveroom4" name="Room" value="Room4">
+      <label for="liveroom4">🌙 Room 4</label>
+    </div>
+  
+    <div class="room-option">
+      <input type="radio" id="liveroom5" name="Room" value="Room5">
+      <label for="liveroom5">🚀 Room 5</label>
+    </div>
+  </div>
+  <br>
+  <br>
+  <button onclick="
+// 1. Get the inputs
+   window.uinp = document.getElementById('uinp');
+  window.selected = document.querySelector('input[name=Room]:checked');
+  
+  // 2. Build the reference (using the window.database and window.ref2 from your script)
+  window.roomPath = 'LiveRooms/' + selected.value;
+   window.currentRef = ref2(database, roomPath);
+
+   // 2. Start the listener with the 'online' check
+  get(currentRef).then((snapshot) => {                     
+    const data = snapshot.val();
+    console.log('Live Update:', data);
+
+    // Check if the room is already online
+    if (data && data.status === 'online') {
+        alert('This room is already live! Please pick another.');
+    } else {
+        // 3. ONLY save if it's NOT online
+        saveTheLive(uinp, selected);
+        document.getElementById('helloWorld').style.display = 'block';
+    }
+  });
+
+  // 4. Run your save function
+
+
+  // 5. Show the success button
+  document.getElementById('helloWorld').style.display = 'block';
+" style=" 
+  background: linear-gradient(90deg,#ff3b3b,#ff7a3b);
+  color:white;
+  padding:14px 20px;
+  border-radius:14px;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+">
+  Go Live
+</button>
+<br>
+<br>
+<button id="helloWorld" onclick="let otto = (selected.id); window.location.href = otto + '.html' " style="
+display: none;
+background: linear-gradient(90deg,#ff3b3b,#ff7a3b);
+color:white;
+padding:14px 20px;
+border-radius:14px;
+border:none;
+font-weight:600;
+cursor:pointer;" class="btn secondary">
+Your Concert is Live! Click here to go to your Concert
+</button>
+    
+      <div id="liveshow"></div>
+</center>
+      <div id="fun" style="display: none;">
+      
+        <font face="Montserrat">
+       
+            <center>
+            <p>
+        🎤 How to Go Live on Asteroid (Using YouTube Live)
+
+Follow these steps to start your live concert on Asteroid.
+<br>
+1️⃣ Create a YouTube Live Stream
+
+Go to YouTube Studio
+
+In the top right, click Create → Go live
+
+Choose “Stream”
+
+Set your:
+
+Title
+
+Description
+
+Privacy (Public or Unlisted recommended)
+
+Click Create stream
+
+⚠️ Note: Your channel must be verified and live streaming enabled on YouTube.
+<br>
+2️⃣ Get the Embed Code
+
+In YouTube Studio, open your Live Stream
+
+Click Share or Embed
+
+Copy the embed code
+(it starts with iframe ...>)
+<br>
+3️⃣ Paste the Embed Code on Asteroid
+
+Come back to Asteroid
+
+Paste the full embed code into the Live Stream Embed text box
+
+Double-check that the code is fully pasted (don’t edit it)
+<br>
+4️⃣ Click “Go Live”
+
+Click the Go Live button
+
+Your YouTube live stream will now appear automatically in your Asteroid concert room
+
+🎉 You are now live on Asteroid!
+<br>
+5️⃣ Share Your Concert Room
+
+Copy your Asteroid concert room link
+
+Share it with fans on:
+
+Instagram
+
+TikTok
+
+Discord
+
+YouTube description
+
+Fans join → watch live → chat together
+
+✅ Tips for Best Experience
+
+Start the YouTube stream before clicking Go Live on Asteroid
+
+Use Unlisted if you only want viewers from Asteroid
+
+Make sure audio is working in YouTube Studio first
+</p>
+</center>
+</font>
+</div>
+    </div>
+</body>
+</html>
