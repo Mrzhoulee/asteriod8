@@ -143,7 +143,7 @@
       <img src="astei.png" alt="Asteroid Music Logo" class="logo-icon">
     </div>
     <div class="logo-text-wrapper">
-      <h1 class="logo-title">Asteroid Music Streaming Platform</h1>
+      <h1 class="logo-title">Asteroid Music</h1>
       <p class="logo-subtitle">Better Music Experience</p>
     </div>
   </div>
@@ -163,7 +163,38 @@
 
   </div>
 </header>
+<style>
+.live-circle:hover {
+  border-color: #ff884d;
+}
 
+
+.live-circle {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 2px solid #ff5a5a;
+  border-radius: 48% 52% 46% 54%; /* uneven = hand-drawn feel */
+  transform: rotate(-2deg); /* slightly crooked */
+}
+
+.live-circle .nav-item {
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+  transform: rotate(2deg); /* counter-rotate text so it's readable */
+}
+
+
+.live-notifier {
+  background: linear-gradient(90deg, #ff4d4d, #ff884d);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+</style>
 <div class="body-layout">
   <aside id="sidebar" class="sidebar">
     <a href="studio.html" class="upload-button">
@@ -182,6 +213,17 @@
           <a href="policy.html" class="nav-item">
             <span>Report Songs</span>
           </a>
+
+          
+          <div class="live-circle">
+            <a href="lively.html" class="nav-item">
+              <span>Live Concerts Menu</span>
+            </a>
+          </div>
+          
+          <div class="live-notifier">
+            [ NEW UPDATE ]🎤 Artists can go live anytime — watch live concerts instantly.
+          </div>
           <div style="color: white;">
 
 
@@ -315,12 +357,10 @@
   </div>
       </div>
     </section>
-<div style=" width:1304px; height: 198px; position: relative;">
+<div style=" width:1304px; height: 198px;">
 	  <img src="https://i.postimg.cc/wvxQD7SC/image.png">
 </div>
-	  <br>
-	  <br>
-    <section id="hot-tracks" class="content-section" style="position: relative;">
+    <section id="hot-tracks" class="content-section">
             <h1><font color="white" face="Montserrat"><b>🔥Trending Songs of the Month</b></font></h1>
 <div id="asteroidLeaderboard" style="background-color: #333; color: white;"></div>
              <div style="text-align:center;">
@@ -451,7 +491,21 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 <center>
   <h1>Syante</h1>
   <a href="https://syante.lovable.app/"><h5>Check out Syante's website</h5></a>
-   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+  <div class="postit">
+    <h3>📝 Leave a note</h3>
+  
+    <textarea id="noteInput" maxlength="140" placeholder="Write something nice..."></textarea>
+  
+    <button onclick="addNote(noteInput)">Send</button>
+  </div>
+  
+
+  <script>
+    // notesContainer will be declared in the module script below
+
+  </script>
+  <div id="notesContainer"></div>
+  <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px; position: relative; left: 320px; bottom: 300px;">
     <h3>Cold Blooded</h3>
 	  <h3>Syante</h3>
     <audio id="audio2" src="https://files.catbox.moe/jgf8el.mp3" preload="auto"></audio>
@@ -505,6 +559,46 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 
 	
 		  
+<style>
+.postit {
+  width: 250px;
+  background: #ffeb77;
+  padding: 15px;
+  box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+  transform: rotate(-2deg);
+  font-family: Arial, sans-serif;
+}
+
+.postit h3 {
+  margin-top: 0;
+}
+
+.postit textarea {
+  width: 100%;
+  height: 80px;
+  border: none;
+  resize: none;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.postit button {
+  margin-top: 10px;
+  padding: 6px 10px;
+  border: none;
+  background: black;
+  color: white;
+  cursor: pointer;
+}
+
+.note {
+  background: #fff3a0;
+  padding: 10px;
+  margin: 10px 0;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+  transform: rotate(1deg);
+}
+</style>
 
 
 
@@ -519,10 +613,28 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     padding: 10px;
     overflow-y: auto;  /* vertical scroll if content is too tall */">
     
-<center>
+
+
   <h1>Mark Macko</h1>
+  <center>
   <a href="https://www.instagram.com/markmacko1/"><h5>Check out Mark Macko's instagram</h5></a>
-   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+</center>
+  <div class="postit">
+    <h3>📝 Leave a note</h3>
+  
+    <textarea id="noteInput" maxlength="140" placeholder="Write something nice..."></textarea>
+  
+    <button onclick="addNote(noteInput)">Send</button>
+  </div>
+  
+
+  <script>
+    // notesContainer will be declared in the module script below
+
+  </script>
+  <div id="notesContainer"></div>
+  
+   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px; position: relative; left: 320px; bottom: 300px;">
     <h3>Coyote Christmas</h3>
 	  <h3>Mark Macko</h3>
     <audio id="audio2" src="https://files.catbox.moe/sw7tqz.mp3" preload="auto"></audio>
@@ -530,7 +642,8 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     <button onclick="pause2()">PAUSE</button>
 
 
-  </center>
+
+  
   </div>
 </div>
 </div>
@@ -1086,7 +1199,152 @@ setInterval(flySanta, 10000);
 </div>
 
 <script>
-  let Cmay = document.getElementById("Cmay")
+  
+</script>
+
+
+        <script> 
+        
+
+
+                  document.getElementById('copyEmail').addEventListener('click', ()=>{
+            navigator.clipboard.writeText("asteroidcontactbussiness@gmail.com");
+            document.getElementById('Copied').style.visibility =  "visible";
+          })
+
+	document.addEventListener('DOMContentLoaded', function() {
+		const trustpilot_invitation = {
+   			recipientEmail: 'john@gmail.com',
+   			recipientName: 'John',
+   			referenceId: 'Order_123',
+   			source: 'InvitationScript',
+  		};
+  		tp('createInvitation', trustpilot_invitation);
+	});
+</script>
+
+
+        <script>
+        (function(w,d,s,r,n){w.TrustpilotObject=n;w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)};
+            a=d.createElement(s);a.async=1;a.src=r;a.type='text/java'+s;f=d.getElementsByTagName(s)[0];
+            f.parentNode.insertBefore(a,f)})(window,document,'script', 'https://invitejs.trustpilot.com/tp.min.js', 'tp');
+            tp('register', 'kHOOIyiBHcbxqOu0');
+</script>
+        <script>
+
+
+document.getElementById("playlists").addEventListener('click', ()=>{
+  window.location.href = "hiphop.html";
+})
+const audio1 = document.getElementById("audio1");
+const audio2 = document.getElementById("audio2");
+const audio3 = document.getElementById("audio3");
+const audio4 = document.getElementById("audio4");
+const audio5 = document.getElementById("audio5");
+
+          console.log("885")
+          
+          function play1() {
+            audio1.play();
+          }
+
+
+          function pause1() {
+            audio1.pause();
+          }
+
+                   
+          function play2() {
+            audio2.play();
+          }
+
+
+          function pause2() {
+            audio2.pause();
+          }
+
+                  
+          function play3() {
+            audio3.play();
+          }
+
+
+          function pause3() {
+            audio3.pause();
+          }
+
+                    
+          function play4() {
+            audio4.play();
+          }
+
+
+          function pause4() {
+            audio4.pause();
+          }
+
+                    function play5() {
+            audio5.play();
+          }
+
+
+          function pause5() {
+            audio5.pause();
+          }
+
+          console.log("934")
+          var toggle = "none"
+          document.getElementById("gg").addEventListener('click', () => {
+            console.log("jjsjsjsjjsjsjsjsjjsjjsjsjsj", toggle, toggle.includes("none"));
+            if (toggle.includes("block")) {
+              document.getElementById("turtle").style.display = "none";
+            } else {
+              document.getElementById("turtle").style.display = "block";
+            }
+            toggle = toggle.includes("none") ? "block" : "none"
+          })
+
+          
+          console.log("940")
+
+          document.getElementById("google-sign-in-mobile").addEventListener('click', () => {
+            document.getElementById("google-sign-in").click()
+          })
+          console.log("941")
+        </script>
+        <script type="module">
+          console.log("955")
+console.log("960");
+          // Import the functions you need from the SDKs you need
+     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
+  import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+  import { getDatabase, ref as ref2, onValue, update, get, set, remove, push} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+  import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
+console.log('1050')
+          // https://firebase.google.com/docs/web/setup#available-libraries
+
+          // Your web app's Firebase configuration
+          // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+  authDomain: "asteroid-cdc13.firebaseapp.com",
+  databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+  projectId: "asteroid-cdc13",
+  storageBucket: "asteroid-cdc13.appspot.com",
+  messagingSenderId: "793353824502",
+  appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+  measurementId: "G-GV72TMNNGR"
+};
+
+console.log('1067') 
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+let currentMusician = "";
+const notesContainer = document.getElementById('notesContainer');
+let Cmay = document.getElementById("Cmay")
   let Skizi = document.getElementById("Skizi")
   let fourtySeven = document.getElementById("47")
   let PJ = document.getElementById("PJ")
@@ -1118,7 +1376,7 @@ setInterval(flySanta, 10000);
     document.getElementById("ov13").style.display = "block";
 			 }
 	
-	         if(window.location.hash == "#SYANTE"){
+	         if(window.location.hash == "#SYANTE"){;
     document.getElementById("po12").style.display = "block";
     document.getElementById("ov12").style.display = "block";
   }
@@ -1348,148 +1606,39 @@ setInterval(flySanta, 10000);
       showPopup("po16", "ov16");
     });
   }
-</script>
+ currentMusician = window.location.hash.replace("#", "");
+ loadNotes();
+  window.addNote = function(note) {
+  if (!currentMusician || !note) return;
 
+  // Get the text value from the textarea element
+  const noteText = note.value || note;
+  console.log("Note text value:", noteText);
 
-        <script> 
-        
+  const noteRef = push(ref2(database, "notes/" + currentMusician));
 
-
-                  document.getElementById('copyEmail').addEventListener('click', ()=>{
-            navigator.clipboard.writeText("asteroidcontactbussiness@gmail.com");
-            document.getElementById('Copied').style.visibility =  "visible";
-          })
-
-	document.addEventListener('DOMContentLoaded', function() {
-		const trustpilot_invitation = {
-   			recipientEmail: 'john@gmail.com',
-   			recipientName: 'John',
-   			referenceId: 'Order_123',
-   			source: 'InvitationScript',
-  		};
-  		tp('createInvitation', trustpilot_invitation);
-	});
-</script>
-
-
-        <script>
-        (function(w,d,s,r,n){w.TrustpilotObject=n;w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)};
-            a=d.createElement(s);a.async=1;a.src=r;a.type='text/java'+s;f=d.getElementsByTagName(s)[0];
-            f.parentNode.insertBefore(a,f)})(window,document,'script', 'https://invitejs.trustpilot.com/tp.min.js', 'tp');
-            tp('register', 'kHOOIyiBHcbxqOu0');
-</script>
-        <script>
-
-
-document.getElementById("playlists").addEventListener('click', ()=>{
-  window.location.href = "hiphop.html";
-})
-const audio1 = document.getElementById("audio1");
-const audio2 = document.getElementById("audio2");
-const audio3 = document.getElementById("audio3");
-const audio4 = document.getElementById("audio4");
-const audio5 = document.getElementById("audio5");
-
-          console.log("885")
-          
-          function play1() {
-            audio1.play();
-          }
-
-
-          function pause1() {
-            audio1.pause();
-          }
-
-                   
-          function play2() {
-            audio2.play();
-          }
-
-
-          function pause2() {
-            audio2.pause();
-          }
-
-                  
-          function play3() {
-            audio3.play();
-          }
-
-
-          function pause3() {
-            audio3.pause();
-          }
-
-                    
-          function play4() {
-            audio4.play();
-          }
-
-
-          function pause4() {
-            audio4.pause();
-          }
-
-                    function play5() {
-            audio5.play();
-          }
-
-
-          function pause5() {
-            audio5.pause();
-          }
-
-          console.log("934")
-          var toggle = "none"
-          document.getElementById("gg").addEventListener('click', () => {
-            console.log("jjsjsjsjjsjsjsjsjjsjjsjsjsj", toggle, toggle.includes("none"));
-            if (toggle.includes("block")) {
-              document.getElementById("turtle").style.display = "none";
-            } else {
-              document.getElementById("turtle").style.display = "block";
-            }
-            toggle = toggle.includes("none") ? "block" : "none"
-          })
-
-          
-          console.log("940")
-
-          document.getElementById("google-sign-in-mobile").addEventListener('click', () => {
-            document.getElementById("google-sign-in").click()
-          })
-          console.log("941")
-        </script>
-        <script type="module">
-          console.log("955")
-console.log("960");
-          // Import the functions you need from the SDKs you need
-     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
-  import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-  import { getDatabase, ref as ref2, onValue, update, get, set, remove, push} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
-  import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
-console.log('1050')
-          // https://firebase.google.com/docs/web/setup#available-libraries
-
-          // Your web app's Firebase configuration
-          // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
-  authDomain: "asteroid-cdc13.firebaseapp.com",
-  databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
-  projectId: "asteroid-cdc13",
-  storageBucket: "asteroid-cdc13.appspot.com",
-  messagingSenderId: "793353824502",
-  appId: "1:793353824502:web:3ac24821911d14773ba4d7",
-  measurementId: "G-GV72TMNNGR"
+  set(noteRef, {
+    note: noteText
+  });
 };
 
-console.log('1067') 
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+
+
+
+
+function loadNotes() {
+  if (!currentMusician) return;
+
+  onValue(ref2(database, "notes/" + currentMusician), (snapshot3) => {
+    notesContainer.innerHTML = "";
+
+    snapshot3.forEach(childSnapshot => {
+      notesContainer.innerHTML += `<br><div class="postit">Anonymous: ${childSnapshot.val().note}</div>`;
+    });
+  });
+}
+
+
 
 console.log("hello 2236");
 const songRef = ref2(database, 'songplayed');
@@ -1609,6 +1758,9 @@ console.log('1133')
 
 
 console.log('1171')
+
+
+
             //define (tmp) as the key "a" in localStorage as people upload the the song infos 
             let tmp = Object.values(snapshot.val())
             let cde = ""
@@ -2151,10 +2303,6 @@ window.queuemusic = function(fileInp, title){
             }
           })
   </script>
-
-
-
-
 
 
 
