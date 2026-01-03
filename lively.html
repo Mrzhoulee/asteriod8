@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add_circle" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Concerts Menu</title>
+</head>
+<body>
+    <style>
+body {
+display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+    }
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+        </style>
+    <style>
+ .rooms-section {
+  width: 320px;
+  background: #121212;
+  padding: 16px;
+  border-radius: 20px;
+  color: white;
+  font-family: Arial, sans-serif;
+  align-items: center;
+}
+
+.rooms-section h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.rooms {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.room {
+  display: block;
+  background: #1e1e1e;
+  padding: 10px;
+  border-radius: 12px;
+  text-decoration: none; /* remove underline */
+  color: white;
+  cursor: pointer;
+}
+
+.room:hover {
+  background: #2a2a2a;
+}
+
+.big-icon {
+  font-size: 63px; /* try 24, 32, 40, 48 */
+  color: red;
+
+
+  a {
+  text-decoration: none;
+}
+
+
+}
+.create-live {
+  display: flex;
+  align-items: center;     /* vertical alignment */
+  gap: 10px;               /* space between icon & text */
+  text-decoration: none;
+}
+
+.create-live h3 {
+  margin: 0;               /* removes default h3 spacing */
+  font-family: Montserrat, sans-serif;
+  color: red;
+}
+
+
+  </style>  
+
+        
+<div class="rooms-section">
+    <a href="newLive.html" class="create-live">
+      <span class="material-symbols-outlined big-icon">
+        add_circle
+      </span>
+      <h3>Create Live Stream</h3>
+    </a>
+
+  
+            <center>
+        <h1><font face="Montserrat">Live Concerts Rooms</font></h1>
+            <div class="rooms">
+                <div class="rooms">
+                    <a href="liveroom1.html" class="room">Room 1</a>
+                    <a href="liveroom2.html" class="room">Room 2</a>
+                    <a href="liveroom3.html" class="room">Room 3</a>
+                    <a href="liveroom4.html" class="room">Room 4</a>
+                    <a href="liveroom5.html" class="room">Room 5</a>
+                  </div>
+            </div>
+          </div>
+          
+    </center>
+</body>
+</html>
