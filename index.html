@@ -162,10 +162,6 @@
 
 
   </div>
-	<script>function initApollo(){var n=Math.random().toString(36).substring(7),o=document.createElement("script");
-o.src="https://assets.apollo.io/micro/website-tracker/tracker.iife.js?nocache="+n,o.async=!0,o.defer=!0,
-o.onload=function(){window.trackingFunctions.onLoad({appId:"695878e8aa9d14001d8f8596"})},
-document.head.appendChild(o)}initApollo();</script>
 </header>
 <style>
 .live-circle:hover {
@@ -240,7 +236,16 @@ document.head.appendChild(o)}initApollo();</script>
  
         </nav>
       </div>
-    
+      <div class="sidebar-promo-wrapper">
+        <a href="https://www.producthunt.com/products/asteroid-2" class="promo-card">
+          <div class="promo-icon-wrapper">
+            <img src="16_1075.svg" alt="Product Hunt logo">
+          </div>
+          <div class="promo-text">
+            <span class="promo-subtitle">LEAVE A REVIEW ON</span>
+            <span class="promo-title">Product Hunt</span>
+          </div>
+        </a>
         <a href="Asteroid%20Terms.html" class="terms-link">Terms & Conditions</a>
       </div>
     </div>
@@ -355,79 +360,272 @@ document.head.appendChild(o)}initApollo();</script>
 <div style=" width:1304px; height: 198px;">
 	  <img src="https://i.postimg.cc/wvxQD7SC/image.png">
 </div>
-	  <br>
-	  <br>
-	  <br>
-	  <br>
+<br>
+<br>
+<br>
+<br>
     <section id="hot-tracks" class="content-section">
             <h1><font color="white" face="Montserrat"><b>🔥Trending Songs of the Month</b></font></h1>
 <div id="asteroidLeaderboard" style="background-color: #333; color: white;"></div>
              <div style="text-align:center;">
     <div class="content">
     </section>
+    <center>
     <section id="discover-modes">
-      <h2 class="section-title">Discover Modes</h2>
+      <h2 class="section-title">Discover Songs</h2>
+      <h4>I'm feeling</h4>
+ 
       <div class="discover-modes-grid horizontal-scroll">
         <div class="mode-card">
-          <button onclick="window.location.href = 'workout.html'" style="border:none; padding:0; background:none; cursor:pointer;">
+          <div class="feelings">
+            <button class="feeling-btn" id="Lonely">Lonely</button>
+            <button class="feeling-btn" id="Rain">Rain</button>
+            <button class="feeling-btn" id="Late">Late</button>
+            <button class="feeling-btn" id="Focus">Focus</button>
+            <button class="feeling-btn" id="Calm">Calm</button>
+            <button class="feeling-btn" id="Party">Party</button>
+            <button class="feeling-btn" id="Holiday">Holiday</button>
+            <button class="feeling-btn" id="Beach">Beach</button>
+            <button class="feeling-btn" id="InThePlane">In the Plane</button>
+            <button class="feeling-btn" id="MorningDrive">Morning Drive</button>
+            <button class="feeling-btn" id="LateDrive">Late Drive</button>
+            <button class="feeling-btn" id="Mad">Mad</button>
+            
+            <button class="feeling-btn" id="Tired">Tired</button>
+            <button class="feeling-btn" id="Productive">Productive</button>
+            <button class="feeling-btn" id="Excited">Excited</button>
+            
 
-          <!--merged image-->
-          <div class="stacked-image-container">
-            <img src="https://i.postimg.cc/RCwpRb52/istock-478624695.avif" alt="Workout Mode album art stack" class="stacked-image-item" style="z-index: 3;">
-            <img src="" alt="" class="stacked-image-item stacked-image-middle">
-            <img src="" alt="" class="stacked-image-item stacked-image-bottom">
           </div>
-          <div class="mode-text">
-            <p class="mode-title">Rock Mode</p> 
-          </div>
-          </button>
-        </div>
-        <div class="mode-card">
-          <button onclick="window.location.href = 'chill.html'" style="border:none; padding:0; background:none; cursor:pointer;">
+        </center>
+          <script>
+const response = await fetch(
+  'https://api.vectorshift.ai/v1/pipeline/69733b4098163cbba15657a5/run',
+  {
+    method: 'POST',
+    headers: {
+      "Authorization": "Bearer YOUR_REAL_JWT_HERE",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      inputs: {
+        discover: "Chill"
+      }
+    })
+  }
+);
 
-          <!--merged image-->
-          <div class="stacked-image-container">
-            <img src="https://i.postimg.cc/BbfY32Dh/images-9.jpg" alt="Chill Mode album art stack" class="stacked-image-item" style="z-index: 3;">
-            <img src="" alt="" class="stacked-image-item stacked-image-middle">
-            <img src="" alt="" class="stacked-image-item stacked-image-bottom">
-          </div>
-          <div class="mode-text">
-            <p class="mode-title">Acoustic Mode</p>
-          </div>
-          </button>
-        </div>
+const data = await response.json();
+console.log(data);
 
-        <div class="mode-card">
-               <button onclick="window.location.href = 'hiphop.html'" style="border:none; padding:0; background:none; cursor:pointer;">
+          </script>
 
+          <script>
+            // Mood mapping for user interface moods to analyzed moods
+            const moodMap = {
+              Lonely: ["calm", "chill"],
+              Productive: ["focus"],
+              Focus: ["focus"],
+              Calm: ["calm"],
+              Party: ["party", "energetic"],
+              Holiday: ["party", "energetic", "chill"],
+              InThePlane: ["calm", "chill"],
+              MorningDrive: ["energetic", "focus"],
+              LateDrive: ["chill"],
+              Tired: ["calm", "chill"]
+
+            };
+
+            // Function to get songs by mood
+            async function getSongsByMood(mood) {
+              console.log("🎵 Searching for songs with mood:", mood);
+              try {
+                const response = await fetch(`https://getsongsbymood-2nyi7qyxtq-nn.a.run.app?mood=${mood}`);
+                const data = await response.json();
+                console.log("✅ Found songs:", data);
+                return data;
+              } catch (error) {
+                console.error("❌ Error fetching songs:", error);
+                return { results: [], error: error.message };
+              }
+            }
+
+            // Function to display song results
+            function displaySongResults(songs, moodName) {
+              // Remove existing results
+              const existingResults = document.getElementById('song-results');
+              if (existingResults) {
+                existingResults.remove();
+              }
+
+              // Create results container
+              const resultsDiv = document.createElement('div');
+              resultsDiv.id = 'song-results';
+              resultsDiv.style.cssText = `
+                margin-top: 20px;
+                margin-left: 0px;
+                padding: 20px;
+                background: rgba(0, 0, 0, 0.8);
+                border-radius: 10px;
+                color: white;
+                max-width: 100%;
+                display: block;
+                width: 100%;
+                text-align: center !important;
+                alight-items: center !important;
+              `;
+
+              resultsDiv.innerHTML = `
+                <h3 style="color: #ff6b6b; text-align: center;">🎵 Songs for "${moodName}" mood</h3>
+                <div id="songs-list" style="margin-top: 15px;"></div>
+              `;
+
+              // Add songs to the list
+              const songsList = resultsDiv.querySelector('#songs-list');
+              if (songs.length === 0) {
+                songsList.innerHTML = '<p style="text-align: center; color: #ccc;">No songs found for this mood yet. Upload some MP3s and they will be analyzed automatically!</p>';
+              } else {
+                songs.forEach(song => {
+                  const songDiv = document.createElement('div');
+                  songDiv.style.cssText = `
+                    padding: 10px;
+                    margin: 5px 0;
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: 5px;
+                    border-left: 3px solid #ff6b6b;
+                  `;
+
+                  const songName = song.name.split('/').pop(); // Get filename without path
+                  songDiv.innerHTML = `
+                    <div style="font-weight: bold; color: #ff6b6b;">${songName}</div>
+                    <div style="font-size: 12px; color: #ccc;">
+                      Mood: ${song.mood} |
+                      User moods: ${song.userMoods.join(', ') || 'None'} |
+                      Size: ${Math.round(song.size / 1024 / 1024 * 100) / 100}MB
+                    </div>
+                  `;
+                  songsList.appendChild(songDiv);
+                });
+              }
+
+              // Insert results after the discover-modes section (outside the center tag)
+              const discoverSection = document.getElementById('discover-modes');
+              discoverSection.parentNode.insertBefore(resultsDiv, discoverSection.nextSibling);
+            }
+
+            // Add click event listeners to feeling buttons
+            document.addEventListener('DOMContentLoaded', function() {
+              const feelingButtons = document.querySelectorAll('.feeling-btn');
+
+              feelingButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                  // Remove active class from all buttons
+                  feelingButtons.forEach(btn => btn.classList.remove('active'));
+
+                  // Add active class to clicked button
+                  this.classList.add('active');
+
+                  const moodName = this.id;
+                  const analyzedMoods = moodMap[moodName];
+
+                  if (analyzedMoods) {
+                    console.log(`🎯 User selected "${moodName}" mood, which maps to:`, analyzedMoods);
+                    const allSongs = [];
+
+                    // Get songs for each analyzed mood
+                    for (const mood of analyzedMoods) {
+                      const result = await getSongsByMood(mood);
+                      if (result.results) {
+                        allSongs.push(...result.results);
+                      }
+                    }
+
+                    // Remove duplicates based on song name
+                    const uniqueSongs = allSongs.filter((song, index, self) =>
+                      index === self.findIndex(s => s.name === song.name)
+                    );
+
+                    displaySongResults(uniqueSongs, moodName);
+                  } else {
+                    console.log("❌ No mood mapping found for:", moodName);
+                  }
+                });
+              });
+
+              console.log("🎵 Mood selection system initialized!");
+            });
+          </script>
+<style>
   
-          <!--merged image-->
-          <div class="stacked-image-container">
-            <img src="https://i.postimg.cc/bvdF9ypR/rap-and-hip-hop-wall-art.jpg" alt="Dance Music album art stack" class="stacked-image-item" style="z-index: 3;">
-            <img src="" alt="" class="stacked-image-item stacked-image-middle">
-            <img src="" alt="" class="stacked-image-item stacked-image-bottom">
-          </div>
-          <div class="mode-text">
-            <p class="mode-title">Hip-Hop Music</p>
-          </div>
-          </button>
-        </div>
-        <div class="mode-card">
-               <button onclick="window.location.href = 'soul.html'" style="border:none; padding:0; background:none; cursor:pointer;">
+  .feeling-row {
+  margin-bottom: 24px; /* space between rows */
+}
 
-  
-          <!--merged image-->
-          <div class="stacked-image-container">
-            <img src="https://i.postimg.cc/vmj2PJmw/soul-vs-rnb-main-jpg.webp" alt="Soul Music album art stack" class="stacked-image-item" style="z-index: 3;">
-            <img src="" alt="" class="stacked-image-item stacked-image-middle">
-            <img src="" alt="" class="stacked-image-item stacked-image-bottom">
-          </div>
-          <div class="mode-text">
-            <p class="mode-title">Pop Music</p>
+  .feelings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
 
-          </div>
-        </div>
-            </button>
+/* Base floating button */
+.feeling-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%; /* 100% round */
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+  text-align: center;
+
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  animation: float 6s ease-in-out infinite;
+  transition: all 0.25s ease;
+}
+
+/* Hover = slightly closer */
+.feeling-btn:hover {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+  transform: scale(1.05);
+}
+
+/* Selected state */
+.feeling-btn.active {
+  background: rgba(255, 107, 107, 0.15);
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%   { transform: translate(0px, 0px); }
+  50%  { transform: translate(18px, -14px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+.feeling-btn:nth-child(2) {
+  animation-duration: 7s;
+}
+
+.feeling-btn:nth-child(3) {
+  animation-duration: 5.5s;
+}
+
+.feeling-btn:nth-child(4) {
+  animation-duration: 6.5s;
+}
+
+.feeling-btn:nth-child(5) {
+  animation-duration: 8s;
+}
+
+</style>          
       </div>
     </section>
 
@@ -1074,9 +1272,13 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     <input type="text" placeholder="Search artists, songs or albums..." class="search-input" id="searchInput">
     <img src="—Pngtree—vector search icon_3783210.png" alt="Search" class="search-icon">
   </div>
-  
+
+  <center>  <div id="result"></div>
+  </center>
+
       
-      <div id="ab"></div>
+      <div id="ab" style="margin-bottom: 100px;">      <button width="100%" height="500">Go to the next song</button></div>
+
       </center>
       <div class="snowfall-container">
   <div class="snowflake">❄</div>
@@ -1168,35 +1370,53 @@ setInterval(flySanta, 10000);
 
 
 
-        <div class="lol" style="
-          position: fixed;
-          background-color: #000;
-          width: 100%;
-          height: 100px;
-          display: block;
-          bottom: 0;
-          left: 0;
-          font-size: 70px !important;
-          box-shadow: 5px 5px 20px coral;
-          text-align: center;">
-
-          <h3 id="tata"><font color="coral">SELECT A SONG</font></h3>
-          <i style="cursor: pointer; user-select: none; color: coral !important; font-size: 80px !important;" onclick="(()=>{
-               console.log(window.action)
-               document.getElementById('gaga_' + window.action).play()
-            })()" class="material-symbols-outlined">
-            play_circle
-          </i>
-          <i  style="color: coral !important; font-size: 80px !important;" onclick="(()=>{
-              console.log(window.action)
-              document.getElementById('gaga_' + window.action).pause()
-           })()" class="material-symbols-outlined">
-            pause_circle
-          </i>
-        </div>
-  </main>
+<div class="lol" style="
+position: fixed;
+background-color: #000;
+width: 100%;
+height: 180px;
+display: block;
+bottom: 0;
+left: 0;
+font-size: 70px !important;
+box-shadow: 5px 5px 20px coral;
+text-align: center;
+z-index: 9999;"> <h3 id="tata" style="display: flex; justify-content: center; align-items: center; gap: 20px; margin: 10px 0;">
+<font color="coral">SELECT A SONG</font>
+</h3><div style="font-size: 16px !important; color: white; text-align: left;">
+  <p style="margin: 0; color: coral; font-weight: bold;">Music Queue</p>
+  <table>
+      <tr>
+          <td id="queuesMob"></td>
+      </tr>
+  </table>
 </div>
 
+<i style="cursor: pointer; user-select: none; color: coral !important; font-size: 80px !important;" 
+onclick="(() => {
+ console.log(window.action);
+ document.getElementById('gaga_' + window.action).play();
+})()" class="material-symbols-outlined">
+play_circle
+</i>
+
+<i style="cursor: pointer; user-select: none; color: coral !important; font-size: 80px !important;" 
+onclick="(() => {
+ console.log(window.action);
+ document.getElementById('gaga_' + window.action).pause();
+})()" class="material-symbols-outlined">
+pause_circle
+</i>
+
+</div> ```
+
+### What I changed:
+* **Moved the closing `</div>`:** I moved it to the very bottom, after the icons. Now the icons are "children" of the black bar.
+* **Added `z-index`:** This ensures the bar stays in front of any other content on your page.
+* **Fixed `font-size` on the Queue:** I added `font-size: 16px !important` to the queue container. Without this, your queue text would inherit that `70px` size from the parent and become massive/unreadable.
+* **Flexbox on Header:** Added `display: flex` to the `h3` so the "SELECT A SONG" text and the Queue table sit nicely next to each other.
+
+**Would you like me to add a "Stop" button or a volume slider to the bar as well?**
 <script>
   
 </script>
@@ -1797,40 +2017,135 @@ push(songRef, {
   }
 
 }
-console.log('1209')
-  let jkjk = []
-  let ujk = []
-window.queuemusic = function(fileInp, title){
-  let songqueues = document.getElementById("queues");
-  let theElement = document.createElement('h6');
-  console.log(sorg);
+// Initialize logical queues globally if they aren't already
+window.jkjk = window.jkjk || [];
+window.ujk = window.ujk || [];
+
+window.queuemusic = function(fileInp, title) {
+  // 1. Identify all relevant UI elements
+  const songqueuesMob = document.getElementById("queuesMob");
+  const songqueuesFr = document.getElementById("queues");
+  const tata = document.getElementById("tata");
+  
+  // 2. Determine device state
+  const webpageWidth = document.documentElement.clientWidth;
+  const isMobile = webpageWidth <= 768;
+  console.log('Webpage width:', webpageWidth, 'isMobile:', isMobile);
+  
+  // 3. Add to logical arrays
+  window.jkjk.push(fileInp);
+  window.ujk.push(title);
+
+  // 4. Create and append the visual element to the CORRECT container
+  const theElement = document.createElement('h6');
   theElement.innerText = title;
-  songqueues.appendChild(theElement);
-  let firstH6 = document.querySelector("h6");
-  jkjk.push(fileInp);
-  ujk.push(title)
-  currentPlaying.onended = function replaymod(){
-    firstH6 = document.querySelector("h6"); 
-    let audio = new Audio(jkjk[0])
+
+  if (isMobile && songqueuesMob) {
+    console.log('Adding to queuesMob (mobile)');
+
+    // Create a queue item container for the table
+    const queueItem = document.createElement('div');
+    queueItem.style.fontSize = "16px";
+    queueItem.style.margin = "5px 0";
+    queueItem.style.color = "white";
+    queueItem.style.textAlign = "left";
+    queueItem.style.padding = "5px";
+    queueItem.style.border = "1px solid coral";
+    queueItem.style.borderRadius = "5px";
+    queueItem.style.backgroundColor = "rgba(255, 127, 80, 0.1)";
+    queueItem.innerText = title;
+
+    songqueuesMob.appendChild(queueItem);
+  } else if (!isMobile && songqueuesFr) {
+    console.log('Adding to songqueuesFr (desktop)');
+    songqueuesFr.appendChild(theElement);
+  } else {
+    console.log('No valid container found - isMobile:', isMobile, 'tata exists:', !!tata, 'songqueuesFr exists:', !!songqueuesFr);
+  }
+
+  /**
+   * Internal function to handle the actual playback cycle
+   */
+  function processQueuePlayback() {
+    if (window.jkjk.length === 0) {
+      if (tata) {
+        if (isMobile) {
+          tata.innerHTML = '<font color="coral">SELECT A SONG</font>';
+        } else {
+          tata.style.color = "black";
+        }
+      }
+      return;
+    }
+
+    // Play the first item in the queue
+    let audio = new Audio(window.jkjk[0]);
+    
+    // Pause any currently playing track if 'currentPlaying' is your global controller
+    if (typeof currentPlaying !== 'undefined' && currentPlaying !== null) {
+      currentPlaying.pause();
+    }
+    
+    // Update global reference
+    window.currentPlaying = audio;
     audio.play();
-    document.getElementById('tata').innerText = ujk[0];
-    currentPlaying.pause();
-    audio.onended = function(){
-      let shifted = jkjk.shift();
-      let shiftUjk = ujk.shift();
-      songqueues.removeChild(firstH6)
-      replaymod();
-      let qoried = document.querySelector("#queues h6");
-      if(qoried === null){
-        console.log('qoried haha')
-        document.getElementById("tata").style.color = "black";
+
+    // Update the 'Now Playing' display
+    if (tata) {
+      if (isMobile) {
+        // On mobile, just show current playing song
+        tata.innerHTML = '<div style="color: white; font-weight: bold; text-align: center; margin-bottom: 10px;">Now Playing: ' + window.ujk[0] + '</div>';
+      } else {
+        tata.innerText = window.ujk[0];
+        tata.style.color = "white"; // Set to active color
       }
     }
+
+    audio.onended = function() {
+      // Logic: Remove the track that just finished
+      window.jkjk.shift();
+      window.ujk.shift();
+
+      // UI: Update the display after removing the finished song
+      if (isMobile && songqueuesMob) {
+        const firstQueueItem = songqueuesMob.querySelector("div");
+        if (firstQueueItem) songqueuesMob.removeChild(firstQueueItem);
+      } else if (!isMobile && songqueuesFr) {
+        const firstH6 = songqueuesFr.querySelector("h6");
+        if (firstH6) songqueuesFr.removeChild(firstH6);
+      }
+
+      // Recursion: Play next or reset UI if empty
+      if (window.jkjk.length > 0) {
+        processQueuePlayback();
+      } else {
+        if (tata) {
+          if (isMobile) {
+            tata.innerHTML = '<font color="coral">SELECT A SONG</font>';
+          } else {
+            tata.innerText = "Queue Finished";
+            tata.style.color = "black";
+          }
+        }
+        // Clear mobile queue when finished
+        if (isMobile && songqueuesMob) {
+          songqueuesMob.innerHTML = '';
+        }
+      }
+    };
   }
-}
 
-
-
+  // 5. Trigger playback logic
+  // If nothing is playing, start immediately. 
+  // Otherwise, wait for the current song's onended event.
+  if (typeof currentPlaying === 'undefined' || currentPlaying === null || currentPlaying.paused) {
+    processQueuePlayback();
+  } else {
+    currentPlaying.onended = function() {
+      processQueuePlayback();
+    };
+  }
+};
               window.turnToCoral = function() {
                 document.getElementById("tata").style.color = "coral";
               }
@@ -2302,9 +2617,6 @@ window.queuemusic = function(fileInp, title){
             }
           })
   </script>
-
-
-
 
 
 
