@@ -94,6 +94,15 @@
   style="border:2px solid red; background:white; color:black;"
   type="text" placeholder="Enter your Youtube Live Embed Code Here"
 />
+<input class="large-input" id="tinp"
+style="border:2px solid red; background:white; color:black;"
+type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
+<h3>ⓘ Paste your full DonorBox iframe embed code, or just enter the donation page URL and it will be displayed in an iframe</h3>
+
+<input class="large-input" id="xinp"
+style="border:2px solid red; background:white; color:black;"
+type="text" placeholder="Enter your social media links (e.g., https://instagram.com/username)"/>
+<h3>ⓘ Enter your social media links separated by spaces. They will appear as clickable links in your live room.</h3>
 
 <input class="large-input" id="passcode"
 style="border:2px solid red; background:white; color:black;"
@@ -165,24 +174,30 @@ type="text" placeholder="Create a Live Passcode that you are going to be using. 
     window.saveTheLive = function(uinp, selected) {
         let selectes = selected.value; // Get the room value (e.g. "Room1")
         let path = "LiveRooms/" + selectes;
-        
+
+        // Get additional input values
+        const tinp = document.getElementById('tinp');
+        const xinp = document.getElementById('xinp');
+
+
         // Create the reference INSIDE the function
         const myRef = ref2(database, path);
 
         update(myRef, {
             embed: uinp.value,
+            donationEmbed: tinp && tinp.value ? tinp.value.trim() : null,
+            socials: xinp && xinp.value ? xinp.value.trim() : null,
             startedAt: Date.now(),
             passcode: document.getElementById("passcode").value,
             status: "online"
 
         }).then(() => {
-            console.log("Updated path:", path);
             document.getElementById('helloWorld').style.display = 'block';
         });
 
         // Start listening to the specific room chosen
         onValue(myRef, (snapshot) => {
-            console.log("Current room data:", snapshot.val());
+            // Room data listener
         });
     }
 </script>
@@ -226,9 +241,8 @@ type="text" placeholder="Create a Live Passcode that you are going to be using. 
    window.currentRef = ref2(database, roomPath);
 
    // 2. Start the listener with the 'online' check
-  get(currentRef).then((snapshot) => {                     
+  get(currentRef).then((snapshot) => {
     const data = snapshot.val();
-    console.log('Live Update:', data);
 
     // Check if the room is already online
     if (data && data.status === 'online') {
@@ -304,7 +318,9 @@ Click Create stream
 <br>
 2️⃣ Get the Embed Code
 
-In YouTube Studio, open your Live Stream
+In YouTube Studio, click edit your Live Stream from Content tab
+
+Scroll down and tick "Allow Embeding"
 
 Click Share or Embed
 

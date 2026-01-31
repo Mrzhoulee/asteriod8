@@ -104,6 +104,18 @@
 <br>
 <br>
 <div id="show"></div>
+
+<!-- Scroll Down Indicator -->
+<div id="scrollIndicator" style="display: none; text-align: center; margin: 20px auto; padding: 10px; background: linear-gradient(90deg,#ff3b3b,#ff7a3b); color: white; border-radius: 25px; font-weight: bold; animation: pulse 2s infinite;">
+  ⬇️ SCROLL DOWN ⬇️
+</div>
+
+<!-- Donation Box Container -->
+<div id="donationBox" style="display: none; margin: 20px auto; max-width: 600px; text-align: center;"></div>
+
+<!-- Socials Container -->
+<div id="socialsBox" style="display: none; margin: 20px auto; max-width: 600px; text-align: center; padding: 15px; background: #1e1e1e; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);"></div>
+
 <style>
     .material-symbols-outlined {
       font-variation-settings:
@@ -111,6 +123,17 @@
       'wght' 400,
       'GRAD' 0,
       'opsz' 24
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    #scrollIndicator {
+      animation: pulse 2s infinite;
+      font-size: 16px;
     }
     </style>
 
@@ -217,9 +240,11 @@ document.getElementById('pscd').style.display = "none";
 document.getElementById("banGlocks").style.display = "none";
 document.getElementById('show').style.display = "none";
 update(roomPath, {
-    embed: "",      // Set to an empty string instead of null
-    passcode: "",   // Set to an empty string instead of null
-    status: "offline" // Add a new key to keep the folder alive
+    embed: "",           // Set to an empty string instead of null
+    donationEmbed: "",   // Clear donation box embed
+    socials: "",         // Clear social media links
+    passcode: "",        // Set to an empty string instead of null
+    status: "offline"    // Add a new key to keep the folder alive
 });
     // 2. Wait 2 seconds then hide it
     setTimeout(() => {
@@ -232,6 +257,56 @@ update(roomPath, {
         // 3. Update the UI automatically
         // This injects the YouTube iframe code directly into your 'liveshow' div
         document.getElementById('show').innerHTML = data.embed;
+
+        // Display donation embed if available
+        let hasAdditionalContent = false;
+        if (data.donationEmbed && data.donationEmbed.trim() !== '') {
+            let donationContent = data.donationEmbed.trim();
+
+            // If it looks like just a URL (no HTML tags), wrap it in a Donorbox-compatible iframe
+            if (donationContent.startsWith('http') && !donationContent.includes('<iframe') && !donationContent.includes('<script')) {
+                donationContent = `<iframe src="${donationContent}" name="donorbox" allowpaymentrequest="allowpaymentrequest" seamless="seamless" frameborder="0" scrolling="no" height="900px" width="100%" style="max-width: 500px; min-width: 250px; max-height:none!important" allow="payment"></iframe>`;
+            }
+            // If it's already a full embed code (contains iframe/script), use it as-is
+
+            document.getElementById('donationBox').innerHTML = donationContent;
+            document.getElementById('donationBox').style.display = 'block';
+            hasAdditionalContent = true;
+        } else {
+            document.getElementById('donationBox').style.display = 'none';
+        }
+
+        // Display socials if available
+        if (data.socials && data.socials.trim() !== '') {
+            let socialsContent = data.socials.trim();
+
+            // If it looks like plain text URLs, convert to clickable links
+            if (!socialsContent.includes('<') && !socialsContent.includes('>')) {
+                // Split by common separators and create links
+                const lines = socialsContent.split(/\s+/);
+                socialsContent = lines.map(line => {
+                    // Simple URL detection
+                    if (line.startsWith('http://') || line.startsWith('https://') || line.startsWith('www.')) {
+                        const url = line.startsWith('www.') ? 'https://' + line : line;
+                        return `<a href="${url}" target="_blank" style="color: #00aaff; text-decoration: none; margin: 5px; display: inline-block;">${line}</a>`;
+                    }
+                    return line;
+                }).join('<br>');
+            }
+
+            document.getElementById('socialsBox').innerHTML = socialsContent;
+            document.getElementById('socialsBox').style.display = 'block';
+            hasAdditionalContent = true;
+        } else {
+            document.getElementById('socialsBox').style.display = 'none';
+        }
+
+        // Show/hide scroll indicator based on additional content
+        if (hasAdditionalContent) {
+            document.getElementById('scrollIndicator').style.display = 'block';
+        } else {
+            document.getElementById('scrollIndicator').style.display = 'none';
+        }
 
     } else {
         console.log("No live stream found at this path.");
