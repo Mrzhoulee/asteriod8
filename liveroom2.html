@@ -104,6 +104,55 @@
 <br>
 <br>
 <div id="show"></div>
+<!-- Chat Container -->
+<div id="chatContainer" style="width: 100%; height: 400px; margin: 20px auto; border: 2px solid #333; border-radius: 10px; overflow: hidden;">
+    <iframe src="https://asteroidconcertlive.chatango.com/" width="100%" height="100%" frameborder="0" scrolling="auto"></iframe>
+  </div>
+<div id="banGlocks">
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <input id="pscd" type="text" placeholder="Please Enter the Livestream Passcode" />
+
+        <button onclick="triggerEndStreamUI()" class="tick-btn">
+            <span class="material-symbols-outlined">
+                check_circle
+                </span>
+        </button>
+    </div>
+</div>
+ <div id="loadingPopup" style="
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(18, 18, 18, 0.95);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Montserrat', sans-serif;
+    color: white;">
+
+    <div class="loader-circle"></div>
+
+    <h2 style="margin-top: 25px; letter-spacing: 1px;">Ending Stream...</h2>
+    <p style="color: #ff7a3b; font-weight: 500;">Cleaning up your room</p>
+</div>
+
+<style>
+    /* Spinner Animation */
+    .loader-circle {
+        width: 60px;
+        height: 60px;
+        border: 6px solid #2a2a2a;
+        border-top: 6px solid #ff3b3b; /* Red matching your Go Live button */
+        border-radius: 50%;
+        animation: spin-loader 1s linear infinite;
+    }
+
+    @keyframes spin-loader {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
 
 <!-- Scroll Down Indicator -->
 <div id="scrollIndicator" style="display: none; text-align: center; margin: 20px auto; padding: 10px; background: linear-gradient(90deg,#ff3b3b,#ff7a3b); color: white; border-radius: 25px; font-weight: bold; animation: pulse 2s infinite;">

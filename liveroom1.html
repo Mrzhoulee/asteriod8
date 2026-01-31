@@ -105,6 +105,11 @@
 <br>
 <div id="show"></div>
 
+<!-- Chat Container -->
+<div id="chatContainer" style="width: 100%; height: 400px; margin: 20px auto; border: 2px solid #333; border-radius: 10px; overflow: hidden;">
+    <iframe src="https://asteroidconcertlive.chatango.com/" width="100%" height="100%" frameborder="0" scrolling="auto"></iframe>
+  </div>
+
 <!-- Scroll Down Indicator -->
 <div id="scrollIndicator" style="display: none; text-align: center; margin: 20px auto; padding: 10px; background: linear-gradient(90deg,#ff3b3b,#ff7a3b); color: white; border-radius: 25px; font-weight: bold; animation: pulse 2s infinite;">
   ⬇️ SCROLL DOWN ⬇️
@@ -239,6 +244,8 @@ document.getElementById('tuck').style.display = "none";
 document.getElementById('pscd').style.display = "none";
 document.getElementById("banGlocks").style.display = "none";
 document.getElementById('show').style.display = "none";
+document.getElementById('chatContainer').style.display = "none";
+document.getElementById('scrollIndicator').style.display = "none";
 update(roomPath, {
     embed: "",           // Set to an empty string instead of null
     donationEmbed: "",   // Clear donation box embed
@@ -257,6 +264,9 @@ update(roomPath, {
         // 3. Update the UI automatically
         // This injects the YouTube iframe code directly into your 'liveshow' div
         document.getElementById('show').innerHTML = data.embed;
+
+        // Show chat container
+        document.getElementById('chatContainer').style.display = 'block';
 
         // Display donation embed if available
         let hasAdditionalContent = false;
@@ -311,6 +321,8 @@ update(roomPath, {
     } else {
         console.log("No live stream found at this path.");
         document.getElementById('liveshow').innerHTML = "<h1>Room Offline</h1>";
+        document.getElementById('chatContainer').style.display = 'none';
+        document.getElementById('scrollIndicator').style.display = 'none';
     }
 }, (error) => {
     console.error("The read failed: " + error.code);
