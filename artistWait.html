@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Waitlist - Asteroid Music</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .waitlist-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        .waitlist-title {
+            color: #FF8B38;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #111827;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        button {
+            background-color: #FF8B38;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #e67a33;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="waitlist-container">
+        <h1 class="waitlist-title">Sign up for Artist Waitlist</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            Join our exclusive artist waitlist and be among the first to get featured on Asteroid Music!
+        </p>
+
+        <form id="waitlistForm">
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="artistName">Artist Name *</label>
+                <input type="text" id="artistName" placeholder="Enter your Artist Nickname" required>
+            </div>
+
+            <div class="form-group">
+                <label for="links">Link To Songs *</label>
+                <textarea id="links" placeholder="Enter your socials (e.g. Spotify, Instagram, Soundcloud, Twitter)" required></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn">Join Waitlist</button>
+        </form>
+
+        <div id="successMessage" class="success-message">
+            Successfully signed up! We'll be in touch soon.
+        </div>
+
+        <div id="errorMessage" class="error-message">
+            Error signing up. Please try again.
+        </div>
+    </div>
+<script>
+    // Waitlist submission function
+    async function submitWaitlist(email, artistName, links) {
+      const submitBtn = document.getElementById('submitBtn');
+      const successMessage = document.getElementById('successMessage');
+      const errorMessage = document.getElementById('errorMessage');
+
+      // Hide previous messages
+      successMessage.style.display = 'none';
+      errorMessage.style.display = 'none';
+
+      // Disable button and show loading
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing up...';
+
+      try {
+        const response = await fetch('https://api.freewaitlists.com/waitlists/cmlcbzaq2003u01p2v2xc38qp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            meta: {
+              artist_name: artistName,
+              social_links: links,
+              source: 'artist-signup'
+            }
+          })
+        });
+
+        const result = await response.json();
+        console.log('Waitlist submission result:', result);
+
+        if (response.ok) {
+          successMessage.style.display = 'block';
+          document.getElementById('waitlistForm').reset();
+        } else {
+          errorMessage.textContent = result.message || 'Error signing up. Please try again.';
+          errorMessage.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error submitting to waitlist:', error);
+        errorMessage.textContent = 'Network error. Please check your connection and try again.';
+        errorMessage.style.display = 'block';
+      } finally {
+        // Re-enable button
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Join Waitlist';
+      }
+    }
+
+    // Form submission handler
+    document.getElementById('waitlistForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const artistName = document.getElementById('artistName').value;
+      const links = document.getElementById('links').value;
+
+      submitWaitlist(email, artistName, links);
+    });
+</script>
+</body>
+</html>
