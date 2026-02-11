@@ -10,24 +10,23 @@
     body { background-color: antiquewhite; font-family: "Montserrat", sans-serif; margin: 0; padding: 20px; text-align: center; }
     .upload-btn { width: 130px; height: 45px; background-color: coral; color: black; border-radius: 10px; cursor: pointer; border: none; font-weight: bold; margin: 10px; }
     
-    /* CAMPAIGN UI */
-    #campaignContainer { display: none; margin-bottom: 30px; }
+    /* CAMPAIGN UI - Ensure these stay hidden unless code is found */
+    #campaignContainer { display: none; margin-bottom: 30px; border-bottom: 2px dashed #ccc; padding-bottom: 20px; }
     .tutorial-box { background: white; border: 3px solid #00ff88; padding: 20px; border-radius: 15px; max-width: 600px; margin: 0 auto 20px auto; text-align: left; }
     .progress-box { background: #fff3e0; border: 2px solid coral; padding: 20px; border-radius: 15px; max-width: 500px; margin: 0 auto; }
     
-    /* Progress Bar */
     .bar-bg { height: 20px; width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; overflow: hidden; border: 1px solid #bbb; }
     #progressBarStatus { height: 100%; width: 0%; background: linear-gradient(90deg, #00ff88, #008044); transition: width 0.5s ease; }
     
     .alertBox { background-color: lightcoral; padding: 15px; visibility: hidden; border-radius: 10px; margin: 10px auto; width: 80%; }
     input { margin: 8px; padding: 12px; width: 80%; max-width: 400px; border-radius: 8px; border: 1px solid #ccc; }
-    #unlockMsg { color: #008044; font-weight: bold; display: none; margin-top: 10px; font-size: 1.1em; }
+    #unlockMsg { color: #008044; font-weight: bold; display: none; margin-top: 10px; }
   </style>
 </head>
 <body>
 
   <div style="margin-bottom: 20px;">
-    <button id="google-sign-in" style="padding: 10px 20px; cursor: pointer; border-radius: 5px; border: 1px solid black; background: white;">
+    <button id="google-sign-in" style="padding: 10px 20px; cursor: pointer; border-radius: 5px; background: white;">
         <i class="fa-brands fa-google"></i> <span id="gcm">Sign In with Google</span>
     </button>
   </div>
@@ -35,7 +34,7 @@
   <div id="campaignContainer">
     <div class="tutorial-box">
       <h2 style="color: #008044; margin-top: 0;">🚀 3-Month Feature Reward</h2>
-      <p>1. <b>Sign In</b> above to activate your tracking.<br>
+      <p>1. <b>Sign In</b> with Google above.<br>
       2. <b>Share</b> your unique link with <b>1 artist friend</b>.<br>
       3. When they sign in, you unlock a <b>3-Month Feature!</b></p>
     </div>
@@ -47,12 +46,10 @@
       <div id="unlockMsg">✅ UNLOCKED: 3-Month Feature Active!</div>
       
       <p style="font-size: 0.9em;">Your Share Link:</p>
-      <input type="text" id="shareLinkInput" readonly placeholder="Sign in to get link...">
+      <input type="text" id="shareLinkInput" readonly placeholder="Sign in to generate link...">
       <button id="copyBtn" class="upload-btn" style="width: 80px; height: 35px; font-size: 12px;">COPY</button>
     </div>
   </div>
-
-  <hr style="width: 80%; margin: 30px auto; border: 0.5px solid #ccc;">
 
   <form id="uploadForm">
     <h2>Upload Your Media</h2>
@@ -60,17 +57,15 @@
     <input type="text" id="artist" placeholder="Artist Name" required><br>
     <input type="text" id="album" placeholder="Album Name" required><br>
     <input type="file" id="fileInp" accept="audio/mpeg" required><br>
-    
     <div style="margin: 15px;">
         <input type="checkbox" id="agreement" style="width: auto;"> 
         <label for="agreement">I own the rights to this music.</label>
     </div>
-    
     <button id="btn" class="upload-btn">UPLOAD NOW</button>
   </form>
 
-  <div id="alertBox" class="alertBox"><h2>Uploading... please wait.</h2></div>
-  <div id="ooaa" class="alertBox" style="background-color: lightgreen; color: black;"><h2>✅ Success! Upload Complete.</h2></div>
+  <div id="alertBox" class="alertBox"><h2>Uploading...</h2></div>
+  <div id="ooaa" class="alertBox" style="background-color: lightgreen;"><h2>✅ Success! Upload Complete.</h2></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
@@ -94,27 +89,24 @@
   const storage = getStorage(app);
   const provider = new GoogleAuthProvider();
 
-  const VALID_CODE = "ARTISTSOFFEB26";
+  // --- 1. THE MOST IMPORTANT PART: DETECTION ---
+  const params = new URLSearchParams(window.location.search);
+  const refParam = params.get('ref');
+  const byParam = params.get('by');
 
-  function init() {
-    const params = new URLSearchParams(window.location.search);
-    const refParam = params.get('ref');
-    const inviterParam = params.get('by');
-
-    if (refParam === VALID_CODE || localStorage.getItem('ref_active') === "true") {
-      localStorage.setItem('ref_active', "true");
+  if (refParam === "ARTISTSOFFEB26") {
+      console.log("Campaign Code Detected!");
+      localStorage.setItem('ref_active', 'true');
       document.getElementById('campaignContainer').style.display = 'block';
-    }
-
-    if (inviterParam) localStorage.setItem('pending_inviter', inviterParam);
-
-    const savedName = localStorage.getItem("fullName");
-    if (savedName) {
-        document.getElementById("gcm").innerHTML = savedName;
-        updateUIForUser(savedName);
-    }
+  } else if (localStorage.getItem('ref_active') === 'true') {
+      document.getElementById('campaignContainer').style.display = 'block';
   }
 
+  if (byParam) {
+      localStorage.setItem('pending_inviter', byParam);
+  }
+
+  // --- 2. AUTH & PROGRESS ---
   document.getElementById("google-sign-in").onclick = () => {
     signInWithPopup(auth, provider).then(async (res) => {
       const user = res.user;
@@ -122,4 +114,72 @@
       const inviter = localStorage.getItem('pending_inviter');
 
       localStorage.setItem("email", user.email);
-      localStorage.setItem("fullName", user.
+      localStorage.setItem("fullName", user.displayName);
+      document.getElementById("gcm").innerHTML = user.displayName;
+
+      const userRef = ref2(db, 'users/' + safeEmail);
+      const snap = await get(userRef);
+
+      // New user + referral = Credit for the inviter
+      if (!snap.exists() && inviter) {
+        await update(ref2(db, 'referralCounts/' + inviter), { count: increment(1) });
+        localStorage.removeItem('pending_inviter');
+      }
+
+      await update(userRef, { email: user.email, name: user.displayName });
+      loadUserProgress(user.displayName);
+    });
+  };
+
+  function loadUserProgress(name) {
+    const cleanName = name.replace(/\s+/g, '_');
+    document.getElementById('shareLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=ARTISTSOFFEB26&by=${cleanName}`;
+
+    onValue(ref2(db, 'referralCounts/' + cleanName), (snap) => {
+      const count = snap.val()?.count || 0;
+      document.getElementById('countText').innerText = `${count} / 1 Artist Joined`;
+      document.getElementById('progressBarStatus').style.width = (count >= 1 ? 100 : 0) + "%";
+      if(count >= 1) document.getElementById('unlockMsg').style.display = 'block';
+    });
+  }
+
+  // --- 3. UPLOAD ---
+  document.getElementById("btn").onclick = async () => {
+    const email = localStorage.getItem("email");
+    const file = document.getElementById("fileInp").files[0];
+    const title = document.getElementById("title").value;
+    const artist = document.getElementById("artist").value;
+    const album = document.getElementById("album").value;
+
+    if (!email || !file || !title) return alert("Sign in and fill all fields!");
+    if (!document.getElementById("agreement").checked) return alert("Accept agreement!");
+
+    document.getElementById("alertBox").style.visibility = "visible";
+    try {
+      const path = `${album}/${title}/${artist}/${file.name}`;
+      const snap = await uploadBytes(ref(storage, path), file);
+      const url = await getDownloadURL(snap.ref);
+
+      await update(ref2(db, "SONGS/" + title), {
+          fileInp: url, uploader: email, campaign: "ARTISTSOFFEB26"
+      });
+      document.getElementById("alertBox").style.visibility = "hidden";
+      document.getElementById("ooaa").style.visibility = "visible";
+    } catch (err) { alert("Error uploading."); }
+  };
+
+  document.getElementById("copyBtn").onclick = () => {
+    const copyText = document.getElementById("shareLinkInput");
+    copyText.select();
+    navigator.clipboard.writeText(copyText.value);
+    alert("Copied!");
+  };
+
+  // Check if session exists on load
+  if(localStorage.getItem("fullName")) {
+      document.getElementById("gcm").innerHTML = localStorage.getItem("fullName");
+      loadUserProgress(localStorage.getItem("fullName"));
+  }
+</script>
+</body>
+</html>
