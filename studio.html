@@ -116,7 +116,6 @@ label {
 <body>
 <div class="hellothere">
   <div style="position: absolute; top: 0px; left: 90px;">
-    <a href="index.html"><button style="width: 200px !important; height: 45px !important; font-size: large; border-radius: 10%; background-color: black; color: coral;">Back</button></a>
   </div>
 </div>
     <div style="position: absolute; top: 0; right: 90px; ">
@@ -143,15 +142,21 @@ label {
   </ol>
 </div>
 
-<div id="referralTracker" style="display:none; background: white; border: 2px solid coral; padding: 15px; border-radius: 10px; max-width: 500px; margin-bottom: 20px;">
-  <h3 style="margin-top:0;">🚀 3-Month Feature Challenge</h3>
-  <p>Invites: <span id="countText">0 / 3</span></p>
-  <div style="background: #eee; border-radius: 10px; height: 15px; width: 100%;">
-    <div id="progressBarStatus" style="background: coral; height: 100%; width: 0%; border-radius: 10px; transition: 0.5s;"></div>
+<div id="referralTracker" style="display:none; background: #fff; border: 2px solid coral; padding: 20px; border-radius: 15px; max-width: 500px; margin: 20px auto; box-shadow: 0px 4px 10px rgba(0,0,0,0.1);">
+  <h3 style="margin-top:0; color: coral;">🚀 3-Month Feature Challenge</h3>
+  
+  <div id="statsSection">
+    <p id="countText" style="font-weight: bold;">Invites: 0 / 3</p>
+    <div class="bar" style="height: 20px; width: 100%; background: #eee; border-radius: 10px; overflow: hidden; border: 1px solid #ddd;">
+      <div id="progressBarStatus" style="background: linear-gradient(90deg, coral, #ff8e53); height: 100%; width: 0%; transition: width 0.8s ease-in-out;"></div>
+    </div>
   </div>
-  <br>
-  <input type="text" id="shareLinkInput" readonly style="width: 70%; padding: 5px;">
-  <button id="copyBtn" style="cursor:pointer;">Copy My Link</button>
+
+  <p style="font-size: 0.9em; margin-top: 15px;">Share your link to unlock the reward:</p>
+  <div style="display: flex; gap: 10px;">
+    <input type="text" id="shareLinkInput" readonly style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" value="Sign in to generate link...">
+    <button id="copyBtn" class="upload-btn" style="width: 80px; height: 40px;">Copy</button>
+  </div>
 </div>
   <h2>Upload Media</h2>
 
@@ -270,15 +275,24 @@ label {
   const provider = new GoogleAuthProvider();
 
   // --- 1. REFERRAL TRACKING ---
-  function initReferral() {
+  function init() {
     const urlParams = new URLSearchParams(window.location.search);
     const refCode = urlParams.get('ref');
+    const inviter = urlParams.get('by');
 
-    // If the URL has the code, save it and show the boxes
-    if (refCode === "ARTISTSOFFEB26") {
-        localStorage.setItem('referralActive', "ARTISTSOFFEB26");
-        document.getElementById('referralBadge').style.display = 'block';
-        document.getElementById('tutorialBox').style.display = 'block';
+    // FORCE VISIBILITY if the campaign is active
+    if (refCode === "ARTISTSOFFEB26" || localStorage.getItem('refActive') === "ARTISTSOFFEB26") {
+      localStorage.setItem('refActive', "ARTISTSOFFEB26");
+      document.getElementById('referralBadge').style.display = 'block';
+      document.getElementById('tutorialBox').style.display = 'block';
+      document.getElementById('referralTracker').style.display = 'block'; // Shows the bar immediately
+    }
+    
+    if (inviter) localStorage.setItem('pendingBy', inviter);
+
+    const savedName = localStorage.getItem("fullName");
+    if (savedName) {
+        showReferralTools(savedName);
     }
 }
 // MUST CALL THE FUNCTION AT THE BOTTOM
@@ -361,6 +375,7 @@ initReferral();
 
 
 </html>
+
 
 
 
