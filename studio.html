@@ -10,17 +10,18 @@
     body { background-color: antiquewhite; font-family: "Montserrat", sans-serif; margin: 0; padding: 20px; text-align: center; }
     .upload-btn { width: 130px; height: 45px; background-color: coral; color: black; border-radius: 10px; cursor: pointer; border: none; font-weight: bold; margin: 10px; }
     
-    /* CAMPAIGN UI - Visible by default if ref is in URL */
+    /* CAMPAIGN UI */
     #campaignContainer { display: none; margin-bottom: 30px; }
     .tutorial-box { background: white; border: 3px solid #00ff88; padding: 20px; border-radius: 15px; max-width: 600px; margin: 0 auto 20px auto; text-align: left; }
     .progress-box { background: #fff3e0; border: 2px solid coral; padding: 20px; border-radius: 15px; max-width: 500px; margin: 0 auto; }
     
     /* Progress Bar */
     .bar-bg { height: 20px; width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; overflow: hidden; border: 1px solid #bbb; }
-    #progressBarStatus { height: 100%; width: 0%; background: linear-gradient(90deg, #ff7f50, #ff4500); transition: width 0.5s ease; }
+    #progressBarStatus { height: 100%; width: 0%; background: linear-gradient(90deg, #00ff88, #008044); transition: width 0.5s ease; }
     
     .alertBox { background-color: lightcoral; padding: 15px; visibility: hidden; border-radius: 10px; margin: 10px auto; width: 80%; }
     input { margin: 8px; padding: 12px; width: 80%; max-width: 400px; border-radius: 8px; border: 1px solid #ccc; }
+    #unlockMsg { color: #008044; font-weight: bold; display: none; margin-top: 10px; font-size: 1.1em; }
   </style>
 </head>
 <body>
@@ -33,19 +34,20 @@
 
   <div id="campaignContainer">
     <div class="tutorial-box">
-      <h2 style="color: #008044; margin-top: 0;">🌟 3-Month Feature Challenge</h2>
-      <p>1. <b>Sign In</b> above to start tracking.<br>
-      2. <b>Share</b> your link with 3 artist friends.<br>
-      3. Once 3 people sign in via your link, you get featured for <b>3 Months!</b></p>
+      <h2 style="color: #008044; margin-top: 0;">🚀 3-Month Feature Reward</h2>
+      <p>1. <b>Sign In</b> above to activate your tracking.<br>
+      2. <b>Share</b> your unique link with <b>1 artist friend</b>.<br>
+      3. When they sign in, you unlock a <b>3-Month Feature!</b></p>
     </div>
 
     <div class="progress-box">
-      <h3 style="margin: 0; color: coral;">Invite Progress</h3>
-      <p id="countText" style="font-weight: bold;">0 / 3 Friends Joined</p>
+      <h3 style="margin: 0; color: coral;">Reward Progress</h3>
+      <p id="countText" style="font-weight: bold;">0 / 1 Artist Joined</p>
       <div class="bar-bg"><div id="progressBarStatus"></div></div>
+      <div id="unlockMsg">✅ UNLOCKED: 3-Month Feature Active!</div>
       
-      <p style="font-size: 0.9em;">Your Referral Link:</p>
-      <input type="text" id="shareLinkInput" readonly placeholder="Sign in to get your link...">
+      <p style="font-size: 0.9em;">Your Share Link:</p>
+      <input type="text" id="shareLinkInput" readonly placeholder="Sign in to get link...">
       <button id="copyBtn" class="upload-btn" style="width: 80px; height: 35px; font-size: 12px;">COPY</button>
     </div>
   </div>
@@ -94,24 +96,18 @@
 
   const VALID_CODE = "ARTISTSOFFEB26";
 
-  // --- 1. PAGE SETUP ---
   function init() {
     const params = new URLSearchParams(window.location.search);
     const refParam = params.get('ref');
     const inviterParam = params.get('by');
 
-    // Show campaign if code is in URL or saved in browser
     if (refParam === VALID_CODE || localStorage.getItem('ref_active') === "true") {
       localStorage.setItem('ref_active', "true");
       document.getElementById('campaignContainer').style.display = 'block';
     }
 
-    // Capture who referred this new person
-    if (inviterParam) {
-      localStorage.setItem('pending_inviter', inviterParam);
-    }
+    if (inviterParam) localStorage.setItem('pending_inviter', inviterParam);
 
-    // Auto-load session
     const savedName = localStorage.getItem("fullName");
     if (savedName) {
         document.getElementById("gcm").innerHTML = savedName;
@@ -119,7 +115,6 @@
     }
   }
 
-  // --- 2. GOOGLE SIGN IN ---
   document.getElementById("google-sign-in").onclick = () => {
     signInWithPopup(auth, provider).then(async (res) => {
       const user = res.user;
@@ -127,82 +122,4 @@
       const inviter = localStorage.getItem('pending_inviter');
 
       localStorage.setItem("email", user.email);
-      localStorage.setItem("fullName", user.displayName);
-      document.getElementById("gcm").innerHTML = user.displayName;
-
-      // Check if user is new to credit the inviter
-      const userRef = ref2(db, 'users/' + safeEmail);
-      const snap = await get(userRef);
-
-      if (!snap.exists() && inviter) {
-        const inviterRef = ref2(db, 'referralCounts/' + inviter);
-        await update(inviterRef, { count: increment(1) });
-        localStorage.removeItem('pending_inviter');
-      }
-
-      await update(userRef, { email: user.email, name: user.displayName });
-      updateUIForUser(user.displayName);
-    });
-  };
-
-  // --- 3. REFRESH LINK & PROGRESS ---
-  function updateUIForUser(name) {
-    const cleanName = name.replace(/\s+/g, '_');
-    const link = window.location.origin + window.location.pathname + `?ref=${VALID_CODE}&by=${cleanName}`;
-    document.getElementById('shareLinkInput').value = link;
-
-    // Listen for progress
-    onValue(ref2(db, 'referralCounts/' + cleanName), (snap) => {
-      const count = snap.val()?.count || 0;
-      document.getElementById('countText').innerText = `${count} / 3 Friends Joined`;
-      document.getElementById('progressBarStatus').style.width = Math.min((count / 3) * 100, 100) + "%";
-    });
-  }
-
-  // --- 4. UPLOAD LOGIC ---
-  document.getElementById("btn").onclick = async () => {
-    const email = localStorage.getItem("email");
-    const file = document.getElementById("fileInp").files[0];
-    const title = document.getElementById("title").value;
-    const artist = document.getElementById("artist").value;
-    const album = document.getElementById("album").value;
-
-    if (!email) return alert("Sign in first!");
-    if (!file || !title) return alert("Missing info!");
-    if (!document.getElementById("agreement").checked) return alert("Accept agreement!");
-
-    document.getElementById("alertBox").style.visibility = "visible";
-
-    try {
-      const path = `${album}/${title}/${artist}/${file.name}`;
-      const snap = await uploadBytes(ref(storage, path), file);
-      const url = await getDownloadURL(snap.ref);
-
-      const songData = {
-        [title]: { [album]: { [artist]: {
-          fileInp: url,
-          uploader: email,
-          campaign: localStorage.getItem('ref_active') ? VALID_CODE : "organic"
-        }}}
-      };
-
-      await update(ref2(db, "SONGS"), songData);
-      document.getElementById("alertBox").style.visibility = "hidden";
-      document.getElementById("ooaa").style.visibility = "visible";
-    } catch (err) {
-      alert("Error uploading. Check internet.");
-      document.getElementById("alertBox").style.visibility = "hidden";
-    }
-  };
-
-  document.getElementById("copyBtn").onclick = () => {
-    const copyText = document.getElementById("shareLinkInput");
-    copyText.select();
-    navigator.clipboard.writeText(copyText.value);
-    alert("Link Copied! Share with 3 people.");
-  };
-
-  init();
-</script>
-</body>
-</html>
+      localStorage.setItem("fullName", user.
