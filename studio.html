@@ -10,7 +10,7 @@
     body { background-color: antiquewhite; font-family: "Montserrat", sans-serif; margin: 0; padding: 20px; text-align: center; }
     .upload-btn { width: 130px; height: 45px; background-color: coral; color: black; border-radius: 10px; cursor: pointer; border: none; font-weight: bold; margin: 10px; }
     
-    /* CAMPAIGN UI - Ensure these stay hidden unless code is found */
+    /* CAMPAIGN UI */
     #campaignContainer { display: none; margin-bottom: 30px; border-bottom: 2px dashed #ccc; padding-bottom: 20px; }
     .tutorial-box { background: white; border: 3px solid #00ff88; padding: 20px; border-radius: 15px; max-width: 600px; margin: 0 auto 20px auto; text-align: left; }
     .progress-box { background: #fff3e0; border: 2px solid coral; padding: 20px; border-radius: 15px; max-width: 500px; margin: 0 auto; }
@@ -21,9 +21,19 @@
     .alertBox { background-color: lightcoral; padding: 15px; visibility: hidden; border-radius: 10px; margin: 10px auto; width: 80%; }
     input { margin: 8px; padding: 12px; width: 80%; max-width: 400px; border-radius: 8px; border: 1px solid #ccc; }
     #unlockMsg { color: #008044; font-weight: bold; display: none; margin-top: 10px; }
+
+    /* SUCCESS MODAL */
+    #vipSuccessBox { display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid #00ff88; padding: 30px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.5); z-index: 1000; max-width: 400px; }
   </style>
 </head>
 <body>
+
+  <div id="vipSuccessBox">
+    <h1 style="color: #008044; margin-top: 0;">🎉 REWARD UNLOCKED!</h1>
+    <p style="font-size: 1.1em; font-weight: bold;">You’ve successfully invited a friend!</p>
+    <p>Your <b>3-Month Feature</b> is now active! Our team has been notified, and <b>we will be in touch with you via email within 48 hours</b> to coordinate your promotion.</p>
+    <button onclick="document.getElementById('vipSuccessBox').style.display='none'" class="upload-btn">AWESOME!</button>
+  </div>
 
   <div style="margin-bottom: 20px;">
     <button id="google-sign-in" style="padding: 10px 20px; cursor: pointer; border-radius: 5px; background: white;">
@@ -35,7 +45,7 @@
     <div class="tutorial-box">
       <h2 style="color: #008044; margin-top: 0;">🚀 3-Month Feature Reward</h2>
       <p>1. <b>Sign In</b> with Google above.<br>
-      2. <b>Share</b> your unique link with <b>1 artist friend</b>.<br>
+      2. <b>Share</b> your link with <b>1 artist friend</b>.<br>
       3. When they sign in, you unlock a <b>3-Month Feature!</b></p>
     </div>
 
@@ -59,13 +69,15 @@
     <input type="file" id="fileInp" accept="audio/mpeg" required><br>
     <div style="margin: 15px;">
         <input type="checkbox" id="agreement" style="width: auto;"> 
-        <label for="agreement">I own the rights to this music.</label>
+        <label for="agreement">I confirm I own this music.</label>
     </div>
     <button id="btn" class="upload-btn">UPLOAD NOW</button>
   </form>
 
   <div id="alertBox" class="alertBox"><h2>Uploading...</h2></div>
   <div id="ooaa" class="alertBox" style="background-color: lightgreen;"><h2>✅ Success! Upload Complete.</h2></div>
+
+<script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
@@ -88,23 +100,15 @@
   const auth = getAuth(app);
   const storage = getStorage(app);
   const provider = new GoogleAuthProvider();
+  const jsConfetti = new JSConfetti();
 
-  // --- 1. THE MOST IMPORTANT PART: DETECTION ---
+  // --- 1. DETECTION ---
   const params = new URLSearchParams(window.location.search);
-  const refParam = params.get('ref');
-  const byParam = params.get('by');
-
-  if (refParam === "ARTISTSOFFEB26") {
-      console.log("Campaign Code Detected!");
+  if (params.get('ref') === "ARTISTSOFFEB26" || localStorage.getItem('ref_active') === 'true') {
       localStorage.setItem('ref_active', 'true');
       document.getElementById('campaignContainer').style.display = 'block';
-  } else if (localStorage.getItem('ref_active') === 'true') {
-      document.getElementById('campaignContainer').style.display = 'block';
   }
-
-  if (byParam) {
-      localStorage.setItem('pending_inviter', byParam);
-  }
+  if (params.get('by')) localStorage.setItem('pending_inviter', params.get('by'));
 
   // --- 2. AUTH & PROGRESS ---
   document.getElementById("google-sign-in").onclick = () => {
@@ -120,7 +124,6 @@
       const userRef = ref2(db, 'users/' + safeEmail);
       const snap = await get(userRef);
 
-      // New user + referral = Credit for the inviter
       if (!snap.exists() && inviter) {
         await update(ref2(db, 'referralCounts/' + inviter), { count: increment(1) });
         localStorage.removeItem('pending_inviter');
@@ -133,13 +136,23 @@
 
   function loadUserProgress(name) {
     const cleanName = name.replace(/\s+/g, '_');
+    const safeEmail = localStorage.getItem("email").replace(/\./g, ',');
     document.getElementById('shareLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=ARTISTSOFFEB26&by=${cleanName}`;
 
-    onValue(ref2(db, 'referralCounts/' + cleanName), (snap) => {
+    onValue(ref2(db, 'referralCounts/' + cleanName), async (snap) => {
       const count = snap.val()?.count || 0;
       document.getElementById('countText').innerText = `${count} / 1 Artist Joined`;
       document.getElementById('progressBarStatus').style.width = (count >= 1 ? 100 : 0) + "%";
-      if(count >= 1) document.getElementById('unlockMsg').style.display = 'block';
+
+      if(count >= 1) {
+          document.getElementById('unlockMsg').style.display = 'block';
+          if (localStorage.getItem('rewardNotified') !== 'true') {
+              document.getElementById('vipSuccessBox').style.display = 'block';
+              await update(ref2(db, 'users/' + safeEmail), { eligibility: "3_MONTH_FEATURE" });
+              jsConfetti.addConfetti({ emojis: ['🎉', '🚀', '🔥'] });
+              localStorage.setItem('rewardNotified', 'true');
+          }
+      }
     });
   }
 
@@ -147,35 +160,30 @@
   document.getElementById("btn").onclick = async () => {
     const email = localStorage.getItem("email");
     const file = document.getElementById("fileInp").files[0];
-    const title = document.getElementById("title").value;
-    const artist = document.getElementById("artist").value;
-    const album = document.getElementById("album").value;
-
-    if (!email || !file || !title) return alert("Sign in and fill all fields!");
+    if (!email || !file) return alert("Sign in and select a file!");
     if (!document.getElementById("agreement").checked) return alert("Accept agreement!");
 
     document.getElementById("alertBox").style.visibility = "visible";
     try {
-      const path = `${album}/${title}/${artist}/${file.name}`;
+      const path = `${document.getElementById("album").value}/${document.getElementById("title").value}/${document.getElementById("artist").value}/${file.name}`;
       const snap = await uploadBytes(ref(storage, path), file);
       const url = await getDownloadURL(snap.ref);
-
-      await update(ref2(db, "SONGS/" + title), {
+      await update(ref2(db, "SONGS/" + document.getElementById("title").value), {
           fileInp: url, uploader: email, campaign: "ARTISTSOFFEB26"
       });
       document.getElementById("alertBox").style.visibility = "hidden";
       document.getElementById("ooaa").style.visibility = "visible";
-    } catch (err) { alert("Error uploading."); }
+      jsConfetti.addConfetti();
+    } catch (err) { alert("Upload failed."); }
   };
 
   document.getElementById("copyBtn").onclick = () => {
     const copyText = document.getElementById("shareLinkInput");
     copyText.select();
     navigator.clipboard.writeText(copyText.value);
-    alert("Copied!");
+    alert("Copied! Share it with 1 person.");
   };
 
-  // Check if session exists on load
   if(localStorage.getItem("fullName")) {
       document.getElementById("gcm").innerHTML = localStorage.getItem("fullName");
       loadUserProgress(localStorage.getItem("fullName"));
