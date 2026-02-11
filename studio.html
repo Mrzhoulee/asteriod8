@@ -130,32 +130,33 @@ label {
 
   </div>
 <center>
-  <h1>Asteroid Teams Studio</h1>
-  <h2>Upload Media</h2>
-
-  <form id="uploadForm" class="formUpload">
-    <div id="referralBadge" style="display: none; background: #00ff88; color: black; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; text-align: center;">
-  ✨ Referral Active: You are eligible for a Feature!
+  <h1>Asteroid Teams Studio</h1><div id="referralBadge" style="display:none; background-color: #00ff88; color: black; padding: 15px; border-radius: 8px; font-weight: bold; margin: 20px auto; width: fit-content; border: 2px solid black;">
+    ✨ Campaign Active: ARTISTSOFFEB26 Feature Eligible
 </div>
-    <div id="tutorialBox" style="display:none; background: #fff; border: 3px solid #00ff88; padding: 20px; border-radius: 15px; max-width: 600px; margin-bottom: 20px; text-align: left;">
+
+<div id="tutorialBox" style="display:none; background: #fff; border: 3px solid #00ff88; padding: 20px; border-radius: 15px; max-width: 600px; margin-bottom: 20px; text-align: left;">
   <h2 style="color: #008044; margin-top: 0;">🌟 How to get Featured</h2>
   <ol>
-    <li><strong>Sign In:</strong> Use the Google button above (Required for tracking).</li>
-    <li><strong>Fill Details:</strong> Enter your Song Title, Artist Name, and Album.</li>
-    <li><strong>Upload:</strong> Select your MP3 file and click Upload.</li>
-    <li><strong>Confirmation:</strong> Once finished, your track is automatically flagged for the February Feature list!</li>
+    <li><strong>Sign In:</strong> Click the Google button (Required to track your 3 invites).</li>
+    <li><strong>Share:</strong> Copy your personal link and send it to 3 people.</li>
+    <li><strong>Upload:</strong> Put your song up. Once 3 people sign in via your link, you get the 3-month feature!</li>
   </ol>
 </div>
 
 <div id="referralTracker" style="display:none; background: white; border: 2px solid coral; padding: 15px; border-radius: 10px; max-width: 500px; margin-bottom: 20px;">
   <h3 style="margin-top:0;">🚀 3-Month Feature Challenge</h3>
-  <p>Invite 3 friends to sign in. Once they do, you unlock a 3-month feature on all social medias!</p>
-  <div style="background: #eee; border-radius: 10px; height: 20px; width: 100%; margin: 10px 0;">
+  <p>Invites: <span id="countText">0 / 3</span></p>
+  <div style="background: #eee; border-radius: 10px; height: 15px; width: 100%;">
     <div id="progressBarStatus" style="background: coral; height: 100%; width: 0%; border-radius: 10px; transition: 0.5s;"></div>
   </div>
-  <p id="countText">Invites: 0 / 3</p>
-  <p id="unlockMsg" style="color: green; font-weight: bold; display: none;">✅ You've earned a 3-Month Feature!</p>
+  <br>
+  <input type="text" id="shareLinkInput" readonly style="width: 70%; padding: 5px;">
+  <button id="copyBtn" style="cursor:pointer;">Copy My Link</button>
 </div>
+  <h2>Upload Media</h2>
+
+  <form id="uploadForm" class="formUpload">
+ 
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
     <input type="file" class="inputFile" id="fileInp" accept="audio/mpeg" required />
@@ -271,12 +272,17 @@ label {
   // --- 1. REFERRAL TRACKING ---
   function initReferral() {
     const urlParams = new URLSearchParams(window.location.search);
-    const inviter = urlParams.get('by'); // The person who shared the link
+    const refCode = urlParams.get('ref');
 
-    if (inviter) {
-      localStorage.setItem('pendingReferrer', inviter);
+    // If the URL has the code, save it and show the boxes
+    if (refCode === "ARTISTSOFFEB26") {
+        localStorage.setItem('referralActive', "ARTISTSOFFEB26");
+        document.getElementById('referralBadge').style.display = 'block';
+        document.getElementById('tutorialBox').style.display = 'block';
     }
-  }
+}
+// MUST CALL THE FUNCTION AT THE BOTTOM
+initReferral();
 
   // --- 2. GOOGLE SIGN IN & REWARD LOGIC ---
   document.getElementById("google-sign-in").addEventListener("click", () => {
@@ -355,6 +361,7 @@ label {
 
 
 </html>
+
 
 
 
