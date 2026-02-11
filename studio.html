@@ -1,260 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteroid Teams Media Studio</title>
   <style>
-    body {
-      background-color: antiquewhite;
-      font-family: "Montserrat", sans-serif;
-      margin: 0;
-      height: 100vh;
-    }
-
- input {
-  display: inline-block;
-  vertical-align: 50px /* Optional: aligns elements vertically */
-}
-
-label {
-  margin-right: 5px; /* Optional: adds spacing between label and input */
-}
-
-
-    .upload-btn {
-      width: 90px;
-      height: 40px;
-      background-color: coral;
-      color: black;
-      border-radius: 10%;
-      transition: ease-in 0.5s;
-    }
-
-    .upload-btn:hover {
-      width: 140px;
-      height: 90px;
-      background-color: lightsalmon;
-      font-size: large;
-    }
-
-    .bar {
-      height: 50px;
-      width: 500px;
-      background-color: grey;
-      position: relative;
-    }
-
-    .progress {
-      background: linear-gradient(12deg, red, blue);
-      position: relative;
-      width: 0;
-    }
-
-
-.inline-container h3,
-  .inline-container input {
-    display: inline-block;
-    vertical-align: middle; /* Align elements vertically */
-    margin-right: 10px; /* Add some space between them */
-  }
-
-
-    .alert {
-      opacity: 0;
-      background-color: coral;
-    }
-
-    .alertBox {
-      background-color: lightcoral;
-      width: 500px;
-      height: 100px;
-      visibility: hidden;
-      border-radius: 10%;
-      text-align: center;
-    }
-
-
-    .google-sign-in{
-      display: block;
-    }
-    .ht5 {
-      background-color: lightcoral;
-      width: 800px;
-      height: 100px;
-      display:none;
-      border-radius: 10%;
-      text-align: center;
-    }
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      /* Allow clicks to pass through the canvas */
-    }
-
-
-    @media only screen and (max-width:1200px){
-      .hellothere{
-      position: absolute;
-      top: 400px;
-      left: 180px;
-      }
-    }
+    body { background-color: antiquewhite; font-family: "Montserrat", sans-serif; margin: 0; padding: 20px; text-align: center; }
+    .upload-btn { width: 130px; height: 45px; background-color: coral; color: black; border-radius: 10px; cursor: pointer; border: none; font-weight: bold; margin: 10px; }
+    
+    /* CAMPAIGN UI - Visible by default if ref is in URL */
+    #campaignContainer { display: none; margin-bottom: 30px; }
+    .tutorial-box { background: white; border: 3px solid #00ff88; padding: 20px; border-radius: 15px; max-width: 600px; margin: 0 auto 20px auto; text-align: left; }
+    .progress-box { background: #fff3e0; border: 2px solid coral; padding: 20px; border-radius: 15px; max-width: 500px; margin: 0 auto; }
+    
+    /* Progress Bar */
+    .bar-bg { height: 20px; width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; overflow: hidden; border: 1px solid #bbb; }
+    #progressBarStatus { height: 100%; width: 0%; background: linear-gradient(90deg, #ff7f50, #ff4500); transition: width 0.5s ease; }
+    
+    .alertBox { background-color: lightcoral; padding: 15px; visibility: hidden; border-radius: 10px; margin: 10px auto; width: 80%; }
+    input { margin: 8px; padding: 12px; width: 80%; max-width: 400px; border-radius: 8px; border: 1px solid #ccc; }
   </style>
 </head>
-
 <body>
-<div class="hellothere">
-  <div style="position: absolute; top: 0px; left: 90px;">
+
+  <div style="margin-bottom: 20px;">
+    <button id="google-sign-in" style="padding: 10px 20px; cursor: pointer; border-radius: 5px; border: 1px solid black; background: white;">
+        <i class="fa-brands fa-google"></i> <span id="gcm">Sign In with Google</span>
+    </button>
   </div>
-</div>
-    <div style="position: absolute; top: 0; right: 90px; ">
 
+  <div id="campaignContainer">
+    <div class="tutorial-box">
+      <h2 style="color: #008044; margin-top: 0;">🌟 3-Month Feature Challenge</h2>
+      <p>1. <b>Sign In</b> above to start tracking.<br>
+      2. <b>Share</b> your link with 3 artist friends.<br>
+      3. Once 3 people sign in via your link, you get featured for <b>3 Months!</b></p>
+    </div>
 
-<div style="color: black">
-    <button style="background-color: white;" id="google-sign-in"><span id="gcm" style="font-size: medium; color: black;"><font color="black">Continue With
-        <i class="fa-brands fa-google"></i> </font></span></button>
-
-</div>
-
-  </div>
-<center>
-  <h1>Asteroid Teams Studio</h1><div id="referralBadge" style="display:none; background-color: #00ff88; color: black; padding: 15px; border-radius: 8px; font-weight: bold; margin: 20px auto; width: fit-content; border: 2px solid black;">
-    ✨ Campaign Active: ARTISTSOFFEB26 Feature Eligible
-</div>
-
-<div id="tutorialBox" style="display:none; background: #fff; border: 3px solid #00ff88; padding: 20px; border-radius: 15px; max-width: 600px; margin-bottom: 20px; text-align: left;">
-  <h2 style="color: #008044; margin-top: 0;">🌟 How to get Featured</h2>
-  <ol>
-    <li><strong>Sign In:</strong> Click the Google button (Required to track your 3 invites).</li>
-    <li><strong>Share:</strong> Copy your personal link and send it to 3 people.</li>
-    <li><strong>Upload:</strong> Put your song up. Once 3 people sign in via your link, you get the 3-month feature!</li>
-  </ol>
-</div>
-
-<div id="referralTracker" style="display:none; background: #fff; border: 2px solid coral; padding: 20px; border-radius: 15px; max-width: 500px; margin: 20px auto; box-shadow: 0px 4px 10px rgba(0,0,0,0.1);">
-  <h3 style="margin-top:0; color: coral;">🚀 3-Month Feature Challenge</h3>
-  
-  <div id="statsSection">
-    <p id="countText" style="font-weight: bold;">Invites: 0 / 3</p>
-    <div class="bar" style="height: 20px; width: 100%; background: #eee; border-radius: 10px; overflow: hidden; border: 1px solid #ddd;">
-      <div id="progressBarStatus" style="background: linear-gradient(90deg, coral, #ff8e53); height: 100%; width: 0%; transition: width 0.8s ease-in-out;"></div>
+    <div class="progress-box">
+      <h3 style="margin: 0; color: coral;">Invite Progress</h3>
+      <p id="countText" style="font-weight: bold;">0 / 3 Friends Joined</p>
+      <div class="bar-bg"><div id="progressBarStatus"></div></div>
+      
+      <p style="font-size: 0.9em;">Your Referral Link:</p>
+      <input type="text" id="shareLinkInput" readonly placeholder="Sign in to get your link...">
+      <button id="copyBtn" class="upload-btn" style="width: 80px; height: 35px; font-size: 12px;">COPY</button>
     </div>
   </div>
 
-  <p style="font-size: 0.9em; margin-top: 15px;">Share your link to unlock the reward:</p>
-  <div style="display: flex; gap: 10px;">
-    <input type="text" id="shareLinkInput" readonly style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" value="Sign in to generate link...">
-    <button id="copyBtn" class="upload-btn" style="width: 80px; height: 40px;">Copy</button>
-  </div>
-</div>
-  <h2>Upload Media</h2>
+  <hr style="width: 80%; margin: 30px auto; border: 0.5px solid #ccc;">
 
-  <form id="uploadForm" class="formUpload">
- 
-    <span class="fileText"></span>
-    <input type="text" id="title" placeholder="Enter Title" required>
-    <input type="file" class="inputFile" id="fileInp" accept="audio/mpeg" required />
-    <input type="text" id="album" placeholder="Enter your custom Album" required>
-    <input type="text" id="artist" placeholder="Enter the Song Artist" class="text" required>
-    <center>
-    <button id="btn" class="upload-btn" type="button"><b>Upload</b></button>
-    <button id="Boostpost" class="upload-btn" type="button"><b>BOOST POST</b></button>
-    </center>
-<div class="inline-container">
-  <input type="checkbox" id="agreement">
-  <label for="agreement">
-    I confirm that I am the rightful owner of <span id="titlelol"></span>, 
-    or have full legal rights to upload it. 
-    If I do not, I accept all liability and Asteroid may remove this content 
-    and suspend my account.
-  </label>
-</div>
-
-  </center>
+  <form id="uploadForm">
+    <h2>Upload Your Media</h2>
+    <input type="text" id="title" placeholder="Song Title" required><br>
+    <input type="text" id="artist" placeholder="Artist Name" required><br>
+    <input type="text" id="album" placeholder="Album Name" required><br>
+    <input type="file" id="fileInp" accept="audio/mpeg" required><br>
+    
+    <div style="margin: 15px;">
+        <input type="checkbox" id="agreement" style="width: auto;"> 
+        <label for="agreement">I own the rights to this music.</label>
+    </div>
+    
+    <button id="btn" class="upload-btn">UPLOAD NOW</button>
   </form>
 
-<center>
-      <div class="alertBox" id="alt5">
-    <h1><b>The agreement checkbox is required.</b></h1>
-  </div>
-  <div class="alertBox" id="alertBox">
-    <h1><b>Your Song is being uploaded, Please wait...</b></h1>
-   
-  </div>
-  <div class="alertBox" id="alt1">
-    <h1><b>Please fill out the  song information</b></h1>
-  </div>
+  <div id="alertBox" class="alertBox"><h2>Uploading... please wait.</h2></div>
+  <div id="ooaa" class="alertBox" style="background-color: lightgreen; color: black;"><h2>✅ Success! Upload Complete.</h2></div>
 
-  <div class="alertBox" id="ooaa">
-    <h1><b>Your Song is Successfully uploaded!</b></h1>
-  </div>
-
-
-    <div class="ht5" id="alt2">
-    <h1><b>If your song is a single then enter "Singles" in the album form instead of leaving it blank. </b></h1>
-  </div>
-<div style="text-align: center !important;">
-    <h1>Uploading Guide</h1>
-  <font face="Montserrat">
-  1. Enter your Song Title
-  <br>
-
-  2. Enter your Artist names
-  <br>
-
-  3. Enter your Album, if it's a single then just enter Single
-  <br>
-
-  4. Make sure you're signed in and please also tick the agreement box
-  <br>
-  
-  5. Click Upload then you're done!
-</font>
-</div>
-  </div>
-  <div class="bar">
-    <div class="progress"></div>
-  </div>
-
-
-</center>
-  <canvas id="can"></canvas>
-
-
-  <script>
-    const button = document.getElementById('btn')
-    button.addEventListener('click', () => {
-      let progress = document.getElementById("progress");
-      const interval = setInterval(() => {
-        if (progress = 100) {
-          clearInterval(interval);
-        } else {
-          progress += 5;
-          progressBar.style.width = progress + '%';
-        }
-      }, 1000);
-
-    });
-  </script>
-
-
-
-
-  <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getDatabase, ref as ref2, set, update, get, onValue, increment } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  import { getDatabase, ref as ref2, update, get, onValue, increment } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
@@ -269,120 +87,122 @@ label {
   };
 
   const app = initializeApp(firebaseConfig);
-  const database = getDatabase(app);
+  const db = getDatabase(app);
   const auth = getAuth(app);
   const storage = getStorage(app);
   const provider = new GoogleAuthProvider();
 
-  // --- 1. REFERRAL TRACKING ---
+  const VALID_CODE = "ARTISTSOFFEB26";
+
+  // --- 1. PAGE SETUP ---
   function init() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const refCode = urlParams.get('ref');
-    const inviter = urlParams.get('by');
+    const params = new URLSearchParams(window.location.search);
+    const refParam = params.get('ref');
+    const inviterParam = params.get('by');
 
-    // FORCE VISIBILITY if the campaign is active
-    if (refCode === "ARTISTSOFFEB26" || localStorage.getItem('refActive') === "ARTISTSOFFEB26") {
-      localStorage.setItem('refActive', "ARTISTSOFFEB26");
-      document.getElementById('referralBadge').style.display = 'block';
-      document.getElementById('tutorialBox').style.display = 'block';
-      document.getElementById('referralTracker').style.display = 'block'; // Shows the bar immediately
+    // Show campaign if code is in URL or saved in browser
+    if (refParam === VALID_CODE || localStorage.getItem('ref_active') === "true") {
+      localStorage.setItem('ref_active', "true");
+      document.getElementById('campaignContainer').style.display = 'block';
     }
-    
-    if (inviter) localStorage.setItem('pendingBy', inviter);
 
+    // Capture who referred this new person
+    if (inviterParam) {
+      localStorage.setItem('pending_inviter', inviterParam);
+    }
+
+    // Auto-load session
     const savedName = localStorage.getItem("fullName");
     if (savedName) {
-        showReferralTools(savedName);
+        document.getElementById("gcm").innerHTML = savedName;
+        updateUIForUser(savedName);
     }
-}
-// MUST CALL THE FUNCTION AT THE BOTTOM
-initReferral();
+  }
 
-  // --- 2. GOOGLE SIGN IN & REWARD LOGIC ---
-  document.getElementById("google-sign-in").addEventListener("click", () => {
-    signInWithPopup(auth, provider).then(async (result) => {
-      const user = result.user;
+  // --- 2. GOOGLE SIGN IN ---
+  document.getElementById("google-sign-in").onclick = () => {
+    signInWithPopup(auth, provider).then(async (res) => {
+      const user = res.user;
       const safeEmail = user.email.replace(/\./g, ',');
-      const inviterName = localStorage.getItem('pendingReferrer');
+      const inviter = localStorage.getItem('pending_inviter');
 
       localStorage.setItem("email", user.email);
       localStorage.setItem("fullName", user.displayName);
+      document.getElementById("gcm").innerHTML = user.displayName;
 
-      // Check if this is a new referral
-      const userRef = ref2(database, 'users/' + safeEmail);
-      const snapshot = await get(userRef);
+      // Check if user is new to credit the inviter
+      const userRef = ref2(db, 'users/' + safeEmail);
+      const snap = await get(userRef);
 
-      if (!snapshot.exists() && inviterName) {
-        // This is a new person clicking an invite link! 
-        // Give credit to the person who invited them
-        const inviterRef = ref2(database, 'referralCounts/' + inviterName);
-        await update(inviterRef, {
-          count: increment(1)
-        });
-        localStorage.removeItem('pendingReferrer'); // Reward given
+      if (!snap.exists() && inviter) {
+        const inviterRef = ref2(db, 'referralCounts/' + inviter);
+        await update(inviterRef, { count: increment(1) });
+        localStorage.removeItem('pending_inviter');
       }
 
-      // Save user profile
-      update(userRef, { email: user.email, name: user.displayName });
-      
-      showShareTools(user.displayName);
-      trackMyProgress(user.displayName);
+      await update(userRef, { email: user.email, name: user.displayName });
+      updateUIForUser(user.displayName);
     });
-  });
+  };
 
-  // --- 3. PROGRESS TRACKER ---
-  function trackMyProgress(myName) {
-    const cleanName = myName.replace(/\s+/g, '_');
-    const myRef = ref2(database, 'referralCounts/' + cleanName);
-    
-    onValue(myRef, (snapshot) => {
-      const data = snapshot.val();
-      const count = data ? data.count : 0;
-      
-      document.getElementById('referralTracker').style.display = 'block';
-      document.getElementById('countText').innerText = `Invites: ${count} / 3`;
-      
-      const progressPercent = Math.min((count / 3) * 100, 100);
-      document.getElementById('progressBarStatus').style.width = progressPercent + "%";
-
-      if (count >= 3) {
-        document.getElementById('unlockMsg').style.display = 'block';
-        // Flag user in database for 3-month feature
-        const safeEmail = localStorage.getItem("email").replace(/\./g, ',');
-        update(ref2(database, 'users/' + safeEmail), { eligibility: "3_MONTH_FEATURE" });
-      }
-    });
-  }
-
-  // --- 4. SHARE LINK GENERATOR ---
-  function showShareTools(name) {
+  // --- 3. REFRESH LINK & PROGRESS ---
+  function updateUIForUser(name) {
     const cleanName = name.replace(/\s+/g, '_');
-    document.getElementById('shareSection').style.display = 'block';
-    document.getElementById('shareLinkInput').value = `https://asteroid8.net/studio.html?ref=ARTISTSOFFEB26&by=${cleanName}`;
+    const link = window.location.origin + window.location.pathname + `?ref=${VALID_CODE}&by=${cleanName}`;
+    document.getElementById('shareLinkInput').value = link;
+
+    // Listen for progress
+    onValue(ref2(db, 'referralCounts/' + cleanName), (snap) => {
+      const count = snap.val()?.count || 0;
+      document.getElementById('countText').innerText = `${count} / 3 Friends Joined`;
+      document.getElementById('progressBarStatus').style.width = Math.min((count / 3) * 100, 100) + "%";
+    });
   }
 
-  // Copy function...
-  document.getElementById("copyBtn").addEventListener("click", () => {
-    const input = document.getElementById("shareLinkInput");
-    input.select();
-    navigator.clipboard.writeText(input.value);
-    alert("Link Copied! Send this to 3 artists to get featured for 3 months!");
-  });
+  // --- 4. UPLOAD LOGIC ---
+  document.getElementById("btn").onclick = async () => {
+    const email = localStorage.getItem("email");
+    const file = document.getElementById("fileInp").files[0];
+    const title = document.getElementById("title").value;
+    const artist = document.getElementById("artist").value;
+    const album = document.getElementById("album").value;
 
-  initReferral();
+    if (!email) return alert("Sign in first!");
+    if (!file || !title) return alert("Missing info!");
+    if (!document.getElementById("agreement").checked) return alert("Accept agreement!");
+
+    document.getElementById("alertBox").style.visibility = "visible";
+
+    try {
+      const path = `${album}/${title}/${artist}/${file.name}`;
+      const snap = await uploadBytes(ref(storage, path), file);
+      const url = await getDownloadURL(snap.ref);
+
+      const songData = {
+        [title]: { [album]: { [artist]: {
+          fileInp: url,
+          uploader: email,
+          campaign: localStorage.getItem('ref_active') ? VALID_CODE : "organic"
+        }}}
+      };
+
+      await update(ref2(db, "SONGS"), songData);
+      document.getElementById("alertBox").style.visibility = "hidden";
+      document.getElementById("ooaa").style.visibility = "visible";
+    } catch (err) {
+      alert("Error uploading. Check internet.");
+      document.getElementById("alertBox").style.visibility = "hidden";
+    }
+  };
+
+  document.getElementById("copyBtn").onclick = () => {
+    const copyText = document.getElementById("shareLinkInput");
+    copyText.select();
+    navigator.clipboard.writeText(copyText.value);
+    alert("Link Copied! Share with 3 people.");
+  };
+
+  init();
 </script>
 </body>
-
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
