@@ -134,6 +134,9 @@ label {
   <h2>Upload Media</h2>
 
   <form id="uploadForm" class="formUpload">
+    <div id="referralBadge" style="display: none; background: #00ff88; color: black; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; text-align: center;">
+  ✨ Referral Active: You are eligible for a Feature!
+</div>
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
     <input type="file" class="inputFile" id="fileInp" accept="audio/mpeg" required />
@@ -223,18 +226,14 @@ label {
 
 
   <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
-  <script type="module">
-    // Import the functions you need from the SDKs you need
+<script type="module">
+    // 1. Firebase SDK Imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-    import { getDatabase, ref as ref2, set, update, onValue, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getDatabase, ref as ref2, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
     import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
-    // TODO: Add SDKs for Firebase products that you want to use
-    // https://firebase.google.com/docs/web/setup#available-libraries
 
-    // Your web app's Firebase configurationx
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    // 2. Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
       authDomain: "asteroid-cdc13.firebaseapp.com",
@@ -242,223 +241,169 @@ label {
       projectId: "asteroid-cdc13",
       storageBucket: "asteroid-cdc13.appspot.com",
       messagingSenderId: "793353824502",
-      appId: "1:793353824502:web:3ac24821911d14773ba4d7",
-      measurementId: "G-GV72TMNNGR"
+      appId: "1:793353824502:web:3ac24821911d14773ba4d7"
     };
 
-    // Initialize Firebase
+    // Initialize Services
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
     const storage = getStorage(app);
     const database = getDatabase(app);
-    let users = localStorage.getItem("users");
-
-
-
-            const auth = getAuth(app);
-            const provider = new GoogleAuthProvider();
-
-       document.getElementById("google-sign-in").addEventListener("click", (e) => {
-              console.log("gcm_ready");
-              signInWithPopup(auth, provider)
-                .then((result) => {
-                  // This gives you a Google Access Token. You can use it to access the Google API.
-                  const credential = GoogleAuthProvider.credentialFromResult(result);
-                  const token = credential.accessToken;
-                  // The signed-in user info.
-                  const user = result.user;
-                  console.log(user)
-                  console.log("google-sign-in-clicked")
-                  localStorage.setItem("email", user["email"]);
-                  localStorage.setItem("CurrentUser", user["email"]);
-                  localStorage.setItem("fullName", user["displayName"]);
-                  localStorage.setItem("pfp", user.imageUrl);
-                  localStorage.setItem("pfp", user.photoURL); // 
-                  var fullName = user.displayName;
-                  document.getElementById("gcm").innerHTML = fullName;
-                  document.getElementById("gcd").innerHTML = fullName;
-                  console.log("Photo URL:", user.photoURL);
-
-
-
-                  // IdP data available using getAdditionalUserInfo(result)
-                  // ...
-                }).catch((error) => {
-                  // Handle Errors here.
-                  const errorCode = error.code;
-                  const errorMessage = error.message;
-                  // The email of the user's account used.
-                  const email = error.customData.email;
-                  // The AuthCredential type that was used.
-                  const credential = GoogleAuthProvider.credentialFromError(error);
-                  // ...
-                });
-            })
-    
-
-    let gaga = {}
-    const canvas = document.getElementById('can');
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
     const jsConfetti = new JSConfetti();
-    const boost = document.getElementById("Boostpost");
 
-    const btn = document.getElementById("btn");
-    boost.addEventListener('click', () => {
-      window.location.href = "boost.html"
-    })
+    // --- 3. STRICT REFERRAL & POPUP LOGIC ---
+    // Only display the feature popup if the URL matches the specific campaign
+    function initReferralSystem() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const refParam = urlParams.get('ref');
+        const byParam = urlParams.get('by'); // Tracks the specific artist who shared it
+        const VALID_CODE = "ARTISTSOFFEB26";
 
-    // Ensure canvas is full-screen
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
-
-    // getDownloadURL(ref(storage, "1/1/Guns N' Roses - Knockin' On Heaven's Door (Lyrics) (1).mp3"))
-    // .then((url)=>{
-    //   console.log(url);
-    // })
-
-
-    // localStorage.setItem('a', JSON.stringify({
-
-        let emailty = localStorage.getItem("email");
-
-
-
-    onValue(ref2(database, "SONGS/"), (snapshot) => {
-      console.log(snapshot.val())
-    })
-    //   }))
-    btn.addEventListener('click', async () => {
+        if (refParam === VALID_CODE) {
+            localStorage.setItem('referralId', VALID_CODE);
+            if (byParam) localStorage.setItem('invitedBy', byParam);
             
-
-      const fileInp = document.getElementById("fileInp").files;
-      const album = document.getElementById("album").value;
-      const title = document.getElementById("title").value;
-      const artist = document.getElementById("artist").value;
-                  let agreement = document.getElementById("agreement");
-          let email = localStorage.getItem("email");
-
-// Case 1: all fields filled but agreement not ticked
-      
-  const alt1 = document.getElementById("alt1"); // Missing fields
-  const alt2 = document.getElementById("alt2"); // Album empty
-  const alt5 = document.getElementById("alt5"); // Agreement missing
-  
-// First, hide all alerts initially
-alt1.style.visibility = "hidden";
-alt2.style.visibility = "hidden";
-alt5.style.visibility = "hidden";
-
-if(!email){
-    alt5.style.visibility = "visible";
-    alt5.innerHTML = `<center><b><h2>Sign in is required to upload.</h2></b></center>`;
-    return;
-}
-
-// Check the agreement first
-// Check agreement first
-if (!agreement.checked) { 
-    alt5.style.visibility = "visible";
-    alt5.innerHTML = `<center><b><h2>The agreement checkbox is required.</h2></b></center>`;
-    return; 
-}
-if (!artist || !title || fileInp.length === 0) {
-    alt1.style.visibility = "visible";
-    alt1.innerHTML = `<center><b><h2>Please fill out the song information</h2></b></center>`;
-    return;
-}
-
-// Check single-album warning (only shows if album is empty but other fields are filled)
-if (!album && artist && title && fileInp.length > 0) {
-    alt1.style.visibility = "visible";
-    alt1.innerHTML = `<center><b><h2>If your song is a single then enter "Singles" in the album form instead of leaving it blank.</h2></b></center>`;
-    // ⚠ no return here, so database will still save
-}
-
-// Assume `email` contains the user's email
-const safeEmail = email.replace(/\./g, ','); // replace dots with commas
-
-// Everything is valid, save to database
-set(ref2(database, 'agreements/' + safeEmail), {
-    email: email,
-    agreement: true,
-    songtitle: title,
-    timestamp: Date.now()
-});
-
-// If all checks pass, hide all alerts and proceed
-alt1.style.visibility = "hidden";
-alt2.style.visibility = "hidden";
-alt5.style.visibility = "hidden";
-
-// Save agreement info to database
-
-
-
-
-
-
-
-      // ✅ If we got here → everything is valid
-document.getElementById("btn").disabled = false;
-document.getElementById("titlelol").innerText = title;
-
-      console.log("hello");
-      // Show alert on button click
-      document.getElementById("alertBox").style.visibility = "visible";
-
-
-
-      // Add confetti explosion
-      jsConfetti.addConfetti({
-        emojis: ['🌈', '⚡️', '💥', '✨', '💫', '🌸'],
-      });
-
-
-
-      let i = 0;
-      while (i < fileInp.length) {
-        const response = await uploadBytes(ref(storage, album + "/" + title + "/" + artist + "/" + fileInp[i].name), fileInp[i]);
-        const downloadURL = await getDownloadURL(response.ref);
-
-        let gaga = {};
-      
-        let rec = title + "/" + album + "/" + fileInp[i].name;
-        if (rec) {
-    console.log("Loading finished");
-    console.log(rec);  // Log the stored message
-    document.getElementById("ooaa").style.visibility = "visible";
-    document.getElementById("alertBox").style.visibility = "hidden";
-}
-        gaga[title] = {}
-        gaga[title][album] = {}
-        gaga[title][album][artist] = {
-          fileInp: downloadURL,
-          title: title,
-          album: album,
-          artist: artist
+            // Display the Feature Badge/Popup
+            const badge = document.getElementById('referralBadge');
+            if (badge) badge.style.display = 'block';
+        } else {
+            // Optional: If they land without the code, check if it was previously saved
+            if (localStorage.getItem('referralId') !== VALID_CODE) {
+                localStorage.removeItem('referralId');
+                localStorage.removeItem('invitedBy');
+            }
         }
-        console.log(gaga);
-        update(ref2(database, "SONGS"), gaga); 
-        i++;
-        console.log("cccccc");
-      }
+    }
 
-     
-      
-    
-  
+    // --- 4. SHARING LINK GENERATION ---
+    // Creates a link for the current artist to share with others
+    function generateArtistShareLink() {
+        const fullName = localStorage.getItem("fullName") || "Artist";
+        const email = localStorage.getItem("email");
+        
+        if (email) {
+            const cleanName = fullName.replace(/\s+/g, '_'); // "John Doe" -> "John_Doe"
+            const shareLink = `https://asteroid8.net/?ref=ARTISTSOFFEB26&by=${cleanName}`;
+            
+            const shareInput = document.getElementById("shareLinkInput");
+            if (shareInput) shareInput.value = shareLink;
+        }
+    }
 
-
-  
+    // --- 5. GOOGLE SIGN-IN ---
+    document.getElementById("google-sign-in").addEventListener("click", () => {
+        signInWithPopup(auth, provider).then((result) => {
+            const user = result.user;
+            localStorage.setItem("email", user.email);
+            localStorage.setItem("fullName", user.displayName);
+            
+            document.getElementById("gcm").innerHTML = user.displayName;
+            generateArtistShareLink(); // Update share link once logged in
+        }).catch(err => console.error("Auth Error:", err));
     });
-  </script>
+
+    // --- 6. UPLOAD & DATA PACKAGING ---
+    const btn = document.getElementById("btn");
+    btn.addEventListener('click', async () => {
+        const fileInp = document.getElementById("fileInp").files;
+        const album = document.getElementById("album").value;
+        const title = document.getElementById("title").value;
+        const artist = document.getElementById("artist").value;
+        const agreement = document.getElementById("agreement");
+        const email = localStorage.getItem("email");
+
+        // UI Alerts
+        const alt1 = document.getElementById("alt1");
+        const alt5 = document.getElementById("alt5");
+        alt1.style.visibility = "hidden";
+        alt5.style.visibility = "hidden";
+
+        // Requirement Checks
+        if (!email) {
+            alt5.style.visibility = "visible";
+            alt5.innerHTML = "<h2>Login required to be featured.</h2>";
+            return;
+        }
+        if (!agreement.checked) {
+            alt5.style.visibility = "visible";
+            alt5.innerHTML = "<h2>Check the ownership agreement.</h2>";
+            return;
+        }
+        if (!artist || !title || fileInp.length === 0) {
+            alt1.style.visibility = "visible";
+            return;
+        }
+
+        // Prepare Referral Metadata
+        const campaign = localStorage.getItem('referralId') || "organic";
+        const referrer = localStorage.getItem('invitedBy') || "none";
+        const safeEmail = email.replace(/\./g, ',');
+
+        // Log Agreement in Database
+        set(ref2(database, 'agreements/' + safeEmail), {
+            email: email,
+            agreement: true,
+            songtitle: title,
+            campaign: campaign,
+            referrer: referrer,
+            timestamp: Date.now()
+        });
+
+        document.getElementById("alertBox").style.visibility = "visible";
+        jsConfetti.addConfetti();
+
+        // Process Uploads
+        for (let i = 0; i < fileInp.length; i++) {
+            const storagePath = `${album}/${title}/${artist}/${fileInp[i].name}`;
+            const uploadTask = await uploadBytes(ref(storage, storagePath), fileInp[i]);
+            const downloadURL = await getDownloadURL(uploadTask.ref);
+
+            // PACKAGE EVERYTHING FOR THE "SONGS" NODE
+            let uploadPackage = {};
+            uploadPackage[title] = {};
+            uploadPackage[title][album] = {};
+            uploadPackage[title][album][artist] = {
+                fileInp: downloadURL,
+                title: title,
+                album: album,
+                artist: artist,
+                uploaderEmail: email,       // Identity
+                referralCode: campaign,     // ARTISTSOFFEB26 check
+                invitedBy: referrer,        // Viral tracking
+                timestamp: Date.now()
+            };
+
+            update(ref2(database, "SONGS"), uploadPackage);
+        }
+
+        // Success UI
+        document.getElementById("ooaa").style.visibility = "visible";
+        document.getElementById("alertBox").style.visibility = "hidden";
+        
+        // Clear campaign data after successful use
+        localStorage.removeItem('referralId');
+        localStorage.removeItem('invitedBy');
+    });
+
+    // Copy Button for Sharing Link
+    document.getElementById("copyBtn")?.addEventListener("click", () => {
+        const link = document.getElementById("shareLinkInput");
+        link.select();
+        navigator.clipboard.writeText(link.value);
+        alert("Personalized Referral Link Copied!");
+    });
+
+    // Run on startup
+    initReferralSystem();
+    generateArtistShareLink();
+
+</script>
 </body>
 
 
 </html>
+
 
 
 
