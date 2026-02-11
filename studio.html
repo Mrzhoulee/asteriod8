@@ -137,6 +137,24 @@ label {
     <div id="referralBadge" style="display: none; background: #00ff88; color: black; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; text-align: center;">
   ✨ Referral Active: You are eligible for a Feature!
 </div>
+    <div id="tutorialBox" style="display:none; background: #fff; border: 3px solid #00ff88; padding: 20px; border-radius: 15px; max-width: 600px; margin-bottom: 20px; text-align: left;">
+  <h2 style="color: #008044; margin-top: 0;">🌟 How to get Featured</h2>
+  <ol>
+    <li><strong>Sign In:</strong> Use the Google button above (Required for tracking).</li>
+    <li><strong>Fill Details:</strong> Enter your Song Title, Artist Name, and Album.</li>
+    <li><strong>Upload:</strong> Select your MP3 file and click Upload.</li>
+    <li><strong>Confirmation:</strong> Once finished, your track is automatically flagged for the February Feature list!</li>
+  </ol>
+</div>
+
+<div id="shareSection" style="display:none; background: #ffe4c4; padding: 15px; border-radius: 10px; border: 1px solid coral; margin-bottom: 20px; max-width: 500px;">
+  <p style="font-weight: bold; margin-bottom: 5px;">Invite other artists to the feature campaign:</p>
+  <div style="display: flex; gap: 5px;">
+    <input type="text" id="shareLinkInput" readonly style="flex: 1; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+    <button id="copyBtn" style="background: coral; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Copy</button>
+  </div>
+  <small id="copyMsg" style="color: green; display: none;">Link copied to clipboard!</small>
+</div>
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
     <input type="file" class="inputFile" id="fileInp" accept="audio/mpeg" required />
@@ -160,6 +178,9 @@ label {
   </form>
 
 <center>
+      <div class="alertBox" id="alt5">
+    <h1><b>The agreement checkbox is required.</b></h1>
+  </div>
   <div class="alertBox" id="alertBox">
     <h1><b>Your Song is being uploaded, Please wait...</b></h1>
    
@@ -171,9 +192,7 @@ label {
   <div class="alertBox" id="ooaa">
     <h1><b>Your Song is Successfully uploaded!</b></h1>
   </div>
-    <div class="alertBox" id="alt5">
-    <h1><b>The agreement checkbox is required.</b></h1>
-  </div>
+
 
     <div class="ht5" id="alt2">
     <h1><b>If your song is a single then enter "Singles" in the album form instead of leaving it blank. </b></h1>
@@ -227,182 +246,137 @@ label {
 
   <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
 <script type="module">
-    // 1. Firebase SDK Imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref as ref2, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getDatabase, ref as ref2, set, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
-    // 2. Firebase Configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
-      authDomain: "asteroid-cdc13.firebaseapp.com",
-      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
-      projectId: "asteroid-cdc13",
-      storageBucket: "asteroid-cdc13.appspot.com",
-      messagingSenderId: "793353824502",
-      appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+  const firebaseConfig = {
+    apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
+    authDomain: "asteroid-cdc13.firebaseapp.com",
+    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+    projectId: "asteroid-cdc13",
+    storageBucket: "asteroid-cdc13.appspot.com",
+    messagingSenderId: "793353824502",
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+  const database = getDatabase(app);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  const VALID_CODE = "ARTISTSOFFEB26";
+
+  // --- A. REFERRAL & TUTORIAL LOGIC ---
+  function initStudio() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+
+    // If they have the code in URL, save it and show tutorial
+    if (refCode === VALID_CODE) {
+      localStorage.setItem('referralActive', VALID_CODE);
+    }
+
+    const isActive = localStorage.getItem('referralActive') === VALID_CODE;
+    if (isActive) {
+      document.getElementById('tutorialBox').style.display = 'block';
+    }
+
+    // Check if user is already logged in to show the share link
+    if (localStorage.getItem("email")) {
+      showShareLink();
+    }
+  }
+
+  // --- B. GOOGLE SIGN IN ---
+  document.getElementById("google-sign-in").addEventListener("click", () => {
+    signInWithPopup(auth, provider).then((result) => {
+      localStorage.setItem("email", result.user.email);
+      localStorage.setItem("fullName", result.user.displayName);
+      document.getElementById("gcm").innerHTML = result.user.displayName;
+      showShareLink(); // Show the copier after login
+    });
+  });
+
+  // --- C. SHARE LINK COPIER ---
+  function showShareLink() {
+    const shareSection = document.getElementById("shareSection");
+    const shareInput = document.getElementById("shareLinkInput");
+    shareSection.style.display = 'block';
+    // Generates the campaign link
+    shareInput.value = `https://asteroid8.net/studio.html?ref=${VALID_CODE}`;
+  }
+
+  document.getElementById("copyBtn").addEventListener("click", () => {
+    const input = document.getElementById("shareLinkInput");
+    input.select();
+    navigator.clipboard.writeText(input.value);
+    document.getElementById("copyMsg").style.display = "block";
+    setTimeout(() => { document.getElementById("copyMsg").style.display = "none"; }, 2000);
+  });
+
+  // --- D. UPLOAD LOGIC ---
+  document.getElementById("btn").addEventListener('click', async () => {
+    const email = localStorage.getItem("email");
+    const fileInp = document.getElementById("fileInp").files;
+    const title = document.getElementById("title").value;
+    const album = document.getElementById("album").value;
+    const artist = document.getElementById("artist").value;
+
+    // Validation
+    if (!email) {
+      alert("Sign in is required to be featured!");
+      return;
+    }
+    if (!document.getElementById("agreement").checked) {
+      alert("Please agree to the terms.");
+      return;
+    }
+    if (fileInp.length === 0 || !title || !artist) {
+      alert("Please fill all fields.");
+      return;
+    }
+
+    const campaign = localStorage.getItem('referralActive') === VALID_CODE ? VALID_CODE : "organic";
+
+    document.getElementById("alertBox").style.visibility = "visible";
+
+    // 1. Upload to Storage
+    const storagePath = `${album}/${title}/${artist}/${fileInp[0].name}`;
+    const snapshot = await uploadBytes(ref(storage, storagePath), fileInp[0]);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+
+    // 2. Save to Realtime Database
+    let songData = {};
+    songData[title] = {};
+    songData[title][album] = {};
+    songData[title][album][artist] = {
+      fileInp: downloadURL,
+      title: title,
+      album: album,
+      artist: artist,
+      uploaderEmail: email, // Saved Email
+      referralStatus: campaign // Saved Code
     };
 
-    // Initialize Services
-    const app = initializeApp(firebaseConfig);
-    const storage = getStorage(app);
-    const database = getDatabase(app);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-    const jsConfetti = new JSConfetti();
+    update(ref2(database, "SONGS"), songData);
 
-    // --- 3. STRICT REFERRAL & POPUP LOGIC ---
-    // Only display the feature popup if the URL matches the specific campaign
-    function initReferralSystem() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const refParam = urlParams.get('ref');
-        const byParam = urlParams.get('by'); // Tracks the specific artist who shared it
-        const VALID_CODE = "ARTISTSOFFEB26";
+    document.getElementById("alertBox").style.visibility = "hidden";
+    document.getElementById("ooaa").style.visibility = "visible";
+    
+    // Clear the referral after success so it doesn't stay forever
+    localStorage.removeItem('referralActive');
+  });
 
-        if (refParam === VALID_CODE) {
-            localStorage.setItem('referralId', VALID_CODE);
-            if (byParam) localStorage.setItem('invitedBy', byParam);
-            
-            // Display the Feature Badge/Popup
-            const badge = document.getElementById('referralBadge');
-            if (badge) badge.style.display = 'block';
-        } else {
-            // Optional: If they land without the code, check if it was previously saved
-            if (localStorage.getItem('referralId') !== VALID_CODE) {
-                localStorage.removeItem('referralId');
-                localStorage.removeItem('invitedBy');
-            }
-        }
-    }
-
-    // --- 4. SHARING LINK GENERATION ---
-    // Creates a link for the current artist to share with others
-    function generateArtistShareLink() {
-        const fullName = localStorage.getItem("fullName") || "Artist";
-        const email = localStorage.getItem("email");
-        
-        if (email) {
-            const cleanName = fullName.replace(/\s+/g, '_'); // "John Doe" -> "John_Doe"
-            const shareLink = `https://asteroid8.net/?ref=ARTISTSOFFEB26&by=${cleanName}`;
-            
-            const shareInput = document.getElementById("shareLinkInput");
-            if (shareInput) shareInput.value = shareLink;
-        }
-    }
-
-    // --- 5. GOOGLE SIGN-IN ---
-    document.getElementById("google-sign-in").addEventListener("click", () => {
-        signInWithPopup(auth, provider).then((result) => {
-            const user = result.user;
-            localStorage.setItem("email", user.email);
-            localStorage.setItem("fullName", user.displayName);
-            
-            document.getElementById("gcm").innerHTML = user.displayName;
-            generateArtistShareLink(); // Update share link once logged in
-        }).catch(err => console.error("Auth Error:", err));
-    });
-
-    // --- 6. UPLOAD & DATA PACKAGING ---
-    const btn = document.getElementById("btn");
-    btn.addEventListener('click', async () => {
-        const fileInp = document.getElementById("fileInp").files;
-        const album = document.getElementById("album").value;
-        const title = document.getElementById("title").value;
-        const artist = document.getElementById("artist").value;
-        const agreement = document.getElementById("agreement");
-        const email = localStorage.getItem("email");
-
-        // UI Alerts
-        const alt1 = document.getElementById("alt1");
-        const alt5 = document.getElementById("alt5");
-        alt1.style.visibility = "hidden";
-        alt5.style.visibility = "hidden";
-
-        // Requirement Checks
-        if (!email) {
-            alt5.style.visibility = "visible";
-            alt5.innerHTML = "<h2>Login required to be featured.</h2>";
-            return;
-        }
-        if (!agreement.checked) {
-            alt5.style.visibility = "visible";
-            alt5.innerHTML = "<h2>Check the ownership agreement.</h2>";
-            return;
-        }
-        if (!artist || !title || fileInp.length === 0) {
-            alt1.style.visibility = "visible";
-            return;
-        }
-
-        // Prepare Referral Metadata
-        const campaign = localStorage.getItem('referralId') || "organic";
-        const referrer = localStorage.getItem('invitedBy') || "none";
-        const safeEmail = email.replace(/\./g, ',');
-
-        // Log Agreement in Database
-        set(ref2(database, 'agreements/' + safeEmail), {
-            email: email,
-            agreement: true,
-            songtitle: title,
-            campaign: campaign,
-            referrer: referrer,
-            timestamp: Date.now()
-        });
-
-        document.getElementById("alertBox").style.visibility = "visible";
-        jsConfetti.addConfetti();
-
-        // Process Uploads
-        for (let i = 0; i < fileInp.length; i++) {
-            const storagePath = `${album}/${title}/${artist}/${fileInp[i].name}`;
-            const uploadTask = await uploadBytes(ref(storage, storagePath), fileInp[i]);
-            const downloadURL = await getDownloadURL(uploadTask.ref);
-
-            // PACKAGE EVERYTHING FOR THE "SONGS" NODE
-            let uploadPackage = {};
-            uploadPackage[title] = {};
-            uploadPackage[title][album] = {};
-            uploadPackage[title][album][artist] = {
-                fileInp: downloadURL,
-                title: title,
-                album: album,
-                artist: artist,
-                uploaderEmail: email,       // Identity
-                referralCode: campaign,     // ARTISTSOFFEB26 check
-                invitedBy: referrer,        // Viral tracking
-                timestamp: Date.now()
-            };
-
-            update(ref2(database, "SONGS"), uploadPackage);
-        }
-
-        // Success UI
-        document.getElementById("ooaa").style.visibility = "visible";
-        document.getElementById("alertBox").style.visibility = "hidden";
-        
-        // Clear campaign data after successful use
-        localStorage.removeItem('referralId');
-        localStorage.removeItem('invitedBy');
-    });
-
-    // Copy Button for Sharing Link
-    document.getElementById("copyBtn")?.addEventListener("click", () => {
-        const link = document.getElementById("shareLinkInput");
-        link.select();
-        navigator.clipboard.writeText(link.value);
-        alert("Personalized Referral Link Copied!");
-    });
-
-    // Run on startup
-    initReferralSystem();
-    generateArtistShareLink();
-
+  initStudio();
 </script>
 </body>
 
 
 </html>
+
 
 
 
