@@ -147,13 +147,14 @@ label {
   </ol>
 </div>
 
-<div id="shareSection" style="display:none; background: #ffe4c4; padding: 15px; border-radius: 10px; border: 1px solid coral; margin-bottom: 20px; max-width: 500px;">
-  <p style="font-weight: bold; margin-bottom: 5px;">Invite other artists to the feature campaign:</p>
-  <div style="display: flex; gap: 5px;">
-    <input type="text" id="shareLinkInput" readonly style="flex: 1; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
-    <button id="copyBtn" style="background: coral; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Copy</button>
+<div id="referralTracker" style="display:none; background: white; border: 2px solid coral; padding: 15px; border-radius: 10px; max-width: 500px; margin-bottom: 20px;">
+  <h3 style="margin-top:0;">🚀 3-Month Feature Challenge</h3>
+  <p>Invite 3 friends to sign in. Once they do, you unlock a 3-month feature on all social medias!</p>
+  <div style="background: #eee; border-radius: 10px; height: 20px; width: 100%; margin: 10px 0;">
+    <div id="progressBarStatus" style="background: coral; height: 100%; width: 0%; border-radius: 10px; transition: 0.5s;"></div>
   </div>
-  <small id="copyMsg" style="color: green; display: none;">Link copied to clipboard!</small>
+  <p id="countText">Invites: 0 / 3</p>
+  <p id="unlockMsg" style="color: green; font-weight: bold; display: none;">✅ You've earned a 3-Month Feature!</p>
 </div>
     <span class="fileText"></span>
     <input type="text" id="title" placeholder="Enter Title" required>
@@ -247,7 +248,7 @@ label {
   <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getDatabase, ref as ref2, set, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  import { getDatabase, ref as ref2, set, update, get, onValue, increment } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
@@ -262,120 +263,99 @@ label {
   };
 
   const app = initializeApp(firebaseConfig);
-  const storage = getStorage(app);
   const database = getDatabase(app);
   const auth = getAuth(app);
+  const storage = getStorage(app);
   const provider = new GoogleAuthProvider();
 
-  const VALID_CODE = "ARTISTSOFFEB26";
-
-  // --- A. REFERRAL & TUTORIAL LOGIC ---
-  function initStudio() {
+  // --- 1. REFERRAL TRACKING ---
+  function initReferral() {
     const urlParams = new URLSearchParams(window.location.search);
-    const refCode = urlParams.get('ref');
+    const inviter = urlParams.get('by'); // The person who shared the link
 
-    // If they have the code in URL, save it and show tutorial
-    if (refCode === VALID_CODE) {
-      localStorage.setItem('referralActive', VALID_CODE);
-    }
-
-    const isActive = localStorage.getItem('referralActive') === VALID_CODE;
-    if (isActive) {
-      document.getElementById('tutorialBox').style.display = 'block';
-    }
-
-    // Check if user is already logged in to show the share link
-    if (localStorage.getItem("email")) {
-      showShareLink();
+    if (inviter) {
+      localStorage.setItem('pendingReferrer', inviter);
     }
   }
 
-  // --- B. GOOGLE SIGN IN ---
+  // --- 2. GOOGLE SIGN IN & REWARD LOGIC ---
   document.getElementById("google-sign-in").addEventListener("click", () => {
-    signInWithPopup(auth, provider).then((result) => {
-      localStorage.setItem("email", result.user.email);
-      localStorage.setItem("fullName", result.user.displayName);
-      document.getElementById("gcm").innerHTML = result.user.displayName;
-      showShareLink(); // Show the copier after login
+    signInWithPopup(auth, provider).then(async (result) => {
+      const user = result.user;
+      const safeEmail = user.email.replace(/\./g, ',');
+      const inviterName = localStorage.getItem('pendingReferrer');
+
+      localStorage.setItem("email", user.email);
+      localStorage.setItem("fullName", user.displayName);
+
+      // Check if this is a new referral
+      const userRef = ref2(database, 'users/' + safeEmail);
+      const snapshot = await get(userRef);
+
+      if (!snapshot.exists() && inviterName) {
+        // This is a new person clicking an invite link! 
+        // Give credit to the person who invited them
+        const inviterRef = ref2(database, 'referralCounts/' + inviterName);
+        await update(inviterRef, {
+          count: increment(1)
+        });
+        localStorage.removeItem('pendingReferrer'); // Reward given
+      }
+
+      // Save user profile
+      update(userRef, { email: user.email, name: user.displayName });
+      
+      showShareTools(user.displayName);
+      trackMyProgress(user.displayName);
     });
   });
 
-  // --- C. SHARE LINK COPIER ---
-  function showShareLink() {
-    const shareSection = document.getElementById("shareSection");
-    const shareInput = document.getElementById("shareLinkInput");
-    shareSection.style.display = 'block';
-    // Generates the campaign link
-    shareInput.value = `https://asteroid8.net/studio.html?ref=${VALID_CODE}`;
+  // --- 3. PROGRESS TRACKER ---
+  function trackMyProgress(myName) {
+    const cleanName = myName.replace(/\s+/g, '_');
+    const myRef = ref2(database, 'referralCounts/' + cleanName);
+    
+    onValue(myRef, (snapshot) => {
+      const data = snapshot.val();
+      const count = data ? data.count : 0;
+      
+      document.getElementById('referralTracker').style.display = 'block';
+      document.getElementById('countText').innerText = `Invites: ${count} / 3`;
+      
+      const progressPercent = Math.min((count / 3) * 100, 100);
+      document.getElementById('progressBarStatus').style.width = progressPercent + "%";
+
+      if (count >= 3) {
+        document.getElementById('unlockMsg').style.display = 'block';
+        // Flag user in database for 3-month feature
+        const safeEmail = localStorage.getItem("email").replace(/\./g, ',');
+        update(ref2(database, 'users/' + safeEmail), { eligibility: "3_MONTH_FEATURE" });
+      }
+    });
   }
 
+  // --- 4. SHARE LINK GENERATOR ---
+  function showShareTools(name) {
+    const cleanName = name.replace(/\s+/g, '_');
+    document.getElementById('shareSection').style.display = 'block';
+    document.getElementById('shareLinkInput').value = `https://asteroid8.net/studio.html?ref=ARTISTSOFFEB26&by=${cleanName}`;
+  }
+
+  // Copy function...
   document.getElementById("copyBtn").addEventListener("click", () => {
     const input = document.getElementById("shareLinkInput");
     input.select();
     navigator.clipboard.writeText(input.value);
-    document.getElementById("copyMsg").style.display = "block";
-    setTimeout(() => { document.getElementById("copyMsg").style.display = "none"; }, 2000);
+    alert("Link Copied! Send this to 3 artists to get featured for 3 months!");
   });
 
-  // --- D. UPLOAD LOGIC ---
-  document.getElementById("btn").addEventListener('click', async () => {
-    const email = localStorage.getItem("email");
-    const fileInp = document.getElementById("fileInp").files;
-    const title = document.getElementById("title").value;
-    const album = document.getElementById("album").value;
-    const artist = document.getElementById("artist").value;
-
-    // Validation
-    if (!email) {
-      alert("Sign in is required to be featured!");
-      return;
-    }
-    if (!document.getElementById("agreement").checked) {
-      alert("Please agree to the terms.");
-      return;
-    }
-    if (fileInp.length === 0 || !title || !artist) {
-      alert("Please fill all fields.");
-      return;
-    }
-
-    const campaign = localStorage.getItem('referralActive') === VALID_CODE ? VALID_CODE : "organic";
-
-    document.getElementById("alertBox").style.visibility = "visible";
-
-    // 1. Upload to Storage
-    const storagePath = `${album}/${title}/${artist}/${fileInp[0].name}`;
-    const snapshot = await uploadBytes(ref(storage, storagePath), fileInp[0]);
-    const downloadURL = await getDownloadURL(snapshot.ref);
-
-    // 2. Save to Realtime Database
-    let songData = {};
-    songData[title] = {};
-    songData[title][album] = {};
-    songData[title][album][artist] = {
-      fileInp: downloadURL,
-      title: title,
-      album: album,
-      artist: artist,
-      uploaderEmail: email, // Saved Email
-      referralStatus: campaign // Saved Code
-    };
-
-    update(ref2(database, "SONGS"), songData);
-
-    document.getElementById("alertBox").style.visibility = "hidden";
-    document.getElementById("ooaa").style.visibility = "visible";
-    
-    // Clear the referral after success so it doesn't stay forever
-    localStorage.removeItem('referralActive');
-  });
-
-  initStudio();
+  initReferral();
 </script>
 </body>
 
 
 </html>
+
 
 
 
