@@ -5,7 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Test YouTube Embed</title>
 </head>
-<body>
+
+<body style="
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#0f0f14;
+  font-family:Arial, sans-serif;
+  color:white;
+">
 
   <style>
 html, body {
@@ -17,7 +27,7 @@ html, body {
 
 /* Main stream layout */
 .stream-wrapper {
-  display: flex;
+  display: none;
   width: 100vw;
   height: 100vh;
 }
@@ -26,6 +36,7 @@ html, body {
 .video-container {
   flex: 2; /* 66.7% */
   position: relative;
+  display: none;
 }
 
 .video-container iframe {
@@ -40,6 +51,7 @@ html, body {
   border-left: 2px solid #111;
   display: flex;
   flex-direction: column;
+  display: none;
 }
 
 .chat-container .youtube-chat {
@@ -84,9 +96,149 @@ html, body {
 
   </style>
 
+<div id="hyh2sdq2szq" style="
+background:#1a1a22;
+padding:40px;
+border-radius:20px;
+width:350px;
+text-align:center;
+position: fixed;
+box-shadow:0 0 30px rgba(255,100,100,0.2);
+">
+
+<h2>🚀 Join Asteroid's Online Concert Live</h2>
+<p style="color:#aaa; font-size:14px;">
+Enter your email to watch the online concert live!
+</p>
+
+<input 
+  id="emailInput"
+  type="email" 
+  placeholder="Enter your email"
+  style="
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    border:none;
+    border-radius:10px;
+    outline:none;
+  "
+>
+
+<select 
+  id="roleSelect"
+  style="
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    outline:none;
+  "
+>
+  <option value="">I am a...</option>
+  <option value="Artist">Artist</option>
+  <option value="Fan">Fan</option>
+</select>
+
+<button 
+  onclick="saveEmail()" 
+  style="
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    border:none;
+    border-radius:10px;
+    background:coral;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+  "
+>
+Watch
+</button>
+
+<p id="message" style="margin-top:15px; font-size:14px;"></p>
+
+</div>
+<script type="module">
+  console.log("955")
+console.log("960");
+  // Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
+import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { getDatabase, ref as ref2, onValue, update, get, set, remove, push} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
+console.log('1050')
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+authDomain: "asteroid-cdc13.firebaseapp.com",
+databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+projectId: "asteroid-cdc13",
+storageBucket: "asteroid-cdc13.appspot.com",
+messagingSenderId: "793353824502",
+appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+measurementId: "G-GV72TMNNGR"
+};
+
+console.log('1067')
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+window.saveEmail = async function() {
+  document.getElementById("hyh2sdq2szq").style.display = "none";
+ var streamWrapper = document.querySelector(".stream-wrapper");
+  var videoContainer = document.querySelector(".video-container");
+  var chatContainer = document.querySelector(".chat-container");
+
+  if(streamWrapper) streamWrapper.style.display = "flex";
+  if(videoContainer) videoContainer.style.display = "flex";
+  if(chatContainer) chatContainer.style.display = "flex";
+
+
+
+var email = document.getElementById("emailInput").value;
+var role = document.getElementById("roleSelect").value;
+var message = document.getElementById("message");
+
+if(email === "" || role === "") {
+  message.innerText = "Please enter email and select role.";
+  message.style.color = "red";
+  return;
+}
+
+try {
+
+  await push(ref2(database, "CONCERTUSERS/"), {
+    email: email,
+    role: role,
+    date: new Date().toISOString()
+  });
+
+  message.innerText = "You're in 🚀 Welcome to Asteroid.";
+  message.style.color = "lightgreen";
+
+  document.getElementById("emailInput").value = "";
+  document.getElementById("roleSelect").value = "";
+
+} catch (error) {
+  message.innerText = "Something went wrong.";
+  message.style.color = "red";
+}
+
+};
+
+</script>
   <div class="stream-wrapper">
     <div class="video-container">
-<iframe width="1086" height="315" src="https://www.youtube.com/embed/5Npt7_3FGcA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="1086" height="315" src="https://www.youtube.com/embed/Un5IlGKOeHk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 <div class="chat-container">
   <div class="youtube-chat">
@@ -107,7 +259,7 @@ html, body {
 
     <!-- Hidden YouTube Chat Embed (backup - rarely works due to CORS) -->
     <!--
-    <iframe src="https://www.youtube.com/live_chat?v=5Npt7_3FGcA"
+    <iframe src="https://www.youtube.com/live_chat?v=Un5IlGKOeHk"
             style="width: 100%; height: 100%; border: none; display: none;">
     </iframe>
     -->
