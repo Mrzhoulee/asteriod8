@@ -51,7 +51,6 @@ html, body {
   border-left: 2px solid #111;
   display: flex;
   flex-direction: column;
-  display: none;
 }
 
 .chat-container .youtube-chat {
@@ -202,6 +201,21 @@ window.saveEmail = async function() {
   if(videoContainer) videoContainer.style.display = "flex";
   if(chatContainer) chatContainer.style.display = "flex";
 
+  // Set up YouTube live chat embed
+  var chatIframe = document.getElementById("youtube-chat-iframe");
+  if(chatIframe) {
+    // Get current domain or use asteriod8.com as fallback
+    var currentDomain = window.location.hostname;
+    // Remove port if present
+    currentDomain = currentDomain.split(':')[0];
+    // Use asteriod8.com if on localhost or 127.0.0.1
+    if(currentDomain === 'localhost' || currentDomain === '127.0.0.1' || currentDomain === '') {
+      currentDomain = 'asteriod8.com';
+    }
+    var videoId = '9TaMzn1vTxo';
+    chatIframe.src = `https://www.youtube.com/live_chat?v=${videoId}&embed_domain=${currentDomain}`;
+  }
+
 
 
 var email = document.getElementById("emailInput").value;
@@ -238,31 +252,15 @@ try {
 </script>
   <div class="stream-wrapper">
     <div class="video-container">
-<iframe width="1086" height="315" src="https://www.youtube.com/embed/Un5IlGKOeHk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="1086" height="315" src="https://www.youtube.com/embed/9TaMzn1vTxo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 <div class="chat-container">
   <div class="youtube-chat">
-    <!-- Direct YouTube Chat Link (Most Reliable) -->
-    <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #ff0000, #cc0000); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; cursor: pointer; border-radius: 8px; transition: all 0.3s ease;" onclick="window.open('https://www.youtube.com/watch?v=Un5IlGKOeHk', '_blank')">
-      <div style="font-size: 48px; margin-bottom: 20px;">💬</div>
-      <div style="font-size: 20px; font-weight: bold; margin-bottom: 15px;">Live Stream Chat</div>
-      <div style="font-size: 16px; opacity: 0.9; line-height: 1.5; margin-bottom: 20px; max-width: 280px;">
-        Join the conversation with other viewers during live streams!
-      </div>
-      <div style="font-size: 14px; background: rgba(255,255,255,0.2); padding: 12px 20px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.3); transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
-        🔗 Click to Open YouTube Chat
-      </div>
-      <div style="font-size: 12px; opacity: 0.7; margin-top: 15px;">
-        Opens in a new tab for the best experience
-      </div>
-    </div>
-
-    <!-- Hidden YouTube Chat Embed (backup - rarely works due to CORS) -->
-    <!--
-    <iframe src="https://www.youtube.com/live_chat?v=Un5IlGKOeHk"
-            style="width: 100%; height: 100%; border: none; display: none;">
+    <iframe id="youtube-chat-iframe"
+            src="https://www.youtube.com/live_chat?v=9TaMzn1vTxo&embed_domain=asteroid8.net"
+            style="width: 100%; height: 100%; border: none;"
+            allowfullscreen>
     </iframe>
-    -->
   </div>
   <div class="donorbox-section">
     <iframe src="https://donorbox.org/tour-funding" width="100%" height="100%" frameborder="0" scrolling="auto" allow="payment"></iframe>
