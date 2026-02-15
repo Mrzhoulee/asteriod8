@@ -272,6 +272,15 @@
 <div id="artists-grid-8">
      <div class="artists-grid horizontal-scroll">
 
+		 
+
+		 		 				 		 		  <div class="artist-card">
+      <a href="#shiver">
+      <img id="shiver" class="artist-image" src="https://i.postimg.cc/8P7Vt7sp/Shiver-Photo-5.png" width="70" height="70" style="border-radius: 75%;"> 
+      </a> 
+      <p>DJ SHIVER</p>
+    </div> 
+
 
 
 		 		 				 		 		  <div class="artist-card">
@@ -690,6 +699,33 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
   </div>
 </div>
 </div>
+
+		  		  <div id="po17" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
+<div id="ov17" style="display:none; position:fixed; top:50%; left:50%; 
+transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+    width: 1000px;
+    height: 520px;
+    color: black;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;  /* vertical scroll if content is too tall */">
+    
+<center>
+  <h1>DJ SHIVER</h1>
+  <a href="https://instagram.com/aumshiver/"><h5>Check out DJ SHIVER's Instagram Profile</h5></a>
+   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
+	   
+    <h3>BUSH DOOF LIKE GOA</h3>
+	  <h3>DJ SHIVER</h3>
+    <audio id="audio2" src="" preload="auto"></audio>
+    <button onclick="play2()">PLAY</button>
+    <button onclick="pause2()">PAUSE</button>
+  </center>
+  </div>
+</div>
+</div>
+
 
 
 
@@ -1612,11 +1648,17 @@ let Cmay = document.getElementById("Cmay")
 	let MB = document.getElementById("MB");
 	let ADAR = document.getElementById("ADAR");
 			let etherealsonic_ = document.getElementById("etherealsonic_")
-	
+
+						let shiver = document.getElementById("shiver")
 
 	         if(window.location.hash == "#ADAR"){
     document.getElementById("po16").style.display = "block";
     document.getElementById("ov16").style.display = "block";
+			 }
+
+							         if(window.location.hash == "#shiver"){
+    document.getElementById("po20").style.display = "block";
+    document.getElementById("ov20").style.display = "block";
 			 }
 
 				         if(window.location.hash == "#etherealsonic_"){
@@ -1688,6 +1730,7 @@ let Cmay = document.getElementById("Cmay")
 
 
   // Get the anchor tags that wrap the images to prevent default navigation
+			  let shiverLink = document.querySelector('a[href="#shiver"]');
   let etherealsonicLink = document.querySelector('a[href="#etherealsonic_"]');
 			  let MBLink = document.querySelector('a[href="#MB"]');
   let MarkLink = document.querySelector('a[href="#Mark"]');
@@ -1788,7 +1831,13 @@ let Cmay = document.getElementById("Cmay")
   }
 
 
-			
+						  if (shiverLink && shiver) {
+    shiverLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showPopup("po20", "po20");
+    });
+  }
+
 
   if (MarkLink && Mark) {
     MarkLink.addEventListener("click", (e) => {
@@ -2671,6 +2720,7 @@ window.queuemusic = function(fileInp, title) {
             }
           })
   </script>
+
 
 
 
