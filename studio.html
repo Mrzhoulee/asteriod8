@@ -1,193 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asteroid Teams Media Studio</title>
   <style>
-    body { background-color: antiquewhite; font-family: "Montserrat", sans-serif; margin: 0; padding: 20px; text-align: center; }
-    .upload-btn { width: 130px; height: 45px; background-color: coral; color: black; border-radius: 10px; cursor: pointer; border: none; font-weight: bold; margin: 10px; }
-    
-    /* CAMPAIGN UI */
-    #campaignContainer { display: none; margin-bottom: 30px; border-bottom: 2px dashed #ccc; padding-bottom: 20px; }
-    .tutorial-box { background: white; border: 3px solid #00ff88; padding: 20px; border-radius: 15px; max-width: 600px; margin: 0 auto 20px auto; text-align: left; }
-    .progress-box { background: #fff3e0; border: 2px solid coral; padding: 20px; border-radius: 15px; max-width: 500px; margin: 0 auto; }
-    
-    .bar-bg { height: 20px; width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; overflow: hidden; border: 1px solid #bbb; }
-    #progressBarStatus { height: 100%; width: 0%; background: linear-gradient(90deg, #00ff88, #008044); transition: width 0.5s ease; }
-    
-    .alertBox { background-color: lightcoral; padding: 15px; visibility: hidden; border-radius: 10px; margin: 10px auto; width: 80%; }
-    input { margin: 8px; padding: 12px; width: 80%; max-width: 400px; border-radius: 8px; border: 1px solid #ccc; }
-    #unlockMsg { color: #008044; font-weight: bold; display: none; margin-top: 10px; }
+    body {
+      background-color: antiquewhite;
+      font-family: "Montserrat", sans-serif;
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-    /* SUCCESS MODAL */
-    #vipSuccessBox { display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid #00ff88; padding: 30px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.5); z-index: 1000; max-width: 400px; }
+ input {
+  display: inline-block;
+  vertical-align: 50px /* Optional: aligns elements vertically */
+}
+
+label {
+  margin-right: 5px; /* Optional: adds spacing between label and input */
+}
+
+
+    .upload-btn {
+      width: 90px;
+      height: 40px;
+      background-color: coral;
+      color: black;
+      border-radius: 10%;
+      transition: ease-in 0.5s;
+    }
+
+    .upload-btn:hover {
+      width: 140px;
+      height: 90px;
+      background-color: lightsalmon;
+      font-size: large;
+    }
+
+    .bar {
+      height: 50px;
+      width: 500px;
+      background-color: grey;
+      position: relative;
+    }
+
+    .progress {
+      background: linear-gradient(12deg, red, blue);
+      position: relative;
+      width: 0;
+    }
+
+
+.inline-container h3,
+  .inline-container input {
+    display: inline-block;
+    vertical-align: middle; /* Align elements vertically */
+    margin-right: 10px; /* Add some space between them */
+  }
+
+
+    .alert {
+      opacity: 0;
+      background-color: coral;
+    }
+
+    .alertBox {
+      background-color: lightcoral;
+      width: 500px;
+      height: 100px;
+      visibility: hidden;
+      border-radius: 10%;
+      text-align: center;
+    }
+
+
+    .google-sign-in{
+      display:none;
+    }
+    .ht5 {
+      background-color: lightcoral;
+      width: 800px;
+      height: 100px;
+      display:none;
+      border-radius: 10%;
+      text-align: center;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      /* Allow clicks to pass through the canvas */
+    }
   </style>
 </head>
+
 <body>
+    <div style="position: absolute; top: 0; right: 90px;">
 
-  <div id="vipSuccessBox">
-    <h1 style="color: #008044; margin-top: 0;">🎉 REWARD UNLOCKED!</h1>
-    <p style="font-size: 1.1em; font-weight: bold;">You’ve successfully invited a friend!</p>
-    <p>Your <b>3-Month Feature</b> is now active! Our team has been notified, and <b>we will be in touch with you via email within 48 hours</b> to coordinate your promotion.</p>
-    <button onclick="document.getElementById('vipSuccessBox').style.display='none'" class="upload-btn">AWESOME!</button>
+<div style="color: black">
+    <button style="background-color: white;" id="google-sign-in"><span id="gcm" style="font-size: medium; color: black;"><font color="black">Continue With
+        <i class="fa-brands fa-google"></i> </font></span></button>
+
+</div>
+
   </div>
+<center>
+  <h1>Asteroid Teams Studio</h1>
+  <h2>Upload Media</h2>
 
-  <div style="margin-bottom: 20px;">
-    <button id="google-sign-in" style="padding: 10px 20px; cursor: pointer; border-radius: 5px; background: white;">
-        <i class="fa-brands fa-google"></i> <span id="gcm">Sign In with Google</span>
-    </button>
-  </div>
+  <form id="uploadForm" class="formUpload">
+    <span class="fileText"></span>
+    <input type="text" id="title" placeholder="Enter Title" required>
+    <input type="file" class="inputFile" id="fileInp" accept="video/mp4, audio/mpeg" required multiple />
+    <input type="text" id="album" placeholder="Enter your custom Album" required>
+    <input type="text" id="artist" placeholder="Enter the Song Artist" class="text" required>
+    <center>
+    <button id="btn" class="upload-btn" type="button"><b>Upload</b></button>
+    <button id="Boostpost" class="upload-btn" type="button"><b>BOOST POST</b></button>
+    </center>
+<div class="inline-container">
+  <input type="checkbox" id="agreement">
+  <label for="agreement">
+    I confirm that I am the rightful owner of <span id="titlelol"></span>, 
+    or have full legal rights to upload it. 
+    If I do not, I accept all liability and Asteroid may remove this content 
+    and suspend my account.
+  </label>
+</div>
 
-  <div id="campaignContainer">
-    <div class="tutorial-box">
-      <h2 style="color: #008044; margin-top: 0;">🚀 3-Month Feature Reward</h2>
-      <p>1. <b>Sign In</b> with Google above.<br>
-      2. <b>Share</b> your link with <b>1 artist friend</b>.<br>
-      3. When they sign in, you unlock a <b>3-Month Feature!</b></p>
-    </div>
-
-    <div class="progress-box">
-      <h3 style="margin: 0; color: coral;">Reward Progress</h3>
-      <p id="countText" style="font-weight: bold;">0 / 1 Artist Joined</p>
-      <div class="bar-bg"><div id="progressBarStatus"></div></div>
-      <div id="unlockMsg">✅ UNLOCKED: 3-Month Feature Active!</div>
-      
-      <p style="font-size: 0.9em;">Your Share Link:</p>
-      <input type="text" id="shareLinkInput" readonly placeholder="Sign in to generate link...">
-      <button id="copyBtn" class="upload-btn" style="width: 80px; height: 35px; font-size: 12px;">COPY</button>
-    </div>
-  </div>
-
-  <form id="uploadForm">
-    <h2>Upload Your Media</h2>
-    <input type="text" id="title" placeholder="Song Title" required><br>
-    <input type="text" id="artist" placeholder="Artist Name" required><br>
-    <input type="text" id="album" placeholder="Album Name" required><br>
-    <input type="file" id="fileInp" accept="audio/mpeg" required><br>
-    <div style="margin: 15px;">
-        <input type="checkbox" id="agreement" style="width: auto;"> 
-        <label for="agreement">I confirm I own this music.</label>
-    </div>
-    <button id="btn" class="upload-btn">UPLOAD NOW</button>
+  </center>
   </form>
 
-  <div id="alertBox" class="alertBox"><h2>Uploading...</h2></div>
-  <div id="ooaa" class="alertBox" style="background-color: lightgreen;"><h2>✅ Success! Upload Complete.</h2></div>
+<center>
+  <div class="alertBox" id="alertBox">
+    <h1><b>Your Song is being uploaded, Please wait...</b></h1>
+   
+  </div>
+  <div class="alertBox" id="alt1">
+    <h1><b>Please fill out the  song information</b></h1>
+  </div>
 
-<script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+  <div class="alertBox" id="ooaa">
+    <h1><b>Your Song is Successfully uploaded!</b></h1>
+  </div>
+    <div class="alertBox" id="alt5">
+    <h1><b>The agreement checkbox is required.</b></h1>
+  </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getDatabase, ref as ref2, update, get, onValue, increment } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-  import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+    <div class="ht5" id="alt2">
+    <h1><b>If your song is a single then enter "Singles" in the album form instead of leaving it blank. </b></h1>
+  </div>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
-    authDomain: "asteroid-cdc13.firebaseapp.com",
-    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
-    projectId: "asteroid-cdc13",
-    storageBucket: "asteroid-cdc13.appspot.com",
-    messagingSenderId: "793353824502",
-    appId: "1:793353824502:web:3ac24821911d14773ba4d7"
-  };
+  </div>
+  <div class="bar">
+    <div class="progress"></div>
+  </div>
+</center>
+  <canvas id="can"></canvas>
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const auth = getAuth(app);
-  const storage = getStorage(app);
-  const provider = new GoogleAuthProvider();
-  const jsConfetti = new JSConfetti();
 
-  // --- 1. DETECTION ---
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('ref') === "ARTISTSOFFEB26" || localStorage.getItem('ref_active') === 'true') {
-      localStorage.setItem('ref_active', 'true');
-      document.getElementById('campaignContainer').style.display = 'block';
-  }
-  if (params.get('by')) localStorage.setItem('pending_inviter', params.get('by'));
+  <script>
+    const button = document.getElementById('btn')
+    button.addEventListener('click', () => {
+      let progress = document.getElementById("progress");
+      const interval = setInterval(() => {
+        if (progress = 100) {
+          clearInterval(interval);
+        } else {
+          progress += 5;
+          progressBar.style.width = progress + '%';
+        }
+      }, 1000);
 
-  // --- 2. AUTH & PROGRESS ---
-  document.getElementById("google-sign-in").onclick = () => {
-    signInWithPopup(auth, provider).then(async (res) => {
-      const user = res.user;
-      const safeEmail = user.email.replace(/\./g, ',');
-      const inviter = localStorage.getItem('pending_inviter');
-
-      localStorage.setItem("email", user.email);
-      localStorage.setItem("fullName", user.displayName);
-      document.getElementById("gcm").innerHTML = user.displayName;
-
-      const userRef = ref2(db, 'users/' + safeEmail);
-      const snap = await get(userRef);
-
-      if (!snap.exists() && inviter) {
-        await update(ref2(db, 'referralCounts/' + inviter), { count: increment(1) });
-        localStorage.removeItem('pending_inviter');
-      }
-
-      await update(userRef, { email: user.email, name: user.displayName });
-      loadUserProgress(user.displayName);
     });
-  };
+  </script>
 
-  function loadUserProgress(name) {
-    const cleanName = name.replace(/\s+/g, '_');
-    const safeEmail = localStorage.getItem("email").replace(/\./g, ',');
-    document.getElementById('shareLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=ARTISTSOFFEB26&by=${cleanName}`;
 
-    onValue(ref2(db, 'referralCounts/' + cleanName), async (snap) => {
-      const count = snap.val()?.count || 0;
-      document.getElementById('countText').innerText = `${count} / 1 Artist Joined`;
-      document.getElementById('progressBarStatus').style.width = (count >= 1 ? 100 : 0) + "%";
 
-      if(count >= 1) {
-          document.getElementById('unlockMsg').style.display = 'block';
-          if (localStorage.getItem('rewardNotified') !== 'true') {
-              document.getElementById('vipSuccessBox').style.display = 'block';
-              await update(ref2(db, 'users/' + safeEmail), { eligibility: "3_MONTH_FEATURE" });
-              jsConfetti.addConfetti({ emojis: ['🎉', '🚀', '🔥'] });
-              localStorage.setItem('rewardNotified', 'true');
-          }
-      }
+
+  <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+    import { getDatabase, ref as ref2, set, update, onValue, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configurationx
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
+      authDomain: "asteroid-cdc13.firebaseapp.com",
+      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+      projectId: "asteroid-cdc13",
+      storageBucket: "asteroid-cdc13.appspot.com",
+      messagingSenderId: "793353824502",
+      appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+      measurementId: "G-GV72TMNNGR"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const storage = getStorage(app);
+    const database = getDatabase(app);
+    let users = localStorage.getItem("users");
+
+
+
+            const auth = getAuth(app);
+            const provider = new GoogleAuthProvider();
+
+       document.getElementById("google-sign-in").addEventListener("click", (e) => {
+              console.log("gcm_ready");
+              signInWithPopup(auth, provider)
+                .then((result) => {
+                  // This gives you a Google Access Token. You can use it to access the Google API.
+                  const credential = GoogleAuthProvider.credentialFromResult(result);
+                  const token = credential.accessToken;
+                  // The signed-in user info.
+                  const user = result.user;
+                  console.log(user)
+                  console.log("google-sign-in-clicked")
+                  localStorage.setItem("email", user["email"]);
+                  localStorage.setItem("CurrentUser", user["email"]);
+                  localStorage.setItem("fullName", user["displayName"]);
+                  localStorage.setItem("pfp", user.imageUrl);
+                  localStorage.setItem("pfp", user.photoURL); // 
+                  var fullName = user.displayName;
+                  document.getElementById("gcm").innerHTML = fullName;
+                  document.getElementById("gcd").innerHTML = fullName;
+                  console.log("Photo URL:", user.photoURL);
+
+
+
+                  // IdP data available using getAdditionalUserInfo(result)
+                  // ...
+                }).catch((error) => {
+                  // Handle Errors here.
+                  const errorCode = error.code;
+                  const errorMessage = error.message;
+                  // The email of the user's account used.
+                  const email = error.customData.email;
+                  // The AuthCredential type that was used.
+                  const credential = GoogleAuthProvider.credentialFromError(error);
+                  // ...
+                });
+            })
+    
+
+    let gaga = {}
+    const canvas = document.getElementById('can');
+    const jsConfetti = new JSConfetti();
+    const boost = document.getElementById("Boostpost");
+
+    const btn = document.getElementById("btn");
+    boost.addEventListener('click', () => {
+      window.location.href = "boost.html"
+    })
+
+    // Ensure canvas is full-screen
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     });
-  }
 
-  // --- 3. UPLOAD ---
-  document.getElementById("btn").onclick = async () => {
-    const email = localStorage.getItem("email");
-    const file = document.getElementById("fileInp").files[0];
-    if (!email || !file) return alert("Sign in and select a file!");
-    if (!document.getElementById("agreement").checked) return alert("Accept agreement!");
+    // getDownloadURL(ref(storage, "1/1/Guns N' Roses - Knockin' On Heaven's Door (Lyrics) (1).mp3"))
+    // .then((url)=>{
+    //   console.log(url);
+    // })
 
-    document.getElementById("alertBox").style.visibility = "visible";
-    try {
-      const path = `${document.getElementById("album").value}/${document.getElementById("title").value}/${document.getElementById("artist").value}/${file.name}`;
-      const snap = await uploadBytes(ref(storage, path), file);
-      const url = await getDownloadURL(snap.ref);
-      await update(ref2(db, "SONGS/" + document.getElementById("title").value), {
-          fileInp: url, uploader: email, campaign: "ARTISTSOFFEB26"
+
+    // localStorage.setItem('a', JSON.stringify({
+
+        let emailty = localStorage.getItem("email");
+
+
+
+    onValue(ref2(database, "SONGS/"), (snapshot) => {
+      console.log(snapshot.val())
+    })
+    //   }))
+    btn.addEventListener('click', async () => {
+            
+
+      const fileInp = document.getElementById("fileInp").files;
+      const album = document.getElementById("album").value;
+      const title = document.getElementById("title").value;
+      const artist = document.getElementById("artist").value;
+                  let agreement = document.getElementById("agreement");
+          let email = localStorage.getItem("email");
+
+// Case 1: all fields filled but agreement not ticked
+      
+  const alt1 = document.getElementById("alt1"); // Missing fields
+  const alt2 = document.getElementById("alt2"); // Album empty
+  const alt5 = document.getElementById("alt5"); // Agreement missing
+  
+// First, hide all alerts initially
+alt1.style.visibility = "hidden";
+alt2.style.visibility = "hidden";
+alt5.style.visibility = "hidden";
+
+if(!email){
+    alt5.style.visibility = "visible";
+    alt5.innerHTML = `<center><b><h2>Sign in is required to upload.</h2></b></center>`;
+    return;
+}
+
+// Check the agreement first
+// Check agreement first
+if (!agreement.checked) { 
+    alt5.style.visibility = "visible";
+    alt5.innerHTML = `<center><b><h2>The agreement checkbox is required.</h2></b></center>`;
+    return; 
+}
+if (!artist || !title || fileInp.length === 0) {
+    alt1.style.visibility = "visible";
+    alt1.innerHTML = `<center><b><h2>Please fill out the song information</h2></b></center>`;
+    return;
+}
+
+// Check single-album warning (only shows if album is empty but other fields are filled)
+if (!album && artist && title && fileInp.length > 0) {
+    alt1.style.visibility = "visible";
+    alt1.innerHTML = `<center><b><h2>If your song is a single then enter "Singles" in the album form instead of leaving it blank.</h2></b></center>`;
+    // ⚠ no return here, so database will still save
+}
+
+// Assume `email` contains the user's email
+const safeEmail = email.replace(/\./g, ','); // replace dots with commas
+
+// Everything is valid, save to database
+set(ref2(database, 'agreements/' + safeEmail), {
+    email: email,
+    agreement: true,
+    songtitle: title,
+    timestamp: Date.now()
+});
+
+// If all checks pass, hide all alerts and proceed
+alt1.style.visibility = "hidden";
+alt2.style.visibility = "hidden";
+alt5.style.visibility = "hidden";
+
+// Save agreement info to database
+
+
+
+
+
+
+
+      // ✅ If we got here → everything is valid
+document.getElementById("btn").disabled = false;
+document.getElementById("titlelol").innerText = title;
+
+      console.log("hello");
+      // Show alert on button click
+      document.getElementById("alertBox").style.visibility = "visible";
+
+
+
+      // Add confetti explosion
+      jsConfetti.addConfetti({
+        emojis: ['🌈', '⚡️', '💥', '✨', '💫', '🌸'],
       });
-      document.getElementById("alertBox").style.visibility = "hidden";
-      document.getElementById("ooaa").style.visibility = "visible";
-      jsConfetti.addConfetti();
-    } catch (err) { alert("Upload failed."); }
-  };
 
-  document.getElementById("copyBtn").onclick = () => {
-    const copyText = document.getElementById("shareLinkInput");
-    copyText.select();
-    navigator.clipboard.writeText(copyText.value);
-    alert("Copied! Share it with 1 person.");
-  };
 
-  if(localStorage.getItem("fullName")) {
-      document.getElementById("gcm").innerHTML = localStorage.getItem("fullName");
-      loadUserProgress(localStorage.getItem("fullName"));
-  }
-</script>
+
+      let i = 0;
+      while (i < fileInp.length) {
+        const response = await uploadBytes(ref(storage, album + "/" + title + "/" + artist + "/" + fileInp[i].name), fileInp[i]);
+        const downloadURL = await getDownloadURL(response.ref);
+
+        let gaga = {};
+      
+        let rec = title + "/" + album + "/" + fileInp[i].name;
+        if (rec) {
+    console.log("Loading finished");
+    console.log(rec);  // Log the stored message
+    document.getElementById("ooaa").style.visibility = "visible";
+    document.getElementById("alertBox").style.visibility = "hidden";
+}
+        gaga[title] = {}
+        gaga[title][album] = {}
+        gaga[title][album][artist] = {
+          fileInp: downloadURL,
+          title: title,
+          album: album,
+          artist: artist
+        }
+        console.log(gaga);
+        update(ref2(database, "SONGS"), gaga); 
+        i++;
+        console.log("cccccc");
+      }
+
+     
+      
+    
+  
+
+
+  
+    });
+  </script>
 </body>
+
+
 </html>
+

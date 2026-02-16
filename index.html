@@ -194,6 +194,257 @@
   font-weight: 500;
   margin-bottom: 14px;
 }
+
+/* Users Grid Styles */
+.users-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.user-profile-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.user-profile-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(255, 127, 80, 0.2);
+  border-color: #ff7f50;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.user-profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+}
+
+.user-profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.user-profile-name {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+  font-size: 1.1rem;
+}
+
+.user-profile-email {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  word-break: break-all;
+  margin-bottom: 0.5rem;
+}
+
+.user-profile-role {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 127, 80, 0.2);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  color: #ff7f50;
+}
+
+/* Profile Modal Styles */
+.profile-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+}
+
+.profile-modal-overlay.active {
+  display: flex;
+}
+
+.profile-modal-content {
+  background: #0a0a0f;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+}
+
+.profile-modal-header {
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.profile-modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.profile-modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.profile-modal-avatar-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  color: rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.profile-modal-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-modal-name-large {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.profile-modal-bio {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+.profile-modal-body {
+  padding: 2rem;
+}
+
+.profile-modal-section {
+  margin-bottom: 2rem;
+}
+
+.profile-modal-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #ff7f50;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.profile-modal-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.profile-modal-social-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  text-decoration: none;
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.profile-modal-social-link:hover {
+  background: #ff7f50;
+  border-color: #ff7f50;
+  transform: translateY(-2px);
+}
+
+.profile-modal-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.profile-modal-info-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-modal-info-label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.profile-modal-info-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ff7f50;
+}
+
+@media (max-width: 768px) {
+  .users-grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+  
+  .profile-modal-content {
+    margin: 1rem;
+    max-height: 95vh;
+  }
+}
 </style>
 <div class="body-layout">
   <aside id="sidebar" class="sidebar">
@@ -213,14 +464,19 @@
           <a href="policy.html" class="nav-item">
             <span>Report Songs</span>
           </a>
-<div class="live-notifier">
-  <div style="color: white;">
-          <a href="artistWait.html" class="nav-item">
-            <span style="color:white;">Apply for the OG Founding Artists" List (30 slots left)</span>
+          <!-- Shown only for premium artists (PREMIUM/ITG == true) -->
+          <a id="artist-dashboard-link" href="ArtistDashboard.html" class="nav-item" style="display:none;">
+
+            <div class="live-circle">
+            <span>Artist Dashboard</span>
+          </div>
           </a>
-        </div>
-      </div>
-          
+
+          <div class="live-notifier">
+           Artist Dashboard is only for VIP
+          </div>
+
+
           <div class="live-circle">
             <a href="lively.html" class="nav-item">
               <span>Live Concerts Menu</span>
@@ -263,6 +519,29 @@
 
 
 <div id="loader"></div>
+
+<!-- Logout confirmation modal (for when user clicks profile while already signed in) -->
+<div id="logoutModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.7); z-index:2000; align-items:center; justify-content:center;">
+  <div style="background:#020617; color:#e5e7eb; padding:24px 28px; border-radius:18px; width:90%; max-width:360px; box-shadow:0 20px 45px rgba(15,23,42,0.7); font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+    <div style="display:flex; align-items:center; margin-bottom:16px;">
+      <div style="width:36px; height:36px; border-radius:999px; background:rgba(248,113,113,0.15); display:flex; align-items:center; justify-content:center; margin-right:10px;">
+        <span style="font-size:18px;">🚪</span>
+      </div>
+      <div>
+        <h2 style="margin:0; font-size:18px; font-weight:600; color:#f9fafb;">Sign out?</h2>
+        <p style="margin:2px 0 0; font-size:13px; color:#9ca3af;">You are currently signed in.</p>
+      </div>
+    </div>
+    <div style="font-size:13px; color:#9ca3af; margin-bottom:18px;">
+      <div id="logoutUserName" style="font-weight:600; color:#e5e7eb;"></div>
+      <div id="logoutUserEmail" style="font-size:12px;"></div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:4px;">
+      <button id="logoutCancelBtn" style="padding:8px 14px; border-radius:999px; border:1px solid rgba(148,163,184,0.5); background:transparent; color:#e5e7eb; font-size:13px; cursor:pointer;">Cancel</button>
+      <button id="logoutConfirmBtn" style="padding:8px 16px; border-radius:999px; border:none; background:linear-gradient(135deg,#fb7185,#f97316); color:#0f172a; font-weight:600; font-size:13px; cursor:pointer;">Sign out</button>
+    </div>
+  </div>
+</div>
     <section id="artists" style="  display: flex;        /* Line up items in a row */
   overflow-x: auto;     /* Enable sideways scroll */
   gap: 10px;            /* Space between items (optional) */
@@ -272,30 +551,7 @@
 <div id="artists-grid-8">
      <div class="artists-grid horizontal-scroll">
 
-		 
 
-		 		 				 		 		  <div class="artist-card">
-      <a href="#shiver">
-      <img id="shiver" class="artist-image" src="https://i.postimg.cc/8P7Vt7sp/Shiver-Photo-5.png" width="70" height="70" style="border-radius: 75%;"> 
-      </a> 
-      <p>DJ SHIVER</p>
-    </div> 
-
-
-
-		 		 				 		 		  <div class="artist-card">
-      <a href="#elihu">
-      <img id="etherealsonic_" class="artist-image" src="https://i.postimg.cc/sXLZ3nmx/588142225-18142024516456202-461652544984977354-n.jpg" width="70" height="70" style="border-radius: 75%;"> 
-      </a> 
-      <p>Elihu</p>
-    </div> 
-
-		 				 		 		  <div class="artist-card">
-      <a href="#etherealsonic_">
-      <img id="etherealsonic_" class="artist-image" src="F6CE0B9A-B59B-4FBE-94E7-334EFC1F2E86.jpeg" width="70" height="70" style="border-radius: 75%;"> 
-      </a> 
-      <p>EtherealSonic</p>
-    </div> 
 
 
 		 
@@ -386,6 +642,74 @@
   </div>
       </div>
     </section>
+
+    <!-- Users Section -->
+    <section id="users-section" class="content-section">
+      <h2 class="section-title">All Users</h2>
+      
+      <!-- User Search Bar -->
+      <div style="margin-bottom: 2rem;">
+        <div style="position: relative; max-width: 500px; margin: 0 auto;">
+          <input 
+            type="text" 
+            id="userSearchInput" 
+            placeholder="Search users by name, email, or role..." 
+            style="
+              width: 100%;
+              padding: 0.75rem 1rem 0.75rem 3rem;
+              background: rgba(255, 255, 255, 0.1);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              border-radius: 12px;
+              color: #ffffff;
+              font-size: 1rem;
+              outline: none;
+              transition: all 0.3s ease;
+            "
+            onfocus="this.style.background='rgba(255,255,255,0.15)'; this.style.borderColor='#ff7f50';"
+            onblur="this.style.background='rgba(255,255,255,0.1)'; this.style.borderColor='rgba(255,255,255,0.2)';"
+          />
+          <i class="fas fa-search" style="
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.5);
+            font-size: 1rem;
+          "></i>
+          <button 
+            id="clearSearchBtn" 
+            onclick="clearUserSearch()" 
+            style="
+              position: absolute;
+              right: 0.5rem;
+              top: 50%;
+              transform: translateY(-50%);
+              background: transparent;
+              border: none;
+              color: rgba(255,255,255,0.5);
+              cursor: pointer;
+              padding: 0.5rem;
+              display: none;
+              font-size: 1rem;
+            "
+            onmouseover="this.style.color='#ff7f50'"
+            onmouseout="this.style.color='rgba(255,255,255,0.5)'"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div id="usersGrid" class="users-grid-container" style="
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1.5rem;
+        padding: 1rem 0;
+      ">
+        <div class="loading" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.7);">Loading users...</div>
+      </div>
+    </section>
+
 <div style=" width:500px; height: 198px;">
 	  <img src="https://i.postimg.cc/wvxQD7SC/image.png">
 </div>
@@ -472,6 +796,12 @@ console.log(data);
                 const response = await fetch(`https://getsongsbymood-2nyi7qyxtq-nn.a.run.app?mood=${mood}`);
                 const data = await response.json();
                 console.log("✅ Found songs:", data);
+
+                // Debug: Log first song structure to understand available properties
+                if (data.results && data.results.length > 0) {
+                  console.log("🎵 Sample song object:", data.results[0]);
+                }
+
                 return data;
               } catch (error) {
                 console.error("❌ Error fetching songs:", error);
@@ -515,6 +845,10 @@ console.log(data);
                 songsList.innerHTML = '<p style="text-align: center; color: #ccc;">No songs found for this mood yet. Upload some MP3s and they will be analyzed automatically!</p>';
               } else {
                 songs.forEach(song => {
+                  // Debug: Log song data structure
+                  console.log('🎵 Song data:', song);
+                  console.log('🎵 Song name/path:', song.name);
+
                   const songDiv = document.createElement('div');
                   songDiv.style.cssText = `
                     padding: 10px;
@@ -524,15 +858,78 @@ console.log(data);
                     border-left: 3px solid #ff6b6b;
                   `;
 
-                  const songName = song.name.split('/').pop(); // Get filename without path
+                  // Extract clean title from song data
+                  let songTitle = song.title2 || song.title; // Try API title first
+
+                  if (!songTitle && song.name) {
+                    // Extract title from filename: remove path and extension
+                    const filename = song.name.split('/').pop(); // Get filename without path
+                    songTitle = filename.replace(/\.[^/.]+$/, ""); // Remove file extension (.mp3, etc.)
+                  }
+
+                  // Final fallback
+                  songTitle = songTitle || "Unknown Song";
+
+                  // Create unique ID for this song
+                  const songId = `mood_song_${songTitle.replace(/[^a-zA-Z0-9]/g, '_')}_${Math.random().toString(36).substr(2, 9)}`;
+
                   songDiv.innerHTML = `
-                    <div style="font-weight: bold; color: #ff6b6b;">${songName}</div>
-                    <div style="font-size: 12px; color: #ccc;">
-                      Mood: ${song.mood} |
-                      User moods: ${song.userMoods.join(', ') || 'None'} |
-                      Size: ${Math.round(song.size / 1024 / 1024 * 100) / 100}MB
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <div style="flex: 1;">
+                        <div style="font-weight: bold; color: #ff6b6b;">${songTitle}</div>
+                        <div style="font-size: 12px; color: #ccc;">
+                          Mood: ${song.mood} |
+                          User moods: ${song.userMoods.join(', ') || 'None'} |
+                          Size: ${Math.round(song.size / 1024 / 1024 * 100) / 100}MB
+                        </div>
+                      </div>
+                      <button id="playBtn_${songId}" onclick="playMoodSong('${songTitle.replace(/'/g, "\\'")}', '${songId}', '${(song.name || song.path || song.url || '').replace(/'/g, "\\'")}')"
+                              style="background: linear-gradient(90deg, #ff3b3b, #ff7a3b); color: white; border: none; border-radius: 20px; padding: 8px 16px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
+                        ▶️ PLAY
+                      </button>
                     </div>
                   `;
+
+                  // Add audio element for this song
+                  const audioElement = document.createElement('audio');
+                  audioElement.id = `gaga_mood_${songId}`;
+                  audioElement.preload = 'none';
+                  audioElement.style.display = 'none';
+
+                  // Don't set src here - it will be set dynamically in playMoodSong function
+                  // This allows for Firebase Storage URL resolution
+
+                  // Add event listeners for better UX
+                  audioElement.addEventListener('ended', () => {
+                    const button = document.getElementById(`playBtn_${songId}`);
+                    if (button && !button.disabled) {
+                      button.innerHTML = '▶️ PLAY';
+                      button.style.background = 'linear-gradient(90deg, #ff3b3b, #ff7a3b)';
+                    }
+
+                    // Reset tata element when song ends
+                    const tataElement = document.getElementById('tata');
+                    if (tataElement) {
+                      tataElement.innerHTML = '<font color="coral">SELECT A SONG</font>';
+                    }
+                  });
+
+                  audioElement.addEventListener('error', () => {
+                    const button = document.getElementById(`playBtn_${songId}`);
+                    if (button && !button.disabled) {
+                      button.innerHTML = '❌ UNAVAILABLE';
+                      button.style.background = 'linear-gradient(90deg, #666, #555)';
+                      button.disabled = true;
+                    }
+
+                    // Reset tata element on error
+                    const tataElement = document.getElementById('tata');
+                    if (tataElement) {
+                      tataElement.innerHTML = '<font color="coral">SELECT A SONG</font>';
+                    }
+                  });
+
+                  songDiv.appendChild(audioElement);
                   songsList.appendChild(songDiv);
                 });
               }
@@ -541,6 +938,131 @@ console.log(data);
               const discoverSection = document.getElementById('discover-modes');
               discoverSection.parentNode.insertBefore(resultsDiv, discoverSection.nextSibling);
             }
+
+            // Function to play/pause mood songs
+            window.playMoodSong = async function(songTitle, songId, songPath) {
+              const audioId = `gaga_mood_${songId}`;
+              const buttonId = `playBtn_${songId}`;
+              const audio = document.getElementById(audioId);
+              const button = document.getElementById(buttonId);
+
+              if (!audio) {
+                console.error('Audio element not found:', audioId);
+                return;
+              }
+
+              // Stop any currently playing mood songs
+              document.querySelectorAll('audio[id^="gaga_mood_"]').forEach(otherAudio => {
+                if (otherAudio.id !== audioId && !otherAudio.paused) {
+                  otherAudio.pause();
+                  // Reset other buttons to PLAY
+                  const otherBtnId = otherAudio.id.replace('gaga_mood_', 'playBtn_');
+                  const otherBtn = document.getElementById(otherBtnId);
+                  if (otherBtn) {
+                    otherBtn.innerHTML = '▶️ PLAY';
+                    otherBtn.style.background = 'linear-gradient(90deg, #ff3b3b, #ff7a3b)';
+                  }
+                }
+              });
+
+              if (audio.paused) {
+                // Set loading state
+                button.innerHTML = '⏳ LOADING...';
+                button.style.background = 'linear-gradient(90deg, #ffa500, #ff8c00)';
+
+                try {
+                  // Get download URL from Firebase Storage
+                  if (!audio.src || audio.src === '') {
+                    if (songPath) {
+                      console.log('🎵 Loading song from path:', songPath);
+
+                          // If songPath is a direct URL, use it
+                      if (songPath.startsWith('http') && !songPath.includes('127.0.0.1')) {
+                        audio.src = songPath;
+                        console.log('🎵 Using direct URL:', songPath);
+                      } else if (songPath.includes('firebasestorage.googleapis.com')) {
+                        // Already a Firebase Storage URL
+                        audio.src = songPath;
+                        console.log('🎵 Using Firebase Storage URL:', songPath);
+                      } else {
+                        // Try to get from Firebase Storage
+                        try {
+                          if (window.firebaseGetStorage && window.firebaseStorageRef && window.firebaseGetDownloadURL) {
+                            const storage = window.firebaseGetStorage(window.firebaseApp);
+                            const songRef = window.firebaseStorageRef(storage, songPath);
+                            console.log('🎵 Getting download URL from Firebase Storage...');
+                            const downloadURL = await window.firebaseGetDownloadURL(songRef);
+                            audio.src = downloadURL;
+                            console.log('🎵 Firebase Storage URL:', downloadURL);
+                          } else {
+                            throw new Error('Firebase Storage functions not available');
+                          }
+                        } catch (storageError) {
+                          console.warn('Firebase Storage not available, trying fallback options:', storageError);
+
+                          // Try multiple fallback strategies
+                          if (songPath.startsWith('http') && !songPath.includes('127.0.0.1') && !songPath.includes('localhost')) {
+                            // Already a full URL (not localhost)
+                            audio.src = songPath;
+                            console.log('🎵 Using direct URL fallback:', songPath);
+                          } else if (songPath.includes('firebasestorage.googleapis.com')) {
+                            // Already a Firebase Storage URL
+                            audio.src = songPath;
+                            console.log('🎵 Using Firebase Storage URL fallback:', songPath);
+                          } else if (songPath.includes('/') || songPath.includes('songs/') || songPath.includes('music/')) {
+                            // Looks like a file path, try Firebase Storage URL
+                            const cleanPath = songPath.startsWith('/') ? songPath.substring(1) : songPath;
+                            audio.src = `https://firebasestorage.googleapis.com/v0/b/asteroid-cdc13.appspot.com/o/${encodeURIComponent(cleanPath)}?alt=media`;
+                            console.log('🎵 Using constructed Firebase Storage URL:', audio.src);
+                          } else {
+                            // Last resort - try as-is but warn about localhost
+                            console.warn('🎵 Unknown path format, may not work:', songPath);
+                            audio.src = songPath;
+                          }
+                        }
+                      }
+                    } else {
+                      throw new Error('No song path available');
+                    }
+                  }
+
+                  // Play the song
+                  await audio.play();
+                  button.innerHTML = '⏸️ PAUSE';
+                  button.style.background = 'linear-gradient(90deg, #4CAF50, #45a049)';
+                  console.log('Playing:', songTitle, 'from:', audio.src);
+
+                  // Update tata element with current song
+                  const tataElement = document.getElementById('tata');
+                  if (tataElement) {
+                    tataElement.innerHTML = `<font color="coral">🎵 NOW PLAYING: ${songTitle}</font>`;
+                  }
+
+                } catch (error) {
+                  console.error('Error playing song:', error);
+                  button.innerHTML = '❌ UNAVAILABLE';
+                  button.style.background = 'linear-gradient(90deg, #f44336, #d32f2f)';
+                  button.disabled = true;
+
+                  // Show user-friendly error message
+                  setTimeout(() => {
+                    alert(`Unable to load "${songTitle}". The song file may not be available or there may be a network issue.`);
+                  }, 500);
+                }
+              } else {
+                // Pause the song
+                audio.pause();
+                button.innerHTML = '▶️ PLAY';
+                button.style.background = 'linear-gradient(90deg, #ff3b3b, #ff7a3b)';
+                console.log('Paused:', songTitle);
+
+                // Reset tata element to default
+                const tataElement = document.getElementById('tata');
+                if (tataElement) {
+                  tataElement.innerHTML = '<font color="coral">SELECT A SONG</font>';
+                }
+              }
+            };
 
             // Add click event listeners to feeling buttons
             document.addEventListener('DOMContentLoaded', function() {
@@ -660,6 +1182,116 @@ console.log(data);
 
 
         </div>
+
+        <div id="profileCreate" style="display:none;">
+          <div id="ovProfileCreate" style="display:none; position:fixed; top:50%; left:50%; 
+          transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+          width: 1000px;
+          height: 520px;
+          color: white;
+          background: black;
+          border: 1px solid white;
+          padding: 10px;
+          overflow-y: auto;  /* vertical scroll if content is too tall */">
+          <center>
+            <h1>Create Your Profile</h1>
+            <br>
+            <br>
+            <br>
+            <input type="text" id="nickname" placeholder="Artist Nickname" required>
+
+            <br>
+            <br>
+            <br>
+            <input type="text" id="artemail" placeholder="Artist Email" required>
+            
+            <br>
+            <br>
+            <br>
+            <input type="text" id="instagram" placeholder="Instagram profile link">
+            <br>
+            <br>
+            <br>
+            <input type="text" id="spotify" placeholder="Spotify profile link">
+            <br>
+            <br>
+            <br>
+            <input type="text" id="youtube" placeholder="Youtube profile link">
+            <br>
+            <br>
+            <br>
+            <input type="text" id="soundcloud" placeholder="Soundcloud profile link">
+            <br>
+            <br>
+            <br>
+            <button onclick="createProfile()">Create Profile</button>
+            <input type="text" id="applemusic" placeholder="Apple Music profile link">
+            <br>
+            <br>
+            <br>
+
+            <script>function createProfile(){
+              // Show loading popup
+              document.getElementById("profileCreate").style.display = "none";
+
+              // Get form values
+              var nickname = document.getElementById("nickname").value || null;
+              var artemail = document.getElementById("artemail").value || null;
+              var instagram = document.getElementById("instagram").value || null;
+              var youtube = document.getElementById("youtube").value || null;
+              var soundcloud = document.getElementById("soundcloud").value || null;
+              var spotify = document.getElementById("spotify").value || null;
+              var applemusic = document.getElementById("applemusic").value || null;
+
+              // Store email in localStorage for dashboard access
+              localStorage.setItem("artemail", artemail);
+
+              // Update Firebase Realtime Database
+              const userEmail = localStorage.getItem("CurrentUser") || localStorage.getItem("email");
+              if (userEmail) {
+                window.firebaseUpdate(window.firebaseRef(window.firebaseDatabase, 'PROFILES/' + userEmail.replace(/[.#$[\]]/g, '_')), {
+                  nickname: nickname,
+                  email: artemail,
+                  instagram: instagram,
+                  youtube: youtube,
+                  soundcloud: soundcloud,
+                  spotify: spotify,
+                  applemusic: applemusic,
+                  createdAt: new Date().toISOString()
+                });
+              }
+
+
+              const loader = document.getElementById('loader');
+              loader.innerHTML = `
+                <div style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; color:black; padding:30px; border-radius:10px; font-size:18px; z-index:1000; text-align:center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                  <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px auto;"></div>
+                  <div>Getting Things ready for you</div>
+                </div>
+                <style>
+                  @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                  }
+                </style>
+              `;
+              loader.style.display = 'block';
+
+            // Hide loading popup after 2.5 seconds
+            setTimeout(() => {
+              loader.style.display = 'none';
+              loader.innerHTML = '';
+            }, 2500);
+          }
+            </script>
+          </center>
+        </div>
+        </div>
+
+        <div id="signInCon">
+         <div style="width: 250px; height: 100px; background-color: white; color: black; display: none;"><h2>Are you sure you want to log out?</h2> <button onclick="continueGoog()">Yes</button><button onclick="DontGoog()">No</button></div>
+
+
    	  <div id="po11" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
 <div id="ov11" style="display:none; position:fixed; top:50%; left:50%; 
 transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
@@ -700,75 +1332,6 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 </div>
 </div>
 
-		  		  <div id="po17" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
-<div id="ov17" style="display:none; position:fixed; top:50%; left:50%; 
-transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
-    width: 1000px;
-    height: 520px;
-    color: black;
-    background: white;
-    border: 1px solid black;
-    padding: 10px;
-    overflow-y: auto;  /* vertical scroll if content is too tall */">
-    
-<center>
-  <h1>DJ SHIVER</h1>
-  <a href="https://instagram.com/aumshiver/"><h5>Check out DJ SHIVER's Instagram Profile</h5></a>
-   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
-	   
-    <h3>BUSH DOOF LIKE GOA</h3>
-	  <h3>DJ SHIVER</h3>
-    <audio id="audio2" src="" preload="auto"></audio>
-    <button onclick="play2()">PLAY</button>
-    <button onclick="pause2()">PAUSE</button>
-  </center>
-  </div>
-</div>
-</div>
-
-
-
-
-		  <div id="po17" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
-<div id="ov17" style="display:none; position:fixed; top:50%; left:50%; 
-transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
-    width: 1000px;
-    height: 520px;
-    color: black;
-    background: white;
-    border: 1px solid black;
-    padding: 10px;
-    overflow-y: auto;  /* vertical scroll if content is too tall */">
-    
-<center>
-  <h1>EtherealSonic</h1>
-  <a href="https://instagram.com/etherealsonic_/"><h5>Check out EtherealSonic's Instagram Profile</h5></a>
-   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
-    <h3>Hot and Heavy</h3>
-	  <h3>EtherealSonic</h3>
-    <audio id="audio2" src="https://files.catbox.moe/lmamn3.mp3" preload="auto"></audio>
-    <button onclick="play2()">PLAY</button>
-    <button onclick="pause2()">PAUSE</button>
-
-	      <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
-    <h3>Press Repeat</h3>
-	  <h3>EtherealSonic</h3>
-    <audio id="audio2" src="hhttps://files.catbox.moe/59yooh.mp3" preload="auto"></audio>
-    <button onclick="play2()">PLAY</button>
-    <button onclick="pause2()">PAUSE</button>
-
-			     <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px;">
-    <h3>Down (sped up)</h3>
-	  <h3>EtherealSonic</h3>
-    <audio id="audio2" src="https://files.catbox.moe/e4frkl.mp3" preload="auto"></audio>
-    <button onclick="play2()">PLAY</button>
-    <button onclick="pause2()">PAUSE</button>
-  </div>
-  </center>
-  </div>
-</div>
-</div>
-
 
 
 
@@ -784,9 +1347,9 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     overflow-y: auto;  /* vertical scroll if content is too tall */">
     
 <center>
-<h1>Syante</h1>
-	<a href="https://www.instagram.com/say_aunty/">Check out Syante's instagram</a>
+
   
+  <div id="notesContainer"></div>
   <div style="border: 5px solid black; width: 400px; border-radius: 5%; padding: 10px; position: relative;">
     <h3>Cold Blooded</h3>
 	  <h3>Syante</h3>
@@ -1352,46 +1915,7 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 
       </center>
       <div class="snowfall-container">
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-    <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❄</div>
-  <!-- Add more snowflakes as desired -->
+
 </div>
 <style>
 #santa-container {
@@ -1609,8 +2133,8 @@ console.log("960");
      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
   import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-  import { getDatabase, ref as ref2, onValue, update, get, set, remove, push} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+  import { getDatabase, ref as ref2, onValue, update, get, set, remove, push, limitToFirst, startAt, orderByKey, query} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
   import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
 console.log('1050')
           // https://firebase.google.com/docs/web/setup#available-libraries
@@ -1629,9 +2153,74 @@ const firebaseConfig = {
   measurementId: "G-GV72TMNNGR"
 };
 
-console.log('1067') 
+console.log('1067')
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
+const auth = getAuth(app);
+let currentFirebaseUser = null;
+
+// Make Firebase functions globally available for use in regular script tags
+window.firebaseUpdate = update;
+window.firebaseRef = ref2;
+window.firebaseDatabase = database;
+window.firebaseGetStorage = getStorage;
+window.firebaseStorageRef = ref;
+window.firebaseGetDownloadURL = getDownloadURL;
+window.firebaseApp = app;
+window.firebaseAuth = auth;
+window.currentFirebaseUser = null;
+
+// Keep track of auth state so UI can react correctly
+onAuthStateChanged(auth, (user) => {
+  currentFirebaseUser = user;
+  window.currentFirebaseUser = user;
+
+  const dashboardLink = document.getElementById("artist-dashboard-link");
+
+  // If user is signed in, update UI and check premium status
+  if (user) {
+    const gcd = document.getElementById("gcd");
+    const name =
+      user.displayName ||
+      localStorage.getItem("fullName") ||
+      "Profile";
+    if (gcd && (!gcd.innerText || gcd.innerText.includes("Continue With"))) {
+      gcd.innerText = name;
+    }
+
+    // Keep localStorage in sync for rest of the app
+    const email = user.email || "";
+    const emailKey = (email || "").replace(/[.#$[\]]/g, "_");
+    localStorage.setItem("email", email);
+    localStorage.setItem("CurrentUser", email);
+    localStorage.setItem("fullName", user.displayName || "");
+    localStorage.setItem("emailKey", emailKey);
+
+    // Check if this user is a premium artist (PREMIUM/<emailKey>.ITG == true / "true")
+    const premiumRef = ref2(database, "PREMIUM/" + emailKey);
+    get(premiumRef)
+      .then((snapshot) => {
+        const val = snapshot.exists() ? snapshot.val() : null;
+        console.log("Home PREMIUM check:", emailKey, val);
+        const isPremium =
+          !!val && (val.ITG === true || val.ITG === "true");
+        if (dashboardLink) {
+          dashboardLink.style.display = isPremium ? "block" : "none";
+        }
+      })
+      .catch((err) => {
+        console.error("Error checking PREMIUM status on home:", err);
+        if (dashboardLink) {
+          dashboardLink.style.display = "none";
+        }
+      });
+  } else {
+    // Not signed in: hide artist dashboard link
+    if (dashboardLink) {
+      dashboardLink.style.display = "none";
+    }
+  }
+});
 let currentMusician = "";
 const notesContainer = document.getElementById('notesContainer');
 let Cmay = document.getElementById("Cmay")
@@ -1647,23 +2236,11 @@ let Cmay = document.getElementById("Cmay")
 	let Mark = document.getElementById("Mark");
 	let MB = document.getElementById("MB");
 	let ADAR = document.getElementById("ADAR");
-			let etherealsonic_ = document.getElementById("etherealsonic_")
-
-						let shiver = document.getElementById("shiver")
+	
 
 	         if(window.location.hash == "#ADAR"){
     document.getElementById("po16").style.display = "block";
     document.getElementById("ov16").style.display = "block";
-			 }
-
-							         if(window.location.hash == "#shiver"){
-    document.getElementById("po20").style.display = "block";
-    document.getElementById("ov20").style.display = "block";
-			 }
-
-				         if(window.location.hash == "#etherealsonic_"){
-    document.getElementById("po17").style.display = "block";
-    document.getElementById("ov17").style.display = "block";
 			 }
 
 	         if(window.location.hash == "#MB"){
@@ -1730,9 +2307,7 @@ let Cmay = document.getElementById("Cmay")
 
 
   // Get the anchor tags that wrap the images to prevent default navigation
-			  let shiverLink = document.querySelector('a[href="#shiver"]');
-  let etherealsonicLink = document.querySelector('a[href="#etherealsonic_"]');
-			  let MBLink = document.querySelector('a[href="#MB"]');
+  let MBLink = document.querySelector('a[href="#MB"]');
   let MarkLink = document.querySelector('a[href="#Mark"]');
   let SYANTELink = document.querySelector('a[href="#SYANTE"]');
   let BlinkLink = document.querySelector('a[href="#Blink"]');
@@ -1775,8 +2350,7 @@ let Cmay = document.getElementById("Cmay")
     {overlay: "po8", popup: "ov8"},
     {overlay: "po9", popup: "ov9"},
     {overlay: "po10", popup: "ov10"},
-	  {overlay: "po16", popup: "ov16"},
-	  	  {overlay: "po17", popup: "ov17"}
+	  {overlay: "po16", popup: "ov16"}
   ];
 
   popupPairs.forEach(pair => {
@@ -1822,22 +2396,6 @@ let Cmay = document.getElementById("Cmay")
       showPopup("po15", "ov15");
     });
   }
-
-			  if (etherealsonicLink && etherealsonic_) {
-    etherealsonicLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      showPopup("po17", "ov17");
-    });
-  }
-
-
-						  if (shiverLink && shiver) {
-    shiverLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      showPopup("po20", "po20");
-    });
-  }
-
 
   if (MarkLink && Mark) {
     MarkLink.addEventListener("click", (e) => {
@@ -1920,8 +2478,7 @@ let Cmay = document.getElementById("Cmay")
       showPopup("po8", "ov8");
     });
   }
-
-			
+	
   if (ADARLink && ADAR) {
     ADARLink.addEventListener("click", (e) => {
       e.preventDefault();
@@ -2021,26 +2578,105 @@ function disLeader(song, songMonth, currentMonth, list67, data67) {
 console.log('1127')
 let viewportWidth = window.innerWidth;
 let viewportHeight = window.innerHeight;
-document.getElementById("user-profile-button").addEventListener('click', () => {
-  console.log('1140')
-document.getElementById('google-sign-in').click()
 
-})
+// Helpers for logout modal
+function openLogoutModal(user) {
+  const modal = document.getElementById("logoutModal");
+  if (!modal) return;
+
+  const nameEl = document.getElementById("logoutUserName");
+  const emailEl = document.getElementById("logoutUserEmail");
+
+  const displayName =
+    (user && user.displayName) ||
+    localStorage.getItem("fullName") ||
+    "Signed-in user";
+  const email =
+    (user && user.email) ||
+    localStorage.getItem("email") ||
+    "";
+
+  if (nameEl) nameEl.textContent = displayName;
+  if (emailEl) emailEl.textContent = email;
+
+  modal.style.display = "flex";
+}
+
+function closeLogoutModal() {
+  const modal = document.getElementById("logoutModal");
+  if (modal) modal.style.display = "none";
+}
+
+async function confirmLogout() {
+  try {
+    const authInstance = window.firebaseAuth || getAuth(app);
+    await signOut(authInstance);
+  } catch (err) {
+    console.error("Error signing out:", err);
+  }
+
+  // Clear any cached user info for consistency
+  localStorage.removeItem("email");
+  localStorage.removeItem("CurrentUser");
+  localStorage.removeItem("fullName");
+  localStorage.removeItem("hasLoggedInWithGoogle");
+
+  // Reset Google button label
+  const gcd = document.getElementById("gcd");
+  if (gcd) {
+    gcd.innerHTML = '<font color="black">Continue With <i class="fa-brands fa-google"></i></font>';
+  }
+
+  closeLogoutModal();
+}
+
+// Wire modal buttons
+document.getElementById("logoutCancelBtn")?.addEventListener("click", closeLogoutModal);
+document.getElementById("logoutConfirmBtn")?.addEventListener("click", confirmLogout);
+
+// Profile button: if signed in, show logout modal; otherwise trigger Google sign-in
+document.getElementById("user-profile-button").addEventListener("click", () => {
+  console.log("profile_button_clicked");
+  const authInstance = window.firebaseAuth || getAuth(app);
+
+  // Prefer the tracked auth state, fall back to direct currentUser
+  const firebaseUser = window.currentFirebaseUser || authInstance.currentUser;
+  const hasLocalUser =
+    !!localStorage.getItem("email") || !!localStorage.getItem("CurrentUser");
+
+  if (firebaseUser || hasLocalUser) {
+    // Build a lightweight "user" object for the modal, using Firebase if possible,
+    // otherwise falling back to what we have in localStorage.
+    const modalUser =
+      firebaseUser || {
+        displayName: localStorage.getItem("fullName") || "Signed-in user",
+        email: localStorage.getItem("email") || "",
+      };
+    openLogoutModal(modalUser);
+  } else {
+    document.getElementById("google-sign-in").click();
+  }
+});
 
           // Initialize Firebase
           onValue(ref2(database, "SONGS/"), (snapshot) => {
             console.log(Object.values(snapshot.val()))
 console.log('1133')
-            const auth = getAuth(app);
             const provider = new GoogleAuthProvider();
+            // Always force Google to show the account chooser so switching accounts updates correctly
+            provider.setCustomParameters({ prompt: "select_account" });
             console.log('1136')
 
             document.getElementById("google-sign-in").addEventListener("click", (e) => {
               console.log("gcm_ready");
+
+              // Check if this browser has *ever* logged in with Google before.
+              // We use a dedicated flag so switching Google accounts still counts as "returning".
+              const hadPreviousUser = localStorage.getItem("hasLoggedInWithGoogle") === "true";
+
               signInWithPopup(auth, provider)
                 .then((result) => {
-                  
-                console.log('1143')
+                  console.log('1143')
                   // This gives you a Google Access Token. You can use it to access the Google API.
                   const credential = GoogleAuthProvider.credentialFromResult(result);
                   const token = credential.accessToken;
@@ -2048,29 +2684,106 @@ console.log('1133')
                   const user = result.user;
                   console.log(user)
                   console.log("google-sign-in-clicked")
-                  localStorage.setItem("email", user["email"]);
-                  localStorage.setItem("CurrentUser", user["email"]);
-                  localStorage.setItem("fullName", user["displayName"]);
+
+                  // Mark that this browser has logged in at least once
+                  localStorage.setItem("hasLoggedInWithGoogle", "true");
+
+                  // Persist basic user info (always overwrite with latest account)
+                  localStorage.setItem("email", user["email"] || "");
+                  localStorage.setItem("CurrentUser", user["email"] || "");
+                  localStorage.setItem("fullName", user["displayName"] || "");
                   localStorage.setItem("pfp", user.imageUrl);
                   localStorage.setItem("pfp", user.photoURL); // 
-                  var fullName = user.displayName;
+
+                  // Log out what we actually stored so we can debug switching
+                  console.log("Stored email in localStorage:", localStorage.getItem("email"));
+                  console.log("Stored CurrentUser in localStorage:", localStorage.getItem("CurrentUser"));
+                  console.log("Stored fullName in localStorage:", localStorage.getItem("fullName"));
+
+                  var fullName = user.displayName || localStorage.getItem("fullName") || "";
                   console.log(fullName)
                   document.getElementById('gcd').innerHTML = fullName;
-                  document.getElementById("gcm").innerHTML = fullName;
                   document.getElementById("gcd").innerText = fullName;
                   console.log("Photo URL:", user.photoURL);
                   console.log('1160')
 
+                  // Ensure profile form is hidden first
+                  const profileCreate = document.getElementById("profileCreate");
+                  const ovProfileCreate = document.getElementById("ovProfileCreate");
+                  if (profileCreate) profileCreate.style.display = "none";
+                  if (ovProfileCreate) ovProfileCreate.style.display = "none";
+                  
+                  // Check if user already has a profile in Firebase
+                  const sanitizeEmail = (email) => (email || "").replace(/[.#$[\]]/g, '_');
+                  const emailKey = sanitizeEmail(user.email);
+                  const profileRef = ref2(database, 'PROFILES/' + emailKey);
+                  
+                  get(profileRef)
+                    .then((snapshot) => {
+                      const existingProfile = snapshot.exists() ? snapshot.val() : null;
+
+                  // If this is a returning user, show the confirmation popup.
+                  // If this is the first Google login in this browser, show the profile creation "sign up" flow.
+                      if (hadPreviousUser || existingProfile) {
+                        // User has logged in before OR has a profile → don't show profile form
+                        console.log("Returning user or existing profile, skipping profile creation form");
+                        if (profileCreate) profileCreate.style.display = "none";
+                        if (ovProfileCreate) ovProfileCreate.style.display = "none";
+                        
+                    const signInCon = document.getElementById("signInCon");
+                        if (signInCon && hadPreviousUser) {
+                      signInCon.style.display = "block";
+                      const innerPrompt = signInCon.querySelector("div");
+                      if (innerPrompt) {
+                        innerPrompt.style.display = "block";
+                      }
+                    }
+
+                    // Make these functions global so the inline HTML onclick handlers work
+                    window.continueGoog = async function() {
+                      try {
+                        // Fully sign out from Firebase so the next popup can select a different Google account
+                        await signOut(auth);
+                      } catch (err) {
+                        console.error("Error signing out before switching Google account:", err);
+                      }
+
+                      // Clear cached user info so we always replace it with the new account
+                      localStorage.removeItem("email");
+                      localStorage.removeItem("CurrentUser");
+                      localStorage.removeItem("fullName");
+
+                      document.getElementById("signInCon").style.display = "none";
+                      document.getElementById("google-sign-in").click();
+                    };
+
+                    window.DontGoog = function() {
+                      document.getElementById("signInCon").style.display = "none";
+                    };
+                  } else {
+                        // First-time Google login AND no profile exists → show profile creation form
+                        console.log("No existing profile found, showing profile creation form");
+                    if (profileCreate) profileCreate.style.display = "block";
+                    if (ovProfileCreate) ovProfileCreate.style.display = "block";
+                  }
+                    })
+                    .catch((err) => {
+                      console.error("Error checking profile:", err);
+                      // On error, don't show the form to be safe
+                      if (profileCreate) profileCreate.style.display = "none";
+                      if (ovProfileCreate) ovProfileCreate.style.display = "none";
+                    });
 
                   // IdP data available using getAdditionalUserInfo(result)
                   // ...
+
                 }).catch((error) => {
                   console.log('1166')
                   // Handle Errors here.
                   const errorCode = error.code;
                   const errorMessage = error.message;
                   // The email of the user's account used.
-                  const email = error.customData.email;
+                  const email = error.customData ? error.customData.email : null;
                   // The AuthCredential type that was used.
                   const credential = GoogleAuthProvider.credentialFromError(error);
                   // ...
@@ -2107,6 +2820,12 @@ push(songRef, {
   title2,
   ofctime
 });
+
+// Update tata element with current song
+const tataElement = document.getElementById('tata');
+if (tataElement) {
+  tataElement.innerHTML = `<font color="coral">🎵 NOW PLAYING: ${title2}</font>`;
+}
 
 
   let slet = sorg.length;
@@ -2265,9 +2984,18 @@ window.queuemusic = function(fileInp, title) {
    let nsn = Object.values(snapshot.val())[ns];
    console.log(nsn);
    const url = Object.values(Object.values(nsn)[0])[0]['fileInp'];
+   const songTitle = Object.values(Object.values(nsn)[0])[0]['title'];
    console.log(url)
+   console.log('Playing random song:', songTitle);
+
    const audio = new Audio(url);
    audio.play();
+
+   // Update tata element with the random song
+   const tataElement = document.getElementById('tata');
+   if (tataElement && songTitle) {
+     tataElement.innerHTML = `<font color="coral">🎵 NOW PLAYING: ${songTitle}</font>`;
+   }
 
    audio.onended = function (){
     handleKKK();
@@ -2369,12 +3097,10 @@ window.queuemusic = function(fileInp, title) {
 
           
 
-
           
-
-
-          var CurrentUser = localStorage.getItem("CurrentUser");
-
+          
+          
+          
           // Get the search input element
           document.getElementById("input").addEventListener("input", (e) => {
             // Get the value of the input (trim spaces, convert to lowercase)
@@ -2423,17 +3149,6 @@ window.queuemusic = function(fileInp, title) {
 
 
         
-
-
-          let email = localStorage.getItem("email");
-
-
-          localStorage.setItem("CurrentUser", null);
-          if (CurrentUser !== null) {
-            localStorage.setItem("CurrentUser", email);
-          } else {
-            localStorage.setItem("CurrentUser", null);
-          }
 
 
 
@@ -2721,11 +3436,424 @@ window.queuemusic = function(fileInp, title) {
           })
   </script>
 
+  <!-- Profile Modal -->
+  <div id="profileModal" class="profile-modal-overlay">
+    <div class="profile-modal-content" id="profileModalContent">
+      <div class="profile-modal-header" id="profileModalHeader">
+        <button class="profile-modal-close-btn" onclick="closeUserProfileModal()">
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="profile-modal-avatar-large" id="profileModalAvatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="profile-modal-name-large" id="profileModalName">User Name</div>
+        <div class="profile-modal-bio" id="profileModalBio">No bio available</div>
+      </div>
+      <div class="profile-modal-body">
+        <div class="profile-modal-section">
+          <div class="profile-modal-section-title">
+            <i class="fas fa-link"></i> Social Media
+          </div>
+          <div class="profile-modal-socials" id="profileModalSocials">
+            <div style="padding: 1rem; color: rgba(255,255,255,0.6);">No social media links</div>
+          </div>
+        </div>
+        <div class="profile-modal-section">
+          <div class="profile-modal-section-title">
+            <i class="fas fa-info-circle"></i> Profile Information
+          </div>
+          <div class="profile-modal-info">
+            <div class="profile-modal-info-item">
+              <div class="profile-modal-info-label">Email</div>
+              <div class="profile-modal-info-value" id="profileModalEmail">-</div>
+            </div>
+            <div class="profile-modal-info-item">
+              <div class="profile-modal-info-label">Role</div>
+              <div class="profile-modal-info-value" id="profileModalRole">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <script type="module">
+    // Import Firebase functions needed for users loading
+    import { ref as ref2, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+    
+    // Load and display all users from Firebase (copied from ArtistDashboard)
+    let allUsersDataGlobal = [];
+    
+    // Helper function to sanitize email for Firebase keys
+    function sanitizeEmail(email) {
+      return (email || "").replace(/[.#$[\]]/g, '_');
+    }
+    
+    // Function to get database instance
+    function getDb() {
+      if (window.firebaseDatabase) {
+        return window.firebaseDatabase;
+      }
+      return null;
+    }
 
+    async function loadAllUsers() {
+      try {
+        const db = getDb();
+        if (!db) {
+          console.error('Database not available');
+          return;
+        }
+        
+        const profilesRef = ref2(db, 'PROFILES/');
+        const snapshot = await get(profilesRef);
+        
+        const usersGrid = document.getElementById('usersGrid');
+        if (!usersGrid) {
+          console.error('usersGrid element not found');
+          return;
+        }
+        
+        if (!snapshot.exists()) {
+          usersGrid.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
+          return;
+        }
 
+        const profiles = snapshot.val();
+        const profilesArray = Object.entries(profiles).map(([key, value]) => ({
+          emailKey: key,
+          profile: value
+        }));
 
+        if (profilesArray.length === 0) {
+          usersGrid.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
+          return;
+        }
 
+        // Get additional user data (email, role) and premium status for each profile
+        const usersWithProfiles = await Promise.all(profilesArray.map(async (item) => {
+          const emailKey = item.emailKey;
+          
+          // Try to get user data from CONCERTUSERS or other sources
+          let userEmail = null;
+          let userRole = null;
+          let userFullName = null;
+          
+          // Check CONCERTUSERS for email/role
+          const concertUsersRef = ref2(db, 'CONCERTUSERS/');
+          const concertUsersSnapshot = await get(concertUsersRef);
+          if (concertUsersSnapshot.exists()) {
+            const concertUsers = concertUsersSnapshot.val();
+            const userEntry = Object.values(concertUsers).find(u => {
+              const uEmailKey = sanitizeEmail(u.email || '');
+              return uEmailKey === emailKey;
+            });
+            if (userEntry) {
+              userEmail = userEntry.email;
+              userRole = userEntry.role;
+            }
+          }
+          
+          // Check if premium
+          const premiumRef = ref2(db, 'PREMIUM/' + emailKey);
+          const premiumSnapshot = await get(premiumRef);
+          const premium = premiumSnapshot.exists() ? premiumSnapshot.val() : null;
+          const isPremium = premium && (premium.ITG === true || premium.ITG === "true");
+
+          return {
+            emailKey: emailKey,
+            email: userEmail || emailKey.replace(/_/g, '.'),
+            role: userRole || 'User',
+            fullName: userFullName,
+            profile: item.profile,
+            isPremium: isPremium
+          };
+        }));
+
+        // Store users data globally for modal access
+        allUsersDataGlobal = usersWithProfiles;
+
+        // Render users (will be filtered by search if needed)
+        renderUsers(usersWithProfiles);
+
+      } catch (error) {
+        console.error('Error loading users:', error);
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          db: !!getDb(),
+          usersGrid: !!document.getElementById('usersGrid')
+        });
+        const usersGrid = document.getElementById('usersGrid');
+        if (usersGrid) {
+          usersGrid.innerHTML = `<div class="empty-state" style="color: rgba(255,255,255,0.6); padding: 2rem;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Error loading users</p>
+            <p style="font-size: 0.85rem; margin-top: 0.5rem;">${error.message || 'Unknown error'}</p>
+          </div>`;
+        }
+      }
+    }
+
+    // Render users function (with search filtering)
+    function renderUsers(usersToRender) {
+      const usersGrid = document.getElementById('usersGrid');
+      if (!usersGrid) return;
+
+      const searchQuery = document.getElementById('userSearchInput')?.value?.toLowerCase().trim() || '';
+      const clearBtn = document.getElementById('clearSearchBtn');
+      
+      // Show/hide clear button
+      if (clearBtn) {
+        clearBtn.style.display = searchQuery ? 'block' : 'none';
+      }
+
+      // Filter users based on search query
+      let filteredUsers = usersToRender;
+      if (searchQuery) {
+        filteredUsers = usersToRender.filter(user => {
+          const displayName = (user.profile?.nickname || user.fullName || user.email || '').toLowerCase();
+          const email = (user.email || '').toLowerCase();
+          const role = (user.role || '').toLowerCase();
+          const bio = (user.profile?.bio || '').toLowerCase();
+          
+          return displayName.includes(searchQuery) || 
+                 email.includes(searchQuery) || 
+                 role.includes(searchQuery) ||
+                 bio.includes(searchQuery);
+        });
+      }
+
+      if (filteredUsers.length === 0) {
+        usersGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.6);">
+            <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+            <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">No users found</p>
+            <p style="font-size: 0.9rem; opacity: 0.7;">Try adjusting your search terms</p>
+          </div>
+        `;
+        return;
+      }
+
+      usersGrid.innerHTML = filteredUsers.map((user, index) => {
+        // Find original index in allUsersDataGlobal for modal
+        const originalIndex = allUsersDataGlobal.findIndex(u => u.emailKey === user.emailKey);
+        const modalIndex = originalIndex >= 0 ? originalIndex : index;
+        
+        const displayName = user.profile?.nickname || user.fullName || user.email || user.id || 'User';
+        const email = user.email || user.id || 'No email';
+        const role = user.role || 'User';
+        const profilePicture = (user.isPremium && user.profile?.profilePicture) 
+          ? user.profile.profilePicture 
+          : null;
+
+        return `
+          <div class="user-profile-card" onclick="showUserProfileModal(${modalIndex})">
+            <div class="user-profile-avatar">
+              ${profilePicture 
+                ? `<img src="${profilePicture}" alt="${displayName}">` 
+                : '<i class="fas fa-user"></i>'
+              }
+            </div>
+            <div class="user-profile-name">${displayName}</div>
+            <div class="user-profile-email">${email}</div>
+            <div class="user-profile-role">${role}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Clear search function
+    window.clearUserSearch = function() {
+      const searchInput = document.getElementById('userSearchInput');
+      if (searchInput) {
+        searchInput.value = '';
+        renderUsers(allUsersDataGlobal);
+      }
+    };
+
+    // Set up search input listener
+    window.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('userSearchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          renderUsers(allUsersDataGlobal);
+        });
+      }
+    });
+
+    // Original render code (replaced by renderUsers function)
+    function oldRenderCode() {
+      usersGrid.innerHTML = usersWithProfiles.map((user, index) => {
+          const displayName = user.profile?.nickname || user.fullName || user.email || user.id || 'User';
+          const email = user.email || user.id || 'No email';
+          const role = user.role || 'User';
+          const profilePicture = (user.isPremium && user.profile?.profilePicture) 
+            ? user.profile.profilePicture 
+            : null;
+
+          return `
+            <div class="user-profile-card" onclick="showUserProfileModal(${index})">
+              <div class="user-profile-avatar">
+                ${profilePicture 
+                  ? `<img src="${profilePicture}" alt="${displayName}">` 
+                  : '<i class="fas fa-user"></i>'
+                }
+              </div>
+              <div class="user-profile-name">${displayName}</div>
+              <div class="user-profile-email">${email}</div>
+              <div class="user-profile-role">${role}</div>
+            </div>
+          `;
+        }).join('');
+    }
+
+    // Show user profile modal and track profile view
+    window.showUserProfileModal = async function(userIndex) {
+      const userData = allUsersDataGlobal[userIndex];
+      if (!userData) return;
+
+      // Track profile view in Firebase
+      try {
+        const db = getDb();
+        if (db) {
+          const profileViewsRef = ref2(db, `PROFILEVIEWS/${userData.emailKey}`);
+          const currentViews = await get(profileViewsRef);
+          const viewCount = currentViews.exists() ? (currentViews.val() || 0) : 0;
+          await set(profileViewsRef, viewCount + 1);
+        }
+      } catch (error) {
+        console.error('Error tracking profile view:', error);
+      }
+
+      const modal = document.getElementById('profileModal');
+      const modalContent = document.getElementById('profileModalContent');
+      const modalHeader = document.getElementById('profileModalHeader');
+      
+      const displayName = userData.profile?.nickname || userData.fullName || userData.email || userData.id || 'User';
+      const email = userData.email || userData.id || 'No email';
+      const role = userData.role || 'User';
+      const profilePicture = (userData.isPremium && userData.profile?.profilePicture) 
+        ? userData.profile.profilePicture 
+        : null;
+      
+      // Set profile picture
+      const avatar = document.getElementById('profileModalAvatar');
+      if (profilePicture) {
+        avatar.innerHTML = `<img src="${profilePicture}" alt="${displayName}">`;
+      } else {
+        avatar.innerHTML = '<i class="fas fa-user"></i>';
+      }
+
+      // Set name
+      document.getElementById('profileModalName').textContent = displayName;
+
+      // Set bio
+      const bio = userData.profile?.bio || 'No bio available';
+      document.getElementById('profileModalBio').textContent = bio;
+
+      const tinp = userData.profile.tinp || 'No Donation Box Available';
+      const tinpo = []
+      if (userData.profile?.tinp) {
+        tinpo.push({ name: 'Donorbox', url: userData.profile.tinp, icon: 'fab fa-gift' });
+      }
+
+      // Set email and role
+      document.getElementById('profileModalEmail').textContent = email;
+      document.getElementById('profileModalRole').textContent = role;
+
+      // Set social links
+      const socialsContainer = document.getElementById('profileModalSocials');
+      const socials = [];
+      
+      if (userData.profile?.instagram) {
+        socials.push({ name: 'Instagram', url: userData.profile.instagram, icon: 'fab fa-instagram' });
+      }
+      if (userData.profile?.youtube) {
+        socials.push({ name: 'YouTube', url: userData.profile.youtube, icon: 'fab fa-youtube' });
+      }
+      if (userData.profile?.spotify) {
+        socials.push({ name: 'Spotify', url: userData.profile.spotify, icon: 'fab fa-spotify' });
+      }
+      if (userData.profile?.soundcloud) {
+        socials.push({ name: 'SoundCloud', url: userData.profile.soundcloud, icon: 'fab fa-soundcloud' });
+      }
+      if (userData.profile?.applemusic) {
+        socials.push({ name: 'Apple Music', url: userData.profile.applemusic, icon: 'fab fa-apple' });
+      }
+
+      if (socials.length > 0) {
+        socialsContainer.innerHTML = socials.map(social => `
+          <a href="${social.url}" target="_blank" rel="noopener noreferrer" class="profile-modal-social-link">
+            <i class="${social.icon}"></i>
+            <span>${social.name}</span>
+          </a>
+        `).join('');
+      } else {
+        socialsContainer.innerHTML = '<div style="padding: 1rem; color: rgba(255,255,255,0.6);">No social media links</div>';
+      }
+
+      // Apply theme color
+      const themes = {
+        coral: { primary: '#ff7f50', secondary: '#ff6347' },
+        purple: { primary: '#8b5cf6', secondary: '#7c3aed' },
+        blue: { primary: '#3b82f6', secondary: '#2563eb' },
+        green: { primary: '#10b981', secondary: '#059669' },
+        red: { primary: '#ef4444', secondary: '#dc2626' },
+        dark: { primary: '#1f2937', secondary: '#111827' }
+      };
+
+      const theme = themes[userData.profile?.theme || 'coral'] || themes.coral;
+      modalHeader.style.background = `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`;
+      modalContent.style.borderColor = theme.primary;
+
+      // Show modal
+      modal.classList.add('active');
+    };
+
+    // Close user profile modal
+    window.closeUserProfileModal = function() {
+      document.getElementById('profileModal').classList.remove('active');
+    };
+
+    // Close modal when clicking outside
+    document.getElementById('profileModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeUserProfileModal();
+      }
+    });
+
+    // Load users when page loads (copied from ArtistDashboard pattern)
+    window.addEventListener('DOMContentLoaded', () => {
+      // Wait for Firebase to be ready
+      setTimeout(() => {
+        const db = getDb();
+        if (db) {
+          loadAllUsers();
+          
+          // Set up real-time listener
+          const profilesRef = ref2(db, 'PROFILES/');
+          onValue(profilesRef, () => loadAllUsers());
+        } else {
+          // Keep trying until database is ready
+          const checkInterval = setInterval(() => {
+            const db = getDb();
+            if (db) {
+              clearInterval(checkInterval);
+              loadAllUsers();
+              
+              // Set up real-time listener
+              const profilesRef = ref2(db, 'PROFILES/');
+              onValue(profilesRef, () => loadAllUsers());
+            }
+          }, 500);
+          
+          // Stop trying after 10 seconds
+          setTimeout(() => clearInterval(checkInterval), 10000);
+        }
+      }, 1000);
+    });
+  </script>
 
 
 
