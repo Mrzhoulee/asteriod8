@@ -299,7 +299,7 @@
         <input type="checkbox" id="agreement" style="width: auto;"> 
         <label for="agreement">I confirm I own this music.</label>
     </div>
-    <button id="btn" class="upload-btn">UPLOAD NOW</button>
+    <button type="button" id="btn" class="upload-btn">UPLOAD NOW</button>
     <style>
       body {
         margin: 0;
@@ -483,9 +483,20 @@
       const path = `${document.getElementById("album").value}/${document.getElementById("title").value}/${document.getElementById("artist").value}/${file.name}`;
       const snap = await uploadBytes(ref(storage, path), file);
       const url = await getDownloadURL(snap.ref);
-      await update(ref2(db, "SONGS/" + document.getElementById("title").value), {
-          fileInp: url, uploader: email, campaign: "ARTISTSOFFEB26"
-      });
+      const title = document.getElementById("title").value.trim();
+const artist = document.getElementById("artist").value.trim();
+const album = document.getElementById("album").value.trim();
+
+await update(ref2(db, `SONGS/${title}/${album}/${artist}`), {
+  album: album,
+  artist: artist,
+  title: title,
+  fileInp: url,
+  uploader: email,
+  campaign: "ARTISTSOFFEB26",
+  createdAt: Date.now()
+});
+
       document.getElementById("alertBox").style.visibility = "hidden";
       document.getElementById("ooaa").style.visibility = "visible";
       jsConfetti.addConfetti();
