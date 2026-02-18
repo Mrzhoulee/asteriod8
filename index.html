@@ -446,6 +446,7 @@
   }
 }
 </style>
+	
 <div class="body-layout">
   <aside id="sidebar" class="sidebar">
     <a href="studio.html" class="upload-button">
@@ -516,7 +517,75 @@
 
  
 
+<style>
+      /* ===== Featured Section ===== */
+#featuredSection {
+  margin: 60px 0;
+  padding: 20px;
+}
 
+#featuredSection h2 {
+  font-size: 28px;
+  margin-bottom: 25px;
+  font-weight: 800;
+}
+
+/* Container Grid */
+#featuredContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* Card */
+.featuredCard {
+  background: #111;
+  border-radius: 16px;
+  padding: 20px;
+  transition: 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glow Hover */
+.featuredCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 25px rgba(255, 127, 80, 0.4);
+}
+
+/* Song Title */
+.featuredCard h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+/* Album + Artist */
+.featuredCard p {
+  font-size: 14px;
+  opacity: 0.7;
+  margin: 3px 0;
+}
+
+/* Play Button */
+.featuredCard button {
+  margin-top: 12px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: coral;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.featuredCard button:hover {
+  background: #ff5a3c;
+}
+
+    </style>
 
 <div id="loader"></div>
 
