@@ -2,275 +2,469 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test YouTube Embed</title>
-</head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="description" content="Join Asteroid's Online Concert Live">
+<title>Asteroid - Live Concert</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-<body style="
-  margin:0;
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:#0f0f14;
-  font-family:Arial, sans-serif;
-  color:white;
-">
-
-  <style>
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: black;
+  width: 100%;
+  background: #0a0a0f;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: #ffffff;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Main stream layout */
-.stream-wrapper {
+/* Registration Form */
+.registration-form {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background: linear-gradient(135deg, #1a1a22 0%, #0f0f14 100%);
+  padding: 2.5rem;
+  border-radius: 24px;
+  width: 90%;
+  max-width: 480px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 127, 80, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.registration-form.hidden {
   display: none;
+}
+
+.registration-form h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.registration-form p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  margin-top: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  border-color: #ff7f50;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.1);
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  margin-top: 1.25rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  box-shadow: 0 4px 15px rgba(255, 127, 80, 0.3);
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 127, 80, 0.4);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.message {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  min-height: 1.25rem;
+  line-height: 1.5;
+}
+
+/* Main embed container */
+.embed-container {
   width: 100vw;
   height: 100vh;
-}
-
-/* VIDEO */
-.video-container {
-  flex: 2; /* 66.7% */
   position: relative;
+  display: flex;
+  flex-direction: column;
   display: none;
 }
 
-.video-container iframe {
+.embed-container.active {
+  display: flex;
+}
+
+.embed-container iframe {
   width: 100%;
   height: 100%;
   border: none;
+  display: block;
 }
 
-/* CHAT */
-.chat-container {
-  flex: 1; /* 30% */
-  border-left: 2px solid #111;
+/* Social media handle section */
+.social-media-handle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: linear-gradient(135deg, rgba(26, 26, 34, 0.95) 0%, rgba(15, 15, 20, 0.95) 100%);
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 127, 80, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.social-media-handle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 127, 80, 0.3);
+}
+
+.social-icon {
+  font-size: 1.5rem;
+  color: #ff7f50;
+}
+
+.social-text {
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
 }
 
-.chat-container .youtube-chat {
-  flex: 1;
-  border-bottom: 2px solid #111;
+.social-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.chat-container .donorbox-section {
-  flex: 1;
+.social-handle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
 }
 
-.chat-container iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
+.social-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-/* 📱 MOBILE RESPONSIVE */
+.social-link:hover {
+  text-decoration: none;
+}
+
+/* Mobile responsive */
 @media (max-width: 768px) {
-  .stream-wrapper {
-    flex-direction: column;
+  .registration-form {
+    padding: 1.75rem;
+    max-width: calc(100% - 2rem);
+    border-radius: 20px;
   }
 
-  .video-container {
-    height: 70vh;
+  .registration-form h2 {
+    font-size: 1.5rem;
   }
 
-  .chat-container {
-    height: 70vh;
-    border-left: none;
-    border-top: 2px solid #111;
+  .registration-form p {
+    font-size: 0.85rem;
   }
 
-  .chat-container .youtube-chat {
-    border-bottom: 2px solid #111;
+  .form-input,
+  .submit-btn {
+    padding: 0.875rem;
+    font-size: 1rem;
   }
 
-  .chat-container .donorbox-section {
-    border-top: 2px solid #111;
+  .social-media-handle {
+    bottom: 15px;
+    right: 15px;
+    left: 15px;
+    padding: 0.875rem 1.25rem;
+    border-radius: 12px;
+  }
+  
+  .social-icon {
+    font-size: 1.25rem;
+  }
+
+  .social-handle {
+    font-size: 0.9rem;
+  }
+  
+  .social-label {
+    font-size: 0.7rem;
   }
 }
 
+@media (max-width: 480px) {
+  .registration-form {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+
+  .registration-form h2 {
+    font-size: 1.25rem;
+  }
+
+  .form-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .social-media-handle {
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+  }
+  
+  .social-icon {
+    font-size: 1.1rem;
+  }
+  
+  .social-handle {
+    font-size: 0.85rem;
+  }
+}
+
+/* Loading state */
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  color: #ff7f50;
+  font-size: 1.25rem;
+  display: none;
+}
+
+.loading.active {
+  display: block;
+}
   </style>
+</head>
+<body>
 
-<div id="hyh2sdq2szq" style="
-background:#1a1a22;
-padding:40px;
-border-radius:20px;
-width:350px;
-text-align:center;
-position: fixed;
-box-shadow:0 0 30px rgba(255,100,100,0.2);
-">
-
-<h2>🚀 Join Asteroid's Online Concert Live</h2>
-<p style="color:#aaa; font-size:14px;">
-Enter your email to watch the online concert live!
-</p>
+<!-- Registration Form -->
+<div id="registrationForm" class="registration-form">
+  <h2>🚀 Join Asteroid's Live Concert</h2>
+  <p>Enter your details to access the live concert!</p>
 
 <input 
   id="emailInput"
   type="email" 
   placeholder="Enter your email"
-  style="
-    width:100%;
-    padding:12px;
-    margin-top:15px;
-    border:none;
-    border-radius:10px;
-    outline:none;
-  "
+  class="form-input"
+  aria-label="Email address"
+  required
 >
 
-<select 
-  id="roleSelect"
-  style="
-    width:100%;
-    padding:12px;
-    margin-top:10px;
-    border:none;
-    border-radius:10px;
-    outline:none;
-  "
+<input 
+  id="instagramInput"
+  type="text" 
+    placeholder="Instagram handle (e.g., @username)"
+  class="form-input"
+  aria-label="Instagram handle"
+  required
 >
-  <option value="">I am a...</option>
-  <option value="Artist">Artist</option>
-  <option value="Fan">Fan</option>
-</select>
+
+  <input 
+    id="twitterInput"
+    type="text" 
+    placeholder="Twitter/X handle (optional)"
+    class="form-input"
+    aria-label="Twitter handle"
+  >
 
 <button 
-  onclick="saveEmail()" 
-  style="
-    width:100%;
-    padding:12px;
-    margin-top:15px;
-    border:none;
-    border-radius:10px;
-    background:coral;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-  "
+    onclick="submitRegistration()" 
+  class="submit-btn"
+  type="button"
+  aria-label="Submit registration"
+    id="submitBtn"
 >
-Watch
+    Enter Concert
 </button>
 
-<p id="message" style="margin-top:15px; font-size:14px;"></p>
-
+<p id="message" class="message" role="status" aria-live="polite"></p>
 </div>
-<script type="module">
-  console.log("955")
-console.log("960");
-  // Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
-import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-import { getDatabase, ref as ref2, onValue, update, get, set, remove, push} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
-import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
-console.log('1050')
-  // https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
-authDomain: "asteroid-cdc13.firebaseapp.com",
-databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
-projectId: "asteroid-cdc13",
-storageBucket: "asteroid-cdc13.appspot.com",
-messagingSenderId: "793353824502",
-appId: "1:793353824502:web:3ac24821911d14773ba4d7",
-measurementId: "G-GV72TMNNGR"
-};
+<div class="loading" id="loading">Loading...</div>
 
-console.log('1067')
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+<div class="embed-container" id="embedContainer">
+  <iframe 
+    id="gatherlyIframe"
+    src="" 
+    title="Asteroid Weekly Online Live Concerts"
+    allow="camera; microphone; fullscreen; autoplay; encrypted-media"
+    allowfullscreen
+    loading="lazy">
+  </iframe>
+  </div>
+  
+<!-- Social Media Handle Section -->
+<div class="social-media-handle">
+  <a href="https://www.instagram.com/asteroid8net" target="_blank" rel="noopener noreferrer" class="social-link">
+    <span class="social-icon">📱</span>
+    <div class="social-text">
+      <span class="social-label">Follow Us</span>
+      <span class="social-handle">@asteroidincofficial</span>
+    </div>
+  </a>
+</div>
 
-window.saveEmail = async function() {
-  document.getElementById("hyh2sdq2szq").style.display = "none";
- var streamWrapper = document.querySelector(".stream-wrapper");
-  var videoContainer = document.querySelector(".video-container");
-  var chatContainer = document.querySelector(".chat-container");
-
-  if(streamWrapper) streamWrapper.style.display = "flex";
-  if(videoContainer) videoContainer.style.display = "flex";
-  if(chatContainer) chatContainer.style.display = "flex";
-
-  // Set up YouTube live chat embed
-  var chatIframe = document.getElementById("youtube-chat-iframe");
-  if(chatIframe) {
-    // Get current domain or use asteriod8.com as fallback
-    var currentDomain = window.location.hostname;
-    // Remove port if present
-    currentDomain = currentDomain.split(':')[0];
-    // Use asteriod8.com if on localhost or 127.0.0.1
-    if(currentDomain === 'localhost' || currentDomain === '127.0.0.1' || currentDomain === '') {
-      currentDomain = 'asteriod8.com';
-    }
-    var videoId = '9TaMzn1vTxo';
-    chatIframe.src = `https://www.youtube.com/live_chat?v=${videoId}&embed_domain=${currentDomain}`;
+<script>
+// Check if user is already registered
+window.addEventListener('DOMContentLoaded', function() {
+  const isRegistered = localStorage.getItem('concertRegistered');
+  
+  if (isRegistered === 'true') {
+    // User already registered, show embed
+    showEmbed();
+    } else {
+    // Show registration form
+    document.getElementById('registrationForm').classList.remove('hidden');
   }
+});
 
+function submitRegistration() {
+  const email = document.getElementById('emailInput').value.trim();
+  const instagram = document.getElementById('instagramInput').value.trim();
+  const twitter = document.getElementById('twitterInput').value.trim();
+  const message = document.getElementById('message');
+  const submitBtn = document.getElementById('submitBtn');
 
-
-var email = document.getElementById("emailInput").value;
-var role = document.getElementById("roleSelect").value;
-var message = document.getElementById("message");
-
-if(email === "" || role === "") {
-  message.innerText = "Please enter email and select role.";
+  // Validation
+  if (!email || !instagram) {
+    message.innerText = "Please fill in email and Instagram handle.";
   message.style.color = "red";
   return;
 }
 
-try {
+  // Clean Instagram handle
+  const cleanInstagram = instagram.replace('@', '').trim();
+  if (!cleanInstagram) {
+    message.innerText = "Please enter a valid Instagram handle.";
+      message.style.color = "red";
+      return;
+    }
+    
+  // Disable button
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Processing...";
 
-  await push(ref2(database, "CONCERTUSERS/"), {
+  // Save to localStorage (you can also save to Firebase if needed)
+  const userData = {
     email: email,
-    role: role,
-    date: new Date().toISOString()
-  });
+    instagram: cleanInstagram,
+    twitter: twitter ? twitter.replace('@', '').trim() : '',
+    timestamp: new Date().toISOString()
+  };
 
-  message.innerText = "You're in 🚀 Welcome to Asteroid.";
+  localStorage.setItem('concertRegistered', 'true');
+  localStorage.setItem('concertUserData', JSON.stringify(userData));
+
+  // Optional: Save to Firebase (uncomment if you want to use Firebase)
+  /*
+  import { getDatabase, ref as ref2, push } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+  const database = getDatabase();
+  push(ref2(database, "CONCERTREGISTRATIONS/"), userData);
+  */
+
+  // Show success message
+  message.innerText = "Welcome! Loading concert...";
   message.style.color = "lightgreen";
 
-  document.getElementById("emailInput").value = "";
-  document.getElementById("roleSelect").value = "";
-
-} catch (error) {
-  message.innerText = "Something went wrong.";
-  message.style.color = "red";
+  // Hide form and show embed after a brief delay
+  setTimeout(() => {
+    document.getElementById('registrationForm').classList.add('hidden');
+    showEmbed();
+  }, 1000);
 }
 
-};
+function showEmbed() {
+  const embedContainer = document.getElementById('embedContainer');
+  const iframe = document.getElementById('gatherlyIframe');
+  const loading = document.getElementById('loading');
 
+  // Show loading
+  loading.classList.add('active');
+
+  // Set iframe source
+  iframe.src = "https://asteroid-weekly-online-live-concerts.event.gatherly.io/";
+
+  // Show embed container
+  embedContainer.classList.add('active');
+
+  // Hide loading when iframe loads
+  iframe.addEventListener('load', function() {
+    loading.classList.remove('active');
+  });
+
+  // Fallback: hide loading after 3 seconds
+  setTimeout(() => {
+    loading.classList.remove('active');
+  }, 3000);
+}
+
+// Hide loading when iframe loads
+window.addEventListener('load', function() {
+  const loading = document.getElementById('loading');
+  if (loading) {
+    loading.classList.remove('active');
+  }
+});
 </script>
-  <div class="stream-wrapper">
-    <div class="video-container">
-<iframe width="1086" height="315" src="https://www.youtube.com/embed/9TaMzn1vTxo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</div>
-<div class="chat-container">
-  <div class="youtube-chat">
-    <iframe id="youtube-chat-iframe"
-            src="https://www.youtube.com/live_chat?v=9TaMzn1vTxo&embed_domain=asteroid8.net"
-            style="width: 100%; height: 100%; border: none;"
-            allowfullscreen>
-    </iframe>
-  </div>
-  <div class="donorbox-section">
-    <iframe src="https://donorbox.org/tour-funding" width="100%" height="100%" frameborder="0" scrolling="auto" allow="payment"></iframe>
-  </div>
-</div>
-
-</div>
-
 
 </body>
 </html>
-
-
