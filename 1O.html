@@ -363,7 +363,32 @@ html, body {
   </a>
 </div>
 
-<script>
+<script type="module">
+// Import Firebase functions
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getDatabase, ref as ref2, push, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
+  authDomain: "asteroid-cdc13.firebaseapp.com",
+  databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+  projectId: "asteroid-cdc13",
+  storageBucket: "asteroid-cdc13.appspot.com",
+  messagingSenderId: "793353824502",
+  appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+// Make functions globally available
+window.firebaseDatabase = database;
+window.firebaseRef = ref2;
+window.firebasePush = push;
+window.firebaseSet = set;
+
 // Check if user is already registered
 window.addEventListener('DOMContentLoaded', function() {
   const isRegistered = localStorage.getItem('concertRegistered');
@@ -377,7 +402,7 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-function submitRegistration() {
+window.submitRegistration = async function() {
   const email = document.getElementById('emailInput').value.trim();
   const instagram = document.getElementById('instagramInput').value.trim();
   const twitter = document.getElementById('twitterInput').value.trim();
@@ -387,49 +412,62 @@ function submitRegistration() {
   // Validation
   if (!email || !instagram) {
     message.innerText = "Please fill in email and Instagram handle.";
-  message.style.color = "red";
-  return;
-}
+    message.style.color = "red";
+    return;
+  }
 
   // Clean Instagram handle
   const cleanInstagram = instagram.replace('@', '').trim();
   if (!cleanInstagram) {
     message.innerText = "Please enter a valid Instagram handle.";
-      message.style.color = "red";
-      return;
-    }
+    message.style.color = "red";
+    return;
+  }
     
   // Disable button
   submitBtn.disabled = true;
   submitBtn.textContent = "Processing...";
+  message.innerText = "Saving your information...";
+  message.style.color = "#ff7f50";
 
-  // Save to localStorage (you can also save to Firebase if needed)
+  // Prepare user data
   const userData = {
     email: email,
     instagram: cleanInstagram,
     twitter: twitter ? twitter.replace('@', '').trim() : '',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    registeredAt: Date.now()
   };
 
-  localStorage.setItem('concertRegistered', 'true');
-  localStorage.setItem('concertUserData', JSON.stringify(userData));
+  try {
+    // Save to Firebase Realtime Database
+    console.log("💾 Saving to Firebase...");
+    const registrationsRef = ref2(database, "CONCERTREGISTRATIONS/");
+    const newRegistrationRef = push(registrationsRef);
+    await set(newRegistrationRef, userData);
+    console.log("✅ Successfully saved to Firebase:", newRegistrationRef.key);
+    
+    // Also save to localStorage for quick access
+    localStorage.setItem('concertRegistered', 'true');
+    localStorage.setItem('concertUserData', JSON.stringify(userData));
+    localStorage.setItem('concertRegistrationId', newRegistrationRef.key);
 
-  // Optional: Save to Firebase (uncomment if you want to use Firebase)
-  /*
-  import { getDatabase, ref as ref2, push } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
-  const database = getDatabase();
-  push(ref2(database, "CONCERTREGISTRATIONS/"), userData);
-  */
+    // Show success message
+    message.innerText = "✅ Welcome! Loading concert...";
+    message.style.color = "lightgreen";
 
-  // Show success message
-  message.innerText = "Welcome! Loading concert...";
-  message.style.color = "lightgreen";
-
-  // Hide form and show embed after a brief delay
-  setTimeout(() => {
-    document.getElementById('registrationForm').classList.add('hidden');
-    showEmbed();
-  }, 1000);
+    // Hide form and show embed after a brief delay
+    setTimeout(() => {
+      document.getElementById('registrationForm').classList.add('hidden');
+      showEmbed();
+    }, 1000);
+  } catch (error) {
+    console.error("❌ Error saving to Firebase:", error);
+    message.innerText = "Error saving data. Please try again.";
+    message.style.color = "red";
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Enter Concert";
+  }
 }
 
 function showEmbed() {
@@ -441,7 +479,7 @@ function showEmbed() {
   loading.classList.add('active');
 
   // Set iframe source
-  iframe.src = "https://asteroid-weekly-online-live-concerts-real.event.gatherly.io/?_gl=1*zz7gk4*_ga*MTIxODIxOTUyMy4xNzcxMzgxMjg2*_ga_MDQ45XG3C4*czE3NzE2MjkzNzckbzMkZzEkdDE3NzE2MzE5NjAkajIzJGwwJGgw";
+  iframe.src = "https://asteroid-weekly-online-live-concerts.event.gatherly.io/";
 
   // Show embed container
   embedContainer.classList.add('active');
@@ -468,4 +506,3 @@ window.addEventListener('load', function() {
 
 </body>
 </html>
-
