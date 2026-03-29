@@ -131,10 +131,10 @@
 
   <div class="header-right">
     <div class="header-sign-in-group" aria-label="Sign in options">
-      <button type="button" class="header-sign-in-btn header-sign-in-google" id="google-sign-in" style="display: none !important;">
+      <button type="button" class="header-sign-in-btn header-sign-in-google" id="google-sign-in">
         <span id="gcd" class="header-sign-in-gcd">Continue with <i class="fa-brands fa-google"></i></span>
       </button>
-      <button type="button" class="header-sign-in-btn header-sign-in-apple" id="apple-sign-in" style="display: none !important;" aria-label="Continue with Apple">
+      <button type="button" class="header-sign-in-btn header-sign-in-apple" id="apple-sign-in" aria-label="Continue with Apple">
         <i class="fa-brands fa-apple" aria-hidden="true"></i> Continue with Apple
       </button>
     </div>
@@ -189,6 +189,14 @@
   background: #000;
   color: #fff;
   border: none;
+}
+/* Visible by default so guests see buttons before/without Firebase; JS hides when signed in */
+#google-sign-in,
+#apple-sign-in {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 @media (max-width: 768px) {
   .header-right {
