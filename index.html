@@ -129,24 +129,81 @@
     </div>
   </div>
 
-<button id="user-profile-button" class="user-profile-button">
-    <img src="I12_417_1_10701.svg" alt="User Profile" class="user-profile-icon">
-  </button>
-      <div style="position: absolute; top: 15px; right: 90px; z-index: 50;">
-
-<div style="color: black; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
-    <button type="button" style="position: relative; top:2px;  right:2px; background-color: white; display: none !important;" id="google-sign-in"><span id="gcd" style="font-size: medium; color: black;"><font color="black">Continue With
-        <i class="fa-brands fa-google"></i> </font></span></button>
-    <button type="button" id="apple-sign-in" style="display: none !important; background: #000; color: #fff; border: none; border-radius: 6px; padding: 8px 14px; font-size: medium; cursor: pointer; font-weight: 600;" aria-label="Sign in with Apple">
-        <i class="fa-brands fa-apple"></i> Sign in with Apple
+  <div class="header-right">
+    <div class="header-sign-in-group" aria-label="Sign in options">
+      <button type="button" class="header-sign-in-btn header-sign-in-google" id="google-sign-in" style="display: none !important;">
+        <span id="gcd" class="header-sign-in-gcd">Continue with <i class="fa-brands fa-google"></i></span>
+      </button>
+      <button type="button" class="header-sign-in-btn header-sign-in-apple" id="apple-sign-in" style="display: none !important;" aria-label="Continue with Apple">
+        <i class="fa-brands fa-apple" aria-hidden="true"></i> Continue with Apple
+      </button>
+    </div>
+    <button type="button" id="user-profile-button" class="user-profile-button" aria-label="Account">
+      <img src="I12_417_1_10701.svg" alt="" class="user-profile-icon" width="24" height="24">
     </button>
-</div>
-
-
-
   </div>
 </header>
 <style>
+/* Header: sign-in column + profile — no overlap (replaces absolute positioning) */
+.header {
+  position: relative;
+}
+.header-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: auto;
+  z-index: 10;
+}
+.header-sign-in-group {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+}
+.header-sign-in-btn {
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  line-height: 1.35;
+  width: 100%;
+  max-width: 240px;
+}
+.header-sign-in-google {
+  background: #fff;
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+}
+.header-sign-in-gcd {
+  font-size: 13px;
+  color: #111;
+}
+.header-sign-in-apple {
+  background: #000;
+  color: #fff;
+  border: none;
+}
+@media (max-width: 768px) {
+  .header-right {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+  .header-sign-in-group {
+    flex: 1 1 auto;
+    min-width: min(100%, 200px);
+    max-width: calc(100% - 56px);
+  }
+}
 /* === Coral / Black / White theme overrides === */
 .live-circle:hover {
   border-color: #ff7f50;
@@ -2680,7 +2737,7 @@ onAuthStateChanged(auth, (user) => {
       user.displayName ||
       localStorage.getItem("fullName") ||
       "Profile";
-    if (gcd && (!gcd.innerText || gcd.innerText.includes("Continue With"))) {
+    if (gcd && (!gcd.innerText || /continue with/i.test(gcd.innerText))) {
       gcd.innerText = name;
     }
 
@@ -3158,7 +3215,7 @@ async function confirmLogout() {
   // Reset Google button label
   const gcd = document.getElementById("gcd");
   if (gcd) {
-    gcd.innerHTML = '<font color="black">Continue With <i class="fa-brands fa-google"></i></font>';
+    gcd.innerHTML = 'Continue with <i class="fa-brands fa-google"></i>';
   }
 
   closeLogoutModal();
