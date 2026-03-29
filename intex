@@ -1,0 +1,48 @@
+signInWithPopup(auth, provider).then(async (res) => {
+      const user = res.user;
+      const safeEmail = user.email.replace(/\./g, ',');
+
+      // Firestore referral system (VIP featuring)
+      try {
+        await createOrUpdateUserOnSignup(user, getReferralFromURL());
+      } catch (e) { console.warn("Referral system:", e); }
+      const inviter = localStorage.getItem('pending_inviter');
+
+      localStorage.setItem("email", user.email);
+      localStorage.setItem("fullName", user.displayName);
+      document.getElementById("gcm").innerHTML = user.displayName;
+
+      const userRef = ref2(db, 'users/' + safeEmail);
+      const snap = await get(userRef);
+
+      if (!snap.exists() && inviter) {
+        await update(ref2(db, 'referralCounts/' + inviter), { count: increment(1) });
+        localStorage.removeItem('pending_inviter');
+      }
+
+      await update(userRef, { email: user.email, name: user.displayName });
+      loadUserProgress(user.displayName);
+    });
+  };
+
+  function loadUserProgress(name) {
+    const cleanName = name.replace(/\s+/g, '_');
+    const safeEmail = localStorage.getItem("email").replace(/\./g, ',');
+    document.getElementById('shareLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=ARTISTSOFFEB26&by=${cleanName}`;
+
+    onValue(ref2(db, 'referralCounts/' + cleanName), async (snap) => {
+      const count = snap.val()?.count || 0;
+      document.getElementById('countText').innerText = `${count} / 1 Artist Joined`;
+      document.getElementById('progressBarStatus').style.width = (count >= 1 ? 100 : 0) + "%";
+
+      if(count >= 1) {
+          document.getElementById('unlockMsg').style.display = 'block';
+          if (localStorage.getItem('rewardNotified') !== 'true') {
+              document.getElementById('vipSuccessBox').style.display = 'block';
+              await update(ref2(db, 'users/' + safeEmail), { eligibility: "3_MONTH_FEATURE" });
+              jsConfetti.addConfetti({ emojis: ['🎉', '🚀', '🔥'] });
+              localStorage.setItem('rewardNotified', 'true');
+          }
+      }
+    });
+  }

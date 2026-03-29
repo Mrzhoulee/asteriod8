@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+
+  <style>
+
+   button{
+   background-color: Black;
+   color:Black;
+   width:300px;
+   height:200px;
+   border-radius:5px;
+   }
+   </style>
+
+
+
+  
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap')
+</style>
+  
+<style>
+body{
+  
+background-color: #67708f;
+color: #67708f;
+  
+}
+
+
+  
+</style>
+
+
+
+
+  
+</head>
+
+<style>
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+</style>
+
+
+
+  
+<body>
+
+<img src="IMG_2982.jpeg" alt="snow" width="350" height="590">
+  
+<div class="container">
+<div class="centered"><font face="Montserrat"></font></div>
+</div>
+  
+  <h1><font face="Montserrat" font color="white">Get Spaces now It's free</h1>
+  <font face="Montserrat" font color="white">This free SCOPE access will be available to November 20 2025</font>
+    <font face="Montserrat" font color="white">You can play all the games, Walt(News blog) , <b>LIVE CONCERT</b> and other features from Asteroid, Unlock Now!</font>
+  <font color ="white">Free $0.00</font>
+<button id="purchaseButton" onclick="purchasePremium()"><font face="Montserrat" font color="white">Unlock SCOPE</font></button>
+<button onclick="myFunc()"><font color="white">GET USERNAME AND PASSWORD FOR <b>Spaces</b></font></button>
+  
+<p id="demo"></p>
+     
+
+<script>
+
+
+
+var currentUser = JSON.parse(localStorage.getItem("CurrentUser"));
+
+if (currentUser === null) {
+    alert("User is not signed in.");
+    window.location.href = "index.html";
+} else {
+    // Assuming 'currentUser' is an object with properties 'name' and 'email'\
+    checkPremiumStatus(currentUser);
+    updateStatusMessage(currentUser.isPremiumUser);
+}
+  
+function myFunc() {
+  document.getElementById("demo").innerHTML = "Username = Preuser, Password =  User102049 ";
+alert("Your SCOPE USERNAME AND PASSWORD IS SUCCESSFULLY CREATED FOR YOU!")
+}
+
+function purchasePremium() {
+    let currentUserEmail = localStorage.getItem("currentUser");
+    let user_records = JSON.parse(localStorage.getItem("users")) || [];
+
+    user_records = user_records.map(user => {
+        if (user.email === currentUserEmail) {
+            user.isPremiumUser = true;
+            user.premiumStartDate = new Date().toISOString(); // Set current date as premium start date
+
+            // Calculate premium expiration date (12 months from now)
+            let premiumEndDate = new Date(user.premiumStartDate);
+            premiumEndDate.setMonth(premiumEndDate.getMonth() + 12); // Add 12 months
+
+            user.premiumEndDate = premiumEndDate.toISOString(); // Store expiration date
+        }
+        return user;
+    });
+
+    localStorage.setItem("users", JSON.stringify(user_records));
+    localStorage.setItem("isPremiumUser", "true");
+
+    alert("Premium Purchased Successfully for one full year!");
+
+}
+
+  
+  
+
+  function checkPremiumStatus(user) {
+    if (user.isPremiumUser) {
+        let expiryDate = new Date(user.premiumExpiry);
+        if (new Date() > expiryDate) {
+            user.isPremiumUser = false;
+            user.premiumExpiry = null;
+            localStorage.setItem("currentUser", JSON.stringify(user));
+            alert("Your SCOPE subscription has expired.");
+        }
+    }
+}
+
+  function updateStatusMessage(isPremiumUser) {
+    let statusMessage = document.getElementById("statusMessage");
+    if (isPremiumUser) {
+        statusMessage.textContent = "Welcome, SCOPE User!";
+    } else {
+        statusMessage.textContent = "You are a regular user.";
+    }
+}
+
+</script>
+<a href="Pre.html"><font face="Montserrat" font color="White">Go to SCOPE LOG IN</font></a>
+
+
+
+
+
+
+</body>
+</html>
+  

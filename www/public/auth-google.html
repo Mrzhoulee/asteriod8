@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in with Google - Asteroid</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #000; color: #fff; }
+    #msg { text-align: center; padding: 20px; }
+    .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,87,34,0.3); border-top-color: coral; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 20px auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="msg">Signing in with Google...</div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+      authDomain: "asteroid-cdc13.firebaseapp.com",
+      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+      projectId: "asteroid-cdc13",
+      storageBucket: "asteroid-cdc13.appspot.com",
+      messagingSenderId: "793353824502",
+      appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+      measurementId: "G-GV72TMNNGR"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    async function run() {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const idToken = credential?.idToken;
+          if (idToken) {
+            const redirectUrl = "asteroid://auth?token=" + encodeURIComponent(idToken);
+            document.getElementById("msg").innerHTML = "Sign-in successful! Opening app...<br><a href=\"" + redirectUrl + "\" style=\"color:coral;margin-top:12px;display:inline-block\">Tap here if the app doesn't open</a>";
+            const a = document.createElement("a");
+            a.href = redirectUrl;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => { window.location.href = redirectUrl; }, 300);
+            return;
+          }
+        }
+        document.getElementById("msg").innerHTML = '<div class="spinner"></div>Redirecting to Google...';
+        await signInWithRedirect(auth, provider);
+      } catch (err) {
+        console.error("Auth error:", err);
+        document.getElementById("msg").innerHTML = "Sign-in failed. Please try again.<br><a href='#' onclick='location.reload()' style='color:coral'>Retry</a>";
+      }
+    }
+    run();
+  </script>
+</body>
+</html>

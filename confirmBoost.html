@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Boost</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <style>/* HTML: <div class="loader"></div> */
+    /* From Uiverse.io by mobinkakei */ 
+.wrapper {
+  width: 200px;
+  height: 60px;
+  position: relative;
+  z-index: 1;
+}
+
+.circle {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  border-radius: 50%;
+  background-color: #fff;
+  left: 15%;
+  transform-origin: 50%;
+  animation: circle7124 .5s alternate infinite ease;
+}
+
+@keyframes circle7124 {
+  0% {
+    top: 60px;
+    height: 5px;
+    border-radius: 50px 50px 25px 25px;
+    transform: scaleX(1.7);
+  }
+
+  40% {
+    height: 20px;
+    border-radius: 50%;
+    transform: scaleX(1);
+  }
+
+  100% {
+    top: 0%;
+  }
+}
+
+.circle:nth-child(2) {
+  left: 45%;
+  animation-delay: .2s;
+}
+
+.circle:nth-child(3) {
+  left: auto;
+  right: 15%;
+  animation-delay: .3s;
+}
+
+.shadow {
+  width: 20px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: rgba(0,0,0,0.9);
+  position: absolute;
+  top: 62px;
+  transform-origin: 50%;
+  z-index: -1;
+  left: 15%;
+  filter: blur(1px);
+  animation: shadow046 .5s alternate infinite ease;
+}
+
+@keyframes shadow046 {
+  0% {
+    transform: scaleX(1.5);
+  }
+
+  40% {
+    transform: scaleX(1);
+    opacity: .7;
+  }
+
+  100% {
+    transform: scaleX(.2);
+    opacity: .4;
+  }
+}
+
+.shadow:nth-child(4) {
+  left: 45%;
+  animation-delay: .2s
+}
+
+.shadow:nth-child(5) {
+  left: auto;
+  right: 15%;
+  animation-delay: .3s;
+}
+
+body{
+    background-color: black;
+}
+
+
+.outfit-helloDad {
+  font-family: "Outfit", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 800;
+  font-style: normal;
+  color:white;
+}
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: black; /* optional */
+    flex-direction: column;
+}
+
+/* Your circle animation container */
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Text container */
+.loader-wrapper {
+    margin-top: 20px; /* 👈 controls closeness */
+}
+
+/* Only show one text at a time */
+.loader-container {
+    height: 60px;
+    overflow: hidden;
+    text-align: center;
+}
+
+#loaderText {
+    transition: transform 0.7s ease;
+}
+
+#loaderText h1 {
+    height: 60px;
+    margin: 0;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+.wrapper,
+.loader-wrapper {
+    transition: opacity 0.5s ease;
+}
+.circle-loader {
+  margin-bottom: 3.5em;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-left-color: #5cb85c;
+  animation: loader-spin 1.2s infinite linear;
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  border-radius: 50%;
+  width: 7em;
+  height: 7em;
+  display: none;
+}
+
+.load-complete {
+  -webkit-animation: none;
+  animation: none;
+  border-color: #5cb85c;
+  transition: border 500ms ease-out;
+}
+
+.checkmark.draw:after {
+  animation-duration: 800ms;
+  animation-timing-function: ease;
+  animation-name: checkmark;
+  transform: scaleX(-1) rotate(135deg);
+}
+.checkmark:after {
+  opacity: 1;
+  height: 3.5em;
+  width: 1.75em;
+  transform-origin: left top;
+  border-right: 3px solid #5cb85c;
+  border-top: 3px solid #5cb85c;
+  content: "";
+  left: 1.75em;
+  top: 3.5em;
+  position: absolute;
+}
+
+@keyframes loader-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes checkmark {
+  0% {
+    height: 0;
+    width: 0;
+    opacity: 1;
+  }
+  20% {
+    height: 0;
+    width: 1.75em;
+    opacity: 1;
+  }
+  40% {
+    height: 3.5em;
+    width: 1.75em;
+    opacity: 1;
+  }
+  100% {
+    height: 3.5em;
+    width: 1.75em;
+    opacity: 1;
+  }
+}
+
+.btn-success {
+  background: #08c42e;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  padding: 10px 15px;
+  border-radius: 5px;
+	cursor: pointer;
+}
+
+        </style>
+
+        <center>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+       
+            <br>
+
+  <!-- From Uiverse.io by mobinkakei --> 
+<div class="wrapper">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="shadow"></div>
+    <div class="shadow"></div>
+    <div class="shadow"></div>
+</div>
+<div class="loader-wrapper">
+    <div class="loader-container">
+        <div class="outfit-helloDad" id="loaderText">
+            <h1>Entering the sound galaxy...</h1>
+            <h1>Amplifying the vibes...</h1>
+            <h1>Launching into orbit...</h1>
+            <h1>Mixing the magic...</h1>
+            <h1>Calibrating star frequencies...</h1>
+        </div>
+    </div>
+</div>
+
+
+<div class="circle-loader">
+    <div id="displayText" class="checkmark"></div>
+</div>
+
+<div style="display: none !important;" id="howTo">
+    <div class="outfit-helloDad">
+        <h2>Thank you for purchasing!</h2>
+        <h4>Asteroid will process your boosted upload within 24 hours.</h4>
+</div>
+</div>
+</center>
+
+<script>
+    const loaderText = document.getElementById("loaderText");
+    const messages = loaderText.children;
+    const total = messages.length;
+    
+    let index = 0;
+    
+    // Vertical switching
+    const interval = setInterval(() => {
+      index++;
+      loaderText.style.transform = `translateY(-${index * 60}px)`;
+    }, 900);
+    
+    // Stop after 3.8 seconds
+    setTimeout(() => {
+      clearInterval(interval);
+    
+      // Fade out text + bouncing circles
+      document.querySelector(".wrapper").style.opacity = "0";
+      document.querySelector(".loader-wrapper").style.opacity = "0";
+    
+      setTimeout(() => {
+        document.querySelector(".wrapper").style.display = "none";
+        document.querySelector(".loader-wrapper").style.display = "none";
+    
+        // Stop spinner
+        document.querySelector(".circle-loader").classList.add("load-complete");
+    
+        // Show checkmark
+        
+        const loader = document.querySelector(".circle-loader");
+const check = document.getElementById("displayText");
+
+loader.style.display = "block";   // show circle
+loader.classList.add("load-complete"); // turn circle green
+
+check.style.display = "block";    // show tick container
+check.classList.add("draw");      // START the tick animation
+
+document.getElementById("howTo").style.display = "block";
+
+
+      }, 500);
+    
+    }, 3800);
+    </script>
+    
+    <script>
+
+
+
+    let title1 = localStorage.getItem("BoostTitle");
+let artist1 = localStorage.getItem("BoostArtist");
+let album1 = localStorage.getItem("BoostAlbum");
+let linkToArtist1 = localStorage.getItem("linkToArtist");
+let linkToAlbum1 = localStorage.getItem("linkToAlbum");
+let linkToSong1 = localStorage.getItem("linkToSong");
+
+
+</script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref as ref2, update, get, onValue, increment } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+  
+    const firebaseConfig = {
+      apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
+      authDomain: "asteroid-cdc13.firebaseapp.com",
+      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+      projectId: "asteroid-cdc13",
+      storageBucket: "asteroid-cdc13.appspot.com",
+      messagingSenderId: "793353824502",
+      appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+    };
+  
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+    const provider = new GoogleAuthProvider();
+
+    (async () => {
+
+const params = new URLSearchParams(window.location.search);
+const success = params.get("success"); // ✅ FIXED
+
+if (success !== "true") {
+  console.log("No success param found");
+  return;
+}
+
+const boostId = localStorage.getItem("pendingBoostId");
+
+if (!boostId) {
+  alert("No pending boost found.");
+  return;
+}
+
+try {
+
+  await update(ref2(db, "boostSongs/" + boostId), {
+    status: "paid",
+    paid: true,
+    paidAt: Date.now()
+  });
+
+  localStorage.removeItem("pendingBoostId");
+
+  console.log("Boost marked as paid.");
+
+} catch (err) {
+  console.error(err);
+  alert("Payment confirmation failed.");
+}
+
+})();
+
+
+    </script>
+</body>
+</html>

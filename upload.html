@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload News</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="blog.html">Home</a></li>
+            <li><a href="Premium.html">SCOPE</a></li>
+            <li><a href="Boost.html">Boost my post</a></li>
+        </ul>
+    </nav>
+    <input type="text" id="des" placeholder="Post here" />
+    <input type="file" id="fileInp" />
+    <button onclick="po()">POST</button>
+    
+    <script>
+        function po() {
+            const loti = document.createElement("li");
+            loti.innerHTML = fileInp, des;
+            document.body.appendChild(loti);
+            // Get the description value
+            var des = document.getElementById('des').value;
+ 
+            // Get the file input element
+            var fileInput = document.getElementById('fileInp');
+            
+            if (fileInput.files.length > 0) {
+                var file = fileInput.files[0];
+                var reader = new FileReader();
+
+                reader.onload = function(event) {
+                    var fileBase64 = event.target.result; // Base64 encoded string
+
+                    // Store the description and Base64 file content in localStorage
+                    localStorage.setItem('des', des);
+                    localStorage.setItem('fileBase64', fileBase64); // Store the file as Base64
+                    localStorage.setItem('post', des + " " + fileBase64);
+
+                    alert("POST Upload successfully! GOOD LUCK!");
+                    window.location.href = 'blog.html';
+                };
+
+                reader.readAsDataURL(file); // Read the file as Base64
+            } else {
+                // If no file is selected, just save the description
+                localStorage.setItem('des', des);
+                localStorage.setItem('post', des);
+                
+                alert("POST Upload successfully! GOOD LUCK!");
+                window.location.href = 'blog.html';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "rules": {
+    "owner_token": { ".read": false, ".write": true },
+    "boostSongs": { ".read": true, ".write": true, "$boostId": { ".validate": "newData.hasChildren()" } },
+    "SONGS": { ".read": true, ".write": true },
+    "songplayed": { ".read": true, ".write": true },
+    "songPlayed": { ".read": true, ".write": true },
+    "PREMIUM": { ".read": true, ".write": true },
+    "PROFILES": { ".read": true, ".write": true },
+    "users": { ".read": true, ".write": true },
+    "CONCERTUSERS": { ".read": true, ".write": true }
+  }
+}

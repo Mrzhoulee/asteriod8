@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asteroid Teams Media Studio</title>
+  <style>
+    body { background-color: antiquewhite; font-family: "Montserrat", sans-serif; margin: 0; padding: 20px; text-align: center; }
+    .upload-btn { width: 130px; height: 45px; background-color: coral; color: black; border-radius: 10px; cursor: pointer; border: none; font-weight: bold; margin: 10px; }
+    
+    /* CAMPAIGN UI */
+    #campaignContainer { display: none; margin-bottom: 30px; border-bottom: 2px dashed #ccc; padding-bottom: 20px; }
+    .tutorial-box { background: white; border: 3px solid #00ff88; padding: 20px; border-radius: 15px; max-width: 600px; margin: 0 auto 20px auto; text-align: left; }
+    .progress-box { background: #fff3e0; border: 2px solid coral; padding: 20px; border-radius: 15px; max-width: 500px; margin: 0 auto; }
+    
+    .bar-bg { height: 20px; width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; overflow: hidden; border: 1px solid #bbb; }
+    #progressBarStatus { height: 100%; width: 0%; background: linear-gradient(90deg, #00ff88, #008044); transition: width 0.5s ease; }
+    
+    .alertBox { background-color: lightcoral; padding: 15px; visibility: hidden; border-radius: 10px; margin: 10px auto; width: 80%; }
+    
+    /* Custom alerts (replace browser alert()) */
+    .customAlertOverlay{
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      background: rgba(0,0,0,0.45);
+      padding: 16px;
+      backdrop-filter: blur(6px);
+    }
+    .customAlertCard{
+      width: min(560px, 100%);
+      background: rgba(255,255,255,0.92);
+      border-radius: 18px;
+      border: 1px solid rgba(255,127,80,0.35);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.25);
+      overflow: hidden;
+      transform: translateY(10px) scale(0.98);
+      animation: customAlertIn 180ms ease forwards;
+    }
+    @keyframes customAlertIn{
+      to { transform: translateY(0) scale(1); }
+    }
+    .customAlertTop{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px 10px 20px;
+      background: linear-gradient(135deg, rgba(255,127,80,0.16), rgba(255,60,120,0.08));
+    }
+    .customAlertIcon{
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,127,80,0.15);
+      border: 1px solid rgba(255,127,80,0.25);
+      flex: 0 0 auto;
+    }
+    .customAlertTitle{
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+      color: #222;
+    }
+    .customAlertBody{
+      padding: 0 20px 12px 20px;
+    }
+    .customAlertMessage{
+      margin: 0;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.45;
+    }
+    .customAlertActions{
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 20px 18px 20px;
+      gap: 10px;
+    }
+    .customAlertBtn{
+      background: linear-gradient(135deg, #ff7f50, #ff3c78);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(255,60,120,0.18);
+      transition: transform 0.15s ease;
+    }
+    .customAlertBtn:active{ transform: scale(0.98); }
+
+    .customAlertCard.tone-error{ border-color: rgba(255,60,120,0.45); }
+    .customAlertCard.tone-error .customAlertIcon{
+      background: rgba(255,60,120,0.14);
+      border-color: rgba(255,60,120,0.25);
+    }
+    .customAlertCard.tone-success{ border-color: rgba(0,200,120,0.45); }
+    .customAlertCard.tone-success .customAlertIcon{
+      background: rgba(0,200,120,0.14);
+      border-color: rgba(0,200,120,0.25);
+    }
+    .customAlertCard.tone-info{ border-color: rgba(0,160,255,0.45); }
+    .customAlertCard.tone-info .customAlertIcon{
+      background: rgba(0,160,255,0.14);
+      border-color: rgba(0,160,255,0.25);
+    }
+    input { margin: 8px; padding: 12px; width: 80%; max-width: 400px; border-radius: 8px; border: 1px solid #ccc; }
+    #unlockMsg { color: #008044; font-weight: bold; display: none; margin-top: 10px; }
+
+    /* SUCCESS MODAL */
+    #vipSuccessBox { display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid #00ff88; padding: 30px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.5); z-index: 1000; max-width: 400px; }
+  </style>
+</head>
+<body>
+
+  <div id="vipSuccessBox">
+    <h1 style="color: #008044; margin-top: 0;">🎉 REWARD UNLOCKED!</h1>
+    <p style="font-size: 1.1em; font-weight: bold;">You’ve successfully invited a friend!</p>
+    <p>Your <b>3-Month Feature</b> is now active! Our team has been notified, and <b>we will be in touch with you via email within 48 hours</b> to coordinate your promotion.</p>
+    <button onclick="document.getElementById('vipSuccessBox').style.display='none'" class="upload-btn">AWESOME!</button>
+  </div>
+
+  <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+    <button onclick="ujuujuj()" id="google-sign-in" style="padding: 10px 20px; cursor: pointer; border-radius: 5px; background: white;">
+        <i class="fa-brands fa-google"></i> <span id="gcm">Sign In with Google</span>
+    </button>
+    <button onclick="window.__studioSignInWithApple && window.__studioSignInWithApple()" id="apple-sign-in" style="padding: 10px 20px; cursor: pointer; border-radius: 5px; background: #000; color: #fff; border: 1px solid #555; font-size: 14px; font-family: -apple-system, sans-serif;">
+         Sign in with Apple
+    </button>
+  </div>
+
+  <div id="campaignContainer">
+    <div class="tutorial-box">
+      <h2 style="color: #008044; margin-top: 0;">🚀 3-Month Feature Reward</h2>
+      <p>1. <b>Sign In</b> with Google above.<br>
+      2. <b>Share</b> your link with <b>1 artist friend</b>.<br>
+      3. When they sign in, you unlock a <b>3-Month Feature!</b></p>
+    </div>
+
+    <div class="progress-box">
+      <h3 style="margin: 0; color: coral;">Reward Progress</h3>
+      <p id="countText" style="font-weight: bold;">0 / 1 Artist Joined</p>
+      <div class="bar-bg"><div id="progressBarStatus"></div></div>
+      <div id="unlockMsg">✅ UNLOCKED: 3-Month Feature Active!</div>
+      
+      <p style="font-size: 0.9em;">Your Share Link:</p>
+      <input type="text" id="shareLinkInput" readonly placeholder="Sign in to generate link...">
+      <button id="copyBtn" class="upload-btn" style="width: 80px; height: 35px; font-size: 12px;">COPY</button>
+    </div>
+  </div>
+
+  <div id="boostuploadContainer" class="boost-container">
+
+    <h2>Boost Your Upload</h2>
+  
+    <form id="boostForm">
+  
+      <input type="text" id="BoostTitle" placeholder="Song Title" required>
+      <input type="text" id="BoostArtist" placeholder="Artist Name" required>
+      <input type="text" id="BoostAlbum" placeholder="Album Name" required>
+  
+      <input type="text" id="linkToArtist" placeholder="Artist Social Link" required>
+      <input type="text" id="linkToSong" placeholder="Song Link" required>
+      <input type="text" id="linkToAlbum" placeholder="Album Link" required>
+  
+      <div class="upload-wrapper">
+  
+        <div class="upload-box" id="dropAreaBoost">
+          <p id="boostUploadText">🎵 Drag & Drop Your Audio Here</p>
+          <small>or click to upload (.mp3 / .wav)</small>
+        </div>
+  
+        <input type="file"
+               id="boostFileInp"
+               accept=".mp3,.wav"
+               hidden
+               required>
+  
+      </div>
+  
+      <button type="button" id="boostBtn" class="boost-btn">
+        BOOST NOW & PAY
+      </button>
+  
+    </form>
+    <div id="alertBox" class="alertBox"><h2>Uploading...</h2></div>
+  <div id="ooaa" class="alertBox" style="background-color: lightgreen;"><h2>✅ Success! Upload Complete.</h2></div>
+  </div>
+
+  <!-- Custom HTML/CSS alert overlay (no browser alert()) -->
+  <div id="customAlertOverlay" class="customAlertOverlay" aria-hidden="true">
+    <div id="customAlertCard" class="customAlertCard tone-error" role="alert" aria-live="assertive">
+      <div class="customAlertTop">
+        <div id="customAlertIcon" class="customAlertIcon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 id="customAlertTitle" class="customAlertTitle">Error</h3>
+      </div>
+      <div class="customAlertBody">
+        <p id="customAlertMessage" class="customAlertMessage">Something went wrong.</p>
+      </div>
+      <div class="customAlertActions">
+        <button type="button" id="customAlertOk" class="customAlertBtn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="i-am-sign-in" style="display: none;">
+    <h2>You are now signed in, you can now upload your songs now!</h2>
+  </div>
+<style>
+
+.boost-container {
+  display: none;
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 3px solid black;
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+}
+
+.boost-container input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.upload-wrapper {
+  margin-top: 15px;
+}
+
+.upload-box {
+  padding: 40px 20px;
+  border: 2px dashed coral;
+  border-radius: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s ease;
+  background: rgba(255,127,80,0.05);
+}
+
+.upload-box:hover {
+  background: rgba(255,127,80,0.15);
+}
+
+.upload-box.dragover {
+  border-color: #ff3c78;
+  background: rgba(255,60,120,0.2);
+}
+
+.boost-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  border: none;
+  border-radius: 30px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #ff7f50, #ff3c78);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.boost-btn:hover {
+  transform: scale(1.05);
+}
+
+</style>
+  
+<script>const boostInput = document.getElementById("boostFileInp");
+  const boostDropArea = document.getElementById("dropAreaBoost");
+  const uploadText = document.getElementById("uploadMain");
+  const boostUploadText = document.getElementById("boostUploadText");
+  
+  // Clicking box opens file picker
+  boostDropArea.addEventListener("click", () => {
+    boostInput.click();
+  });
+  
+  // Show file name when selected
+  boostInput.addEventListener("change", () => {
+    if (boostInput.files.length > 0) {
+      boostUploadText.textContent =
+        "File Selected ✅"
+    }
+  });
+  </script>  
+
+  <form id="uploadForm">
+    <h2>Upload Your Media</h2>
+    <input type="text" id="title" placeholder="Song Title" required><br>
+    <input type="text" id="artist" placeholder="Artist Name" required><br>
+    <input type="text" id="album" placeholder="Album Name" required><br>
+    <style>
+      .upload-wrapper {
+        width: 320px;
+      }
+    
+      .upload-box {
+        width: 100%;
+        padding: 40px 20px;
+        border: 2px dashed coral;
+        border-radius: 15px;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        cursor: pointer;
+        transition: 0.3s ease;
+        background: rgba(255, 127, 80, 0.05);
+        box-sizing: border-box;
+      }
+    
+      .upload-box:hover {
+        background: rgba(255, 127, 80, 0.15);
+      }
+    
+      .upload-box.dragover {
+        background: rgba(255, 60, 120, 0.2);
+        border-color: #ff3c78;
+      }
+    
+      .upload-box.file-selected {
+        border-style: solid;
+        background: rgba(0, 200, 120, 0.15);
+        border-color: #00c878;
+      }
+    
+      .upload-text {
+        margin: 0;
+        font-weight: bold;
+        color: #333;
+      }
+    
+      .upload-sub {
+        font-weight: normal;
+        font-size: 13px;
+        margin-top: 8px;
+      }
+    
+      #fileInp {
+        display: none;
+      }
+    </style>
+    
+  <center>
+    <div class="upload-wrapper">
+      <div class="upload-box" id="dropArea">
+        <p class="upload-text" id="uploadMain">
+          🎵 Drag & Drop Your Audio Here
+        </p>
+        <p class="upload-sub" id="uploadSub">
+          or click to upload (.mp3 only)
+        </p>
+      </div>
+ 
+      <input type="file" id="fileInp" accept="audio/mpeg/wav" required>
+      
+    </div>
+  </center>
+    <script>
+      const dropArea = document.getElementById("dropArea");
+      const fileInput = document.getElementById("fileInp");
+      const uploadMain = document.getElementById("uploadMain");
+      const uploadSub = document.getElementById("uploadSub");
+    
+      function showFileName(file) {
+        uploadMain.textContent = "✅ " + file.name;
+        uploadSub.textContent = "Click to change file";
+        dropArea.classList.add("file-selected");
+      }
+    
+      // Click to open
+      dropArea.addEventListener("click", () => {
+        fileInput.click();
+      });
+    
+      // File selected from picker
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files.length > 0) {
+          showFileName(fileInput.files[0]);
+        }
+      });
+    
+      // Drag styling
+      dropArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropArea.classList.add("dragover");
+      });
+    
+      dropArea.addEventListener("dragleave", () => {
+        dropArea.classList.remove("dragover");
+      });
+    
+      dropArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropArea.classList.remove("dragover");
+    
+        if (e.dataTransfer.files.length > 0) {
+          fileInput.files = e.dataTransfer.files;
+          showFileName(e.dataTransfer.files[0]);
+        }
+      });
+    </script>
+    
+    <div style="margin: 15px;">
+        <input type="checkbox" id="agreement" style="width: auto;"> 
+        <label for="agreement">I confirm I own this music.</label>
+    </div>
+    <button type="button" id="btn" class="upload-btn">UPLOAD NOW</button>
+    <style>
+      body {
+        margin: 0;
+        background: #ffffff;
+        transition: background 1.5s ease;
+      }
+    
+      /* Full rainbow spectrum gradient */
+      .liquid-bg {
+        background: linear-gradient(
+          -45deg,
+          hsl(0, 100%, 50%),
+          hsl(30, 100%, 50%),
+          hsl(60, 100%, 50%),
+          hsl(90, 100%, 50%),
+          hsl(120, 100%, 50%),
+          hsl(150, 100%, 50%),
+          hsl(180, 100%, 50%),
+          hsl(210, 100%, 50%),
+          hsl(240, 100%, 50%),
+          hsl(270, 100%, 50%),
+          hsl(300, 100%, 50%),
+          hsl(330, 100%, 50%),
+          hsl(360, 100%, 50%)
+        );
+        background-size: 800% 800%;
+        animation: liquidMove 15s ease infinite;
+      }
+    
+      @keyframes liquidMove {
+        0%   { background-position: 0% 50%; }
+        25%  { background-position: 50% 100%; }
+        50%  { background-position: 100% 50%; }
+        75%  { background-position: 50% 0%; }
+        100% { background-position: 0% 50%; }
+      }
+    
+      #boost {
+        background: linear-gradient(135deg, #ff7f50, #ff3c78);
+        color: white;
+        padding: 12px 28px;
+        border: none;
+        border-radius: 30px;
+        font-weight: bold;
+        font-size: 15px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(255, 60, 120, 0.4);
+        width: 170px;
+        height: 60px;
+        transition: 0.3s ease;
+        width: 225px;
+      }
+    
+      #boost:hover {
+        transform: scale(1.08);
+      }
+    </style>
+  <br>
+  <br>
+    <button id="boost" disabled style="opacity:0.5;cursor:default;">Activate Premium Boost — Coming Soon</button>
+    <br>
+    <br>
+    <font face="Montserrat">Click Activate to get your song featured on the top page</font>
+    <br><br>
+    <a href="vip-dashboard.html" style="color: #ff7f50; text-decoration: none; font-weight: 600;"><i class="fas fa-crown"></i> VIP Dashboard – Referral & Eligibility</a>
+    <script>
+    
+    </script>
+    
+  </form>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+  
+      const boostBtn = document.getElementById("boost");
+      const boostContainer = document.getElementById("boostuploadContainer");
+  
+      boostBtn.addEventListener("click", function () {
+        boostContainer.style.display = "block";
+        window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: "smooth" // Optional: makes the scroll animated
+  });
+
+
+
+      });
+  
+    });
+  </script>
+  
+
+  <script>
+    function ujuujuj() {
+      console.log("google-sign-in clicked");
+      localStorage.setItem("studioSignInFlow", "true");
+      const AUTH_URL = "https://asteroid-cdc13.firebaseapp.com/auth-google.html";
+      const isNative = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
+
+      // iOS native: open auth page immediately from this user gesture.
+      // This avoids popup/redirect blocks that happen later in async code.
+      if (isNative) {
+        try {
+          const Browser = window.Capacitor?.Plugins?.Browser;
+          if (Browser && typeof Browser.open === "function") {
+            console.log("⚡️ ujuujuj opening Browser plugin auth URL");
+            Browser.open({ url: AUTH_URL });
+            return;
+          }
+        } catch (e) {
+          console.warn("Studio Browser.open from click failed:", e);
+        }
+        // Fallback to index auth flow (more stable in this app build).
+        console.log("⚡️ ujuujuj fallback -> index signInFromStudio flow");
+        window.location.href = "index.html?signInFromStudio=true";
+        return;
+      }
+
+      // Avoid redirecting to index.html on iOS (can block auth popups).
+      // The actual sign-in runs in the module script below.
+      const attempt = (triesLeft = 50) => {
+        if (typeof window.__studioSignInWithGoogle === "function") {
+          window.__studioSignInWithGoogle();
+          return;
+        }
+        if (triesLeft <= 0) {
+          console.warn("Studio sign-in not ready yet.");
+          return;
+        }
+        setTimeout(() => attempt(triesLeft - 1), 100);
+      };
+      attempt();
+    }
+    </script>
+
+<script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getDatabase, ref as ref2, update, get, onValue, increment, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, onAuthStateChanged, GoogleAuthProvider, OAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+  import { processReferralURL, createOrUpdateUserOnSignup, getReferralFromURL, onSongUploaded } from "./js/referral-system.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
+    authDomain: "asteroid-cdc13.firebaseapp.com",
+    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+    projectId: "asteroid-cdc13",
+    storageBucket: "asteroid-cdc13.appspot.com",
+    messagingSenderId: "793353824502",
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+  };
+
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const auth = getAuth(app);
+  const storage = getStorage(app);
+  const provider = new GoogleAuthProvider();
+  const appleProvider = new OAuthProvider("apple.com");
+  appleProvider.addScope("email");
+  appleProvider.addScope("name");
+  const jsConfetti = new JSConfetti();
+  const AUTH_URL = "https://asteroid-cdc13.firebaseapp.com/auth-google.html";
+  const APPLE_AUTH_URL = "https://asteroid-cdc13.firebaseapp.com/auth-apple.html";
+  let lastProgressNameLoaded = "";
+
+  console.log("⚡️ STUDIO_HTML_LOADED (web build)", {
+    ts: Date.now(),
+    ua: navigator.userAgent
+  });
+
+  function showCustomAlert({ title = "Notice", message = "", tone = "error", autoHideMs = 0, onOk = null, okText = "OK" } = {}) {
+    const overlay = document.getElementById("customAlertOverlay");
+    const card = document.getElementById("customAlertCard");
+    const icon = document.getElementById("customAlertIcon");
+    const titleEl = document.getElementById("customAlertTitle");
+    const messageEl = document.getElementById("customAlertMessage");
+    const okBtn = document.getElementById("customAlertOk");
+
+    if (!overlay || !card || !icon || !titleEl || !messageEl || !okBtn) return;
+
+    card.classList.remove("tone-error", "tone-success", "tone-info");
+    card.classList.add(`tone-${tone}`);
+
+    // Update icon by tone
+    if (tone === "success") icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+    else if (tone === "info") icon.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+    else icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+
+    overlay.style.display = "flex";
+    overlay.setAttribute("aria-hidden", "false");
+
+    const hide = () => {
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+    };
+
+    okBtn.textContent = okText;
+    okBtn.onclick = () => {
+      hide();
+      if (typeof onOk === "function") onOk();
+    };
+
+    if (autoHideMs && autoHideMs > 0) {
+      window.clearTimeout(window.__customAlertTimer);
+      window.__customAlertTimer = window.setTimeout(hide, autoHideMs);
+    }
+  }
+
+  function isIOS() {
+    const ua = navigator.userAgent || "";
+    return /iPad|iPhone|iPod/i.test(ua);
+  }
+  const isCapacitorNative = () =>
+    typeof window.Capacitor !== "undefined" &&
+    typeof window.Capacitor.isNativePlatform === "function" &&
+    window.Capacitor.isNativePlatform();
+  const getAppPlugin = () => {
+    try { return window.Capacitor?.Plugins?.App || null; } catch (e) { return null; }
+  };
+  const getBrowserPlugin = () => {
+    try { return window.Capacitor?.Plugins?.Browser || null; } catch (e) { return null; }
+  };
+
+  let _lastHandledToken = null;
+  async function handleAuthRedirectUrl(url) {
+    console.log("⚡️ handleAuthRedirectUrl called", { url });
+    if (!url) return;
+    const match = String(url).match(/asteroid:\/\/auth\?token=([^&]+)/);
+    if (!match || !match[1]) return;
+    const idToken = decodeURIComponent(match[1]);
+    if (idToken === _lastHandledToken) { console.log("⚡️ duplicate token, skipping"); return; }
+    _lastHandledToken = idToken;
+
+    // Close browser immediately so the WebView unfreezes
+    try {
+      const Browser = getBrowserPlugin();
+      if (Browser && typeof Browser.close === "function") Browser.close();
+    } catch (e) { /* ignore */ }
+
+    // Decode the JWT payload to get user info without waiting for network
+    let jwtPayload = {};
+    try {
+      const parts = idToken.split(".");
+      if (parts.length >= 2) jwtPayload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
+    } catch (e) { console.warn("⚡️ JWT decode failed", e); }
+
+    const email = jwtPayload.email || "";
+    const fullName = jwtPayload.name || "";
+    const emailKey = (email || "").replace(/[.#$[\]]/g, "_");
+
+    console.log("⚡️ JWT decoded user info:", { email, fullName, sub: jwtPayload.sub });
+
+    // Persist to localStorage immediately so upload works right away
+    if (email) {
+      localStorage.setItem("email", email);
+      localStorage.setItem("CurrentUser", email);
+      localStorage.setItem("fullName", fullName);
+      localStorage.setItem("name", fullName);
+      localStorage.setItem("emailKey", emailKey);
+      localStorage.setItem("studioUserData", JSON.stringify({
+        uid: jwtPayload.sub || "",
+        email,
+        fullName,
+        name: fullName,
+        emailKey,
+        photoURL: jwtPayload.picture || "",
+        providerId: "google.com",
+        lastSignInAt: Date.now()
+      }));
+      console.log("⚡️ localStorage updated from JWT (pre-credential)");
+    }
+
+    // Update UI immediately
+    const gcm = document.getElementById("gcm");
+    if (gcm) gcm.innerHTML = fullName || email || "Signed in";
+    const googleBtn = document.getElementById("google-sign-in");
+    if (googleBtn) googleBtn.setAttribute("data-signed-in", "true");
+    const signedInBox = document.getElementById("i-am-sign-in");
+    if (signedInBox) signedInBox.style.display = "block";
+
+    showCustomAlert({ title: "Signed in", message: "You can now upload your song.", tone: "success", autoHideMs: 2200 });
+
+    // Now try Firebase credential sign-in in the background (non-blocking)
+    try {
+      const cred = GoogleAuthProvider.credential(idToken);
+      const result = await signInWithCredential(auth, cred);
+      console.log("✅ Firebase signInWithCredential succeeded", { uid: result.user?.uid, email: result.user?.email });
+      await applySignedInUser(result.user, { showSuccessAlert: false, source: "deep-link" });
+    } catch (err) {
+      console.warn("⚡️ Firebase credential sign-in failed (localStorage already set):", err?.code || err);
+    }
+  }
+
+  let _lastAppleRedirect = null;
+  async function handleAppleAuthRedirect(url) {
+    console.log("⚡️ handleAppleAuthRedirect called", { url });
+    if (!url) return;
+    if (!String(url).startsWith("asteroid://auth-apple")) return;
+    if (url === _lastAppleRedirect) { console.log("⚡️ duplicate apple redirect, skipping"); return; }
+    _lastAppleRedirect = url;
+
+    try {
+      const Browser = getBrowserPlugin();
+      if (Browser && typeof Browser.close === "function") Browser.close();
+    } catch (e) { /* ignore */ }
+
+    const params = new URLSearchParams(String(url).split("?")[1] || "");
+    const email = params.get("email") || "";
+    const fullName = params.get("name") || "";
+    const uid = params.get("uid") || "";
+    const photo = params.get("photo") || "";
+    const emailKey = (email || "").replace(/[.#$[\]]/g, "_");
+
+    console.log("⚡️ Apple sign-in user info:", { email, fullName, uid });
+
+    if (email) {
+      localStorage.setItem("email", email);
+      localStorage.setItem("CurrentUser", email);
+      localStorage.setItem("fullName", fullName);
+      localStorage.setItem("name", fullName);
+      localStorage.setItem("emailKey", emailKey);
+      localStorage.setItem("studioUserData", JSON.stringify({
+        uid, email, fullName, name: fullName, emailKey,
+        photoURL: photo, providerId: "apple.com", lastSignInAt: Date.now()
+      }));
+      console.log("⚡️ localStorage updated from Apple auth redirect");
+    }
+
+    const gcm = document.getElementById("gcm");
+    if (gcm) gcm.innerHTML = fullName || email || "Signed in";
+    const googleBtn = document.getElementById("google-sign-in");
+    if (googleBtn) googleBtn.setAttribute("data-signed-in", "true");
+    const appleBtn = document.getElementById("apple-sign-in");
+    if (appleBtn) appleBtn.setAttribute("data-signed-in", "true");
+    const signedInBox = document.getElementById("i-am-sign-in");
+    if (signedInBox) signedInBox.style.display = "block";
+
+    showCustomAlert({ title: "Signed in", message: "You can now upload your song.", tone: "success", autoHideMs: 2200 });
+  }
+
+  async function applySignedInUser(user, opts = {}) {
+    const { showSuccessAlert = true, source = "unknown" } = opts;
+    const email = user?.email || "";
+    const fullName = user?.displayName || "";
+    const emailKey = (email || "").replace(/[.#$[\]]/g, "_");
+    const buttonName = fullName || email || "Signed in";
+
+    const storedUserData = {
+      uid: user?.uid || "",
+      email,
+      fullName,
+      name: fullName,
+      emailKey,
+      photoURL: user?.photoURL || user?.imageUrl || "",
+      providerId: user?.providerData?.[0]?.providerId || "",
+      lastSignInAt: Date.now()
+    };
+
+    localStorage.setItem("email", email);
+    localStorage.setItem("CurrentUser", email);
+    localStorage.setItem("fullName", fullName);
+    localStorage.setItem("name", fullName);
+    localStorage.setItem("emailKey", emailKey);
+    localStorage.setItem("pfp", user.photoURL || user.imageUrl || "");
+    localStorage.setItem("studioUserData", JSON.stringify(storedUserData));
+
+    console.log("✅ Studio sign-in successful", { source });
+    console.log("👤 Studio user (raw):", user);
+    console.log("📦 Stored studio user data:", storedUserData);
+
+    // Referral system user creation (VIP system)
+    try {
+      await createOrUpdateUserOnSignup(user, getReferralFromURL());
+    } catch (e) {
+      console.warn("Referral system:", e);
+    }
+
+    // Update UI
+    const googleBtn = document.getElementById("google-sign-in");
+    if (googleBtn) googleBtn.setAttribute("data-signed-in", "true");
+
+    const gcm = document.getElementById("gcm");
+    if (gcm) gcm.innerHTML = buttonName;
+
+    const signedInBox = document.getElementById("i-am-sign-in");
+    if (signedInBox) signedInBox.style.display = "block";
+
+    const progressName = fullName || (email ? email.split("@")[0] : "");
+    if (progressName && progressName !== lastProgressNameLoaded) {
+      lastProgressNameLoaded = progressName;
+      loadUserProgress(progressName);
+    }
+
+    if (showSuccessAlert) {
+      showCustomAlert({
+        title: "Signed in",
+        message: "You can now upload your song.",
+        tone: "success",
+        autoHideMs: 2200
+      });
+    }
+  }
+
+  // Native app deep-link auth bridge (Capacitor Browser -> asteroid://auth?token=...)
+  let nativeAuthBridgeReady = false;
+  async function ensureNativeAuthBridge() {
+    if (nativeAuthBridgeReady) return;
+    if (!isCapacitorNative()) {
+      // Capacitor may not be ready at initial module load inside some iOS WebViews.
+      setTimeout(() => {
+        ensureNativeAuthBridge().catch(() => {});
+      }, 300);
+      return;
+    }
+    const App = getAppPlugin();
+    if (!App) {
+      setTimeout(() => {
+        ensureNativeAuthBridge().catch(() => {});
+      }, 300);
+      return;
+    }
+
+    try {
+      console.log("⚡️ Setting up native auth bridge (Studio)");
+      App.addListener("appUrlOpen", (event) => {
+        console.log("⚡️ appUrlOpen event (Studio)", event);
+        const u = event && event.url;
+        if (u && String(u).startsWith("asteroid://auth-apple")) {
+          handleAppleAuthRedirect(u);
+        } else {
+          handleAuthRedirectUrl(u);
+        }
+      });
+      App.getLaunchUrl()
+        .then((launch) => {
+          console.log("⚡️ getLaunchUrl result (Studio)", launch);
+          if (launch && launch.url) {
+            if (String(launch.url).startsWith("asteroid://auth-apple")) {
+              handleAppleAuthRedirect(launch.url);
+            } else {
+              handleAuthRedirectUrl(launch.url);
+            }
+          }
+        })
+        .catch(() => {});
+      nativeAuthBridgeReady = true;
+    } catch (e) {
+      console.warn("Studio native auth bridge setup error:", e);
+    }
+  }
+
+  // Try early, and again later in case Capacitor loads after module evaluation.
+  ensureNativeAuthBridge().catch(() => {});
+  setTimeout(() => ensureNativeAuthBridge().catch(() => {}), 1200);
+
+  // Google sign-in for Studio.
+  // On iOS (in-app webviews) popups often get cancelled, so we use redirect.
+  window.__studioSignInWithGoogle = async function __studioSignInWithGoogle() {
+    try {
+      console.log("⚡️ __studioSignInWithGoogle click", {
+        isIOS: isIOS(),
+        isCapacitorNative: isCapacitorNative()
+      });
+      showCustomAlert({
+        title: "Signing in",
+        message: isIOS() ? "Redirecting to Google sign-in…" : "Opening Google sign-in…",
+        tone: "info",
+        autoHideMs: 0
+      });
+
+      if (isIOS()) {
+        if (isCapacitorNative()) {
+          await ensureNativeAuthBridge();
+          const Browser = getBrowserPlugin();
+          console.log("⚡️ Browser plugin (Studio)", Browser);
+          if (Browser && typeof Browser.open === "function") {
+            console.log("⚡️ Using Capacitor Browser.open", { url: AUTH_URL });
+            await Browser.open({ url: AUTH_URL });
+            return;
+          }
+          console.log("⚡️ Browser.open unavailable; fallback -> index signInFromStudio flow");
+          window.location.href = "index.html?signInFromStudio=true";
+          return;
+        }
+        await signInWithRedirect(auth, provider);
+        return; // redirect will happen
+      }
+
+      const res = await signInWithPopup(auth, provider);
+      await applySignedInUser(res.user, { showSuccessAlert: true, source: "popup" });
+    } catch (err) {
+      console.error("Studio sign-in error:", err);
+      showCustomAlert({
+        title: "Sign-in failed",
+        message: err?.message ? String(err.message) : "Please try again.",
+        tone: "error"
+      });
+    }
+  };
+
+  window.__studioSignInWithApple = async function __studioSignInWithApple() {
+    try {
+      console.log("⚡️ __studioSignInWithApple click", { isIOS: isIOS(), isCapacitorNative: isCapacitorNative() });
+      showCustomAlert({ title: "Signing in", message: "Opening Apple sign-in…", tone: "info", autoHideMs: 0 });
+
+      if (isIOS() && isCapacitorNative()) {
+        await ensureNativeAuthBridge();
+        const Browser = getBrowserPlugin();
+        if (Browser && typeof Browser.open === "function") {
+          console.log("⚡️ Using Capacitor Browser.open for Apple", { url: APPLE_AUTH_URL });
+          await Browser.open({ url: APPLE_AUTH_URL });
+          return;
+        }
+      }
+
+      const res = await signInWithPopup(auth, appleProvider);
+      await applySignedInUser(res.user, { showSuccessAlert: true, source: "apple-popup" });
+    } catch (err) {
+      console.error("Studio Apple sign-in error:", err);
+      showCustomAlert({ title: "Sign-in failed", message: err?.message ? String(err.message) : "Please try again.", tone: "error" });
+    }
+  };
+
+  // If we arrived back from a redirect sign-in, finalize it here.
+  // Wrapped in a function to avoid top-level await issues on older iOS WebViews.
+  async function finalizeRedirectSignInIfNeeded() {
+    try {
+      const redirectResult = await getRedirectResult(auth);
+      if (redirectResult && redirectResult.user) {
+        await applySignedInUser(redirectResult.user, { showSuccessAlert: true, source: "redirect-result" });
+      }
+    } catch (e) {
+      console.warn("Redirect result handling error:", e);
+    }
+  }
+  finalizeRedirectSignInIfNeeded();
+
+  // Keep Studio state synced even if auth completes outside this exact code path.
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      console.log("🔐 Studio auth state: signed in", {
+        uid: user.uid,
+        email: user.email,
+        name: user.displayName
+      });
+      await applySignedInUser(user, { showSuccessAlert: false, source: "auth-state" });
+    } else {
+      console.log("🔐 Studio auth state: signed out");
+    }
+  });
+
+  function getSignedInEmail() {
+    const localEmail = localStorage.getItem("email");
+    if (localEmail) return localEmail;
+
+    const currentUserEmail = localStorage.getItem("CurrentUser");
+    if (currentUserEmail) {
+      localStorage.setItem("email", currentUserEmail);
+      console.log("ℹ️ Recovered email from CurrentUser:", currentUserEmail);
+      return currentUserEmail;
+    }
+
+    try {
+      const storedStudioUser = JSON.parse(localStorage.getItem("studioUserData") || "{}");
+      if (storedStudioUser && storedStudioUser.email) {
+        localStorage.setItem("email", storedStudioUser.email);
+        localStorage.setItem("CurrentUser", storedStudioUser.email);
+        if (storedStudioUser.fullName) {
+          localStorage.setItem("fullName", storedStudioUser.fullName);
+          localStorage.setItem("name", storedStudioUser.fullName);
+        }
+        console.log("ℹ️ Recovered email from studioUserData:", storedStudioUser.email);
+        return storedStudioUser.email;
+      }
+    } catch (_) {}
+    // Intentionally do not rely on auth.currentUser here.
+    // Upload gating should be driven by localStorage to stay consistent across index<->studio flows.
+    return "";
+  }
+
+  async function waitForAuthEmail(timeoutMs = 2000) {
+    // Fast path: if already present in auth, use it immediately.
+    const authEmail = auth.currentUser?.email || "";
+    if (authEmail) return authEmail;
+
+    // Otherwise wait briefly for auth state to settle.
+    return await new Promise((resolve) => {
+      let done = false;
+      const t = window.setTimeout(() => {
+        if (done) return;
+        done = true;
+        resolve("");
+      }, timeoutMs);
+
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (done) return;
+        const email = user?.email || "";
+        done = true;
+        window.clearTimeout(t);
+        unsubscribe();
+        resolve(email);
+      });
+    });
+  }
+
+  function hydrateStudioUserFromStorage() {
+    const email = localStorage.getItem("email") || localStorage.getItem("CurrentUser") || "";
+    const fullName = localStorage.getItem("fullName") || localStorage.getItem("name") || "";
+    const buttonName = fullName || email || "";
+    if (!buttonName) return;
+
+    const gcm = document.getElementById("gcm");
+    if (gcm) gcm.innerHTML = buttonName;
+
+    const signedInBox = document.getElementById("i-am-sign-in");
+    if (signedInBox) signedInBox.style.display = "block";
+
+    const progressName = fullName || (email ? email.split("@")[0] : "");
+    if (progressName && progressName !== lastProgressNameLoaded) {
+      lastProgressNameLoaded = progressName;
+      loadUserProgress(progressName);
+    }
+
+    console.log("ℹ️ Studio hydrated user from localStorage", { email, fullName });
+  }
+
+  function persistStudioAuthFromUrl() {
+    const qp = new URLSearchParams(window.location.search);
+    const studioEmail = qp.get("studioEmail") || "";
+    const studioName = qp.get("studioName") || "";
+    const studioUid = qp.get("studioUid") || "";
+    if (!studioEmail && !studioName) return;
+
+    const email = studioEmail || localStorage.getItem("email") || localStorage.getItem("CurrentUser") || "";
+    const name = studioName || localStorage.getItem("fullName") || localStorage.getItem("name") || "";
+    const emailKey = (email || "").replace(/[.#$[\]]/g, "_");
+
+    if (email) {
+      localStorage.setItem("email", email);
+      localStorage.setItem("CurrentUser", email);
+      localStorage.setItem("emailKey", emailKey);
+    }
+    if (name) {
+      localStorage.setItem("fullName", name);
+      localStorage.setItem("name", name);
+    }
+
+    const mergedUser = {
+      uid: studioUid || "",
+      email,
+      fullName: name,
+      name,
+      emailKey,
+      lastSignInAt: Date.now()
+    };
+    localStorage.setItem("studioUserData", JSON.stringify(mergedUser));
+    console.log("✅ Studio auth persisted from index redirect", mergedUser);
+  }
+
+  persistStudioAuthFromUrl();
+
+  const studioIsSignedIn = new URLSearchParams(window.location.search).get('studioIsSignedIn');
+  if (studioIsSignedIn) {
+    console.log("studio is signed in");
+    document.getElementById("i-am-sign-in").style.display = "none";
+  } else {
+    console.log("studio is not signed in");
+  }
+  hydrateStudioUserFromStorage();
+  window.addEventListener("pageshow", hydrateStudioUserFromStorage);
+  window.addEventListener("focus", hydrateStudioUserFromStorage);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) hydrateStudioUserFromStorage();
+  });
+  window.addEventListener("storage", hydrateStudioUserFromStorage);
+  // --- 0. REFERRAL (VIP featuring system) ---
+  processReferralURL();
+
+  // --- 1. DETECTION ---
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('ref') === "ARTISTSOFFEB26" || localStorage.getItem('ref_active') === 'true') {
+      localStorage.setItem('ref_active', 'true');
+      document.getElementById('campaignContainer').style.display = 'block';
+  }
+  if (params.get('by')) localStorage.setItem('pending_inviter', params.get('by'));
+
+  // --- 2. AUTH & PROGRESS ---
+
+
+  // --- 3. UPLOAD ---
+  document.getElementById("btn").onclick = async () => {
+    let email = getSignedInEmail();
+    if (!email) {
+      email = await waitForAuthEmail(2500);
+      if (email) {
+        // Persist + update UI/gated logic from Firebase auth state.
+        if (auth.currentUser) {
+          await applySignedInUser(auth.currentUser, { showSuccessAlert: false, source: "upload-auth-recovery" });
+        } else {
+          // Fallback: persist minimal values.
+          localStorage.setItem("email", email);
+          localStorage.setItem("CurrentUser", email);
+        }
+        console.log("✅ Studio upload: recovered email from auth.currentUser", { email });
+      }
+    }
+    const file = document.getElementById("fileInp").files[0];
+    const title = document.getElementById("title").value.trim();
+    const artist = document.getElementById("artist").value.trim();
+    const album = document.getElementById("album").value.trim();
+
+    if (!email) {
+      console.log("⚡️ Upload blocked: no signed-in email", {
+        localEmail: localStorage.getItem("email"),
+        currentUser: localStorage.getItem("CurrentUser")
+      });
+      showCustomAlert({
+        title: "Sign in required",
+        message: "Please click the profile login button on the home page (index), sign in with Google, then return to Studio to upload your song.",
+        tone: "error",
+        okText: "Go to Login",
+        onOk: () => {
+          localStorage.setItem("studioSignInFlow", "true");
+          window.location.href = "index.html?signInFromStudio=true";
+        }
+      });
+      return;
+    }
+    if (!title || !artist || !album) {
+      showCustomAlert({ title: "Missing details", message: "Please fill in all fields (Title, Artist, Album)!", tone: "error" });
+      return;
+    }
+    if (!file) {
+      showCustomAlert({ title: "File missing", message: "Please select an audio file to upload!", tone: "error" });
+      return;
+    }
+    if (!document.getElementById("agreement").checked) {
+      showCustomAlert({ title: "Agreement required", message: "Please check the box to confirm you own this music!", tone: "error" });
+      return;
+    }
+
+    // Hide success message if visible, show loading
+    document.getElementById("ooaa").style.visibility = "hidden";
+    document.getElementById("alertBox").style.visibility = "visible";
+    document.getElementById("alertBox").innerHTML = "<h2>⏳ Uploading your song...</h2>";
+
+    try {
+      console.log("File size: " + (file.size / 1024 / 1024).toFixed(2) + " MB");
+
+      // Upload file to storage
+      const path = `${album}/${title}/${artist}/${file.name}`;
+      document.getElementById("alertBox").innerHTML = "<h2>⏳ Uploading file to storage...</h2>";
+      const snap = await uploadBytes(ref(storage, path), file);
+      const url = await getDownloadURL(snap.ref);
+      console.log("File uploaded to:", url);
+
+      // Save song data to database
+      document.getElementById("alertBox").innerHTML = "<h2>⏳ Saving song information...</h2>";
+      const songData = {
+        album: album,
+        artist: artist,
+        title: title,
+        fileInp: url,
+        uploader: email,
+        campaign: "ARTISTSOFFEB26",
+        createdAt: Date.now()
+      };
+      const dbPath = `SONGS/${title}/${album}/${artist}`;
+      await update(ref2(db, dbPath), songData);
+      console.log("✅ Song data saved to database at:", dbPath);
+
+      // Firestore referral system – increment songCount & check eligibility
+      try {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          await onSongUploaded(currentUser.uid, title);
+        }
+      } catch (e) { console.warn("Referral system:", e); }
+      console.log("📦 Song data:", songData);
+
+      // Success!
+      document.getElementById("alertBox").style.visibility = "hidden";
+      document.getElementById("ooaa").style.visibility = "visible";
+      document.getElementById("ooaa").innerHTML = "<h2>✅ Success! Your song has been uploaded and will appear on the main page shortly.</h2>";
+      jsConfetti.addConfetti();
+
+      // Reset form
+      document.getElementById("uploadForm").reset();
+      document.getElementById("fileInp").value = "";
+      document.getElementById("uploadMain").textContent = "🎵 Drag & Drop Your Audio Here";
+      document.getElementById("uploadSub").textContent = "or click to upload (.mp3 only)";
+      document.getElementById("dropArea").classList.remove("file-selected");
+      document.getElementById("agreement").checked = false;
+
+      // Hide success message after 5 seconds
+      setTimeout(() => {
+        document.getElementById("ooaa").style.visibility = "hidden";
+      }, 5000);
+
+    } catch (err) {
+      console.error("Upload error:", err);
+      document.getElementById("alertBox").style.visibility = "hidden";
+      showCustomAlert({
+        title: "Upload failed",
+        message: err?.message ? String(err.message) : "Unknown error. Please try again.",
+        tone: "error"
+      });
+    }
+  };
+
+  // Campaign progress UI (VIP featuring system)
+  // Loads referral count for this user and unlocks the success box when ready.
+  function loadUserProgress(name) {
+    const cleanName = (name || "").replace(/\s+/g, '_');
+    const rawEmail = localStorage.getItem("email");
+    const safeEmail = rawEmail ? rawEmail.replace(/\./g, ',') : '';
+
+    const shareInput = document.getElementById('shareLinkInput');
+    if (shareInput) {
+      shareInput.value = `${window.location.origin}${window.location.pathname}?ref=ARTISTSOFFEB26&by=${encodeURIComponent(cleanName)}`;
+    }
+
+    const countRef = ref2(db, 'referralCounts/' + cleanName);
+    onValue(countRef, async (snap) => {
+      const count = snap.val()?.count || 0;
+
+      const countTextEl = document.getElementById('countText');
+      if (countTextEl) countTextEl.innerText = `${count} / 1 Artist Joined`;
+
+      const bar = document.getElementById('progressBarStatus');
+      if (bar) bar.style.width = (count >= 1 ? 100 : 0) + "%";
+
+      const unlockMsg = document.getElementById('unlockMsg');
+      if (unlockMsg) unlockMsg.style.display = (count >= 1 ? 'block' : 'none');
+
+      if (count >= 1 && localStorage.getItem('rewardNotified') !== 'true') {
+        const vipBox = document.getElementById('vipSuccessBox');
+        if (vipBox) vipBox.style.display = 'block';
+
+        if (safeEmail) {
+          await update(ref2(db, 'users/' + safeEmail), { eligibility: "3_MONTH_FEATURE" });
+        }
+
+        jsConfetti.addConfetti({ emojis: ['🎉', '🚀', '🔥'] });
+        localStorage.setItem('rewardNotified', 'true');
+      }
+    });
+  }
+
+  document.getElementById("copyBtn").onclick = () => {
+    const copyText = document.getElementById("shareLinkInput");
+    copyText.select();
+    navigator.clipboard.writeText(copyText.value);
+    showCustomAlert({ title: "Copied!", message: "Share it with 1 person to unlock your reward.", tone: "success", autoHideMs: 3500 });
+  };
+
+  if(localStorage.getItem("fullName")) {
+      hydrateStudioUserFromStorage();
+  }
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+
+const boostBtn = document.getElementById("boostBtn");
+
+async function cleanupExpiredBoosts() {
+  const snapshot = await get(ref2(db, "boostSongs"));
+  if (!snapshot.exists()) return;
+
+  const boosts = snapshot.val();
+  const now = Date.now();
+  const oneHour = 60 * 60 * 1000;
+
+  for (const id in boosts) {
+    const boost = boosts[id];
+
+    if (
+      boost.status === "pending_payment" &&
+      boost.paid !== true &&
+      now - boost.createdAt > oneHour
+    ) {
+      await remove(ref2(db, "boostSongs/" + id));
+      console.log("Deleted expired boost:", id);
+    }
+  }
+}
+
+  boostBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  let email = getSignedInEmail();
+  if (!email) {
+    email = await waitForAuthEmail(2500);
+    if (email) {
+      if (auth.currentUser) {
+        await applySignedInUser(auth.currentUser, { showSuccessAlert: false, source: "boost-upload-auth-recovery" });
+      } else {
+        localStorage.setItem("email", email);
+        localStorage.setItem("CurrentUser", email);
+      }
+      console.log("✅ Studio boost upload: recovered email from auth.currentUser", { email });
+    }
+  }
+  const file = document.getElementById("boostFileInp").files[0];
+
+  if (!email || !file) {
+    showCustomAlert({
+      title: "Sign in required",
+      message: "Please click the profile login button on the home page (index), sign in with Google, then return to Studio to upload your boost.",
+      tone: "error",
+      okText: "Go to Login",
+      onOk: () => {
+        localStorage.setItem("studioSignInFlow", "true");
+        window.location.href = "index.html?signInFromStudio=true";
+      }
+    });
+    return;
+  }
+
+  document.getElementById("alertBox").style.visibility = "visible";
+
+  try {
+
+    await cleanupExpiredBoosts();
+
+    const boostId = "boost_" + Date.now();
+
+    const title = document.getElementById("BoostTitle").value.trim();
+    const artist = document.getElementById("BoostArtist").value.trim();
+    const album = document.getElementById("BoostAlbum").value.trim();
+    const linkToArtist = document.getElementById("linkToArtist").value.trim();
+    const linkToSong = document.getElementById("linkToSong").value.trim();
+    const linkToAlbum = document.getElementById("linkToAlbum").value.trim();
+
+    const path = `boostUploads/${email}/${boostId}_${file.name}`;
+
+    const snap = await uploadBytes(ref(storage, path), file);
+    const url = await getDownloadURL(snap.ref);
+
+    await update(ref2(db, "boostSongs/" + boostId), {
+      BoostFileInp: url,
+      uploader: email,
+      campaign: "ARTISTSOFFEB26",
+      linkToArtist,
+      linkToSong,
+      linkToAlbum,
+      BoostTitle: title,
+      BoostArtist: artist,
+      BoostAlbum: album,
+      status: "pending_payment",
+      paid: false,
+      createdAt: Date.now()
+    });
+
+    localStorage.setItem("pendingBoostId", boostId);
+
+    window.location.href = "https://buy.stripe.com/bJe14nbpWfuV81idk7gQE04";
+
+  } catch (err) {
+    console.error(err);
+    showCustomAlert({ title: "Boost failed", message: "Upload failed. Please try again.", tone: "error" });
+    document.getElementById("alertBox").style.visibility = "hidden";
+  }
+});
+  });
+
+
+</script>
+<!-- Mobile bottom nav -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<nav class="mobile-nav">
+  <a href="index.html" class="mobile-nav-item"><span class="material-symbols-outlined">home</span><span>Home</span></a>
+  <a href="lively.html" class="mobile-nav-item"><span class="material-symbols-outlined">mic</span><span>Concerts</span></a>
+  <a href="studio.html" class="mobile-nav-item mobile-nav-active"><span class="material-symbols-outlined">upload</span><span>Upload</span></a>
+  <a href="pat.html" class="mobile-nav-item"><span class="material-symbols-outlined">queue_music</span><span>Playlist</span></a>
+</nav>
+<style>
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;width:100%;z-index:10000;background:#0a0a0a;border-top:1px solid rgba(255,127,80,0.25);padding:6px 0 max(6px,env(safe-area-inset-bottom));justify-content:space-around;align-items:center}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:rgba(255,255,255,0.5);font-family:'Poppins',sans-serif;font-size:11px;font-weight:500;padding:4px 12px;border-radius:10px;transition:color .2s,background .2s}
+.mobile-nav-item .material-symbols-outlined{font-size:24px}
+.mobile-nav-item:hover,.mobile-nav-item.mobile-nav-active{color:#ff7f50}
+.mobile-nav-item.mobile-nav-active{background:rgba(255,127,80,0.1)}
+@media(max-width:768px){.mobile-nav{display:flex}}
+</style>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="profileTitle"></title>
+</head>
+<body>
+  <style>
+    body{
+      background-color: #000;
+    }
+
+    #fpf{
+      position: absolute;
+      top: 20px;
+      right: 610px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
+  </style>
+  <center>
+    <font face="Montserrat" color="coral"><h1 id="fn"></h1></font>
+    <input type="file" id="filePfp" accept="image" style="display: none;" max="1"/>
+    <font face="Montserrat" color="coral"><h3 id="pfpLabel" style="display: none;"> Choose a Profile Picture</h3></font>
+    </center>   <input type="image" id="fpf" src="user-icon-on-transparent-background-free-png.webp"></img>
+    <script>
+var pfp = localStorage.getItem("pfp");
+if (pfp) {
+  document.getElementById("fpf").src = pfp;
+} else {
+  document.getElementById("fpf").src = "user-icon-on-transparent-background-free-png.webp"; // or any placeholder image you have
+}
+
+document.getElementById("fpf").addEventListener('click', ()=>{
+  document.getElementById("filePfp").style.display = "block";
+  document.getElementById("pfpLabel").style.display = "block";
+  var files = document.getElementById("filePfp").files[0];
+  localStorage.getItem("pfp", files);
+  document.getElementById('filePfp').addEventListener('change', ()=>{
+    console.log(files)
+  })
+  console.log('hehe');
+
+
+
+})
+
+var fullName = localStorage.getItem("fullName");
+document.getElementById("fn").innerHTML = fullName;
+// If no full name is found (user is not logged in), redirect to login page
+if (fullName === null) {
+  window.location.href = "index.html"; // Redirect to login page if no full name found
+} else {
+  // Display full name in the profile title
+  document.getElementById("profileTitle").innerHTML = fullName;
+}
+
+
+    </script>
+    
+</body>
+</html>

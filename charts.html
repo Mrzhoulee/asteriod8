@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asteroid Charts – Top VIP Artists</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --coral: #ff7f50;
+      --coral-dark: #ff6347;
+      --bg-dark: #0a0a0f;
+      --card-bg: #1a1a22;
+      --text: #ffffff;
+      --text-muted: rgba(255,255,255,0.7);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--coral), var(--coral-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1.75rem;
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+    .chart-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .chart-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .chart-rank {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--coral), var(--coral-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .chart-rank.gold { background: linear-gradient(135deg, #ffd700, #ffb700); }
+    .chart-rank.silver { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); }
+    .chart-rank.bronze { background: linear-gradient(135deg, #cd7f32, #b87333); }
+    .chart-info {
+      flex: 1;
+    }
+    .chart-name {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+    .chart-refs {
+      font-size: 0.85rem;
+      color: var(--coral);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    .link-row {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    .link-row a {
+      color: var(--coral);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-trophy"></i> Asteroid Charts</h1>
+    <p class="subtitle">Top VIP artists by referrals</p>
+
+    <div id="chartList" class="chart-list"></div>
+    <div id="emptyState" class="empty-state" style="display:none;">
+      <i class="fas fa-music"></i>
+      <p>No VIP artists yet. Be the first to climb the charts!</p>
+    </div>
+
+    <div class="link-row">
+      <a href="vip-dashboard.html"><i class="fas fa-crown"></i> VIP Dashboard</a> &nbsp;|&nbsp;
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { subscribeToTopVipArtists } from "./js/referral-system.js";
+
+    const chartList = document.getElementById("chartList");
+    const emptyState = document.getElementById("emptyState");
+
+    subscribeToTopVipArtists(50, (artists) => {
+      if (!artists || artists.length === 0) {
+        chartList.innerHTML = "";
+        emptyState.style.display = "block";
+        return;
+      }
+
+      emptyState.style.display = "none";
+      chartList.innerHTML = artists.map((a, i) => {
+        const rank = i + 1;
+        let rankClass = "";
+        if (rank === 1) rankClass = "gold";
+        else if (rank === 2) rankClass = "silver";
+        else if (rank === 3) rankClass = "bronze";
+
+        return `
+          <div class="chart-item">
+            <div class="chart-rank ${rankClass}">${rank}</div>
+            <div class="chart-info">
+              <div class="chart-name">${escapeHtml(a.username || "Artist")}</div>
+              <div class="chart-refs">${a.referralCount || 0} referral${(a.referralCount || 0) !== 1 ? "s" : ""}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    });
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

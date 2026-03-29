@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+    <style>
+        .message {
+            position: fixed;
+            bottom: 0px;
+        }
+
+
+        #textarea {
+            width: 1000px;
+            height: auto;
+            background: linear-gradient(2deg, coral, lightcoral);
+        }
+
+        body{
+            background-color: antiquewhite;
+        }
+    </style>
+
+    <center>
+        <font face="Montserrat">
+            <b>
+    <div id="textarea"></div>
+    </b>
+    </font>
+    </center>
+
+
+
+  <center>
+        <div style="position: fixed; bottom: 10px; width: 170px; height: 40px; ">
+        <input type="text" name="" id="message" class="message" value=""/>
+        <button id="send-btn" type="button" class="message"><i class="fa fa-send-o"></i></button>
+        <h3 id="alertSystem" class="message"></h3>
+    </div>
+</center>
+
+    
+
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyDA66SguZ-8xkt4Ocab9W-aja_QYhEmJbM",
+            authDomain: "asteroid-cdc13.firebaseapp.com",
+            databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+            projectId: "asteroid-cdc13",
+            storageBucket: "asteroid-cdc13.appspot.com",
+            messagingSenderId: "793353824502",
+            appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+            measurementId: "G-GV72TMNNGR"
+        };
+        const currentUser = localStorage.getItem("currentName");
+        const app = initializeApp(firebaseConfig);
+
+        // Initialize Firebase
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+        let chatName = prompt("Enter your name:");
+
+        onValue(ref(db, "message"), (snapshot)=>{
+                let textarea = document.getElementById("textarea")
+                textarea.innerHTML = ""
+                Object.values(snapshot.val()).forEach(item=>{
+                    textarea.innerHTML += "<p>" + item + "</p>" ;
+                })
+            })
+
+
+        // Prevents form submission
+        import { getDatabase, ref, child, push, update, onValue} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        document.getElementById("send-btn").addEventListener('click', function (event) {
+
+
+
+
+
+            var message = document.getElementById("message").value;
+            let obj = {}
+            onValue(ref(db, "message"), (snapshot)=>{
+                
+              obj['message'] = snapshot.val()
+              obj['message'][new Date().getTime()] = chatName + ":" + message;
+            update(ref(db), obj)
+              
+              
+            }, {
+                onlyOnce: true
+            }
+        ) 
+
+            document.getElementById("message").value = " ";
+        });
+
+        onValue(ref(db, "message"),(snapshot)=>{
+            console.log(snapshot.val())
+        })
+    </script>
+</body>
+
+</html>

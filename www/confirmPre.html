@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
+        import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+        import { getDatabase, ref as ref2, update, get, set } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+        import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
+console.log('1050')
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+            authDomain: "asteroid-cdc13.firebaseapp.com",
+            databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+            projectId: "asteroid-cdc13",
+            storageBucket: "asteroid-cdc13.appspot.com",
+            messagingSenderId: "793353824502",
+            appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+            measurementId: "G-GV72TMNNGR"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: "select_account" });
+
+        const sanitizeEmail = (email) => (email || "").replace(/[.#$[\]]/g, '_');
+
+        // Warn the user if they try to close the page with an incomplete profile form
+        function attachProfileUnloadWarning() {
+          window.onbeforeunload = function (e) {
+            e = e || window.event;
+            // For modern browsers
+            if (e) {
+              e.returnValue = "Your artist profile is not saved yet. Are you sure you want to leave?";
+            }
+            // For older browsers
+            return "Your artist profile is not saved yet. Are you sure you want to leave?";
+          };
+        }
+
+        function clearProfileUnloadWarning() {
+          window.onbeforeunload = null;
+        }
+
+        // Global createProfile used by the "Create Profile" button
+        window.createProfile = async function () {
+          const user = auth.currentUser;
+          if (!user) {
+            alert("Please sign in again to continue.");
+            window.location.href = "index.html";
+            return;
+          }
+
+          const emailKey = sanitizeEmail(user.email);
+
+          // Keep localStorage in sync for the rest of the app
+          localStorage.setItem("email", user.email || "");
+          localStorage.setItem("CurrentUser", user.email || "");
+          localStorage.setItem("fullName", user.displayName || "");
+          localStorage.setItem("emailKey", emailKey);
+          localStorage.setItem("artemail", user.email || "");
+
+          // Get form values
+          const nickname   = document.getElementById("nickname").value || null;
+          const instagram  = document.getElementById("instagram").value || null;
+          const youtube    = document.getElementById("youtube").value || null;
+          const soundcloud = document.getElementById("soundcloud").value || null;
+          const spotify    = document.getElementById("spotify").value || null;
+          const applemusic = document.getElementById("applemusic").value || null;
+
+          // Hide profile form
+          document.getElementById("profileCreate").style.display = "none";
+          clearProfileUnloadWarning();
+
+          // Show loader
+          const loader = document.getElementById('loader');
+          if (loader) {
+            loader.innerHTML = `
+              <div style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; color:black; padding:30px; border-radius:10px; font-size:18px; z-index:1000; text-align:center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px auto;"></div>
+                <div>Getting Things ready for you</div>
+              </div>
+              <style>
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              </style>
+            `;
+            loader.style.display = 'block';
+          }
+
+          try {
+            // Save profile in Firebase (no localStorage needed for server state)
+            await set(ref2(database, 'PROFILES/' + emailKey), {
+              nickname,
+              instagram,
+              youtube,
+              soundcloud,
+              spotify,
+              applemusic,
+              createdAt: new Date().toISOString()
+            });
+
+            // Mark ITG=true for this user
+            await update(ref2(database, 'PREMIUM/' + emailKey), {
+              ITG: true
+            });
+
+            window.location.href = "ArtistDashboard.html";
+          } catch (err) {
+            console.error("Error creating profile / updating premium:", err);
+            alert("Something went wrong saving your profile. Please try again.");
+            if (loader) {
+              loader.style.display = 'none';
+              loader.innerHTML = '';
+            }
+          }
+        };
+
+        // Helper to show/hide the Google sign‑in prompt
+        function showSignInPrompt() {
+          const overlay = document.getElementById("signinOverlay");
+          if (overlay) overlay.style.display = "flex";
+        }
+
+        function hideSignInPrompt() {
+          const overlay = document.getElementById("signinOverlay");
+          if (overlay) overlay.style.display = "none";
+        }
+
+        // Expose sign‑in handler globally for the button
+        window.handleGoogleSignIn = async function () {
+          try {
+            await signInWithPopup(auth, provider);
+            // onAuthStateChanged will fire and continue the flow
+          } catch (err) {
+            console.error("Error during Google sign-in:", err);
+            alert("Unable to sign in with Google right now. Please try again.");
+          }
+        };
+
+        // On load, check Firebase Auth instead of localStorage
+        onAuthStateChanged(auth, async (user) => {
+          if (!user) {
+            // Not signed in: show a nice Google sign‑in prompt
+            showSignInPrompt();
+            return;
+          }
+
+          hideSignInPrompt();
+
+          const emailKey = sanitizeEmail(user.email);
+
+          // Keep localStorage in sync whenever we detect a signed‑in user here
+          localStorage.setItem("email", user.email || "");
+          localStorage.setItem("CurrentUser", user.email || "");
+          localStorage.setItem("fullName", user.displayName || "");
+          localStorage.setItem("emailKey", emailKey);
+          localStorage.setItem("artemail", user.email || "");
+
+          const profileRef = ref2(database, 'PROFILES/' + emailKey);
+          const premiumRef = ref2(database, 'PREMIUM/' + emailKey);
+
+          try {
+            const snapshot = await get(profileRef);
+            const existingProfile = snapshot.exists() ? snapshot.val() : null;
+
+            const profileCreate = document.getElementById("profileCreate");
+            const ovProfileCreate = document.getElementById("ovProfileCreate");
+
+            // Always hide the profile form first, then show it only if needed
+            if (profileCreate) profileCreate.style.display = "none";
+            if (ovProfileCreate) ovProfileCreate.style.display = "none";
+            clearProfileUnloadWarning();
+
+            if (!existingProfile) {
+              // New artist: show the profile creation form and protect against accidental closing
+              console.log("No existing profile found, showing profile creation form");
+              if (profileCreate) profileCreate.style.display = "block";
+              if (ovProfileCreate) ovProfileCreate.style.display = "block";
+              attachProfileUnloadWarning();
+            } else {
+              // Returning artist: ensure PREMIUM.ITG is true and show a welcome‑back popup
+              console.log("Existing profile found, skipping profile creation form");
+              
+              // Explicitly ensure profile form stays hidden
+              if (profileCreate) profileCreate.style.display = "none";
+              if (ovProfileCreate) ovProfileCreate.style.display = "none";
+              
+              try {
+                await update(premiumRef, { ITG: true });
+              } catch (e) {
+                console.error("Error updating PREMIUM.ITG for returning artist:", e);
+              }
+
+              clearProfileUnloadWarning();
+
+              const welcomeOverlay = document.getElementById("welcomeBackOverlay");
+              const welcomeNameEl = document.getElementById("welcomeBackName");
+
+              const displayName =
+                existingProfile.nickname ||
+                user.displayName ||
+                user.email ||
+                "Artist";
+
+              if (welcomeNameEl) {
+                welcomeNameEl.textContent = displayName;
+              }
+              if (welcomeOverlay) {
+                welcomeOverlay.style.display = "flex";
+              }
+
+              // Optional: auto‑redirect after a short delay
+              setTimeout(() => {
+                window.location.href = "ArtistDashboard.html";
+              }, 1800);
+            }
+          } catch (err) {
+            console.error("Error checking profile / updating premium:", err);
+            // On error, hide the form to be safe
+            const profileCreate = document.getElementById("profileCreate");
+            const ovProfileCreate = document.getElementById("ovProfileCreate");
+            if (profileCreate) profileCreate.style.display = "none";
+            if (ovProfileCreate) ovProfileCreate.style.display = "none";
+            alert("Unable to contact the server right now. Please try again later.");
+          }
+        });
+    </script>
+</head>
+<body>
+    <!-- Loader container used by createProfile() -->
+    <div id="loader" style="display:none;"></div>
+
+    <!-- Google sign-in prompt shown when user is not authenticated -->
+    <div id="signinOverlay" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.8); z-index:1500; align-items:center; justify-content:center;">
+      <div style="background:#020617; color:#e5e7eb; padding:26px 28px; border-radius:18px; width:90%; max-width:380px; box-shadow:0 20px 45px rgba(15,23,42,0.7); font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; text-align:left;">
+        <h2 style="margin:0 0 8px; font-size:20px; font-weight:600; color:#f9fafb;">Sign in to continue</h2>
+        <p style="margin:0 0 18px; font-size:13px; color:#9ca3af;">
+          Use your Google account to unlock your Asteroid Artist Dashboard and create your profile.
+        </p>
+        <button onclick="handleGoogleSignIn()" style="width:100%; padding:10px 16px; border-radius:999px; border:none; background:white; color:#111827; font-size:14px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+          <span style="font-size:16px;">🔑</span>
+          <span>Continue with Google</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Welcome back popup for returning artists -->
+    <div id="welcomeBackOverlay" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.8); z-index:1600; align-items:center; justify-content:center;">
+      <div style="background:#020617; color:#e5e7eb; padding:26px 30px; border-radius:18px; width:90%; max-width:380px; box-shadow:0 20px 45px rgba(15,23,42,0.7); font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; text-align:left;">
+        <h2 style="margin:0 0 6px; font-size:20px; font-weight:600; color:#f9fafb;">Welcome back,</h2>
+        <p id="welcomeBackName" style="margin:0 0 14px; font-size:18px; font-weight:600; color:#f97316;"></p>
+        <p style="margin:0 0 18px; font-size:13px; color:#9ca3af;">
+          Taking you to your VIP Asteroid Artist Dashboard...
+        </p>
+        <a href="ArtistDashboard.html" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:9px 16px; border-radius:999px; background:linear-gradient(135deg,#fb7185,#f97316); color:#0f172a; font-size:13px; font-weight:600; text-decoration:none; cursor:pointer;">
+          <span>Go to Dashboard now</span>
+        </a>
+      </div>
+    </div>
+    <div id="profileCreate" style="display:none;">
+        <div id="ovProfileCreate" style="display:none; position:fixed; top:50%; left:50%; 
+        transform:translate(-50%, -50%); background:white; padding:20px; border:1px solid black; width: 1000px; height: 520px;display:none;
+        width: 1000px;
+        height: 520px;
+        color: white;
+        background: black;
+        border: 1px solid white;
+        padding: 10px;
+        overflow-y: auto;  /* vertical scroll if content is too tall */">
+        <center>
+          <h1>Create Your Profile</h1>
+          <br>
+          <br>
+          <br>
+          <input type="text" id="nickname" placeholder="Artist Nickname" required>
+          <br>
+          <br>
+          <br>
+          <input type="text" id="instagram" placeholder="Instagram profile link">
+          <br>
+          <br>
+          <br>
+          <input type="text" id="youtube" placeholder="Youtube profile link">
+          <br>
+          <br>
+          <br>
+          <input type="text" id="soundcloud" placeholder="Soundcloud profile link">
+          <br>
+          <br>
+          <br>
+          <input type="text" id="spotify" placeholder="Spotify profile link">
+          <br>
+          <br>
+          <br>
+          <button onclick="createProfile()">Create Profile</button>
+          <input type="text" id="applemusic" placeholder="Apple Music profile link">
+          <br>
+          <br>
+          <br>
+        </center>
+      </div>
+      </div>
+</body>
+</html>

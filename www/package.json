@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "@capacitor/app": "^8.0.1",
+    "@capacitor/browser": "^8.0.1",
+    "@capacitor/cli": "^8.1.0",
+    "@capacitor/core": "^8.1.0",
+    "@capacitor/ios": "^8.1.0",
+    "nodemailer": "^8.0.1"
+  },
+  "name": "asteriod8-main",
+  "version": "1.0.0",
+  "description": "This is a web that allows you to listen to popular artist-songs!",
+  "main": "Sketch.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "copy:www": "node scripts/copy-to-www.js",
+    "cap:sync": "npm run copy:www && npx cap sync ios"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
