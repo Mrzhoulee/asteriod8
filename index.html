@@ -1576,7 +1576,14 @@
               localStorage.setItem("artemail", artemail);
 
               // Update Firebase Realtime Database
-              const userEmail = localStorage.getItem("CurrentUser") || localStorage.getItem("email");
+              const userEmail =
+                localStorage.getItem("CurrentUser") ||
+                localStorage.getItem("email") ||
+                (window.firebaseAuth && window.firebaseAuth.currentUser
+                  ? (window.firebaseAuth.currentUser.email ||
+                      window.firebaseAuth.currentUser.providerData[0]?.email ||
+                      window.firebaseAuth.currentUser.uid)
+                  : "");
               if (userEmail) {
                 window.firebaseUpdate(window.firebaseRef(window.firebaseDatabase, 'PROFILES/' + userEmail.replace(/[.#$[\]]/g, '_')), {
                   nickname: nickname,
@@ -2749,13 +2756,16 @@ onAuthStateChanged(auth, (user) => {
       gcd.innerText = name;
     }
 
-    // Keep localStorage in sync for rest of the app
-    const email = user.email || "";
-    const emailKey = (email || "").replace(/[.#$[\]]/g, "_");
-    localStorage.setItem("email", email);
-    localStorage.setItem("CurrentUser", email);
-    localStorage.setItem("fullName", user.displayName || "");
+    // Keep localStorage in sync (Apple often has no user.email — use provider email or uid)
+    const accountId = (user.email || user.providerData[0]?.email || user.uid || "").trim();
+    const emailKey = (accountId || "").replace(/[.#$[\]]/g, "_");
+    localStorage.setItem("email", accountId);
+    localStorage.setItem("CurrentUser", accountId);
+    localStorage.setItem("fullName", user.displayName || localStorage.getItem("fullName") || "");
     localStorage.setItem("emailKey", emailKey);
+    localStorage.setItem("hasLoggedInWithGoogle", "true");
+    if (user.photoURL) localStorage.setItem("pfp", user.photoURL);
+    console.log("[index] onAuthStateChanged: signed in as", accountId, "provider:", user.providerData[0]?.providerId);
 
     // Check if this user is a premium artist (PREMIUM/<emailKey>.ITG == true / "true")
     const premiumRef = ref2(database, "PREMIUM/" + emailKey);
@@ -3272,9 +3282,10 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
           async function handleGoogleSignInSuccess(result, hadPreviousUser) {
             const user = result.user;
             console.log("google-sign-in-clicked", user);
+            const accountId = (user.email || user.providerData[0]?.email || user.uid || "").trim();
             localStorage.setItem("hasLoggedInWithGoogle", "true");
-            localStorage.setItem("email", user["email"] || "");
-            localStorage.setItem("CurrentUser", user["email"] || "");
+            localStorage.setItem("email", accountId);
+            localStorage.setItem("CurrentUser", accountId);
             localStorage.setItem("fullName", user["displayName"] || "");
             localStorage.setItem("pfp", user.photoURL || user.imageUrl || "");
             var fullName = user.displayName || localStorage.getItem("fullName") || "";
@@ -3285,7 +3296,8 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             if (profileCreate) profileCreate.style.display = "none";
             if (ovProfileCreate) ovProfileCreate.style.display = "none";
             const sanitizeEmail = (email) => (email || "").replace(/[.#$[\]]/g, '_');
-            const emailKey = sanitizeEmail(user.email);
+            const emailKey = sanitizeEmail(accountId);
+            localStorage.setItem("emailKey", (accountId || "").replace(/[.#$[\]]/g, "_"));
             const profileRef = ref2(database, 'PROFILES/' + emailKey);
             try {
               const snapshot = await get(profileRef);
@@ -3334,17 +3346,18 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             const uid = params.get("uid") || "";
             const photo = params.get("photo") || "";
             console.log("⚡️ Apple sign-in user info (index):", { email, fullName, uid });
-            if (email) {
-              localStorage.setItem("email", email);
-              localStorage.setItem("CurrentUser", email);
+            const appleAccountId = (email || uid || "").trim();
+            if (appleAccountId) {
+              localStorage.setItem("email", appleAccountId);
+              localStorage.setItem("CurrentUser", appleAccountId);
               localStorage.setItem("fullName", fullName);
               localStorage.setItem("name", fullName);
               localStorage.setItem("hasLoggedInWithGoogle", "true");
               localStorage.setItem("pfp", photo);
-              const emailKey = (email || "").replace(/[.#$[\]]/g, "_");
+              const emailKey = (appleAccountId || "").replace(/[.#$[\]]/g, "_");
               localStorage.setItem("emailKey", emailKey);
               const gcd = document.getElementById("gcd");
-              if (gcd) { gcd.innerHTML = fullName || email; gcd.innerText = fullName || email; }
+              if (gcd) { gcd.innerHTML = fullName || appleAccountId; gcd.innerText = fullName || appleAccountId; }
             }
           }
           (async function setupCapacitorAuth() {
@@ -3411,6 +3424,14 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
                       "Sign in with Apple is not enabled for this app in Firebase.\n\n" +
                         "Open Firebase Console → Authentication → Sign-in method → Apple → Enable, " +
                         "and complete Apple’s Services ID / key setup. Add your site to Authorized domains."
+                    );
+                  } else if (error) {
+                    alert(
+                      "Could not start Apple sign-in.\n\n" +
+                        "A 403 on Apple’s page usually means Return URL / domain mismatch:\n" +
+                        "Apple Developer → Services ID → Sign in with Apple → Return URLs must include exactly:\n" +
+                        "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
+                        "Web domains must include your live hostname (e.g. asteroid8.net and www.asteroid8.net)."
                     );
                   }
                 });

@@ -408,7 +408,7 @@
 <script type="module">
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
   import { getDatabase, ref as ref2, update, get, onValue, increment, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
   import { processReferralURL, createOrUpdateUserOnSignup, getReferralFromURL, onSongUploaded } from "./js/referral-system.js";
 
@@ -432,6 +432,35 @@
   appleProvider.addScope("name");
   const jsConfetti = new JSConfetti();
 
+  function syncAuthUserToLocalStorage(user) {
+    if (!user) return;
+    const id = (user.email || user.providerData[0]?.email || user.uid || "").trim();
+    if (id) {
+      localStorage.setItem("email", id);
+      localStorage.setItem("CurrentUser", id);
+      localStorage.setItem("emailKey", id.replace(/[.#$[\]]/g, "_"));
+      localStorage.setItem("hasLoggedInWithGoogle", "true");
+      if (user.displayName) localStorage.setItem("fullName", user.displayName);
+      if (user.photoURL) localStorage.setItem("pfp", user.photoURL);
+
+      const gcm = document.getElementById("gcm");
+      if (gcm && (!gcm.textContent || /sign in/i.test(gcm.textContent))) {
+        gcm.textContent = user.displayName || id;
+      }
+      const appleLabel = document.getElementById("apple-sign-in-label");
+      if (appleLabel && (!appleLabel.textContent || /sign in/i.test(appleLabel.textContent))) {
+        appleLabel.textContent = user.displayName || id;
+      }
+    }
+  }
+  onAuthStateChanged(auth, (user) => {
+    syncAuthUserToLocalStorage(user);
+    if (user) {
+      console.log("[studio] onAuthStateChanged: signed in as", user.email || user.uid);
+    }
+  });
+  if (auth.currentUser) syncAuthUserToLocalStorage(auth.currentUser);
+
   // --- 0. REFERRAL (VIP featuring system) ---
   processReferralURL();
 
@@ -454,11 +483,20 @@
     } catch (e) { console.warn("Referral system:", e); }
     const inviter = localStorage.getItem('pending_inviter');
 
-    localStorage.setItem("email", emailForStorage || user.uid);
+    const storedId = emailForStorage || user.uid;
+    localStorage.setItem("email", storedId);
+    localStorage.setItem("CurrentUser", storedId);
     localStorage.setItem("fullName", user.displayName || "");
-    document.getElementById("gcm").innerHTML = user.displayName || emailForStorage || "Signed in";
+    localStorage.setItem("hasLoggedInWithGoogle", "true");
+    localStorage.setItem("pfp", user.photoURL || "");
+    localStorage.setItem("emailKey", storedId.replace(/[.#$[\]]/g, "_"));
+
+    const displayLabel = user.displayName || emailForStorage || "Signed in";
+    document.getElementById("gcm").innerHTML = displayLabel;
     const appleLabel = document.getElementById("apple-sign-in-label");
-    if (appleLabel) appleLabel.textContent = user.displayName || emailForStorage || "Signed in";
+    if (appleLabel) appleLabel.textContent = displayLabel;
+
+    console.log("[studio] Auth complete. email=" + storedId + ", name=" + (user.displayName || "(none)"));
 
     const userRef = ref2(db, 'users/' + safeEmail);
     const snap = await get(userRef);
@@ -468,7 +506,12 @@
       localStorage.removeItem('pending_inviter');
     }
 
-    await update(userRef, { email: emailForStorage || user.uid, name: user.displayName || "" });
+    await update(userRef, {
+      email: storedId,
+      name: user.displayName || "",
+      provider: user.providerData[0]?.providerId || "unknown",
+      lastLogin: Date.now()
+    });
     loadUserProgress(user.displayName || emailForStorage || "Artist");
   }
 
@@ -488,20 +531,23 @@
   if (appleBtn) {
     appleBtn.addEventListener("click", () => {
       console.log("[studio] Apple sign-in clicked");
-      signInWithPopup(auth, appleProvider)
-        .then((res) => completeStudioSignIn(res))
-        .catch((err) => {
-          console.error("Apple sign-in:", err?.code || err);
-          if (err && err.code === "auth/popup-blocked") {
-            alert("Pop-up was blocked. Allow pop-ups for this site, then try again.");
-          } else if (err && err.code === "auth/operation-not-allowed") {
-            alert(
-              "Sign in with Apple is not enabled for this app in Firebase yet.\n\n" +
-                "In Firebase Console: Authentication → Sign-in method → enable Apple, " +
-                "and add your web domain under Authentication → Settings → Authorized domains."
-            );
-          }
-        });
+      signInWithPopup(auth, appleProvider).then((res) => completeStudioSignIn(res)).catch((err) => {
+        console.error("Apple sign-in:", err?.code || err);
+        if (err && err.code === "auth/operation-not-allowed") {
+          alert(
+            "Sign in with Apple is not enabled for this app in Firebase yet.\n\n" +
+              "Firebase Console → Authentication → Sign-in method → Apple → Enable."
+          );
+        } else if (err) {
+          alert(
+            "Could not start Apple sign-in.\n\n" +
+              "If you see 403 on Apple’s page, open Apple Developer → your Services ID → " +
+              "Sign in with Apple → Return URLs must include exactly:\n" +
+              "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
+              "Domains must list the site you use (e.g. asteroid8.net and www.asteroid8.net)."
+          );
+        }
+      });
     });
   }
 
@@ -530,7 +576,8 @@
 
   // --- 3. UPLOAD ---
   document.getElementById("btn").onclick = async () => {
-    const email = localStorage.getItem("email");
+    syncAuthUserToLocalStorage(auth.currentUser);
+    const email = (localStorage.getItem("email") || "").trim() || (auth.currentUser && (auth.currentUser.email || auth.currentUser.uid)) || "";
     const file = document.getElementById("fileInp").files[0];
     if (!email || !file) {
       alert("Please sign in and select a file!");
@@ -656,7 +703,8 @@ async function cleanupExpiredBoosts() {
 boostBtn.addEventListener("click", async (e) => {
   e.preventDefault();
 
-  const email = localStorage.getItem("email");
+  syncAuthUserToLocalStorage(auth.currentUser);
+  const email = (localStorage.getItem("email") || "").trim() || (auth.currentUser && (auth.currentUser.email || auth.currentUser.uid)) || "";
   const file = document.getElementById("boostFileInp").files[0];
 
   if (!email || !file) {
