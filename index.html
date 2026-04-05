@@ -186,9 +186,9 @@
   color: #111;
 }
 .header-sign-in-apple {
-  background: #000;
-  color: #fff;
-  border: none;
+  background: #fff;
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.14);
 }
 /* Visible by default so guests see buttons before/without Firebase; JS hides when signed in */
 #google-sign-in,
@@ -740,6 +740,38 @@
       <button id="logoutCancelBtn" class="logout-btn-cancel">Cancel</button>
       <button id="logoutConfirmBtn" class="logout-btn-confirm">Sign out</button>
     </div>
+    <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+      <button id="deleteAccountBtn" style="background: none; border: none; color: rgba(255,80,80,0.8); font-size: 12px; cursor: pointer; font-family: 'Poppins', sans-serif; padding: 4px 8px; transition: color 0.2s;">Delete my account permanently</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Account confirmation modal -->
+<div id="deleteAccountModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:3000; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#0a0a0a; color:#fff; padding:28px 32px; border-radius:20px; width:100%; max-width:400px; border:1px solid rgba(255,80,80,0.4); box-shadow:0 24px 48px rgba(0,0,0,0.6); font-family:'Poppins',sans-serif;">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+      <div style="width:44px; height:44px; border-radius:50%; background:rgba(255,80,80,0.2); display:flex; align-items:center; justify-content:center; font-size:20px;">⚠️</div>
+      <div>
+        <h2 style="margin:0; font-size:20px; font-weight:600; color:#ff5050; font-family:'Montserrat',sans-serif;">Delete Account?</h2>
+        <p style="margin:4px 0 0; font-size:13px; color:rgba(255,255,255,0.7);">This action is permanent and cannot be undone.</p>
+      </div>
+    </div>
+    <div style="background:rgba(255,80,80,0.08); border:1px solid rgba(255,80,80,0.2); border-radius:12px; padding:14px; margin-bottom:16px; font-size:13px; color:rgba(255,255,255,0.85); line-height:1.6;">
+      This will permanently delete:
+      <ul style="margin:8px 0 0; padding-left:20px;">
+        <li>Your Asteroid account</li>
+        <li>Your profile and preferences</li>
+        <li>Your uploaded songs data</li>
+        <li>All associated account information</li>
+      </ul>
+    </div>
+    <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:14px;">To confirm, type <strong style="color:#ff5050;">DELETE</strong> below:</p>
+    <input id="deleteConfirmInput" type="text" placeholder='Type "DELETE" to confirm' autocomplete="off" style="width:100%; padding:10px 14px; border-radius:10px; border:1px solid rgba(255,80,80,0.3); background:rgba(255,255,255,0.05); color:#fff; font-size:14px; font-family:'Poppins',sans-serif; box-sizing:border-box; margin-bottom:16px; outline:none;">
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button id="deleteAccountCancelBtn" style="padding:10px 20px; border-radius:12px; border:1px solid rgba(255,255,255,0.3); background:transparent; color:#fff; font-size:14px; cursor:pointer; font-family:'Poppins',sans-serif;">Cancel</button>
+      <button id="deleteAccountConfirmBtn" disabled style="padding:10px 20px; border-radius:12px; border:none; background:rgba(255,80,80,0.3); color:rgba(255,255,255,0.4); font-weight:600; font-size:14px; cursor:not-allowed; font-family:'Poppins',sans-serif; transition:all 0.2s;">Delete my account</button>
+    </div>
+    <div id="deleteAccountStatus" style="display:none; margin-top:12px; text-align:center; font-size:13px;"></div>
   </div>
 </div>
     <section id="artists" class="content-section artists-section">
@@ -2442,7 +2474,7 @@ console.log("960");
      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
   import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-  import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, GoogleAuthProvider, OAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+  import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, GoogleAuthProvider, OAuthProvider, signOut, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
   import { getDatabase, ref as ref2, onValue, update, get, set, remove, push, limitToFirst, startAt, orderByKey, query} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
   import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
 console.log('1050')
@@ -2732,6 +2764,8 @@ window.firebaseStorageRef = ref;
 window.firebaseGetDownloadURL = getDownloadURL;
 window.firebaseApp = app;
 window.firebaseAuth = auth;
+window.firebaseRemove = remove;
+window.firebaseDeleteUser = deleteUser;
 window.currentFirebaseUser = null;
 
 // Keep track of auth state so UI can react correctly
@@ -3243,6 +3277,120 @@ async function confirmLogout() {
 document.getElementById("logoutCancelBtn")?.addEventListener("click", closeLogoutModal);
 document.getElementById("logoutConfirmBtn")?.addEventListener("click", confirmLogout);
 
+// --- DELETE ACCOUNT ---
+function openDeleteAccountModal() {
+  closeLogoutModal();
+  const modal = document.getElementById("deleteAccountModal");
+  const input = document.getElementById("deleteConfirmInput");
+  const confirmBtn = document.getElementById("deleteAccountConfirmBtn");
+  const status = document.getElementById("deleteAccountStatus");
+  if (input) { input.value = ""; }
+  if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.background = "rgba(255,80,80,0.3)"; confirmBtn.style.color = "rgba(255,255,255,0.4)"; confirmBtn.style.cursor = "not-allowed"; }
+  if (status) { status.style.display = "none"; status.textContent = ""; }
+  if (modal) modal.style.display = "flex";
+}
+
+function closeDeleteAccountModal() {
+  const modal = document.getElementById("deleteAccountModal");
+  if (modal) modal.style.display = "none";
+}
+
+document.getElementById("deleteAccountBtn")?.addEventListener("click", openDeleteAccountModal);
+document.getElementById("deleteAccountCancelBtn")?.addEventListener("click", closeDeleteAccountModal);
+
+document.getElementById("deleteConfirmInput")?.addEventListener("input", function() {
+  const confirmBtn = document.getElementById("deleteAccountConfirmBtn");
+  const matches = this.value.trim() === "DELETE";
+  if (confirmBtn) {
+    confirmBtn.disabled = !matches;
+    confirmBtn.style.background = matches ? "#ff3333" : "rgba(255,80,80,0.3)";
+    confirmBtn.style.color = matches ? "#fff" : "rgba(255,255,255,0.4)";
+    confirmBtn.style.cursor = matches ? "pointer" : "not-allowed";
+  }
+});
+
+document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", async function() {
+  if (this.disabled) return;
+  const status = document.getElementById("deleteAccountStatus");
+  const showStatus = (msg, color) => { if (status) { status.style.display = "block"; status.style.color = color; status.textContent = msg; } };
+
+  this.disabled = true;
+  this.textContent = "Deleting...";
+  showStatus("Removing your data...", "rgba(255,255,255,0.6)");
+
+  try {
+    const authInstance = window.firebaseAuth;
+    const user = authInstance ? authInstance.currentUser : null;
+    const emailKey = localStorage.getItem("emailKey") || (localStorage.getItem("email") || "").replace(/[.#$[\]]/g, "_");
+    const db = window.firebaseDatabase;
+    const dbRef = window.firebaseRef;
+    const fbRemove = window.firebaseRemove;
+    const fbDeleteUser = window.firebaseDeleteUser;
+
+    if (!db || !dbRef || !fbRemove) {
+      showStatus("Firebase not ready. Please wait a moment and try again.", "#ff9900");
+      this.textContent = "Delete my account";
+      this.disabled = false;
+      return;
+    }
+
+    if (emailKey) {
+      const deletePaths = [
+        "PROFILES/" + emailKey,
+        "PREMIUM/" + emailKey,
+        "PROFILEVIEWS/" + emailKey,
+        "CONCERTUSERS/" + emailKey,
+      ];
+      for (const path of deletePaths) {
+        try { await fbRemove(dbRef(db, path)); console.log("Deleted:", path); } catch (e) { console.warn("Delete " + path + ":", e); }
+      }
+
+      const emailDot = (localStorage.getItem("email") || "").replace(/\./g, ",");
+      if (emailDot) {
+        try { await fbRemove(dbRef(db, "users/" + emailDot)); console.log("Deleted: users/" + emailDot); } catch (e) { console.warn("Delete users/:", e); }
+        try { await fbRemove(dbRef(db, "referralCounts/" + emailDot)); } catch (e) { console.warn("Delete referralCounts/:", e); }
+      }
+    }
+
+    showStatus("Removing your account...", "rgba(255,255,255,0.6)");
+
+    if (user && fbDeleteUser) {
+      try {
+        await fbDeleteUser(user);
+      } catch (authErr) {
+        if (authErr.code === "auth/requires-recent-login") {
+          showStatus("For security, please sign out, sign back in, then delete immediately.", "#ff9900");
+          this.textContent = "Delete my account";
+          this.disabled = false;
+          return;
+        }
+        throw authErr;
+      }
+    }
+
+    localStorage.removeItem("email");
+    localStorage.removeItem("CurrentUser");
+    localStorage.removeItem("fullName");
+    localStorage.removeItem("hasLoggedInWithGoogle");
+    localStorage.removeItem("pfp");
+    localStorage.removeItem("emailKey");
+    localStorage.removeItem("name");
+    localStorage.removeItem("ref_active");
+    localStorage.removeItem("rewardNotified");
+    localStorage.removeItem("pending_inviter");
+    localStorage.removeItem("artemail");
+
+    showStatus("Account deleted. Reloading...", "#44cc44");
+    setTimeout(() => { window.location.reload(); }, 1500);
+
+  } catch (err) {
+    console.error("Account deletion error:", err);
+    showStatus("Deletion failed: " + (err.message || "Unknown error. Please try again."), "#ff5050");
+    this.textContent = "Delete my account";
+    this.disabled = false;
+  }
+});
+
 // Profile button: if signed in, show logout modal; otherwise trigger Google sign-in
 document.getElementById("user-profile-button").addEventListener("click", () => {
   console.log("profile_button_clicked");
@@ -3336,16 +3484,19 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             if (!url || url === _lastAppleRedirectIndex) return;
             _lastAppleRedirectIndex = url;
             console.log("⚡️ handleAppleAuthRedirect (index)", { url });
+
             try {
               const Browser = getBrowserPlugin ? getBrowserPlugin() : null;
               if (Browser && typeof Browser.close === "function") Browser.close();
             } catch (e) {}
+
             const params = new URLSearchParams(String(url).split("?")[1] || "");
             const email = params.get("email") || "";
             const fullName = params.get("name") || "";
             const uid = params.get("uid") || "";
             const photo = params.get("photo") || "";
             console.log("⚡️ Apple sign-in user info (index):", { email, fullName, uid });
+
             const appleAccountId = (email || uid || "").trim();
             if (appleAccountId) {
               localStorage.setItem("email", appleAccountId);
@@ -3356,8 +3507,15 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
               localStorage.setItem("pfp", photo);
               const emailKey = (appleAccountId || "").replace(/[.#$[\]]/g, "_");
               localStorage.setItem("emailKey", emailKey);
+
+              const displayName = fullName || appleAccountId;
               const gcd = document.getElementById("gcd");
-              if (gcd) { gcd.innerHTML = fullName || appleAccountId; gcd.innerText = fullName || appleAccountId; }
+              if (gcd) { gcd.innerHTML = displayName; gcd.innerText = displayName; }
+
+              const googleBtn = document.getElementById("google-sign-in");
+              const appleBtn = document.getElementById("apple-sign-in");
+              if (googleBtn) googleBtn.style.setProperty("display", "none", "important");
+              if (appleBtn) appleBtn.style.setProperty("display", "none", "important");
             }
           }
           (async function setupCapacitorAuth() {
@@ -3557,6 +3715,7 @@ console.log('1171')
       document.body.style.backgroundColor = "White";
 
     }
+
 
 
     var audio = document.getElementById("audioPlayer");

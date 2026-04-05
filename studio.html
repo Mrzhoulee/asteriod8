@@ -302,11 +302,16 @@
           showFileName(e.dataTransfer.files[0]);
         }
       });
+
+      document.getElementById("title").addEventListener("input", function() {
+        const el = document.getElementById("agreementSongTitle");
+        el.textContent = this.value.trim() || "this song";
+      });
     </script>
     
-    <div style="margin: 15px;">
-        <input type="checkbox" id="agreement" style="width: auto;"> 
-        <label for="agreement">I confirm I own this music.</label>
+    <div style="margin: 15px; text-align: left; max-width: 400px; display: inline-block;">
+        <input type="checkbox" id="agreement" style="width: auto; vertical-align: top; margin-top: 4px;"> 
+        <label for="agreement" id="agreementLabel" style="display: inline; line-height: 1.5;">I confirm that I own <strong id="agreementSongTitle">this song</strong> and I accept the <a href="Asteroid%20Terms.html" target="_blank" style="color: coral;">Terms of Service</a> and <a href="policy.html" target="_blank" style="color: coral;">Privacy Policy</a> of Asteroid.</label>
     </div>
     <button type="button" id="btn" class="upload-btn">UPLOAD NOW</button>
     <style>
@@ -432,6 +437,57 @@
   appleProvider.addScope("name");
   const jsConfetti = new JSConfetti();
 
+  const APPLE_AUTH_URL = "https://asteroid-cdc13.firebaseapp.com/auth-apple.html";
+  const isCapacitorNative = () => typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
+  const getBrowserPlugin = () => { try { return window.Capacitor?.Plugins?.Browser || null; } catch (e) { return null; } };
+  const getAppPlugin = () => { try { return window.Capacitor?.Plugins?.App || null; } catch (e) { return null; } };
+
+  function handleAppleAuthRedirect(url) {
+    if (!url) return;
+    console.log("[studio] handleAppleAuthRedirect", url);
+    try {
+      const Browser = getBrowserPlugin();
+      if (Browser && typeof Browser.close === "function") Browser.close();
+    } catch (e) {}
+    const params = new URLSearchParams(String(url).split("?")[1] || "");
+    const email = params.get("email") || "";
+    const fullName = params.get("name") || "";
+    const uid = params.get("uid") || "";
+    const photo = params.get("photo") || "";
+    const id = (email || uid || "").trim();
+    if (id) {
+      localStorage.setItem("email", id);
+      localStorage.setItem("CurrentUser", id);
+      localStorage.setItem("fullName", fullName);
+      localStorage.setItem("hasLoggedInWithGoogle", "true");
+      localStorage.setItem("pfp", photo);
+      localStorage.setItem("emailKey", id.replace(/[.#$[\]]/g, "_"));
+      const gcm = document.getElementById("gcm");
+      if (gcm) gcm.textContent = fullName || id;
+      const appleLabel = document.getElementById("apple-sign-in-label");
+      if (appleLabel) appleLabel.textContent = fullName || id;
+      console.log("[studio] Apple auth complete via redirect:", id);
+    }
+  }
+
+  if (isCapacitorNative()) {
+    const App = getAppPlugin();
+    if (App) {
+      try {
+        App.addListener("appUrlOpen", (event) => {
+          if (event && event.url && String(event.url).startsWith("asteroid://auth-apple")) {
+            handleAppleAuthRedirect(event.url);
+          }
+        });
+        App.getLaunchUrl().then((launch) => {
+          if (launch && launch.url && String(launch.url).startsWith("asteroid://auth-apple")) {
+            handleAppleAuthRedirect(launch.url);
+          }
+        }).catch(() => {});
+      } catch (e) { console.warn("[studio] Capacitor App listener:", e); }
+    }
+  }
+
   function syncAuthUserToLocalStorage(user) {
     if (!user) return;
     const id = (user.email || user.providerData[0]?.email || user.uid || "").trim();
@@ -531,6 +587,13 @@
   if (appleBtn) {
     appleBtn.addEventListener("click", () => {
       console.log("[studio] Apple sign-in clicked");
+      if (isCapacitorNative()) {
+        const Browser = getBrowserPlugin();
+        if (Browser && typeof Browser.open === "function") {
+          try { Browser.open({ url: APPLE_AUTH_URL }); } catch (err) { console.warn("[studio] Browser.open (Apple):", err); }
+        } else { window.location.href = APPLE_AUTH_URL; }
+        return;
+      }
       signInWithPopup(auth, appleProvider).then((res) => completeStudioSignIn(res)).catch((err) => {
         console.error("Apple sign-in:", err?.code || err);
         if (err && err.code === "auth/operation-not-allowed") {
@@ -613,18 +676,33 @@
 
       // Save song data to database
       document.getElementById("alertBox").innerHTML = "<h2>⏳ Saving song information...</h2>";
+      const fullName = localStorage.getItem("fullName") || "";
       const songData = {
         album: album,
         artist: artist,
         title: title,
         fileInp: url,
         uploader: email,
+        uploaderName: fullName,
         campaign: "ARTISTSOFFEB26",
         createdAt: Date.now()
       };
       const dbPath = `SONGS/${title}/${album}/${artist}`;
       await update(ref2(db, dbPath), songData);
       console.log("✅ Song data saved to database at:", dbPath);
+
+      const agreementKey = email.replace(/[.#$[\]]/g, "_") + "_" + Date.now();
+      await update(ref2(db, "AGREEMENTS/" + agreementKey), {
+        email: email,
+        name: fullName,
+        songTitle: title,
+        artistName: artist,
+        albumName: album,
+        type: album.toLowerCase() === title.toLowerCase() ? "single" : "album",
+        acceptedAt: Date.now(),
+        acceptedTerms: true,
+        acceptedPrivacy: true
+      });
 
       // Firestore referral system – increment songCount & check eligibility
       try {
@@ -668,9 +746,12 @@
     alert("Copied! Share it with 1 person.");
   };
 
-  if(localStorage.getItem("fullName")) {
-      document.getElementById("gcm").innerHTML = localStorage.getItem("fullName");
-      loadUserProgress(localStorage.getItem("fullName"));
+  if(localStorage.getItem("fullName") || localStorage.getItem("email")) {
+      const savedName = localStorage.getItem("fullName") || localStorage.getItem("email") || "";
+      document.getElementById("gcm").innerHTML = savedName;
+      const appleLabel = document.getElementById("apple-sign-in-label");
+      if (appleLabel) appleLabel.textContent = savedName;
+      if (savedName) loadUserProgress(savedName);
   }
 
 
