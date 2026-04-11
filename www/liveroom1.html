@@ -52,7 +52,9 @@
 
 /* 1. The Container (Card Style) */
 #banGlocks {
-        width: 380px;          /* Slightly wider for better spacing */
+        width: min(380px, 100%);
+        max-width: 100%;
+        box-sizing: border-box;
         padding: 25px;         /* More breathing room */
         margin: 20px auto;     /* Centers the box horizontally */
         background: #1e1e1e;   /* Dark Grey card background matching your theme */
@@ -61,6 +63,7 @@
         text-align: center;    /* Centers the input inside */
         font-family: 'Montserrat', sans-serif;
         display: none;
+        order: 5;
     }
 
     /* 2. The Input Field (Matching .large-input style) */
@@ -135,10 +138,7 @@
   gap: 0;
 }
 #socialsBox {
-  order: 2;
-}
-#banGlocks {
-  order: 3;
+  order: 4;
 }
 
     </style>
@@ -309,6 +309,26 @@ onValue(roomPath, (snapshot) => {
     console.log("[room-status]", status || "(none)", "embed?", !!embedValue);
     const isLive = !!(snapshot.exists() && embedValue);
 
+    function viewerConcertHostKey() {
+        const ek = (localStorage.getItem("emailKey") || "").trim();
+        if (ek) return ek;
+        const cu = (localStorage.getItem("CurrentUser") || "").trim();
+        const em = (localStorage.getItem("email") || "").trim();
+        const id = (cu || em).trim();
+        return id ? id.replace(/[.#$[\]]/g, "_") : "";
+    }
+    const hostEkStored = data && data.hostEmailKey ? String(data.hostEmailKey).trim() : "";
+    const vkHost = viewerConcertHostKey();
+    const isStreamHost = !hostEkStored || (!!vkHost && vkHost.toLowerCase() === hostEkStored.toLowerCase());
+
+    const tuckEl = document.getElementById("tuck");
+    const banEl = document.getElementById("banGlocks");
+    if (tuckEl) {
+        if (isLive && isStreamHost) tuckEl.style.display = "";
+        else tuckEl.style.display = "none";
+    }
+    if (banEl && (!isLive || !isStreamHost)) banEl.style.display = "none";
+
     if (snapshot.exists()) {
         var Passt = data.passcode;
         var embed67 = data.embed;
@@ -319,6 +339,13 @@ onValue(roomPath, (snapshot) => {
     const popup = document.getElementById('loadingPopup');
     const enteredPasscode = document.getElementById('pscd').value;
     if(!isLive){ alert("No active stream to end in this room."); return; }
+    if (hostEkStored) {
+        const vk = viewerConcertHostKey();
+        if (!vk || vk.toLowerCase() !== hostEkStored.toLowerCase()) {
+            alert("Only the host who started this stream can end it.");
+            return;
+        }
+    }
     if(!Passt || !String(Passt).trim()){ alert("This stream has no end passcode configured. Start a new stream with a passcode first."); return; }
     if(Passt == enteredPasscode){
     // 1. Show the popup
@@ -337,7 +364,8 @@ update(roomPath, {
     donationEmbed: "",   // Clear donation box embed
     socials: "",         // Clear social media links
     passcode: "",        // Set to an empty string instead of null
-    status: "offline"    // Add a new key to keep the folder alive
+    status: "offline",   // Add a new key to keep the folder alive
+    chatEpoch: Date.now() // Hides prior chat for this room in the UI (see concert-social.js)
 });
     // 2. Wait 2 seconds then hide it
     setTimeout(() => {
@@ -372,7 +400,7 @@ update(roomPath, {
 
             // If it looks like just a URL (no HTML tags), wrap it in a Donorbox-compatible iframe
             if (donationContent.startsWith('http') && !donationContent.includes('<iframe') && !donationContent.includes('<script')) {
-                donationContent = `<iframe src="${donationContent}" name="donorbox" allowpaymentrequest="allowpaymentrequest" seamless="seamless" frameborder="0" scrolling="no" height="900px" width="100%" style="max-width: 500px; min-width: 250px; max-height:none!important" allow="payment"></iframe>`;
+                donationContent = `<iframe src="${donationContent}" name="donorbox" allowpaymentrequest="allowpaymentrequest" seamless="seamless" frameborder="0" scrolling="no" height="360" width="100%" style="max-width:500px;min-width:250px;max-height:min(40vh,360px)!important;height:min(40vh,360px)!important;width:100%!important" allow="payment"></iframe>`;
             }
             // If it's already a full embed code (contains iframe/script), use it as-is
 

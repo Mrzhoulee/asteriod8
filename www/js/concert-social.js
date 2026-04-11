@@ -37,20 +37,15 @@ export function mountConcertDock(db, roomNum) {
   const roomLiveRef = ref(db, "LiveRooms/Room" + roomNum);
 
   let currentChatEpoch = 0;
-
-  onValue(roomLiveRef, (snap) => {
-    const d = snap.val();
-    currentChatEpoch =
-      d && typeof d.chatEpoch === "number" && !Number.isNaN(d.chatEpoch) ? d.chatEpoch : 0;
-  });
+  let lastMessagesVal = null;
 
   function messageMatchesEpoch(m) {
     const e = m && typeof m.epoch === "number" && !Number.isNaN(m.epoch) ? m.epoch : 0;
     return e === currentChatEpoch;
   }
 
-  onValue(messagesRef, (snap) => {
-    const v = snap.val();
+  function renderChatFromCache() {
+    const v = lastMessagesVal;
     if (!v) {
       chatList.innerHTML = '<p class="cr-empty">No messages yet — say hi!</p>';
       return;
@@ -73,6 +68,18 @@ export function mountConcertDock(db, roomNum) {
       })
       .join("");
     chatList.scrollTop = chatList.scrollHeight;
+  }
+
+  onValue(roomLiveRef, (snap) => {
+    const d = snap.val();
+    currentChatEpoch =
+      d && typeof d.chatEpoch === "number" && !Number.isNaN(d.chatEpoch) ? d.chatEpoch : 0;
+    renderChatFromCache();
+  });
+
+  onValue(messagesRef, (snap) => {
+    lastMessagesVal = snap.val();
+    renderChatFromCache();
   });
 
   onValue(stickiesRef, (snap) => {

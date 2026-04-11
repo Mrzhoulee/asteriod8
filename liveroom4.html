@@ -52,7 +52,9 @@
 
 /* 1. The Container (Card Style) */
 #banGlocks {
-        width: 380px;          /* Slightly wider for better spacing */
+        width: min(380px, 100%);
+        max-width: 100%;
+        box-sizing: border-box;
         padding: 25px;         /* More breathing room */
         margin: 20px auto;     /* Centers the box horizontally */
         background: #1e1e1e;   /* Dark Grey card background matching your theme */
@@ -61,6 +63,7 @@
         text-align: center;    /* Centers the input inside */
         font-family: 'Montserrat', sans-serif;
         display: none;
+        order: 5;
     }
 
     /* 2. The Input Field (Matching .large-input style) */
@@ -115,6 +118,28 @@
 }
 
 /* Ensures the input and button share the container space */
+#donationBox {
+  order: 99;
+  max-height: min(42vh, 400px);
+  overflow: auto;
+  margin: 20px auto 0;
+  max-width: 600px;
+  text-align: center;
+  -webkit-overflow-scrolling: touch;
+}
+#donationBox iframe {
+  max-height: min(40vh, 360px) !important;
+  height: min(40vh, 360px) !important;
+  width: 100% !important;
+}
+.cr-stage-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+#socialsBox {
+  order: 4;
+}
 
     </style>
 
@@ -124,9 +149,9 @@
     <h1>Room 4</h1>
   </header>
   <div class="cr-grid">
-    <div class="cr-stage">
+    <div class="cr-stage cr-stage-stack">
 
-<button id="tuck" onclick="document.getElementById('banGlocks').style.display = 'block';" class="huck" style="border-radius: 12.5%;">
+<button id="tuck" onclick="document.getElementById('banGlocks').style.display = 'block';" class="huck" style="border-radius: 12.5%; display: none;" type="button">
     <div style="color: darkred">
         <span class="material-symbols-outlined big-icons">stop_circle</span> 
         <h1><font face="Montserrat"><div style="align-items: center;">End <br> Stream</div></font></h1>
@@ -141,10 +166,7 @@
   ⬇️ SCROLL DOWN ⬇️
 </div>
 
-<!-- Donation Box Container -->
-<div id="donationBox" style="display: none; margin: 20px auto; max-width: 600px; text-align: center;"></div>
-
-<!-- Socials Container -->
+<!-- Socials first (readable); donation iframe at bottom -->
 <div id="socialsBox" style="display: none; margin: 20px auto; max-width: 600px; text-align: center; padding: 15px; background: #111827; color: #f3f4f6; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.35);"></div>
 
 <style>
@@ -199,6 +221,9 @@
     <h2 style="margin-top: 25px; letter-spacing: 1px;">Ending Stream...</h2>
     <p style="color: #ff7a3b; font-weight: 500;">Cleaning up your room</p>
 </div>
+
+<!-- Donation box at bottom of stage so it doesn’t cover stream / socials / end controls -->
+<div id="donationBox" style="display: none;"></div>
 
 <style>
     /* Spinner Animation */
@@ -284,6 +309,26 @@ onValue(roomPath, (snapshot) => {
     console.log("[room-status]", status || "(none)", "embed?", !!embedValue);
     const isLive = !!(snapshot.exists() && embedValue);
 
+    function viewerConcertHostKey() {
+        const ek = (localStorage.getItem("emailKey") || "").trim();
+        if (ek) return ek;
+        const cu = (localStorage.getItem("CurrentUser") || "").trim();
+        const em = (localStorage.getItem("email") || "").trim();
+        const id = (cu || em).trim();
+        return id ? id.replace(/[.#$[\]]/g, "_") : "";
+    }
+    const hostEkStored = data && data.hostEmailKey ? String(data.hostEmailKey).trim() : "";
+    const vkHost = viewerConcertHostKey();
+    const isStreamHost = !hostEkStored || (!!vkHost && vkHost.toLowerCase() === hostEkStored.toLowerCase());
+
+    const tuckEl = document.getElementById("tuck");
+    const banEl = document.getElementById("banGlocks");
+    if (tuckEl) {
+        if (isLive && isStreamHost) tuckEl.style.display = "";
+        else tuckEl.style.display = "none";
+    }
+    if (banEl && (!isLive || !isStreamHost)) banEl.style.display = "none";
+
     if (snapshot.exists()) {
         var Passt = data.passcode;
         var embed67 = data.embed;
@@ -294,6 +339,13 @@ onValue(roomPath, (snapshot) => {
     const popup = document.getElementById('loadingPopup');
     const enteredPasscode = document.getElementById('pscd').value;
     if(!isLive){ alert("No active stream to end in this room."); return; }
+    if (hostEkStored) {
+        const vk = viewerConcertHostKey();
+        if (!vk || vk.toLowerCase() !== hostEkStored.toLowerCase()) {
+            alert("Only the host who started this stream can end it.");
+            return;
+        }
+    }
     if(!Passt || !String(Passt).trim()){ alert("This stream has no end passcode configured. Start a new stream with a passcode first."); return; }
     if(Passt == enteredPasscode){
     // 1. Show the popup
@@ -312,7 +364,8 @@ update(roomPath, {
     donationEmbed: "",   // Clear donation box embed
     socials: "",         // Clear social media links
     passcode: "",        // Set to an empty string instead of null
-    status: "offline"    // Add a new key to keep the folder alive
+    status: "offline",   // Add a new key to keep the folder alive
+    chatEpoch: Date.now() // Hides prior chat for this room in the UI (see concert-social.js)
 });
     // 2. Wait 2 seconds then hide it
     setTimeout(() => {
@@ -347,7 +400,7 @@ update(roomPath, {
 
             // If it looks like just a URL (no HTML tags), wrap it in a Donorbox-compatible iframe
             if (donationContent.startsWith('http') && !donationContent.includes('<iframe') && !donationContent.includes('<script')) {
-                donationContent = `<iframe src="${donationContent}" name="donorbox" allowpaymentrequest="allowpaymentrequest" seamless="seamless" frameborder="0" scrolling="no" height="900px" width="100%" style="max-width: 500px; min-width: 250px; max-height:none!important" allow="payment"></iframe>`;
+                donationContent = `<iframe src="${donationContent}" name="donorbox" allowpaymentrequest="allowpaymentrequest" seamless="seamless" frameborder="0" scrolling="no" height="360" width="100%" style="max-width:500px;min-width:250px;max-height:min(40vh,360px)!important;height:min(40vh,360px)!important;width:100%!important" allow="payment"></iframe>`;
             }
             // If it's already a full embed code (contains iframe/script), use it as-is
 
