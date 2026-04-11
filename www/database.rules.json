@@ -18,7 +18,7 @@
           ".read": true,
           "$msgId": {
             ".write": "!data.exists()",
-            ".validate": "newData.hasChildren(['text','ts']) && newData.child('text').isString() && newData.child('text').val().length <= 500 && newData.child('ts').isNumber()"
+            ".validate": "newData.hasChildren(['text','ts']) && newData.child('text').isString() && newData.child('text').val().length <= 500 && newData.child('ts').isNumber() && (!newData.hasChild('epoch') || newData.child('epoch').isNumber())"
           }
         }
       }

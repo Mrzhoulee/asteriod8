@@ -1,4 +1,4 @@
-import { ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+import { ref, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 import { censorProfanity } from "./text-censor.js";
 
 function anonId() {
@@ -34,6 +34,20 @@ export function mountConcertDock(db, roomNum) {
 
   const messagesRef = ref(db, "CONCERT_CHATS/" + slug + "/messages");
   const stickiesRef = ref(db, "CONCERT_STICKIES/" + slug + "/notes");
+  const roomLiveRef = ref(db, "LiveRooms/Room" + roomNum);
+
+  let currentChatEpoch = 0;
+
+  onValue(roomLiveRef, (snap) => {
+    const d = snap.val();
+    currentChatEpoch =
+      d && typeof d.chatEpoch === "number" && !Number.isNaN(d.chatEpoch) ? d.chatEpoch : 0;
+  });
+
+  function messageMatchesEpoch(m) {
+    const e = m && typeof m.epoch === "number" && !Number.isNaN(m.epoch) ? m.epoch : 0;
+    return e === currentChatEpoch;
+  }
 
   onValue(messagesRef, (snap) => {
     const v = snap.val();
@@ -43,8 +57,13 @@ export function mountConcertDock(db, roomNum) {
     }
     const rows = Object.entries(v)
       .map(([id, m]) => ({ id, ...m }))
+      .filter((m) => messageMatchesEpoch(m))
       .sort((a, b) => (a.ts || 0) - (b.ts || 0))
       .slice(-80);
+    if (!rows.length) {
+      chatList.innerHTML = '<p class="cr-empty">No messages yet — say hi!</p>';
+      return;
+    }
     chatList.innerHTML = rows
       .map((m) => {
         const who = esc(m.sender || "Guest");
@@ -73,17 +92,28 @@ export function mountConcertDock(db, roomNum) {
       .join("");
   });
 
-  function sendChat() {
+  async function sendChat() {
     const raw = (chatInput && chatInput.value) || "";
     const nameRaw = (chatName && chatName.value) || "Guest";
     const text = censorProfanity(raw.trim()).slice(0, 500);
     const sender = censorProfanity(nameRaw.trim()).slice(0, 40) || "Guest";
     if (!text) return;
+    let epoch = currentChatEpoch;
+    try {
+      const rs = await get(roomLiveRef);
+      const d = rs.exists() ? rs.val() : null;
+      if (d && typeof d.chatEpoch === "number" && !Number.isNaN(d.chatEpoch)) {
+        epoch = d.chatEpoch;
+      }
+    } catch (e) {
+      console.warn("concert chat epoch read", e);
+    }
     push(messagesRef, {
       text,
       sender,
       ts: Date.now(),
       anonId: anonId(),
+      epoch,
     });
     chatInput.value = "";
   }

@@ -216,13 +216,31 @@ type="text" placeholder="Create a Live Passcode that you are going to be using. 
             return Promise.reject(new Error("missing-passcode"));
         }
 
+        function computeHostEmailKey() {
+            const ek = (localStorage.getItem("emailKey") || "").trim();
+            if (ek) return ek;
+            const cu = (localStorage.getItem("CurrentUser") || "").trim();
+            const em = (localStorage.getItem("email") || "").trim();
+            const id = (cu || em).trim();
+            return id ? id.replace(/[.#$[\]]/g, "_") : "";
+        }
+        const hostEmailKey = computeHostEmailKey();
+        if (!hostEmailKey) {
+            alert("Sign in on Asteroid (Apple or email) before going live so only you can end the stream.");
+            return Promise.reject(new Error("missing-host-key"));
+        }
+
+        const chatEpoch = Date.now();
+
         return update(myRef, {
             embed: embedValue,
             donationEmbed: tinp && tinp.value ? tinp.value.trim() : null,
             socials: xinp && xinp.value ? xinp.value.trim() : null,
             startedAt: Date.now(),
             passcode: passcodeValue,
-            status: "active"
+            status: "active",
+            hostEmailKey: hostEmailKey,
+            chatEpoch: chatEpoch
 
         }).then(() => {
             document.getElementById('helloWorld').style.display = 'block';

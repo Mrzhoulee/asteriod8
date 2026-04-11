@@ -595,6 +595,11 @@
   font-weight: 700;
 }
 .artist-profile-tag { margin-top: 4px; color: rgba(255, 255, 255, 0.72); font-size: 13px; }
+.artist-profile-follow-wrap {
+  margin-top: 12px;
+  max-width: 280px;
+  padding: 0;
+}
 .artist-profile-body { padding: 16px 18px 18px; }
 .artist-social-list { display: grid; gap: 10px; }
 .artist-social-link {
@@ -976,6 +981,81 @@
   font-size: 12px;
   color: rgba(255,255,255,0.45);
   text-align: center;
+}
+.profile-modal-songs-list {
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 0 2px 4px;
+  text-align: left;
+}
+.profile-modal-songs-loading,
+.profile-modal-songs-empty {
+  margin: 0;
+  padding: 12px 8px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+}
+.profile-modal-song-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.profile-modal-song-row audio {
+  display: none;
+}
+.profile-modal-song-info {
+  flex: 1;
+  min-width: 0;
+}
+.profile-modal-song-title {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.profile-modal-song-meta {
+  display: block;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.profile-modal-song-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.profile-modal-song-actions i {
+  font-size: 28px;
+  color: #ff7f50;
+  cursor: pointer;
+}
+.profile-modal-song-actions i:hover {
+  color: #fff;
+}
+.profile-modal-song-actions button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #ff7f50;
+  display: flex;
+}
+.profile-modal-song-actions .material-symbols-outlined {
+  font-size: 22px;
 }
 
 .because-card { background: rgba(255,127,80,0.07); border: 1px solid rgba(255,127,80,0.28); border-radius: 14px; padding: 14px; text-align: left; }
@@ -1839,6 +1919,10 @@ body.create-profile-active {
         <div>
           <h2 id="artistProfileName" class="artist-profile-name">Artist</h2>
           <div id="artistProfileTag" class="artist-profile-tag">Featured artist</div>
+          <div id="artistProfileFollowWrap" class="profile-modal-follow-wrap artist-profile-follow-wrap" style="display: none;">
+            <button type="button" class="profile-follow-btn" id="artistProfileFollowBtn">Follow artist</button>
+            <p class="profile-follow-hint" id="artistProfileFollowHint"></p>
+          </div>
         </div>
       </div>
     </div>
@@ -5050,6 +5134,7 @@ console.log('1171')
 
   <script>
     (function wireCustomArtistProfiles() {
+      /* Optional per-artist followKey: sanitized PROFILES email key if they use the real dashboard; else follow uses feat_ARTISTID. */
       const ARTIST_PROFILES = {
         MB: { name: "Melodic Black", image: "https://i.postimg.cc/vB0FtnYY/image.png", socials: [] },
         Mark: { name: "Mark Macko", image: "https://i.postimg.cc/7YmDnpLw/image.png", socials: [
@@ -5062,6 +5147,9 @@ console.log('1171')
           { label: "SoundCloud", url: "https://soundcloud.com/nerdgamer-11" }
         ]},
         tlc: { name: "The Lone Contraband", image: "https://i.postimg.cc/pLTMSKjq/image.png", socials: [
+          { label: "Instagram", url: "https://www.instagram.com/thelonecontraband/" }
+        ]},
+        TheLoneContraband: { name: "The Lone Contraband", image: "https://i.postimg.cc/pLTMSKjq/image.png", socials: [
           { label: "Instagram", url: "https://www.instagram.com/thelonecontraband/" }
         ]},
         Cmay: { name: "Cmay", image: "https://i.postimg.cc/v8kpXbNZ/v5-5.jpg", socials: [
@@ -5090,7 +5178,71 @@ console.log('1171')
       const nameEl = document.getElementById("artistProfileName");
       const tagEl = document.getElementById("artistProfileTag");
       const listEl = document.getElementById("artistSocialList");
+      const followWrap = document.getElementById("artistProfileFollowWrap");
+      const followBtn = document.getElementById("artistProfileFollowBtn");
+      const followHint = document.getElementById("artistProfileFollowHint");
       if (!overlay || !listEl) return;
+
+      let featuredFollowHelperAttempts = 0;
+
+      function featuredFollowKey(artistId, profile) {
+        const fk = profile && profile.followKey ? String(profile.followKey).trim() : "";
+        if (fk) return fk.replace(/[.#$[\]]/g, "_");
+        return "feat_" + String(artistId || "").replace(/[^a-zA-Z0-9_]/g, "_");
+      }
+
+      function refreshFeaturedFollowUI(artistFollowKey) {
+        if (!followWrap || !followBtn || !followHint || !artistFollowKey) return;
+        const gv = typeof window.getViewerFollowKeyForFollow === "function" ? window.getViewerFollowKeyForFollow : null;
+        const signed = typeof window.isSignedInForFollow === "function" ? window.isSignedInForFollow() : false;
+        if (!gv) {
+          featuredFollowHelperAttempts++;
+          followWrap.style.display = "block";
+          followBtn.dataset.artistKey = artistFollowKey;
+          followBtn.dataset.mode = "follow";
+          followBtn.textContent = "Follow artist";
+          followBtn.disabled = false;
+          followHint.textContent = "Loading…";
+          if (featuredFollowHelperAttempts <= 24) {
+            setTimeout(function () { refreshFeaturedFollowUI(artistFollowKey); }, 400);
+          } else {
+            followHint.textContent = "Hard-refresh the page if follow stays stuck on Loading.";
+          }
+          return;
+        }
+        featuredFollowHelperAttempts = 0;
+        const viewerKey = gv();
+        if (viewerKey === artistFollowKey) {
+          followWrap.style.display = "none";
+          return;
+        }
+        followWrap.style.display = "block";
+        followBtn.dataset.artistKey = artistFollowKey;
+        followBtn.disabled = false;
+        if (!signed) {
+          followBtn.textContent = "Sign in to follow";
+          followBtn.dataset.mode = "signin";
+          followHint.textContent = "Sign in with Apple to follow this artist and see updates under “From artists you follow”.";
+          return;
+        }
+        followBtn.dataset.mode = "follow";
+        followBtn.textContent = "Follow artist";
+        followHint.textContent = "Their posts appear under “From artists you follow” on the home page (same as profile artists).";
+        const db = window.firebaseDatabase;
+        const refFn = window.firebaseRef;
+        const getFn = window.firebaseGet;
+        if (db && refFn && getFn) {
+          getFn(refFn(db, "FOLLOWING/" + viewerKey + "/" + artistFollowKey))
+            .then(function (snap) {
+              if (snap.exists() && snap.val() === true) {
+                followBtn.textContent = "Following";
+                followBtn.disabled = true;
+                followBtn.dataset.mode = "follow";
+              }
+            })
+            .catch(function () {});
+        }
+      }
       window.setProfileFocusMode = function(enabled) {
         document.body.classList.toggle("profile-focus-active", !!enabled);
       };
@@ -5098,6 +5250,8 @@ console.log('1171')
       function closeArtistModal() {
         if (typeof window.__unmountFeaturedProfileStickies === "function") window.__unmountFeaturedProfileStickies();
         overlay.classList.remove("active");
+        delete overlay.dataset.followArtistKey;
+        if (followWrap) followWrap.style.display = "none";
         window.setProfileFocusMode(false);
       }
 
@@ -5112,12 +5266,50 @@ console.log('1171')
           : `<div class="artist-social-empty">No socials available.</div>`;
         const stickyKey = "feat_" + String(artistId || "").replace(/[^a-zA-Z0-9_]/g, "_");
         if (typeof window.__mountFeaturedProfileStickies === "function") window.__mountFeaturedProfileStickies(stickyKey);
+        const artistFollowKey = featuredFollowKey(artistId, profile);
+        overlay.dataset.followArtistKey = artistFollowKey;
+        refreshFeaturedFollowUI(artistFollowKey);
         overlay.classList.add("active");
         window.setProfileFocusMode(true);
       }
 
       if (backBtn) backBtn.addEventListener("click", closeArtistModal);
       overlay.addEventListener("click", (e) => { if (e.target === overlay) closeArtistModal(); });
+
+      if (followBtn) {
+        followBtn.addEventListener("click", async function () {
+          if (followBtn.disabled) return;
+          if (followBtn.dataset.mode === "signin") {
+            document.getElementById("apple-sign-in")?.click();
+            return;
+          }
+          const artistKey = followBtn.dataset.artistKey || overlay.dataset.followArtistKey;
+          if (!artistKey) return;
+          if (typeof window.isSignedInForFollow === "function" && !window.isSignedInForFollow()) {
+            document.getElementById("apple-sign-in")?.click();
+            return;
+          }
+          const db = window.firebaseDatabase;
+          const refFn = window.firebaseRef;
+          const setFn = window.firebaseSet;
+          const gv = window.getViewerFollowKeyForFollow;
+          if (!db || !refFn || !setFn || typeof gv !== "function") {
+            alert("Connection not ready. Try again in a moment.");
+            return;
+          }
+          const viewerKey = gv();
+          try {
+            await setFn(refFn(db, "FOLLOWS/" + artistKey + "/" + viewerKey), true);
+            await setFn(refFn(db, "FOLLOWING/" + viewerKey + "/" + artistKey), true);
+            followBtn.textContent = "Following";
+            followBtn.disabled = true;
+            followBtn.dataset.mode = "follow";
+          } catch (e) {
+            console.error(e);
+            alert("Could not follow right now.");
+          }
+        });
+      }
 
       document.querySelectorAll("#artists-grid-8 a[href^='#']").forEach((link) => {
         link.addEventListener("click", (e) => {
@@ -5161,6 +5353,12 @@ console.log('1171')
           <div class="profile-modal-socials" id="profileModalSocials">
             <div style="padding: 1rem; color: rgba(255,255,255,0.6);">No social media links</div>
           </div>
+        </div>
+        <div class="profile-modal-section">
+          <div class="profile-modal-section-title">
+            <i class="fas fa-music"></i> Their music on Asteroid
+          </div>
+          <div id="profileModalSongsList" class="profile-modal-songs-list" aria-live="polite"></div>
         </div>
         <div class="profile-modal-section">
           <div class="profile-modal-section-title">
@@ -5234,12 +5432,78 @@ console.log('1171')
       return (email || "").replace(/[.#$[\]]/g, '_');
     }
 
+    function rtdbUploaderKey(raw) {
+      return String(raw || "").trim().replace(/[.#$[\]]/g, "_");
+    }
+
+    function flattenSongsFromRtdb(songsData) {
+      const allSongs = [];
+      if (!songsData || typeof songsData !== "object") return allSongs;
+      for (const albums of Object.values(songsData)) {
+        if (!albums || typeof albums !== "object") continue;
+        for (const artists of Object.values(albums)) {
+          if (!artists || typeof artists !== "object") continue;
+          for (const songData of Object.values(artists)) {
+            if (songData && typeof songData === "object" && songData.title && songData.fileInp) {
+              const up = (
+                songData.uploader ||
+                songData.uploaderEmail ||
+                songData.uploadedBy ||
+                songData.userEmail ||
+                songData.email ||
+                ""
+              )
+                .toString()
+                .trim();
+              allSongs.push(up ? { ...songData, uploader: up } : { ...songData });
+            }
+          }
+        }
+      }
+      return allSongs;
+    }
+
+    function songBelongsToUserProfile(song, userData) {
+      const raw = (
+        song.uploader ||
+        song.uploaderEmail ||
+        song.uploadedBy ||
+        song.userEmail ||
+        song.email ||
+        ""
+      )
+        .toString()
+        .trim();
+      if (!raw) return false;
+      const ek = (userData.emailKey || "").trim();
+      const k = rtdbUploaderKey(raw);
+      if (ek && (k === ek || k.toLowerCase() === ek.toLowerCase())) return true;
+      const pe = userData.profile && userData.profile.email ? String(userData.profile.email).trim() : "";
+      if (pe && raw === pe) return true;
+      if (pe && rtdbUploaderKey(pe) === ek) return true;
+      const em = (userData.email || "").trim();
+      if (em && raw === em) return true;
+      if (em && rtdbUploaderKey(em) === ek) return true;
+      return false;
+    }
+
+    function escProfileSongQ(s) {
+      return String(s || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    }
+    function escProfileSongAttr(s) {
+      return String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;");
+    }
+
     function getViewerFollowKeyForFollow() {
       const ek = (localStorage.getItem('emailKey') || '').trim();
       if (ek) return ek;
-      const em = (localStorage.getItem('email') || '').trim();
       const cu = (localStorage.getItem('CurrentUser') || '').trim();
-      const id = em || cu;
+      const em = (localStorage.getItem('email') || '').trim();
+      // Prefer CurrentUser (Firebase uid / canonical id) over email so Apple relay email never mismatches PROFILES/<emailKey>.
+      const id = cu || em;
       if (id) return sanitizeEmail(id);
       let pk = localStorage.getItem('pollVoterKey');
       if (!pk) {
@@ -5253,12 +5517,19 @@ console.log('1171')
       try {
         if (window.firebaseAuth && window.firebaseAuth.currentUser) return true;
       } catch (e) {}
-      if (localStorage.getItem('asteroidSignedInBefore') !== 'true') return false;
+      const signedFlag =
+        localStorage.getItem('asteroidSignedInBefore') === 'true' ||
+        localStorage.getItem('isLoggedIn') === 'true' ||
+        localStorage.getItem('localAuthOnly') === '1';
+      if (!signedFlag) return false;
       const ek = (localStorage.getItem('emailKey') || '').trim();
       const cu = (localStorage.getItem('CurrentUser') || '').trim();
       const em = (localStorage.getItem('email') || '').trim();
       return !!(ek || cu || em);
     }
+
+    window.getViewerFollowKeyForFollow = getViewerFollowKeyForFollow;
+    window.isSignedInForFollow = isSignedInForFollow;
     
     // Function to get database instance
     function getDb() {
@@ -5538,7 +5809,7 @@ console.log('1171')
       const bio = userData.profile?.bio || 'No bio available';
       document.getElementById('profileModalBio').textContent = bio;
 
-      const tinp = userData.profile.tinp || 'No Donation Box Available';
+      const tinp = userData.profile?.tinp || 'No Donation Box Available';
       const tinpo = []
       if (userData.profile?.tinp) {
         tinpo.push({ name: 'Donorbox', url: userData.profile.tinp, icon: 'fab fa-gift' });
@@ -5578,6 +5849,59 @@ console.log('1171')
       } else {
         socialsContainer.innerHTML = '<div style="padding: 1rem; color: rgba(255,255,255,0.6);">No social media links</div>';
       }
+
+      const songsMount = document.getElementById("profileModalSongsList");
+      async function fillProfileSongs() {
+        if (!songsMount) return;
+        songsMount.innerHTML = '<p class="profile-modal-songs-loading">Loading tracks…</p>';
+        const dbSongs = getDb();
+        if (!dbSongs) {
+          songsMount.innerHTML = '<p class="profile-modal-songs-empty">Library is not connected.</p>';
+          return;
+        }
+        try {
+          const snap = await get(ref2(dbSongs, "SONGS"));
+          const val = snap.exists() ? snap.val() : null;
+          const all = flattenSongsFromRtdb(val);
+          const mine = all.filter((s) => songBelongsToUserProfile(s, userData));
+          mine.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+          if (!mine.length) {
+            songsMount.innerHTML =
+              '<p class="profile-modal-songs-empty">No tracks uploaded through Asteroid Studio for this profile yet.</p>';
+            return;
+          }
+          const tidBase = "pm" + Date.now();
+          const moodFor = (s) =>
+            String(s.mood || s.primaryMood || (Array.isArray(s.moods) && s.moods.length ? s.moods[0] : "") || "").trim();
+          let html = "";
+          mine.slice(0, 80).forEach((s, i) => {
+            const tid = tidBase + "_" + i;
+            const t = escProfileSongAttr(s.title);
+            const a = escProfileSongAttr(s.artist || "");
+            const al = escProfileSongAttr(s.album || "");
+            const urlAttr = escProfileSongAttr(s.fileInp || "");
+            const up = escProfileSongAttr(s.uploader || "");
+            const m = escProfileSongAttr(moodFor(s));
+            html += `<div class="profile-modal-song-row">
+  <audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" data-display-album="${al}" data-mood="${m}" data-uploader="${up}" playsinline preload="metadata"><source src="${urlAttr}" type="audio/mpeg"></audio>
+  <div class="profile-modal-song-info">
+    <span class="profile-modal-song-title">${t}</span>
+    <span class="profile-modal-song-meta">${a}${al ? " · " + al : ""}</span>
+  </div>
+  <div class="profile-modal-song-actions">
+    <i class="fa fa-play-circle" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play"></i>
+    <i class="fa fa-pause-circle-o" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
+    <button type="button" onclick="queuemusic('${escProfileSongQ(s.fileInp)}','${escProfileSongQ(s.title)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button>
+  </div>
+</div>`;
+          });
+          songsMount.innerHTML = html;
+        } catch (e) {
+          console.warn("profile songs", e);
+          songsMount.innerHTML = '<p class="profile-modal-songs-empty">Could not load tracks.</p>';
+        }
+      }
+      void fillProfileSongs();
 
       const followWrap = document.getElementById('profileModalFollowWrap');
       const followBtn = document.getElementById('profileFollowBtn');
@@ -5662,6 +5986,15 @@ console.log('1171')
     // Close user profile modal
     window.closeUserProfileModal = function() {
       unmountUserProfileStickies();
+      const songsList = document.getElementById("profileModalSongsList");
+      if (songsList) {
+        songsList.querySelectorAll("audio").forEach((a) => {
+          try {
+            a.pause();
+          } catch (e) {}
+        });
+        songsList.innerHTML = "";
+      }
       document.getElementById('profileModal').classList.remove('active');
       if (window.setProfileFocusMode) window.setProfileFocusMode(false);
       else document.body.classList.remove('profile-focus-active');

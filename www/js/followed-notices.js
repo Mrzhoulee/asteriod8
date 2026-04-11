@@ -19,9 +19,9 @@ function sanitizeKeyPart(s) {
 function viewerFollowKey() {
   const ek = (localStorage.getItem("emailKey") || "").trim();
   if (ek) return ek;
-  const em = (localStorage.getItem("email") || "").trim();
   const cu = (localStorage.getItem("CurrentUser") || "").trim();
-  const id = em || cu;
+  const em = (localStorage.getItem("email") || "").trim();
+  const id = cu || em;
   if (id) return sanitizeKeyPart(id);
   let pk = localStorage.getItem("pollVoterKey");
   if (!pk) {

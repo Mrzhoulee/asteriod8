@@ -115,6 +115,31 @@
 }
 
 /* Ensures the input and button share the container space */
+#donationBox {
+  order: 99;
+  max-height: min(42vh, 400px);
+  overflow: auto;
+  margin: 20px auto 0;
+  max-width: 600px;
+  text-align: center;
+  -webkit-overflow-scrolling: touch;
+}
+#donationBox iframe {
+  max-height: min(40vh, 360px) !important;
+  height: min(40vh, 360px) !important;
+  width: 100% !important;
+}
+.cr-stage-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+#socialsBox {
+  order: 2;
+}
+#banGlocks {
+  order: 3;
+}
 
     </style>
 
@@ -124,9 +149,9 @@
     <h1>Room 1</h1>
   </header>
   <div class="cr-grid">
-    <div class="cr-stage">
+    <div class="cr-stage cr-stage-stack">
 
-<button id="tuck" onclick="document.getElementById('banGlocks').style.display = 'block';" class="huck" style="border-radius: 12.5%;">
+<button id="tuck" onclick="document.getElementById('banGlocks').style.display = 'block';" class="huck" style="border-radius: 12.5%; display: none;" type="button">
     <div style="color: darkred">
         <span class="material-symbols-outlined big-icons">stop_circle</span> 
         <h1><font face="Montserrat"><div style="align-items: center;">End <br> Stream</div></font></h1>
@@ -141,10 +166,7 @@
   ⬇️ SCROLL DOWN ⬇️
 </div>
 
-<!-- Donation Box Container -->
-<div id="donationBox" style="display: none; margin: 20px auto; max-width: 600px; text-align: center;"></div>
-
-<!-- Socials Container -->
+<!-- Socials first (readable); donation iframe at bottom -->
 <div id="socialsBox" style="display: none; margin: 20px auto; max-width: 600px; text-align: center; padding: 15px; background: #111827; color: #f3f4f6; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.35);"></div>
 
 <style>
@@ -199,6 +221,9 @@
     <h2 style="margin-top: 25px; letter-spacing: 1px;">Ending Stream...</h2>
     <p style="color: #ff7a3b; font-weight: 500;">Cleaning up your room</p>
 </div>
+
+<!-- Donation box at bottom of stage so it doesn’t cover stream / socials / end controls -->
+<div id="donationBox" style="display: none;"></div>
 
 <style>
     /* Spinner Animation */
