@@ -18,6 +18,9 @@
     <button onclick="po()">POST</button>
     
     <script>
+        function scopedKey(name) {
+            return (typeof authUserStorageKey === "function") ? authUserStorageKey(name) : name;
+        }
         function po() {
             const loti = document.createElement("li");
             loti.innerHTML = fileInp, des;
@@ -36,9 +39,9 @@
                     var fileBase64 = event.target.result; // Base64 encoded string
 
                     // Store the description and Base64 file content in localStorage
-                    localStorage.setItem('des', des);
-                    localStorage.setItem('fileBase64', fileBase64); // Store the file as Base64
-                    localStorage.setItem('post', des + " " + fileBase64);
+                    localStorage.setItem(scopedKey('des'), des);
+                    localStorage.setItem(scopedKey('fileBase64'), fileBase64); // Store the file as Base64
+                    localStorage.setItem(scopedKey('post'), des + " " + fileBase64);
 
                     alert("POST Upload successfully! GOOD LUCK!");
                     window.location.href = 'blog.html';
@@ -47,8 +50,8 @@
                 reader.readAsDataURL(file); // Read the file as Base64
             } else {
                 // If no file is selected, just save the description
-                localStorage.setItem('des', des);
-                localStorage.setItem('post', des);
+                localStorage.setItem(scopedKey('des'), des);
+                localStorage.setItem(scopedKey('post'), des);
                 
                 alert("POST Upload successfully! GOOD LUCK!");
                 window.location.href = 'blog.html';

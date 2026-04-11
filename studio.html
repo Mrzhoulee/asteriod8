@@ -10,11 +10,19 @@
     body { background-color: antiquewhite; font-family: "Montserrat", sans-serif; margin: 0; padding: 20px; text-align: center; }
     .upload-btn { width: 130px; height: 45px; background-color: coral; color: black; border-radius: 10px; cursor: pointer; border: none; font-weight: bold; margin: 10px; }
     .sign-in-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .studio-email-signin {
+      padding: 10px 18px; cursor: pointer; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2);
+      font-weight: 600; font-family: inherit; background: #fff; color: #111;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .studio-email-signin:hover { filter: brightness(0.97); }
     .apple-sign-in {
       padding: 10px 18px; cursor: pointer; border-radius: 6px; border: none; font-weight: 600; font-family: inherit;
       background: #000; color: #fff; display: inline-flex; align-items: center; gap: 8px;
     }
     .apple-sign-in:hover { filter: brightness(1.08); }
+    #studioSignInRow.studio-signin-row--hidden { display: none !important; }
+    #studioTopBar.studio-topbar--visible { display: block !important; }
     
     /* CAMPAIGN UI */
     #campaignContainer { display: none; margin-bottom: 30px; border-bottom: 2px dashed #ccc; padding-bottom: 20px; }
@@ -30,9 +38,105 @@
 
     /* SUCCESS MODAL */
     #vipSuccessBox { display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid #00ff88; padding: 30px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.5); z-index: 1000; max-width: 400px; }
+
+    /* Upload complete message (studio) */
+    .upload-success-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 20000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(20px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+      box-sizing: border-box;
+    }
+    .upload-success-overlay[hidden] {
+      display: none !important;
+    }
+    .upload-success-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: rgba(10, 10, 10, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .upload-success-modal {
+      position: relative;
+      z-index: 1;
+      max-width: 400px;
+      width: 100%;
+      background: linear-gradient(165deg, #1c1c1c 0%, #0e0e0e 100%);
+      border: 1px solid rgba(255, 127, 80, 0.45);
+      border-radius: 22px;
+      padding: 32px 26px 26px;
+      box-shadow:
+        0 28px 90px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+        0 0 40px rgba(255, 127, 80, 0.12);
+      text-align: center;
+      color: #fff;
+      font-family: "Montserrat", sans-serif;
+    }
+    .upload-success-icon {
+      font-size: 52px;
+      line-height: 1;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 4px 12px rgba(255, 127, 80, 0.35));
+    }
+    .upload-success-title {
+      margin: 0 0 14px;
+      font-size: 22px;
+      font-weight: 800;
+      color: #ff7f50;
+      letter-spacing: -0.02em;
+    }
+    .upload-success-track {
+      margin: 0 0 6px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+    .upload-success-sub {
+      margin: 0 0 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .upload-success-body {
+      margin: 0 0 26px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.78);
+    }
+    .upload-success-btn {
+      width: 100%;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff7f50, #e85d2c);
+      color: #fff;
+      box-shadow: 0 10px 28px rgba(255, 127, 80, 0.38);
+      transition: filter 0.2s ease, transform 0.15s ease;
+    }
+    .upload-success-btn:hover {
+      filter: brightness(1.07);
+    }
+    .upload-success-btn:active {
+      transform: scale(0.98);
+    }
   </style>
 </head>
 <body>
+  <script src="auth.js"></script>
+  <div id="studioTopBar" style="display:none;text-align:right;margin:0 auto 12px;max-width:640px;">
+    <button type="button" onclick="if(window.authLogout)authLogout()" style="background:#111;color:#ff7f50;border:1px solid #ff7f50;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-family:inherit;">Sign out</button>
+  </div>
 
   <div id="vipSuccessBox">
     <h1 style="color: #008044; margin-top: 0;">🎉 REWARD UNLOCKED!</h1>
@@ -41,19 +145,11 @@
     <button onclick="document.getElementById('vipSuccessBox').style.display='none'" class="upload-btn">AWESOME!</button>
   </div>
 
-  <div class="sign-in-row">
-    <button id="google-sign-in" type="button" style="padding: 10px 20px; cursor: pointer; border-radius: 5px; background: white;">
-        <i class="fa-brands fa-google"></i> <span id="gcm">Sign In with Google</span>
-    </button>
-    <button id="apple-sign-in" type="button" class="apple-sign-in" aria-label="Sign in with Apple">
-        <i class="fa-brands fa-apple" style="font-size: 1.15em;"></i> <span id="apple-sign-in-label">Sign in with Apple</span>
-    </button>
-  </div>
 
   <div id="campaignContainer">
     <div class="tutorial-box">
       <h2 style="color: #008044; margin-top: 0;">🚀 3-Month Feature Reward</h2>
-      <p>1. <b>Sign In</b> with Google or Apple above.<br>
+      <p>1. <b>Sign In</b> with Apple above.<br>
       2. <b>Share</b> your link with <b>1 artist friend</b>.<br>
       3. When they sign in, you unlock a <b>3-Month Feature!</b></p>
     </div>
@@ -105,7 +201,7 @@
   
     </form>
     <div id="alertBox" class="alertBox"><h2>Uploading...</h2></div>
-  <div id="ooaa" class="alertBox" style="background-color: lightgreen;"><h2>✅ Success! Upload Complete.</h2></div>
+  <div id="ooaa" class="alertBox" style="display:none !important;" aria-hidden="true"></div>
   </div>
 <style>
 
@@ -191,6 +287,40 @@
 
   <form id="uploadForm">
     <h2>Upload Your Media</h2>
+  <div id="studioSignInRow" class="sign-in-row" style="margin-top: 6px; margin-bottom: 12px;">
+    <button id="apple-sign-in" type="button" class="apple-sign-in" aria-label="Sign in with Apple">
+        <i class="fa-brands fa-apple" style="font-size: 1.15em;"></i> <span id="apple-sign-in-label">Sign in with Apple</span>
+    </button>
+    <button type="button" id="studio-email-signin" class="studio-email-signin">Sign in with email</button>
+  </div>
+  <script>
+    (function studioAuthPaintSync() {
+      function uid() {
+        var id = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || localStorage.getItem("userEmail") || localStorage.getItem("artemail") || "").trim();
+        if (id === "null" || id === "undefined") return "";
+        return id;
+      }
+      function sessionQuick() {
+        if (typeof window.isSessionValid === "function") return window.isSessionValid();
+        if (localStorage.getItem("isLoggedIn") === "true") return true;
+        if (localStorage.getItem("localAuthOnly") === "1" && uid()) return true;
+        if (localStorage.getItem("asteroidSignedInBefore") === "true" && uid()) return true;
+        return false;
+      }
+      try {
+        var signedIn = sessionQuick();
+        var row = document.getElementById("studioSignInRow");
+        var bar = document.getElementById("studioTopBar");
+        if (signedIn) {
+          if (row) {
+            row.classList.add("studio-signin-row--hidden");
+            row.setAttribute("aria-hidden", "true");
+          }
+          if (bar) bar.classList.add("studio-topbar--visible");
+        }
+      } catch (e) {}
+    })();
+  </script>
     <input type="text" id="title" placeholder="Song Title" required><br>
     <input type="text" id="artist" placeholder="Artist Name" required><br>
     <input type="text" id="album" placeholder="Album Name" required><br>
@@ -314,6 +444,8 @@
         <label for="agreement" id="agreementLabel" style="display: inline; line-height: 1.5;">I confirm that I own <strong id="agreementSongTitle">this song</strong> and I accept the <a href="Asteroid%20Terms.html" target="_blank" style="color: coral;">Terms of Service</a> and <a href="policy.html" target="_blank" style="color: coral;">Privacy Policy</a> of Asteroid.</label>
     </div>
     <button type="button" id="btn" class="upload-btn">UPLOAD NOW</button>
+    <label for="uploadStatusArea" style="display:block;margin:16px auto 6px;max-width:400px;text-align:left;font-size:12px;font-weight:700;color:#333;font-family:Montserrat,sans-serif;">Upload status</label>
+    <textarea id="uploadStatusArea" readonly rows="5" aria-live="polite" placeholder="Progress will show here when you upload." style="display:block;width:min(400px,92vw);max-width:400px;margin:0 auto 20px;padding:12px;font-size:13px;line-height:1.45;font-family:Montserrat,sans-serif;border-radius:12px;border:1px solid #bbb;box-sizing:border-box;background:#f8f8f8;color:#111;resize:vertical;"></textarea>
     <style>
       body {
         margin: 0;
@@ -364,20 +496,36 @@
         width: 170px;
         height: 60px;
         transition: 0.3s ease;
+        position: relative;
+        z-index: 20;
+        pointer-events: auto;
+        touch-action: manipulation;
+        -webkit-appearance: none;
+        appearance: none;
       }
     
       #boost:hover {
         transform: scale(1.08);
       }
+
+      #boost:disabled {
+        background: #9a9a9a;
+        box-shadow: none;
+        cursor: not-allowed;
+        opacity: 0.75;
+        transform: none;
+      }
+
+      #boost:disabled:hover {
+        transform: none;
+      }
     </style>
   <br>
   <br>
-    <button id="boost">Activate Premium Boost</button>
+    <button id="boost" type="button" disabled aria-disabled="true">Currently Disabled</button>
     <br>
     <br>
     <font face="Montserrat">Click Activate to get your song featured on the top page</font>
-    <br><br>
-    <a href="vip-dashboard.html" style="color: #ff7f50; text-decoration: none; font-weight: 600;"><i class="fas fa-crown"></i> VIP Dashboard – Referral & Eligibility</a>
     <script>
     
     </script>
@@ -385,23 +533,57 @@
   </form>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-  
+    function openBoostUpload(event) {
+      if (event) event.preventDefault();
       const boostBtn = document.getElementById("boost");
+      if (boostBtn && boostBtn.disabled) return;
       const boostContainer = document.getElementById("boostuploadContainer");
-  
-      boostBtn.addEventListener("click", function () {
-        boostContainer.style.display = "block";
-        window.scrollTo({
-    top: 0,
-    left: 0,
-    behavior: "smooth" // Optional: makes the scroll animated
-  });
+      if (!boostContainer) return;
 
+      boostContainer.style.display = "block";
+      boostContainer.removeAttribute("hidden");
+      boostContainer.scrollIntoView({ behavior: "smooth", block: "start" });
 
+      const firstField = document.getElementById("BoostTitle");
+      if (firstField && typeof firstField.focus === "function") {
+        setTimeout(() => firstField.focus(), 250);
+      }
+    }
 
+    function initBoostTrigger() {
+      const boostBtn = document.getElementById("boost");
+      if (!boostBtn || boostBtn.dataset.boostBound === "1") return;
+      boostBtn.dataset.boostBound = "1";
+      boostBtn.type = "button";
+
+      const openFromEvent = (ev) => openBoostUpload(ev);
+      boostBtn.addEventListener("click", openFromEvent, { passive: false });
+      boostBtn.addEventListener("touchend", openFromEvent, { passive: false });
+      boostBtn.addEventListener("pointerup", openFromEvent);
+      boostBtn.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") openFromEvent(ev);
       });
-  
+    }
+
+    function initBoostGlobalFallback() {
+      if (window.__boostGlobalFallbackBound) return;
+      window.__boostGlobalFallbackBound = true;
+
+      const delegateOpen = (ev) => {
+        const target = ev.target && ev.target.closest ? ev.target.closest("#boost") : null;
+        if (!target || target.disabled) return;
+        openBoostUpload(ev);
+      };
+
+      document.addEventListener("click", delegateOpen, true);
+      document.addEventListener("touchend", delegateOpen, { capture: true, passive: false });
+    }
+
+    initBoostTrigger();
+    initBoostGlobalFallback();
+    document.addEventListener("DOMContentLoaded", () => {
+      initBoostTrigger();
+      initBoostGlobalFallback();
     });
   </script>
   
@@ -412,44 +594,228 @@
 
 <script type="module">
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getDatabase, ref as ref2, update, get, onValue, increment, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getDatabase, goOnline, ref as ref2, update, get, onValue, increment, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  import { getAuth, signInWithPopup, signInWithCredential, signInAnonymously, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
   import { processReferralURL, createOrUpdateUserOnSignup, getReferralFromURL, onSongUploaded } from "./js/referral-system.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
+    apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
     authDomain: "asteroid-cdc13.firebaseapp.com",
     databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
     projectId: "asteroid-cdc13",
     storageBucket: "asteroid-cdc13.appspot.com",
     messagingSenderId: "793353824502",
-    appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+    measurementId: "G-GV72TMNNGR"
   };
 
   const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   const db = getDatabase(app);
   const auth = getAuth(app);
   const storage = getStorage(app);
-  const provider = new GoogleAuthProvider();
   const appleProvider = new OAuthProvider("apple.com");
   appleProvider.addScope("email");
   appleProvider.addScope("name");
   const jsConfetti = new JSConfetti();
 
+  function appendUploadStatus(line) {
+    const ta = document.getElementById("uploadStatusArea");
+    if (!ta) return;
+    const cur = ta.value.trim();
+    ta.value = cur ? cur + "\n" + line : line;
+    ta.style.display = "block";
+    try { ta.scrollTop = ta.scrollHeight; } catch (e) {}
+  }
+  function clearUploadStatus() {
+    const ta = document.getElementById("uploadStatusArea");
+    if (ta) {
+      ta.value = "";
+      ta.style.display = "block";
+    }
+  }
+
+  /** RTDB path segments cannot contain . # $ [ ] / — invalid keys often surface as PERMISSION_DENIED. */
+  function sanitizeRtdbPathSegment(seg) {
+    const s = String(seg ?? "").replace(/[.#$\[\]/]/g, "_").trim();
+    return s.length ? s : "_";
+  }
+
+  function withTimeout(promise, ms, label) {
+    return new Promise((resolve, reject) => {
+      const t = setTimeout(() => {
+        reject(new Error(label + " timed out after " + Math.round(ms / 1000) + "s — check network or try again."));
+      }, ms);
+      Promise.resolve(promise).then(
+        (v) => {
+          clearTimeout(t);
+          resolve(v);
+        },
+        (e) => {
+          clearTimeout(t);
+          reject(e);
+        }
+      );
+    });
+  }
+
+  function closeUploadSuccessModal() {
+    const overlay = document.getElementById("uploadSuccessOverlay");
+    if (!overlay) return;
+    overlay.setAttribute("hidden", "");
+    overlay.setAttribute("aria-hidden", "true");
+    try {
+      document.body.style.overflow = "";
+    } catch (e) {}
+  }
+  window.closeUploadSuccessModal = closeUploadSuccessModal;
+
+  function initUploadSuccessOverlayOnce() {
+    const uploadOkOverlay = document.getElementById("uploadSuccessOverlay");
+    if (!uploadOkOverlay || uploadOkOverlay.dataset.studioOverlayBound === "1") return;
+    uploadOkOverlay.dataset.studioOverlayBound = "1";
+    const close = () => closeUploadSuccessModal();
+    const bd = uploadOkOverlay.querySelector(".upload-success-backdrop");
+    const btn = document.getElementById("uploadSuccessCloseBtn");
+    const modal = uploadOkOverlay.querySelector(".upload-success-modal");
+    if (bd) bd.addEventListener("click", close);
+    if (btn) btn.addEventListener("click", close);
+    if (modal) {
+      modal.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+      });
+    }
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && uploadOkOverlay && !uploadOkOverlay.hasAttribute("hidden")) close();
+    });
+  }
+
+  function openUploadSuccessModal(opts) {
+    initUploadSuccessOverlayOnce();
+    const overlay = document.getElementById("uploadSuccessOverlay");
+    const trackEl = document.getElementById("uploadSuccessTrack");
+    const subEl = document.getElementById("uploadSuccessSub");
+    if (!overlay) return;
+    const track = (opts && opts.trackTitle) || "Your song";
+    const artist = (opts && opts.artist) || "";
+    if (trackEl) trackEl.textContent = track;
+    if (subEl) subEl.textContent = artist ? "by " + artist : "";
+    overlay.removeAttribute("hidden");
+    overlay.setAttribute("aria-hidden", "false");
+    try {
+      document.body.style.overflow = "hidden";
+    } catch (e) {}
+    try {
+      var closeBtn = document.getElementById("uploadSuccessCloseBtn");
+      if (closeBtn && typeof closeBtn.focus === "function") closeBtn.focus();
+    } catch (e2) {}
+  }
+
+  function studioUploadLocalIdentity() {
+    let id = (
+      localStorage.getItem("email") ||
+      localStorage.getItem("userEmail") ||
+      localStorage.getItem("CurrentUser") ||
+      localStorage.getItem("artemail") ||
+      ""
+    ).trim();
+    if (id === "null" || id === "undefined") id = "";
+    return id;
+  }
+
+  /** Local / demo “email” session: Storage still needs a Firebase user; we use anonymous for request.auth. */
+  function shouldAttemptAnonymousFirebaseForUpload() {
+    if (!studioUploadLocalIdentity()) return false;
+    if (localStorage.getItem("localAuthOnly") === "1") return true;
+    if (localStorage.getItem("isLoggedIn") === "true") return true;
+    if (typeof window.isSessionValid === "function" && window.isSessionValid()) return true;
+    return false;
+  }
+
+  async function ensureFirebaseAuthForUpload() {
+    if (typeof auth.authStateReady === "function") {
+      try {
+        await auth.authStateReady();
+      } catch (e) {
+        console.warn("[studio] auth.authStateReady", e);
+      }
+    }
+    syncAuthUserToLocalStorage(auth.currentUser);
+    if (auth.currentUser) return true;
+
+    if (shouldAttemptAnonymousFirebaseForUpload()) {
+      try {
+        await signInAnonymously(auth);
+        appendUploadStatus("Signed in for upload (Firebase session for Storage).");
+        return true;
+      } catch (e) {
+        console.error("[studio] signInAnonymously", e);
+        const code = e && e.code ? String(e.code) : "";
+        let msg =
+          "Could not start a Firebase session for upload. Your app sign-in is fine; Storage requires Firebase Auth.";
+        if (code === "auth/operation-not-allowed") {
+          msg =
+            "Enable Anonymous sign-in in Firebase: Console → Authentication → Sign-in method → Anonymous → Enable. Then try upload again.";
+        } else if (code) {
+          msg += " Error: " + code + (e.message ? " — " + e.message : "");
+        }
+        appendUploadStatus(msg);
+        alert(msg);
+        return false;
+      }
+    }
+    appendUploadStatus("Please sign in first — Apple or email (button above).");
+    alert("Please sign in before uploading: use “Sign in with Apple” or “Sign in with email” at the top of this page.");
+    return false;
+  }
+
   const APPLE_AUTH_URL = "https://asteroid-cdc13.firebaseapp.com/auth-apple.html";
+  let _studioCapResumeCloserDone = false;
   const isCapacitorNative = () => typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
   const getBrowserPlugin = () => { try { return window.Capacitor?.Plugins?.Browser || null; } catch (e) { return null; } };
   const getAppPlugin = () => { try { return window.Capacitor?.Plugins?.App || null; } catch (e) { return null; } };
 
-  function handleAppleAuthRedirect(url) {
-    if (!url) return;
+  async function dismissInAppBrowser(reason) {
+    const Browser = getBrowserPlugin();
+    if (!Browser || typeof Browser.close !== "function") {
+      console.warn("[studio][Cap Browser] close skipped - plugin missing", reason);
+      return;
+    }
+    const delays = [0, 60, 180, 400, 800];
+    for (let i = 0; i < delays.length; i++) {
+      const ms = delays[i];
+      if (ms > 0) await new Promise((r) => setTimeout(r, ms));
+      try {
+        await Browser.close();
+        console.log("[studio][Cap Browser] closed OK", reason, "afterMs", ms);
+        try { sessionStorage.removeItem("capAuthBrowserOpened"); } catch (e2) {}
+        return;
+      } catch (e) {
+        console.warn("[studio][Cap Browser] close attempt failed", reason, "afterMs", ms, e && (e.message || e));
+      }
+    }
+  }
+
+  let _lastStudioAppleUrl = null;
+  async function handleAppleAuthRedirect(url) {
+    if (!url || url === _lastStudioAppleUrl) return;
+    _lastStudioAppleUrl = url;
     console.log("[studio] handleAppleAuthRedirect", url);
-    try {
-      const Browser = getBrowserPlugin();
-      if (Browser && typeof Browser.close === "function") Browser.close();
-    } catch (e) {}
     const params = new URLSearchParams(String(url).split("?")[1] || "");
+    const appleIdToken = params.get("appleIdToken") || "";
+    const appleAccessToken = params.get("appleAccessToken") || "";
+    if (appleIdToken) {
+      try {
+        const credential = appleProvider.credential({
+          idToken: appleIdToken,
+          accessToken: appleAccessToken || undefined,
+        });
+        await signInWithCredential(auth, credential);
+        console.log("[studio] Firebase Auth restored for Storage/RTDB");
+      } catch (e) {
+        console.error("[studio] signInWithCredential (Apple)", e);
+      }
+    }
     const email = params.get("email") || "";
     const fullName = params.get("name") || "";
     const uid = params.get("uid") || "";
@@ -459,15 +825,14 @@
       localStorage.setItem("email", id);
       localStorage.setItem("CurrentUser", id);
       localStorage.setItem("fullName", fullName);
-      localStorage.setItem("hasLoggedInWithGoogle", "true");
+      localStorage.setItem("asteroidSignedInBefore", "true");
       localStorage.setItem("pfp", photo);
       localStorage.setItem("emailKey", id.replace(/[.#$[\]]/g, "_"));
-      const gcm = document.getElementById("gcm");
-      if (gcm) gcm.textContent = fullName || id;
       const appleLabel = document.getElementById("apple-sign-in-label");
       if (appleLabel) appleLabel.textContent = fullName || id;
       console.log("[studio] Apple auth complete via redirect:", id);
     }
+    applyStudioAuthUI();
   }
 
   if (isCapacitorNative()) {
@@ -475,15 +840,30 @@
     if (App) {
       try {
         App.addListener("appUrlOpen", (event) => {
-          if (event && event.url && String(event.url).startsWith("asteroid://auth-apple")) {
-            handleAppleAuthRedirect(event.url);
+          const u = event && event.url;
+          if (u && String(u).startsWith("asteroid://auth-apple")) {
+            void (async () => {
+              await dismissInAppBrowser("studio-apple-deeplink");
+              await handleAppleAuthRedirect(u);
+            })();
           }
         });
         App.getLaunchUrl().then((launch) => {
-          if (launch && launch.url && String(launch.url).startsWith("asteroid://auth-apple")) {
-            handleAppleAuthRedirect(launch.url);
+          const u = launch && launch.url;
+          if (u && String(u).startsWith("asteroid://auth-apple")) {
+            void (async () => {
+              await dismissInAppBrowser("studio-apple-launch");
+              await handleAppleAuthRedirect(u);
+            })();
           }
         }).catch(() => {});
+        if (!_studioCapResumeCloserDone) {
+          _studioCapResumeCloserDone = true;
+          App.addListener("resume", () => {
+            const t = parseInt(sessionStorage.getItem("capAuthBrowserOpened") || "0", 10);
+            if (t && Date.now() - t < 180000) void dismissInAppBrowser("studio-app-resume-fallback");
+          });
+        }
       } catch (e) { console.warn("[studio] Capacitor App listener:", e); }
     }
   }
@@ -495,27 +875,76 @@
       localStorage.setItem("email", id);
       localStorage.setItem("CurrentUser", id);
       localStorage.setItem("emailKey", id.replace(/[.#$[\]]/g, "_"));
-      localStorage.setItem("hasLoggedInWithGoogle", "true");
+      localStorage.setItem("asteroidSignedInBefore", "true");
       if (user.displayName) localStorage.setItem("fullName", user.displayName);
       if (user.photoURL) localStorage.setItem("pfp", user.photoURL);
 
-      const gcm = document.getElementById("gcm");
-      if (gcm && (!gcm.textContent || /sign in/i.test(gcm.textContent))) {
-        gcm.textContent = user.displayName || id;
-      }
       const appleLabel = document.getElementById("apple-sign-in-label");
       if (appleLabel && (!appleLabel.textContent || /sign in/i.test(appleLabel.textContent))) {
         appleLabel.textContent = user.displayName || id;
       }
     }
+  } 
+
+  function applyStudioAuthUI() {
+    const row = document.getElementById("studioSignInRow");
+    const topBar = document.getElementById("studioTopBar");
+    const sessionOk = typeof window.isSessionValid === "function" && window.isSessionValid();
+    const signedIn = !!auth.currentUser || sessionOk;
+    if (row) {
+      if (signedIn) {
+        row.classList.add("studio-signin-row--hidden");
+        row.style.display = "none";
+        row.setAttribute("aria-hidden", "true");
+      } else {
+        row.classList.remove("studio-signin-row--hidden");
+        row.style.display = "";
+        row.removeAttribute("aria-hidden");
+      }
+    }
+    if (topBar) {
+      if (signedIn) {
+        topBar.classList.add("studio-topbar--visible");
+        topBar.style.display = "block";
+      } else {
+        topBar.classList.remove("studio-topbar--visible");
+        topBar.style.display = "none";
+      }
+    }
   }
+  window.applyStudioAuthUI = applyStudioAuthUI;
+
+  function refreshStudioAuthUI() {
+    applyStudioAuthUI();
+    try {
+      requestAnimationFrame(() => applyStudioAuthUI());
+    } catch (e) {}
+    setTimeout(() => applyStudioAuthUI(), 50);
+  }
+
   onAuthStateChanged(auth, (user) => {
     syncAuthUserToLocalStorage(user);
     if (user) {
       console.log("[studio] onAuthStateChanged: signed in as", user.email || user.uid);
     }
+    applyStudioAuthUI();
   });
   if (auth.currentUser) syncAuthUserToLocalStorage(auth.currentUser);
+  refreshStudioAuthUI();
+  window.addEventListener("load", () => {
+    try { refreshStudioAuthUI(); } catch (e) {}
+  });
+  window.addEventListener("pageshow", () => {
+    try { applyStudioAuthUI(); } catch (e) {}
+  });
+  if (typeof auth.authStateReady === "function") {
+    auth.authStateReady().then(() => {
+      try {
+        syncAuthUserToLocalStorage(auth.currentUser);
+        applyStudioAuthUI();
+      } catch (e) {}
+    });
+  }
 
   // --- 0. REFERRAL (VIP featuring system) ---
   processReferralURL();
@@ -543,12 +972,11 @@
     localStorage.setItem("email", storedId);
     localStorage.setItem("CurrentUser", storedId);
     localStorage.setItem("fullName", user.displayName || "");
-    localStorage.setItem("hasLoggedInWithGoogle", "true");
+    localStorage.setItem("asteroidSignedInBefore", "true");
     localStorage.setItem("pfp", user.photoURL || "");
     localStorage.setItem("emailKey", storedId.replace(/[.#$[\]]/g, "_"));
 
     const displayLabel = user.displayName || emailForStorage || "Signed in";
-    document.getElementById("gcm").innerHTML = displayLabel;
     const appleLabel = document.getElementById("apple-sign-in-label");
     if (appleLabel) appleLabel.textContent = displayLabel;
 
@@ -569,20 +997,12 @@
       lastLogin: Date.now()
     });
     loadUserProgress(user.displayName || emailForStorage || "Artist");
+    applyStudioAuthUI();
   }
 
-  const googleBtn = document.getElementById("google-sign-in");
   const appleBtn = document.getElementById("apple-sign-in");
-  if (!googleBtn || !appleBtn) {
-    console.error("[studio] Sign-in buttons missing from DOM");
-  }
-  if (googleBtn) {
-    googleBtn.addEventListener("click", () => {
-      console.log("[studio] Google sign-in clicked");
-      signInWithPopup(auth, provider)
-        .then((res) => completeStudioSignIn(res))
-        .catch((err) => console.error("Google sign-in:", err?.code || err));
-    });
+  if (!appleBtn) {
+    console.error("[studio] Apple sign-in button missing from DOM");
   }
   if (appleBtn) {
     appleBtn.addEventListener("click", () => {
@@ -590,7 +1010,10 @@
       if (isCapacitorNative()) {
         const Browser = getBrowserPlugin();
         if (Browser && typeof Browser.open === "function") {
-          try { Browser.open({ url: APPLE_AUTH_URL }); } catch (err) { console.warn("[studio] Browser.open (Apple):", err); }
+          try {
+            try { sessionStorage.setItem("capAuthBrowserOpened", String(Date.now())); } catch (e0) {}
+            Browser.open({ url: APPLE_AUTH_URL });
+          } catch (err) { console.warn("[studio] Browser.open (Apple):", err); }
         } else { window.location.href = APPLE_AUTH_URL; }
         return;
       }
@@ -614,11 +1037,25 @@
     });
   }
 
+  const emailSignInBtn = document.getElementById("studio-email-signin");
+  if (emailSignInBtn) {
+    emailSignInBtn.addEventListener("click", () => {
+      try {
+        const u = new URL("login.html", window.location.href);
+        u.searchParams.set("return", "studio.html");
+        window.location.assign(u.href);
+      } catch (e) {
+        window.location.href = "login.html?return=studio.html";
+      }
+    });
+  }
+
   function loadUserProgress(name) {
     const cleanName = name.replace(/\s+/g, '_');
     const emailRaw = localStorage.getItem("email") || "";
     const safeEmail = emailRaw.replace(/\./g, ',');
     document.getElementById('shareLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=ARTISTSOFFEB26&by=${cleanName}`;
+    const rewardKey = (typeof authScopedKey === "function") ? authScopedKey("rewardNotified") : "rewardNotified";
 
     onValue(ref2(db, 'referralCounts/' + cleanName), async (snap) => {
       const count = snap.val()?.count || 0;
@@ -627,11 +1064,11 @@
 
       if(count >= 1) {
           document.getElementById('unlockMsg').style.display = 'block';
-          if (localStorage.getItem('rewardNotified') !== 'true') {
+          if (localStorage.getItem(rewardKey) !== 'true') {
               document.getElementById('vipSuccessBox').style.display = 'block';
               await update(ref2(db, 'users/' + safeEmail), { eligibility: "3_MONTH_FEATURE" });
               jsConfetti.addConfetti({ emojis: ['🎉', '🚀', '🔥'] });
-              localStorage.setItem('rewardNotified', 'true');
+              localStorage.setItem(rewardKey, 'true');
           }
       }
     });
@@ -639,26 +1076,37 @@
 
   // --- 3. UPLOAD ---
   document.getElementById("btn").onclick = async () => {
+    clearUploadStatus();
+    appendUploadStatus("Preparing upload…");
+
+    const okAuth = await ensureFirebaseAuthForUpload();
+    if (!okAuth) {
+      document.getElementById("alertBox").style.visibility = "hidden";
+      closeUploadSuccessModal();
+      return;
+    }
+
     syncAuthUserToLocalStorage(auth.currentUser);
     const email = (localStorage.getItem("email") || "").trim() || (auth.currentUser && (auth.currentUser.email || auth.currentUser.uid)) || "";
     const file = document.getElementById("fileInp").files[0];
     if (!email || !file) {
+      appendUploadStatus("Error: Sign in and choose an audio file.");
       alert("Please sign in and select a file!");
       return;
     }
     if (!document.getElementById("agreement").checked) {
+      appendUploadStatus("Error: Accept the agreement to upload.");
       alert("Please accept the agreement!");
       return;
     }
 
-    // Hide success message if visible, show loading
-    document.getElementById("ooaa").style.visibility = "hidden";
-    document.getElementById("alertBox").style.visibility = "visible";
-    document.getElementById("alertBox").innerHTML = "<h2>⏳ Uploading your song...</h2>";
+    closeUploadSuccessModal();
+    document.getElementById("alertBox").style.visibility = "hidden";
 
     try {
       console.log("File size: " + (file.size / 1024 / 1024).toFixed(2) + " MB");
-      
+      appendUploadStatus("Uploading file (" + (file.size / 1024 / 1024).toFixed(2) + " MB)…");
+
       const title = document.getElementById("title").value.trim();
       const artist = document.getElementById("artist").value.trim();
       const album = document.getElementById("album").value.trim();
@@ -667,15 +1115,21 @@
         throw new Error("Please fill in all fields (Title, Artist, Album)");
       }
 
-      // Upload file to storage
-      const path = `${album}/${title}/${artist}/${file.name}`;
-      document.getElementById("alertBox").innerHTML = "<h2>⏳ Uploading file to storage...</h2>";
+      const safeTitle = sanitizeRtdbPathSegment(title);
+      const safeAlbum = sanitizeRtdbPathSegment(album);
+      const safeArtist = sanitizeRtdbPathSegment(artist);
+      const path = `${safeAlbum}/${safeTitle}/${safeArtist}/${file.name}`;
+      appendUploadStatus("Sending file to storage…");
       const snap = await uploadBytes(ref(storage, path), file);
       const url = await getDownloadURL(snap.ref);
       console.log("File uploaded to:", url);
 
-      // Save song data to database
-      document.getElementById("alertBox").innerHTML = "<h2>⏳ Saving song information...</h2>";
+      appendUploadStatus("Saving song info to the database…");
+      try {
+        goOnline(db);
+      } catch (e) {
+        console.warn("[studio] goOnline", e);
+      }
       const fullName = localStorage.getItem("fullName") || "";
       const songData = {
         album: album,
@@ -687,36 +1141,44 @@
         campaign: "ARTISTSOFFEB26",
         createdAt: Date.now()
       };
-      const dbPath = `SONGS/${title}/${album}/${artist}`;
-      await update(ref2(db, dbPath), songData);
+      const dbPath = `SONGS/${safeTitle}/${safeAlbum}/${safeArtist}`;
+      const rtdbTimeoutMs = 45000;
+      await withTimeout(update(ref2(db, dbPath), songData), rtdbTimeoutMs, "Saving song metadata");
       console.log("✅ Song data saved to database at:", dbPath);
 
+      appendUploadStatus("Saving agreement record…");
       const agreementKey = email.replace(/[.#$[\]]/g, "_") + "_" + Date.now();
-      await update(ref2(db, "AGREEMENTS/" + agreementKey), {
-        email: email,
-        name: fullName,
-        songTitle: title,
-        artistName: artist,
-        albumName: album,
-        type: album.toLowerCase() === title.toLowerCase() ? "single" : "album",
-        acceptedAt: Date.now(),
-        acceptedTerms: true,
-        acceptedPrivacy: true
-      });
+      await withTimeout(
+        update(ref2(db, "AGREEMENTS/" + agreementKey), {
+          email: email,
+          name: fullName,
+          songTitle: title,
+          artistName: artist,
+          albumName: album,
+          type: album.toLowerCase() === title.toLowerCase() ? "single" : "album",
+          acceptedAt: Date.now(),
+          acceptedTerms: true,
+          acceptedPrivacy: true
+        }),
+        rtdbTimeoutMs,
+        "Saving agreement"
+      );
 
-      // Firestore referral system – increment songCount & check eligibility
+      // Firestore referral system – increment songCount & check eligibility (don’t block success UI)
       try {
         const currentUser = auth.currentUser;
         if (currentUser) {
-          await onSongUploaded(currentUser.uid, title);
+          void withTimeout(onSongUploaded(currentUser.uid, title), 20000, "Referral sync").catch((e) =>
+            console.warn("Referral system:", e)
+          );
         }
-      } catch (e) { console.warn("Referral system:", e); }
+      } catch (e) {
+        console.warn("Referral system:", e);
+      }
       console.log("📦 Song data:", songData);
 
-      // Success!
-      document.getElementById("alertBox").style.visibility = "hidden";
-      document.getElementById("ooaa").style.visibility = "visible";
-      document.getElementById("ooaa").innerHTML = "<h2>✅ Success! Your song has been uploaded and will appear on the main page shortly.</h2>";
+      appendUploadStatus("Done! Your song was uploaded and should appear on the home page shortly.");
+      openUploadSuccessModal({ trackTitle: title, artist: artist });
       jsConfetti.addConfetti();
 
       // Reset form
@@ -726,16 +1188,20 @@
       document.getElementById("uploadSub").textContent = "or click to upload (.mp3 only)";
       document.getElementById("dropArea").classList.remove("file-selected");
       document.getElementById("agreement").checked = false;
-
-      // Hide success message after 5 seconds
-      setTimeout(() => {
-        document.getElementById("ooaa").style.visibility = "hidden";
-      }, 5000);
+      var songTitleLabel = document.getElementById("agreementSongTitle");
+      if (songTitleLabel) songTitleLabel.textContent = "this song";
 
     } catch (err) {
       console.error("Upload error:", err);
       document.getElementById("alertBox").style.visibility = "hidden";
-      alert("Upload failed: " + (err.message || "Unknown error. Please try again."));
+      const msg = err.message || "Unknown error. Please try again.";
+      appendUploadStatus("Failed: " + msg);
+      if (/permission|Permission/i.test(String(msg))) {
+        appendUploadStatus(
+          "Realtime Database rules blocked the save. Open Firebase Console → Realtime Database → Rules and deploy the rules from this repo (database.rules.json), or ensure SONGS and AGREEMENTS allow write for signed-in users (auth != null). Email login uses anonymous Firebase auth for uploads."
+        );
+      }
+      alert("Upload failed: " + msg);
     }
   };
 
@@ -748,14 +1214,17 @@
 
   if(localStorage.getItem("fullName") || localStorage.getItem("email")) {
       const savedName = localStorage.getItem("fullName") || localStorage.getItem("email") || "";
-      document.getElementById("gcm").innerHTML = savedName;
+      const gcmEl = document.getElementById("gcm");
+      if (gcmEl) gcmEl.innerHTML = savedName;
       const appleLabel = document.getElementById("apple-sign-in-label");
       if (appleLabel) appleLabel.textContent = savedName;
       if (savedName) loadUserProgress(savedName);
   }
+  refreshStudioAuthUI();
 
 
   document.addEventListener("DOMContentLoaded", () => {
+    initUploadSuccessOverlayOnce();
 
 const boostBtn = document.getElementById("boostBtn");
 
@@ -783,6 +1252,11 @@ async function cleanupExpiredBoosts() {
 
 boostBtn.addEventListener("click", async (e) => {
   e.preventDefault();
+
+  if (!(await ensureFirebaseAuthForUpload())) {
+    document.getElementById("alertBox").style.visibility = "hidden";
+    return;
+  }
 
   syncAuthUserToLocalStorage(auth.currentUser);
   const email = (localStorage.getItem("email") || "").trim() || (auth.currentUser && (auth.currentUser.email || auth.currentUser.uid)) || "";
@@ -828,7 +1302,8 @@ boostBtn.addEventListener("click", async (e) => {
       createdAt: Date.now()
     });
 
-    localStorage.setItem("pendingBoostId", boostId);
+    const pendingBoostKey = (typeof authScopedKey === "function") ? authScopedKey("pendingBoostId") : "pendingBoostId";
+    localStorage.setItem(pendingBoostKey, boostId);
 
     window.location.href = "https://buy.stripe.com/bJe14nbpWfuV81idk7gQE04";
 
@@ -842,6 +1317,17 @@ boostBtn.addEventListener("click", async (e) => {
 
 
 </script>
+<div id="uploadSuccessOverlay" class="upload-success-overlay" hidden aria-hidden="true">
+  <div class="upload-success-backdrop" role="presentation" aria-hidden="true"></div>
+  <div class="upload-success-modal" role="dialog" aria-modal="true" aria-labelledby="uploadSuccessHeading">
+    <div class="upload-success-icon" aria-hidden="true">🎵</div>
+    <h2 id="uploadSuccessHeading" class="upload-success-title">You’re all set</h2>
+    <p class="upload-success-track" id="uploadSuccessTrack"></p>
+    <p class="upload-success-sub" id="uploadSuccessSub"></p>
+    <p class="upload-success-body">Your song has been uploaded successfully. It should appear on the home page shortly.</p>
+    <button type="button" class="upload-success-btn" id="uploadSuccessCloseBtn" onclick="if (window.closeUploadSuccessModal) window.closeUploadSuccessModal();">Great!</button>
+  </div>
+</div>
 <!-- Mobile bottom nav -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -857,7 +1343,7 @@ boostBtn.addEventListener("click", async (e) => {
 .mobile-nav-item .material-symbols-outlined{font-size:24px}
 .mobile-nav-item:hover,.mobile-nav-item.mobile-nav-active{color:#ff7f50}
 .mobile-nav-item.mobile-nav-active{background:rgba(255,127,80,0.1)}
-@media(max-width:768px){.mobile-nav{display:flex}}
+@media screen and (max-width:3840px){body{padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}.mobile-nav{display:flex !important}}
 </style>
 </body>
 </html>

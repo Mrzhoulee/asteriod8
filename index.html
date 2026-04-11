@@ -31,10 +31,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Asteroid is a music discovery platform with NO ads supporting indie artists and listeners with curated playlists and ad-supported streaming.">
   <meta property="og:image" content="https://www.asteroid8.net/logo.png">
-  <meta name="google-signin-scope" content="profile email">
-  <meta name="google-signin-client_id"
-    content="793353824502-lev9l8rli2v813bi4ie48qs4bf1pm0nk.apps.googleusercontent.com">
-
   <!-- Preconnect for Google Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,11 +76,6 @@
   <script src="https://cdn-widgetsrepository.yotpo.com/v1/loader/vXV5TxhDJ44clW7jVuCWhM3swa9OfwpA4inhebRI"
     async></script>
   <link rel="shortcut icon" href="astei.jpg" type="image/x-icon">
-  <meta name="google-signin-scope" content="profile email">
-  <meta name="google-signin-client_id"
-    content="793353824502-lev9l8rli2v813bi4ie48qs4bf1pm0nk.apps.googleusercontent.com">
-  <!-- To integrate Google Sign-in -->
-  <script src="https://apis.google.com/js/platform.js" async defer></script>
   <meta name="description" content="Asteroid is a music universe for everyone, with no ads and no interruptions">
   <meta name="google-adsense-account" content="ca-pub-9005824789597666">
   <meta property="og:image" content="https://www.asteroid8.net/logo.png">
@@ -131,12 +122,11 @@
 
   <div class="header-right">
     <div class="header-sign-in-group" aria-label="Sign in options">
-      <button type="button" class="header-sign-in-btn header-sign-in-google" id="google-sign-in">
-        <span id="gcd" class="header-sign-in-gcd">Continue with <i class="fa-brands fa-google"></i></span>
-      </button>
       <button type="button" class="header-sign-in-btn header-sign-in-apple" id="apple-sign-in" aria-label="Continue with Apple">
-        <i class="fa-brands fa-apple" aria-hidden="true"></i> Continue with Apple
+        <i class="fa-brands fa-apple" aria-hidden="true"></i>
+        <span id="gcd">Continue with Apple</span>
       </button>
+      <a href="login.html" class="header-email-login">Email sign-in</a>
     </div>
     <button type="button" id="user-profile-button" class="user-profile-button" aria-label="Account">
       <img src="I12_417_1_10701.svg" alt="" class="user-profile-icon" width="24" height="24">
@@ -176,22 +166,29 @@
   width: 100%;
   max-width: 240px;
 }
-.header-sign-in-google {
-  background: #fff;
-  color: #111;
-  border: 1px solid rgba(0, 0, 0, 0.14);
-}
-.header-sign-in-gcd {
-  font-size: 13px;
-  color: #111;
-}
 .header-sign-in-apple {
   background: #fff;
   color: #111;
   border: 1px solid rgba(0, 0, 0, 0.14);
 }
+.header-sign-in-apple #gcd {
+  font-size: 13px;
+  color: #111;
+}
+.header-email-login {
+  display: inline-block;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  padding: 6px 0 0;
+}
+.header-email-login:hover {
+  color: #ff7f50;
+  text-decoration: underline;
+}
 /* Visible by default so guests see buttons before/without Firebase; JS hides when signed in */
-#google-sign-in,
 #apple-sign-in {
   display: inline-flex !important;
   align-items: center;
@@ -236,6 +233,50 @@
   font-size: 13px;
   font-weight: 500;
   margin-bottom: 14px;
+}
+.discovery-controls {
+  width: min(980px, 100%);
+  margin: 10px auto 14px;
+  padding: 12px;
+  border: 1px solid rgba(255,127,80,0.28);
+  border-radius: 14px;
+  background: rgba(255,127,80,0.06);
+  text-align: left;
+}
+.discovery-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.discovery-row:last-child { margin-bottom: 0; }
+.discovery-label {
+  color: rgba(255,255,255,0.86);
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 120px;
+}
+.chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.filter-chip {
+  border: 1px solid rgba(255,127,80,0.4);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.86);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.filter-chip:hover { border-color: #ff7f50; }
+.filter-chip.active {
+  background: #ff7f50;
+  color: #111;
+  border-color: #ff7f50;
 }
 
 /* Users Grid Styles */
@@ -371,6 +412,29 @@
   background: rgba(255, 127, 80, 0.2);
   color: #ff7f50;
 }
+.profile-modal-back-btn {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+.profile-modal-back-btn:hover {
+  background: rgba(255, 127, 80, 0.22);
+  border-color: rgba(255,127,80,0.8);
+}
 
 .profile-modal-avatar-large {
   width: 120px;
@@ -478,6 +542,160 @@
   font-weight: 600;
   color: #ff7f50;
 }
+
+/* Custom artist profile modal */
+.artist-profile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.artist-profile-overlay.active { display: flex; }
+.artist-profile-card {
+  width: min(760px, 96vw);
+  max-height: 92vh;
+  overflow: auto;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 127, 80, 0.35);
+  background: linear-gradient(165deg, #101010 0%, #0a0a0a 70%);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+}
+.artist-profile-head {
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.artist-profile-back {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.artist-profile-row { margin-top: 12px; display: flex; gap: 14px; align-items: center; }
+.artist-profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 127, 80, 0.6);
+}
+.artist-profile-name {
+  margin: 0;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+}
+.artist-profile-tag { margin-top: 4px; color: rgba(255, 255, 255, 0.72); font-size: 13px; }
+.artist-profile-body { padding: 16px 18px 18px; }
+.artist-social-list { display: grid; gap: 10px; }
+.artist-social-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 127, 80, 0.22);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+}
+.artist-social-link:hover {
+  border-color: rgba(255, 127, 80, 0.5);
+  background: rgba(255, 127, 80, 0.12);
+}
+.artist-social-empty {
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+  padding: 10px 0;
+  font-size: 13px;
+}
+.artist-profile-stickies {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 127, 80, 0.2);
+}
+.artist-profile-stickies h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+}
+.artist-profile-sticky-hint {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.4;
+}
+.profile-sticky-list {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.profile-sticky-list .profile-sticky-empty {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.profile-sticky-list .cr-sticky {
+  background: linear-gradient(145deg, rgba(255, 127, 80, 0.12), rgba(255, 180, 100, 0.06));
+  border: 1px solid rgba(255, 127, 80, 0.25);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #f5f5f5;
+}
+.profile-sticky-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.profile-sticky-compose textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 127, 80, 0.3);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: 'Poppins', sans-serif;
+  resize: vertical;
+  min-height: 52px;
+}
+.profile-sticky-compose button {
+  align-self: flex-start;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  background: #ff7f50;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+}
+.profile-sticky-compose button:hover {
+  background: #e66a3a;
+}
+#profileModalStickySection .profile-sticky-list {
+  max-height: 200px;
+}
 #asteroidLeaderboard {
   background: #111 !important;
   border: 1px solid rgba(255, 127, 80, 0.2);
@@ -542,8 +760,10 @@
 .song-row-info { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .song-row-title { font-weight: 600; font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .song-row-artist { font-size: 12px; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.song-row-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.song-row-actions { display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0; }
 .song-row-actions i, .song-row-actions .material-symbols-outlined { color: #ff7f50; cursor: pointer; transition: transform 0.15s, color 0.15s; }
+.song-row-actions i.song-row-play { font-size: 40px; }
+.song-row-actions i.song-row-pause { font-size: 36px; }
 .song-row-actions i { font-size: 28px; }
 .song-row-actions .material-symbols-outlined { font-size: 22px; }
 .song-row-actions i:hover, .song-row-actions .material-symbols-outlined:hover { color: #fff; transform: scale(1.15); }
@@ -578,7 +798,9 @@
 .single-title { font-weight: 600; font-size: 15px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .single-artist { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
 .single-badge { display: inline-block; margin-top: 6px; padding: 2px 10px; font-size: 11px; font-weight: 600; color: #ff7f50; background: rgba(255,127,80,0.15); border-radius: 8px; }
-.single-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.single-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-shrink: 0; }
+.single-actions i.fa-play-circle { color: #ff7f50; font-size: 44px; cursor: pointer; transition: color 0.15s, transform 0.15s; }
+.single-actions i.fa-pause-circle-o { color: #ff7f50; font-size: 38px; cursor: pointer; transition: color 0.15s, transform 0.15s; }
 .single-actions i { color: #ff7f50; font-size: 30px; cursor: pointer; transition: color 0.15s, transform 0.15s; }
 .single-actions i:hover { color: #fff; transform: scale(1.15); }
 .single-actions button { background: none; border: none; padding: 0; cursor: pointer; display: flex; }
@@ -626,8 +848,193 @@
   min-width: 140px;
 }
 .lol .lol-queue-wrap p { margin: 0 0 4px 0 !important; font-size: 12px !important; }
-.lol .material-symbols-outlined { font-size: 40px !important; }
-.artists-section { display: flex; overflow-x: auto; gap: 16px; scroll-behavior: smooth; white-space: nowrap; }
+.lol-mini-player {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  padding: 14px 16px max(18px, env(safe-area-inset-bottom)) !important;
+}
+.lol-mini-player .lol-main-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px 28px;
+  width: 100%;
+}
+.lol-mini-player .lol-now-wrap {
+  flex: 1 1 240px;
+  min-width: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.lol-mini-player #tata {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  justify-content: center !important;
+}
+.lol-mini-player .lol-load-hint {
+  margin: 0;
+  font-size: 11px !important;
+  line-height: 1.45 !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-weight: 400 !important;
+  max-width: 340px;
+  padding: 0 10px;
+}
+.lol-mini-player .lol-transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  flex-shrink: 0;
+}
+.lol-mini-player .lol-transport-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  margin: 0;
+  cursor: pointer;
+  line-height: 0;
+  border-radius: 50%;
+  transition: transform 0.18s ease, opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.lol-mini-player .lol-transport-btn:hover {
+  transform: scale(1.05);
+}
+.lol-mini-player .lol-transport-btn:active {
+  transform: scale(0.96);
+}
+.lol-mini-player .lol-transport-btn .material-symbols-outlined {
+  font-size: 68px !important;
+  width: 68px;
+  height: 68px;
+  color: #ff7f50 !important;
+}
+.lol-mini-player .lol-queue-wrap {
+  width: 100%;
+  border-top: 1px solid rgba(255, 127, 80, 0.18);
+  padding-top: 10px;
+  margin-top: 2px;
+}
+.artists-section { display: block; overflow: visible; gap: 16px; scroll-behavior: smooth; white-space: normal; }
+/* Keep featured artists/songs visible on iPad-sized layouts */
+@media screen and (min-width: 769px) and (max-width: 1366px) {
+  #artists,
+  #featuredSection {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  #featuredContainer {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+  #artists .section-title,
+  #featuredSection h2 {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin: 0 0 18px !important;
+    line-height: 1.2;
+  }
+  #artists {
+    margin: 72px 0 10px !important;
+    padding-top: 18px !important;
+    min-height: 180px;
+  }
+  #artists-grid-8 {
+    display: block !important;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+  #artists-grid-8 .artists-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 14px;
+    min-width: max-content;
+  }
+  #artists-grid-8 .artist-card {
+    display: flex !important;
+    flex: 0 0 auto;
+  }
+  #featuredSection {
+    margin-top: 20px !important;
+    clear: both;
+  }
+}
+/* ===== APP ONBOARDING ===== */
+.asteroid-onboarding { display: none; position: fixed; inset: 0; z-index: 50000; background: #000; flex-direction: column; font-family: 'Poppins', sans-serif; -webkit-user-select: none; user-select: none; overflow: hidden; }
+.asteroid-onboarding.active { display: flex !important; }
+body.onboarding-active .mobile-nav,
+body.onboarding-active .bottom-queue-dock,
+body.onboarding-active .lol {
+  display: none !important;
+}
+body.onboarding-active {
+  padding-bottom: 0 !important;
+}
+body.profile-focus-active .mobile-nav,
+body.profile-focus-active .bottom-queue-dock,
+body.profile-focus-active .lol {
+  display: none !important;
+}
+body.profile-focus-active {
+  padding-bottom: 0 !important;
+}
+/* Fallback: hide bottom UI whenever profile overlays are open */
+#profileModal.active ~ .mobile-nav,
+#profileModal.active ~ .bottom-queue-dock,
+#profileModal.active ~ .lol,
+#artistProfileOverlay.active ~ .mobile-nav,
+#artistProfileOverlay.active ~ .bottom-queue-dock,
+#artistProfileOverlay.active ~ .lol {
+  display: none !important;
+}
+body.create-profile-active .mobile-nav,
+body.create-profile-active .bottom-queue-dock,
+body.create-profile-active .lol {
+  display: none !important;
+}
+body.create-profile-active {
+  padding-bottom: 0 !important;
+}
+.ob-slides { display: flex; width: 300%; height: 100%; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1); }
+.ob-slide { width: calc(100% / 3); height: 100%; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: max(16px, env(safe-area-inset-top)) 20px max(8px, env(safe-area-inset-bottom)); box-sizing: border-box; text-align: center; position: relative; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.ob-slide::before { content: ""; position: absolute; inset: 0; opacity: 0.08; background: radial-gradient(circle at 50% 40%, #ff7f50, transparent 70%); pointer-events: none; }
+.ob-icon { font-size: 56px; margin-bottom: 24px; filter: drop-shadow(0 0 18px rgba(255,127,80,0.5)); }
+.ob-title { font-family: 'Montserrat', sans-serif; font-size: 26px; font-weight: 800; color: #fff; margin: 0 0 14px; line-height: 1.25; }
+.ob-title span { background: linear-gradient(135deg, #ff7f50, #ff4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.ob-desc { font-size: 15px; color: rgba(255,255,255,0.75); line-height: 1.6; max-width: 340px; margin: 0 0 18px; }
+.ob-features { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 320px; margin: 8px 0 18px; }
+.ob-feat { display: flex; align-items: flex-start; gap: 14px; text-align: left; background: rgba(255,127,80,0.06); border: 1px solid rgba(255,127,80,0.15); padding: 14px 16px; border-radius: 14px; }
+.ob-feat-icon { font-size: 28px; flex-shrink: 0; line-height: 1; }
+.ob-feat-text strong { display: block; color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.ob-feat-text span { color: rgba(255,255,255,0.6); font-size: 12.5px; line-height: 1.4; }
+.ob-bottom { margin-top: 16px; width: 100%; max-width: 360px; flex-shrink: 0; padding: 0 8px 8px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.ob-dots-row { width: 100%; display: flex; justify-content: center; }
+.ob-bottom-top { position: relative; width: 100%; min-height: 40px; padding: 0 72px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+.ob-desc-last { margin-bottom: 0 !important; }
+.ob-btn-primary { width: 100%; max-width: 300px; box-sizing: border-box; }
+.ob-dots { display: flex; gap: 8px; }
+.ob-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.25); transition: all 0.3s; }
+.ob-dot.active { width: 24px; border-radius: 4px; background: #ff7f50; }
+.ob-btn { padding: 12px 28px; border-radius: 12px; border: none; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: transform 0.15s, opacity 0.15s; }
+.ob-btn:active { transform: scale(0.96); }
+.ob-btn-next { background: linear-gradient(135deg, #ff7f50, #e85d2c); color: #fff; }
+.ob-btn-start { background: linear-gradient(135deg, #ff7f50, #e85d2c); color: #fff; padding: 14px 36px; font-size: 16px; }
+@media (max-height: 600px) {
+  .ob-icon { font-size: 40px; margin-bottom: 14px; }
+  .ob-title { font-size: 22px; }
+  .ob-desc { font-size: 13px; }
+  .ob-feat { padding: 10px 12px; }
+}
 .logout-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
 .logout-modal .logout-modal-box { background: #0a0a0a; color: #fff; padding: 28px 32px; border-radius: 20px; width: 100%; max-width: 380px; border: 1px solid rgba(255,127,80,0.25); box-shadow: 0 24px 48px rgba(0,0,0,0.5); font-family: 'Poppins', sans-serif; }
 .logout-modal-header { display: flex; align-items: center; margin-bottom: 16px; gap: 12px; }
@@ -638,6 +1045,26 @@
 .logout-modal-name { font-weight: 600; color: #fff; }
 .logout-modal-email { font-size: 12px; margin-top: 4px; }
 .logout-modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.sign-out-loading-overlay { display: none; position: fixed; inset: 0; z-index: 12000; background: rgba(0,0,0,0.92); align-items: center; justify-content: center; flex-direction: column; gap: 18px; }
+.sign-out-loading-overlay .sign-out-spinner { width: 46px; height: 46px; border: 3px solid rgba(255,127,80,0.2); border-top-color: #ff7f50; border-radius: 50%; animation: asteroidSpinOut 0.65s linear infinite; }
+@keyframes asteroidSpinOut { to { transform: rotate(360deg); } }
+.apple-onboarding-modal { display: none; position: fixed; inset: 0; z-index: 3500; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+.apple-onboarding-box { background: #0a0a0a; color: #fff; max-width: 440px; width: 100%; border-radius: 20px; border: 1px solid rgba(255,127,80,0.35); padding: 24px 22px; font-family: 'Poppins', sans-serif; box-sizing: border-box; max-height: 92vh; overflow-y: auto; }
+.apple-onboarding-box h2 { margin: 0 0 6px; font-family: 'Montserrat', sans-serif; font-size: 20px; color: #fff; }
+.apple-onboarding-sub { margin: 0 0 16px; font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.45; }
+.apple-onboarding-box label { display: block; font-size: 11px; color: rgba(255,255,255,0.55); margin: 10px 0 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.apple-onboarding-box input { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: #fff; font-size: 14px; font-family: 'Poppins', sans-serif; }
+.apple-onboarding-box input::placeholder { color: rgba(255,255,255,0.35); }
+.apple-onboarding-choice-group { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 6px; }
+.apple-onboarding-choice { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04); }
+.apple-onboarding-choice input[type="radio"] { margin-top: 2px; width: auto; }
+.apple-onboarding-choice strong { display: block; font-size: 13px; color: #fff; font-family: 'Montserrat', sans-serif; }
+.apple-onboarding-choice span { display: block; font-size: 12px; color: rgba(255,255,255,0.68); line-height: 1.4; }
+.apple-onboarding-optional { font-size: 12px; color: rgba(255,127,80,0.9); margin: 18px 0 6px; font-weight: 600; }
+.apple-onboarding-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+.apple-onboarding-actions button { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 10px; cursor: pointer; border: none; }
+.apple-onboarding-save { background: linear-gradient(135deg, #ff7f50, #e85d2c); color: #fff; }
+.apple-onboarding-skip { background: transparent; color: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.2) !important; }
 .logout-btn-cancel { padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: #fff; font-size: 14px; cursor: pointer; font-family: 'Poppins', sans-serif; transition: background 0.2s, border-color 0.2s; }
 .logout-btn-cancel:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.5); }
 .logout-btn-confirm { padding: 10px 20px; border-radius: 12px; border: none; background: #ff7f50; color: #fff; font-weight: 600; font-size: 14px; cursor: pointer; font-family: 'Poppins', sans-serif; transition: background 0.2s, transform 0.2s; }
@@ -687,6 +1114,7 @@
           </div>
 
 
+          <div id="tour-live-concerts" class="tour-live-concerts-wrap">
           <div class="live-circle">
             <a href="lively.html" class="nav-item">
               <span>Live Concerts Menu</span>
@@ -696,16 +1124,7 @@
           <div class="live-notifier">
             [ NEW UPDATE ]🎤 Artists can go live anytime — watch live concerts instantly.
           </div>
-          <div style="color: white;">
-
-
-  <h3 style="color: white;">Music Queue</h3>
-  <table>
-    <tr>
-      <td id="queues"></td>
-    </tr>
-  </table>
- 
+          </div>
         </nav>
       </div>
       <div class="sidebar-promo-wrapper">
@@ -721,6 +1140,272 @@
 
 
 <div id="loader"></div>
+
+<!-- App onboarding (first launch only) -->
+<div id="asteroidOnboarding" class="asteroid-onboarding">
+  <div class="ob-slides" id="obSlides">
+
+    <!-- Slide 1: Welcome -->
+    <div class="ob-slide">
+      <div class="ob-icon">🪐</div>
+      <h1 class="ob-title">Welcome to <span>Asteroid</span></h1>
+      <p class="ob-desc">Music discovery that feels human again. No ads, no algorithms deciding what you hear — just real artists, real fans, and real connection.</p>
+      <p class="ob-desc ob-desc-last" style="font-size:13px; color:rgba(255,255,255,0.5);">Community-first. Always free to listen.</p>
+      <div class="ob-bottom">
+        <div class="ob-dots-row">
+          <div class="ob-dots"><div class="ob-dot active"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+        </div>
+        <button type="button" id="obNext1" class="ob-btn ob-btn-next ob-btn-primary" onclick="goToSlide(1)">Next</button>
+      </div>
+    </div>
+
+    <!-- Slide 2: Why Asteroid -->
+    <div class="ob-slide">
+      <div class="ob-icon">✨</div>
+      <h1 class="ob-title">Why <span>Asteroid</span>?</h1>
+      <div class="ob-features">
+        <div class="ob-feat">
+          <div class="ob-feat-icon">🚫</div>
+          <div class="ob-feat-text"><strong>Zero Ads, Ever</strong><span>No interruptions. Just music the way it should be.</span></div>
+        </div>
+        <div class="ob-feat">
+          <div class="ob-feat-icon">🤝</div>
+          <div class="ob-feat-text"><strong>Community-Driven Discovery</strong><span>Find music through real people, not pay-to-win algorithms.</span></div>
+        </div>
+        <div class="ob-feat">
+          <div class="ob-feat-icon">🎤</div>
+          <div class="ob-feat-text"><strong>Live Concerts</strong><span>Watch artists perform live and interact in real time.</span></div>
+        </div>
+        <div class="ob-feat">
+          <div class="ob-feat-icon">🚀</div>
+          <div class="ob-feat-text"><strong>Artists Grow Organically</strong><span>No promotion spend. Growth through participation.</span></div>
+        </div>
+      </div>
+      <div class="ob-bottom">
+        <div class="ob-bottom-top">
+          <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot active"></div><div class="ob-dot"></div></div>
+        </div>
+        <button type="button" id="obNext2" class="ob-btn ob-btn-next ob-btn-primary" onclick="goToSlide(2)">Next</button>
+      </div>
+    </div>
+
+    <!-- Slide 3: Explore features + CTA -->
+    <div class="ob-slide">
+      <div class="ob-icon">🎶</div>
+      <h1 class="ob-title">Ready to <span>explore</span>?</h1>
+      <div class="ob-features">
+        <div class="ob-feat" onclick="finishOnboarding()" style="cursor:pointer">
+          <div class="ob-feat-icon">📚</div>
+          <div class="ob-feat-text"><strong>Song Library</strong><span>Browse and play music from independent artists worldwide.</span></div>
+        </div>
+        <div class="ob-feat" onclick="finishOnboarding('studio.html')" style="cursor:pointer">
+          <div class="ob-feat-icon">🎙️</div>
+          <div class="ob-feat-text"><strong>Upload Your Music</strong><span>Share your songs with the community — free, no limits.</span></div>
+        </div>
+        <div class="ob-feat" onclick="finishOnboarding('lively.html')" style="cursor:pointer">
+          <div class="ob-feat-icon">🎪</div>
+          <div class="ob-feat-text"><strong>Live Concerts</strong><span>Join live sessions, react, chat, and discover new artists.</span></div>
+        </div>
+      </div>
+      <div class="ob-bottom">
+        <div class="ob-bottom-top">
+          <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot active"></div></div>
+        </div>
+        <button type="button" id="obStart" class="ob-btn ob-btn-start ob-btn-primary" onclick="startFeatureTour()">Get Started</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Feature tour: fixed tooltip card at bottom + highlight ring on target -->
+<div id="ftCard" class="ft-card">
+  <div class="ft-card-inner">
+    <div id="ftCardIcon" class="ft-card-icon"></div>
+    <div class="ft-card-body">
+      <div id="ftCardTitle" class="ft-card-title"></div>
+      <div id="ftCardDesc" class="ft-card-desc"></div>
+    </div>
+  </div>
+  <div class="ft-card-footer">
+    <span id="ftCardStep" class="ft-card-step"></span>
+    <button id="ftCardNext" class="ft-card-next" onclick="nextTourStep()">Next</button>
+  </div>
+</div>
+
+<style>
+.ft-card{display:none;position:fixed;left:12px;right:12px;bottom:max(132px,calc(96px + env(safe-area-inset-bottom)));z-index:49000;padding:0;pointer-events:none;max-width:520px;margin-left:auto;margin-right:auto}
+.ft-card.active{display:block;pointer-events:auto;animation:ftPopIn .35s ease}
+@keyframes ftPopIn{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.ft-card-inner{background:#111;border:1.5px solid rgba(255,127,80,0.5);border-radius:18px 18px 0 0;padding:16px 16px 10px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 -8px 32px rgba(0,0,0,0.45)}
+.ft-card-icon{font-size:32px;flex-shrink:0;line-height:1}
+.ft-card-body{flex:1;min-width:0}
+.ft-card-title{font-family:'Montserrat',sans-serif;font-size:17px;font-weight:700;color:#ff7f50;margin:0 0 5px}
+.ft-card-desc{font-size:13.5px;color:rgba(255,255,255,0.85);line-height:1.55;margin:0;white-space:pre-line}
+.ft-card-footer{background:#111;border:1.5px solid rgba(255,127,80,0.5);border-top:none;border-radius:0 0 18px 18px;padding:10px 16px 12px;display:flex;align-items:center;gap:8px;box-shadow:0 12px 28px rgba(0,0,0,0.35)}
+@media (max-height:700px){
+.ft-card{bottom:max(108px,calc(72px + env(safe-area-inset-bottom)))}
+.ft-card-desc{max-height:min(28vh,120px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+}
+.ft-card-step{font-size:12px;color:rgba(255,255,255,0.4);flex:1}
+.ft-card-next{background:linear-gradient(135deg,#ff7f50,#e85d2c);color:#fff;border:none;font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;padding:9px 22px;border-radius:10px;cursor:pointer}
+.ft-highlight-ring{outline:3px solid #ff7f50;outline-offset:6px;border-radius:12px;box-shadow:0 0 0 10px rgba(255,127,80,0.15);transition:outline-color .3s}
+</style>
+
+<script>
+(function () {
+  var OB_KEY = "asteroid_onboarding_done";
+  var wrapper = document.getElementById("asteroidOnboarding");
+  var slides = document.getElementById("obSlides");
+  if (!wrapper || !slides) return;
+
+  if (localStorage.getItem(OB_KEY) === "1") return;
+
+  wrapper.classList.add("active");
+  document.body.classList.add("onboarding-active");
+  document.body.style.overflow = "hidden";
+
+  var current = 0;
+  var total = 3;
+  var startX = 0;
+
+  window.goToSlide = function (i) {
+    if (i < 0 || i >= total) return;
+    current = i;
+    slides.style.transform = "translateX(-" + (current * (100 / total)) + "%)";
+  };
+  // Defensive binding: keeps onboarding navigation working
+  // even if inline onclick attributes are accidentally edited.
+  var obNext1 = document.getElementById("obNext1");
+  var obNext2 = document.getElementById("obNext2");
+  var obStart = document.getElementById("obStart");
+  if (obNext1) obNext1.addEventListener("click", function () { window.goToSlide(1); });
+  if (obNext2) obNext2.addEventListener("click", function () { window.goToSlide(2); });
+  if (obStart) obStart.addEventListener("click", function () { window.startFeatureTour(); });
+
+  window.finishOnboarding = function (navigateTo) {
+    localStorage.setItem(OB_KEY, "1");
+    wrapper.style.opacity = "0";
+    wrapper.style.transition = "opacity 0.35s ease";
+    setTimeout(function () {
+      wrapper.classList.remove("active");
+      wrapper.style.opacity = "";
+      document.body.classList.remove("onboarding-active");
+      document.body.style.overflow = "";
+      if (navigateTo) window.location.href = navigateTo;
+    }, 350);
+  };
+
+  wrapper.addEventListener("touchstart", function (e) {
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+  wrapper.addEventListener("touchend", function (e) {
+    var diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0 && current < total - 1) window.goToSlide(current + 1);
+      else if (diff < 0 && current > 0) window.goToSlide(current - 1);
+    }
+  }, { passive: true });
+
+  var tourSteps = [
+    {
+      target: "ab",
+      icon: "📚",
+      title: "Song Library",
+      desc: "This is where all uploaded songs live. Browse, search, and play music from independent artists around the world — no ads, no limits.",
+    },
+    {
+      target: "hot-tracks",
+      fallback: "asteroidLeaderboard",
+      icon: "🔥",
+      title: "Trending Songs of the Month",
+      desc: "See what the community is listening to right now. The most-played songs this month are ranked here in real time.",
+    },
+    {
+      target: "discover-modes",
+      icon: "🎭",
+      title: "Discover by Mood",
+      desc: "Pick how you're feeling and let Asteroid find the perfect tracks. Discovery based on community, not algorithms.",
+    },
+    {
+      target: "tour-live-concerts-nav",
+      fallback: "tour-live-concerts",
+      fallback2: "sidebar",
+      icon: "🎪",
+      title: "Online live concerts",
+      desc: "Watch: tap Concerts in the bottom bar (or Live Concerts Menu in the sidebar on larger layouts), then choose a room to watch.\n\nHost: on that Live Concerts page, tap Create Live Stream, sign in if asked, and follow the prompts to start your own broadcast.",
+    },
+  ];
+  var tourStep = 0;
+  var ftCard = document.getElementById("ftCard");
+  var ftIcon = document.getElementById("ftCardIcon");
+  var ftTitle = document.getElementById("ftCardTitle");
+  var ftDesc = document.getElementById("ftCardDesc");
+  var ftStep = document.getElementById("ftCardStep");
+  var ftNext = document.getElementById("ftCardNext");
+  var prevHighlight = null;
+
+  function clearHighlight() {
+    if (prevHighlight) {
+      prevHighlight.classList.remove("ft-highlight-ring");
+      prevHighlight = null;
+    }
+  }
+
+  function showTourStep() {
+    clearHighlight();
+    var step = tourSteps[tourStep];
+    var el = document.getElementById(step.target);
+    if (!el && step.fallback) el = document.getElementById(step.fallback);
+    if (!el && step.fallback2) el = document.getElementById(step.fallback2);
+    if (!el) { window.nextTourStep(); return; }
+
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.add("ft-highlight-ring");
+    prevHighlight = el;
+
+    ftIcon.textContent = step.icon;
+    ftTitle.textContent = step.title;
+    ftDesc.textContent = step.desc;
+    ftStep.textContent = (tourStep + 1) + " of " + tourSteps.length;
+    ftNext.textContent = tourStep < tourSteps.length - 1 ? "Next" : "Done";
+
+    ftCard.classList.add("active");
+  }
+
+  window.startFeatureTour = function () {
+    localStorage.setItem(OB_KEY, "1");
+    wrapper.style.opacity = "0";
+    wrapper.style.transition = "opacity 0.3s ease";
+    setTimeout(function () {
+      wrapper.classList.remove("active");
+      wrapper.style.opacity = "";
+      document.body.classList.remove("onboarding-active");
+      document.body.style.overflow = "";
+      tourStep = 0;
+      showTourStep();
+    }, 300);
+  };
+
+  window.nextTourStep = function () {
+    tourStep++;
+    if (tourStep >= tourSteps.length) {
+      window.endFeatureTour();
+      return;
+    }
+    ftCard.classList.remove("active");
+    setTimeout(function () {
+      showTourStep();
+    }, 100);
+  };
+
+  window.endFeatureTour = function () {
+    clearHighlight();
+    ftCard.classList.remove("active");
+    localStorage.setItem(OB_KEY, "1");
+  };
+})();
+</script>
 
 <!-- Logout confirmation modal -->
 <div id="logoutModal" class="logout-modal">
@@ -746,8 +1431,60 @@
   </div>
 </div>
 
+<!-- Full-screen loading while sign-out clears session -->
+<div id="signOutLoadingOverlay" class="sign-out-loading-overlay" aria-live="polite" aria-busy="true">
+  <div class="sign-out-spinner" role="status"></div>
+  <p style="margin:0;color:#fff;font-family:'Poppins',sans-serif;font-size:15px;">Signing out…</p>
+</div>
+
+<!-- After Sign in with Apple: nickname + optional socials -->
+<div id="appleOnboardingModal" class="apple-onboarding-modal" aria-modal="true" role="dialog" aria-labelledby="appleOnboardingTitle">
+  <div class="apple-onboarding-box">
+    <h2 id="appleOnboardingTitle">Finish your profile</h2>
+    <p class="apple-onboarding-sub">Choose a nickname that other listeners will see. Add social links if you like — all optional except your nickname.</p>
+    <label for="appleOnboardingNickname">Nickname</label>
+    <input type="text" id="appleOnboardingNickname" maxlength="80" placeholder="Your artist or display name" autocomplete="nickname">
+    <label>Profile type</label>
+    <div class="apple-onboarding-choice-group" role="radiogroup" aria-label="Profile type">
+      <label class="apple-onboarding-choice" for="appleProfileTypeArtist">
+        <input type="radio" id="appleProfileTypeArtist" name="appleOnboardingProfileType" value="artist">
+        <div>
+          <strong>Public / Artist</strong>
+          <span>Discoverable profile. Email can be shown in profile details.</span>
+        </div>
+      </label>
+      <label class="apple-onboarding-choice" for="appleProfileTypeListener">
+        <input type="radio" id="appleProfileTypeListener" name="appleOnboardingProfileType" value="listener" checked>
+        <div>
+          <strong>Private / Listener</strong>
+          <span>Email stays hidden from other users.</span>
+        </div>
+      </label>
+    </div>
+    <p class="apple-onboarding-optional">Socials (optional)</p>
+    <label for="appleOnboardingInstagram">Instagram URL</label>
+    <input type="url" id="appleOnboardingInstagram" placeholder="https://instagram.com/…">
+    <label for="appleOnboardingTwitter">X (Twitter) URL</label>
+    <input type="url" id="appleOnboardingTwitter" placeholder="https://x.com/…">
+    <label for="appleOnboardingTiktok">TikTok URL</label>
+    <input type="url" id="appleOnboardingTiktok" placeholder="https://tiktok.com/@…">
+    <label for="appleOnboardingYoutube">YouTube URL</label>
+    <input type="url" id="appleOnboardingYoutube" placeholder="https://youtube.com/…">
+    <label for="appleOnboardingSpotify">Spotify URL</label>
+    <input type="url" id="appleOnboardingSpotify" placeholder="https://open.spotify.com/…">
+    <label for="appleOnboardingSoundcloud">SoundCloud URL</label>
+    <input type="url" id="appleOnboardingSoundcloud" placeholder="https://soundcloud.com/…">
+    <label for="appleOnboardingWebsite">Website</label>
+    <input type="url" id="appleOnboardingWebsite" placeholder="https://…">
+    <div class="apple-onboarding-actions">
+      <button type="button" class="apple-onboarding-skip" id="appleOnboardingSkipBtn">Skip for now</button>
+      <button type="button" class="apple-onboarding-save" id="appleOnboardingSaveBtn">Save &amp; continue</button>
+    </div>
+  </div>
+</div>
+
 <!-- Delete Account confirmation modal -->
-<div id="deleteAccountModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:3000; align-items:center; justify-content:center; padding:20px;">
+<div id="deleteAccountModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:3000; align-items:center; justify-content:center; padding:20px; flex-direction:column;">
   <div style="background:#0a0a0a; color:#fff; padding:28px 32px; border-radius:20px; width:100%; max-width:400px; border:1px solid rgba(255,80,80,0.4); box-shadow:0 24px 48px rgba(0,0,0,0.6); font-family:'Poppins',sans-serif;">
     <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
       <div style="width:44px; height:44px; border-radius:50%; background:rgba(255,80,80,0.2); display:flex; align-items:center; justify-content:center; font-size:20px;">⚠️</div>
@@ -766,7 +1503,7 @@
       </ul>
     </div>
     <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:14px;">To confirm, type <strong style="color:#ff5050;">DELETE</strong> below:</p>
-    <input id="deleteConfirmInput" type="text" placeholder='Type "DELETE" to confirm' autocomplete="off" style="width:100%; padding:10px 14px; border-radius:10px; border:1px solid rgba(255,80,80,0.3); background:rgba(255,255,255,0.05); color:#fff; font-size:14px; font-family:'Poppins',sans-serif; box-sizing:border-box; margin-bottom:16px; outline:none;">
+    <input id="deleteConfirmInput" type="text" placeholder='Type "DELETE" to confirm' autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" style="width:100%; padding:10px 14px; border-radius:10px; border:1px solid rgba(255,80,80,0.3); background:rgba(255,255,255,0.05); color:#fff; font-size:14px; font-family:'Poppins',sans-serif; box-sizing:border-box; margin-bottom:16px; outline:none; text-transform:uppercase;">
     <div style="display:flex; justify-content:flex-end; gap:10px;">
       <button id="deleteAccountCancelBtn" style="padding:10px 20px; border-radius:12px; border:1px solid rgba(255,255,255,0.3); background:transparent; color:#fff; font-size:14px; cursor:pointer; font-family:'Poppins',sans-serif;">Cancel</button>
       <button id="deleteAccountConfirmBtn" disabled style="padding:10px 20px; border-radius:12px; border:none; background:rgba(255,80,80,0.3); color:rgba(255,255,255,0.4); font-weight:600; font-size:14px; cursor:not-allowed; font-family:'Poppins',sans-serif; transition:all 0.2s;">Delete my account</button>
@@ -871,6 +1608,33 @@
       </div>
     </section>
 
+<div id="artistProfileOverlay" class="artist-profile-overlay" aria-modal="true" role="dialog">
+  <div class="artist-profile-card">
+    <div class="artist-profile-head">
+      <button type="button" class="artist-profile-back" id="artistProfileBackBtn">Back</button>
+      <div class="artist-profile-row">
+        <img id="artistProfileAvatar" class="artist-profile-avatar" src="" alt="Artist">
+        <div>
+          <h2 id="artistProfileName" class="artist-profile-name">Artist</h2>
+          <div id="artistProfileTag" class="artist-profile-tag">Featured artist</div>
+        </div>
+      </div>
+    </div>
+    <div class="artist-profile-body">
+      <div id="artistSocialList" class="artist-social-list"></div>
+      <div class="artist-profile-stickies">
+        <h3>Thank-you notes</h3>
+        <p class="artist-profile-sticky-hint">Anonymous notes for this artist (language filtered). No sign-in required.</p>
+        <div id="featuredProfileStickyList" class="profile-sticky-list"></div>
+        <div class="profile-sticky-compose">
+          <textarea id="featuredProfileStickyInput" maxlength="280" rows="2" placeholder="Thanks for the music…" autocomplete="off"></textarea>
+          <button type="button" id="featuredProfileStickySend">Post thank-you</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
     <style>
       /* ===== Featured Section — coral/black/white ===== */
 #featuredSection {
@@ -883,6 +1647,14 @@
   font-weight: 700;
   color: #fff;
   font-family: 'Montserrat', sans-serif;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative;
+  z-index: 3;
+  min-height: 32px;
+  line-height: 1.2;
+  text-align: left;
 }
 #featuredContainer {
   display: grid;
@@ -994,7 +1766,7 @@
           <input 
             type="text" 
             id="userSearchInput" 
-            placeholder="Search users by name, email, or role..." 
+            placeholder="Search users by name or role..." 
             style="
               width: 100%;
               padding: 0.75rem 1rem 0.75rem 3rem;
@@ -1063,482 +1835,22 @@
 <div id="asteroidLeaderboard"></div>
              <div style="text-align:center;">
     <div class="content">
-    </section>
     <center>
-    <section id="discover-modes">
-      <h2 class="section-title">Discover Songs</h2>
-      <h4>I'm feeling</h4>
- 
+    <section id="discover-modes" style="margin-top:10px;text-align:center;">
+      <h3 class="section-title" style="font-size:16px;margin:0 0 4px;text-align:center;">Discover Songs</h3>
+      <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0 0 12px;text-align:center;">Mood-based discovery</p>
       <div class="discover-modes-grid horizontal-scroll">
         <div class="mode-card">
-          <div class="feelings">
-            <button class="feeling-btn" id="Lonely">Lonely</button>
-            <button class="feeling-btn" id="Rain">Rain</button>
-            <button class="feeling-btn" id="Late">Late</button>
-            <button class="feeling-btn" id="Focus">Focus</button>
-            <button class="feeling-btn" id="Calm">Calm</button>
-            <button class="feeling-btn" id="Party">Party</button>
-            <button class="feeling-btn" id="Holiday">Holiday</button>
-            <button class="feeling-btn" id="Beach">Beach</button>
-            <button class="feeling-btn" id="InThePlane">In the Plane</button>
-            <button class="feeling-btn" id="MorningDrive">Morning Drive</button>
-            <button class="feeling-btn" id="LateDrive">Late Drive</button>
-            <button class="feeling-btn" id="Mad">Mad</button>
-            
-            <button class="feeling-btn" id="Tired">Tired</button>
-            <button class="feeling-btn" id="Productive">Productive</button>
-            <button class="feeling-btn" id="Excited">Excited</button>
-            
-
+          <div class="moods-unavailable" style="max-width:360px;margin:0 auto;padding:22px 18px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,127,80,0.3);border-radius:16px;font-family:Poppins,sans-serif;box-sizing:border-box;">
+            <p style="margin:0 0 8px;font-size:16px;font-weight:600;color:#ff7f50;">Currently unavailable</p>
+            <p style="margin:0;font-size:13px;line-height:1.55;color:rgba(255,255,255,0.7);">Song moods are turned off for now. Use the main library above to browse and play tracks.</p>
           </div>
-        </center>
-          <script>
-// Wrapped in async IIFE to allow await
-// Note: This API call requires a valid API key. Commented out to prevent errors.
-// Uncomment and add your API key when ready to use this feature.
-/*
-(async () => {
-  try {
-    const apiKey = "YOUR_REAL_JWT_HERE"; // Replace with actual API key
-    if (!apiKey || apiKey === "YOUR_REAL_JWT_HERE") {
-      console.log("⚠️ VectorShift API key not configured, skipping API call");
-      return;
-    }
-    
-    const response = await fetch(
-      'https://api.vectorshift.ai/v1/pipeline/69733b4098163cbba15657a5/run',
-      {
-        method: 'POST',
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          inputs: {
-            discover: "Chill"
-          }
-        })
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log(data);
-  } catch (error) {
-    console.warn("VectorShift API error (non-critical):", error.message);
-  }
-})();
-*/
-          </script>
-
-          <script>
-            // Mood mapping for user interface moods to analyzed moods
-            const moodMap = {
-              Lonely: ["calm", "chill"],
-              Productive: ["focus"],
-              Focus: ["focus"],
-              Calm: ["calm"],
-              Party: ["party", "energetic"],
-              Holiday: ["party", "energetic", "chill"],
-              InThePlane: ["calm", "chill"],
-              MorningDrive: ["energetic", "focus"],
-              LateDrive: ["chill"],
-              Tired: ["calm", "chill"]
-
-            };
-
-            // Function to get songs by mood
-            async function getSongsByMood(mood) {
-              console.log("🎵 Searching for songs with mood:", mood);
-              try {
-                const response = await fetch(`https://getsongsbymood-2nyi7qyxtq-nn.a.run.app?mood=${mood}`);
-                const data = await response.json();
-                console.log("✅ Found songs:", data);
-
-                // Debug: Log first song structure to understand available properties
-                if (data.results && data.results.length > 0) {
-                  console.log("🎵 Sample song object:", data.results[0]);
-                }
-
-                return data;
-              } catch (error) {
-                console.error("❌ Error fetching songs:", error);
-                return { results: [], error: error.message };
-              }
-            }
-
-            // Function to display song results
-            function displaySongResults(songs, moodName) {
-              // Remove existing results
-              const existingResults = document.getElementById('song-results');
-              if (existingResults) {
-                existingResults.remove();
-              }
-
-              // Create results container
-              const resultsDiv = document.createElement('div');
-              resultsDiv.id = 'song-results';
-              resultsDiv.style.cssText = `
-                margin-top: 20px;
-                margin-left: 0px;
-                padding: 20px;
-                background: rgba(0, 0, 0, 0.8);
-                border-radius: 10px;
-                color: white;
-                max-width: 100%;
-                display: block;
-                width: 100%;
-                text-align: center !important;
-                alight-items: center !important;
-              `;
-
-              resultsDiv.innerHTML = `
-                <h3 style="color: #ff6b6b; text-align: center;">🎵 Songs for "${moodName}" mood</h3>
-                <div id="songs-list" style="margin-top: 15px;"></div>
-              `;
-
-              // Add songs to the list
-              const songsList = resultsDiv.querySelector('#songs-list');
-              if (songs.length === 0) {
-                songsList.innerHTML = '<p style="text-align: center; color: #ccc;">No songs found for this mood yet. Upload some MP3s and they will be analyzed automatically!</p>';
-              } else {
-                songs.forEach(song => {
-                  // Debug: Log song data structure
-                  console.log('🎵 Song data:', song);
-                  console.log('🎵 Song name/path:', song.name);
-
-                  const songDiv = document.createElement('div');
-                  songDiv.style.cssText = `
-                    padding: 10px;
-                    margin: 5px 0;
-                    background: rgba(255, 255, 255, 0.1);
-                    border-radius: 5px;
-                    border-left: 3px solid #ff6b6b;
-                  `;
-
-                  // Extract clean title from song data
-                  let songTitle = song.title2 || song.title; // Try API title first
-
-                  if (!songTitle && song.name) {
-                    // Extract title from filename: remove path and extension
-                    const filename = song.name.split('/').pop(); // Get filename without path
-                    songTitle = filename.replace(/\.[^/.]+$/, ""); // Remove file extension (.mp3, etc.)
-                  }
-
-                  // Final fallback
-                  songTitle = songTitle || "Unknown Song";
-
-                  // Create unique ID for this song
-                  const songId = `mood_song_${songTitle.replace(/[^a-zA-Z0-9]/g, '_')}_${Math.random().toString(36).substr(2, 9)}`;
-
-                  songDiv.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                      <div style="flex: 1;">
-                        <div style="font-weight: bold; color: #ff6b6b;">${songTitle}</div>
-                        <div style="font-size: 12px; color: #ccc;">
-                          Mood: ${song.mood} |
-                          User moods: ${song.userMoods.join(', ') || 'None'} |
-                          Size: ${Math.round(song.size / 1024 / 1024 * 100) / 100}MB
-                        </div>
-                      </div>
-                      <button id="playBtn_${songId}" onclick="playMoodSong('${songTitle.replace(/'/g, "\\'")}', '${songId}', '${(song.name || song.path || song.url || '').replace(/'/g, "\\'")}')"
-                              style="background: linear-gradient(90deg, #ff3b3b, #ff7a3b); color: white; border: none; border-radius: 20px; padding: 8px 16px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
-                        ▶️ PLAY
-                      </button>
-                    </div>
-                  `;
-
-                  // Add audio element for this song
-                  const audioElement = document.createElement('audio');
-                  audioElement.id = `gaga_mood_${songId}`;
-                  audioElement.preload = 'none';
-                  audioElement.style.display = 'none';
-
-                  // Don't set src here - it will be set dynamically in playMoodSong function
-                  // This allows for Firebase Storage URL resolution
-
-                  // Add event listeners for better UX
-                  audioElement.addEventListener('ended', () => {
-                    const button = document.getElementById(`playBtn_${songId}`);
-                    if (button && !button.disabled) {
-                      button.innerHTML = '▶️ PLAY';
-                      button.style.background = 'linear-gradient(90deg, #ff3b3b, #ff7a3b)';
-                    }
-
-                    // Reset tata element when song ends
-                    const tataElement = document.getElementById('tata');
-                    if (tataElement) {
-                      tataElement.innerHTML = '<font color="coral">SELECT A SONG</font>';
-                    }
-                  });
-
-                  audioElement.addEventListener('error', () => {
-                    const button = document.getElementById(`playBtn_${songId}`);
-                    if (button && !button.disabled) {
-                      button.innerHTML = '❌ UNAVAILABLE';
-                      button.style.background = 'linear-gradient(90deg, #666, #555)';
-                      button.disabled = true;
-                    }
-
-                    // Reset tata element on error
-                    const tataElement = document.getElementById('tata');
-                    if (tataElement) {
-                      tataElement.innerHTML = '<font color="coral">SELECT A SONG</font>';
-                    }
-                  });
-
-                  songDiv.appendChild(audioElement);
-                  songsList.appendChild(songDiv);
-                });
-              }
-
-              // Insert results after the discover-modes section (outside the center tag)
-              const discoverSection = document.getElementById('discover-modes');
-              discoverSection.parentNode.insertBefore(resultsDiv, discoverSection.nextSibling);
-            }
-
-            // Function to play/pause mood songs
-            window.playMoodSong = async function(songTitle, songId, songPath) {
-              const audioId = `gaga_mood_${songId}`;
-              const buttonId = `playBtn_${songId}`;
-              const audio = document.getElementById(audioId);
-              const button = document.getElementById(buttonId);
-
-              if (!audio) {
-                console.error('Audio element not found:', audioId);
-                return;
-              }
-
-              // Stop any currently playing mood songs
-              document.querySelectorAll('audio[id^="gaga_mood_"]').forEach(otherAudio => {
-                if (otherAudio.id !== audioId && !otherAudio.paused) {
-                  otherAudio.pause();
-                  // Reset other buttons to PLAY
-                  const otherBtnId = otherAudio.id.replace('gaga_mood_', 'playBtn_');
-                  const otherBtn = document.getElementById(otherBtnId);
-                  if (otherBtn) {
-                    otherBtn.innerHTML = '▶️ PLAY';
-                    otherBtn.style.background = 'linear-gradient(90deg, #ff3b3b, #ff7a3b)';
-                  }
-                }
-              });
-
-              if (audio.paused) {
-                // Set loading state
-                button.innerHTML = '⏳ LOADING...';
-                button.style.background = 'linear-gradient(90deg, #ffa500, #ff8c00)';
-
-                try {
-                  // Get download URL from Firebase Storage
-                  if (!audio.src || audio.src === '') {
-                    if (songPath) {
-                      console.log('🎵 Loading song from path:', songPath);
-
-                          // If songPath is a direct URL, use it
-                      if (songPath.startsWith('http') && !songPath.includes('127.0.0.1')) {
-                        audio.src = songPath;
-                        console.log('🎵 Using direct URL:', songPath);
-                      } else if (songPath.includes('firebasestorage.googleapis.com')) {
-                        // Already a Firebase Storage URL
-                        audio.src = songPath;
-                        console.log('🎵 Using Firebase Storage URL:', songPath);
-                      } else {
-                        // Try to get from Firebase Storage
-                        try {
-                          if (window.firebaseGetStorage && window.firebaseStorageRef && window.firebaseGetDownloadURL) {
-                            const storage = window.firebaseGetStorage(window.firebaseApp);
-                            const songRef = window.firebaseStorageRef(storage, songPath);
-                            console.log('🎵 Getting download URL from Firebase Storage...');
-                            const downloadURL = await window.firebaseGetDownloadURL(songRef);
-                            audio.src = downloadURL;
-                            console.log('🎵 Firebase Storage URL:', downloadURL);
-                          } else {
-                            throw new Error('Firebase Storage functions not available');
-                          }
-                        } catch (storageError) {
-                          console.warn('Firebase Storage not available, trying fallback options:', storageError);
-
-                          // Try multiple fallback strategies
-                          if (songPath.startsWith('http') && !songPath.includes('127.0.0.1') && !songPath.includes('localhost')) {
-                            // Already a full URL (not localhost)
-                            audio.src = songPath;
-                            console.log('🎵 Using direct URL fallback:', songPath);
-                          } else if (songPath.includes('firebasestorage.googleapis.com')) {
-                            // Already a Firebase Storage URL
-                            audio.src = songPath;
-                            console.log('🎵 Using Firebase Storage URL fallback:', songPath);
-                          } else if (songPath.includes('/') || songPath.includes('songs/') || songPath.includes('music/')) {
-                            // Looks like a file path, try Firebase Storage URL
-                            const cleanPath = songPath.startsWith('/') ? songPath.substring(1) : songPath;
-                            audio.src = `https://firebasestorage.googleapis.com/v0/b/asteroid-cdc13.appspot.com/o/${encodeURIComponent(cleanPath)}?alt=media`;
-                            console.log('🎵 Using constructed Firebase Storage URL:', audio.src);
-                          } else {
-                            // Last resort - try as-is but warn about localhost
-                            console.warn('🎵 Unknown path format, may not work:', songPath);
-                            audio.src = songPath;
-                          }
-                        }
-                      }
-                    } else {
-                      throw new Error('No song path available');
-                    }
-                  }
-
-                  // Play the song
-                  await audio.play();
-                  button.innerHTML = '⏸️ PAUSE';
-                  button.style.background = 'linear-gradient(90deg, #4CAF50, #45a049)';
-                  console.log('Playing:', songTitle, 'from:', audio.src);
-
-                  // Update tata element with current song
-                  const tataElement = document.getElementById('tata');
-                  if (tataElement) {
-                    tataElement.innerHTML = `<font color="coral">🎵 NOW PLAYING: ${songTitle}</font>`;
-                  }
-
-                } catch (error) {
-                  console.error('Error playing song:', error);
-                  button.innerHTML = '❌ UNAVAILABLE';
-                  button.style.background = 'linear-gradient(90deg, #f44336, #d32f2f)';
-                  button.disabled = true;
-
-                  // Show user-friendly error message
-                  setTimeout(() => {
-                    alert(`Unable to load "${songTitle}". The song file may not be available or there may be a network issue.`);
-                  }, 500);
-                }
-              } else {
-                // Pause the song
-                audio.pause();
-                button.innerHTML = '▶️ PLAY';
-                button.style.background = 'linear-gradient(90deg, #ff3b3b, #ff7a3b)';
-                console.log('Paused:', songTitle);
-
-                // Reset tata element to default
-                const tataElement = document.getElementById('tata');
-                if (tataElement) {
-                  tataElement.innerHTML = '<font color="coral">SELECT A SONG</font>';
-                }
-              }
-            };
-
-            // Add click event listeners to feeling buttons
-            document.addEventListener('DOMContentLoaded', function() {
-              const feelingButtons = document.querySelectorAll('.feeling-btn');
-
-              feelingButtons.forEach(button => {
-                button.addEventListener('click', async function() {
-                  // Remove active class from all buttons
-                  feelingButtons.forEach(btn => btn.classList.remove('active'));
-
-                  // Add active class to clicked button
-                  this.classList.add('active');
-
-                  const moodName = this.id;
-                  const analyzedMoods = moodMap[moodName];
-
-                  if (analyzedMoods) {
-                    console.log(`🎯 User selected "${moodName}" mood, which maps to:`, analyzedMoods);
-                    const allSongs = [];
-
-                    // Get songs for each analyzed mood
-                    for (const mood of analyzedMoods) {
-                      const result = await getSongsByMood(mood);
-                      if (result.results) {
-                        allSongs.push(...result.results);
-                      }
-                    }
-
-                    // Remove duplicates based on song name
-                    const uniqueSongs = allSongs.filter((song, index, self) =>
-                      index === self.findIndex(s => s.name === song.name)
-                    );
-
-                    displaySongResults(uniqueSongs, moodName);
-                  } else {
-                    console.log("❌ No mood mapping found for:", moodName);
-                  }
-                });
-              });
-
-              console.log("🎵 Mood selection system initialized!");
-            });
-          </script>
-<style>
-  
-  .feeling-row {
-  margin-bottom: 24px; /* space between rows */
-}
-
-  .feelings {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-/* Base floating button */
-.feeling-btn {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%; /* 100% round */
-  background: transparent;
-  color: #fff;
-  font-size: 13px;
-  text-align: center;
-
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  animation: float 6s ease-in-out infinite;
-  transition: all 0.25s ease;
-}
-
-/* Hover = slightly closer */
-.feeling-btn:hover {
-  border-color: #ff7f50;
-  color: #ff7f50;
-  transform: scale(1.05);
-}
-
-/* Selected state */
-.feeling-btn.active {
-  background: rgba(255, 127, 80, 0.15);
-  border-color: #ff7f50;
-  color: #ff7f50;
-}
-
-/* Floating animation */
-@keyframes float {
-  0%   { transform: translate(0px, 0px); }
-  50%  { transform: translate(18px, -14px); }
-  100% { transform: translate(0px, 0px); }
-}
-
-.feeling-btn:nth-child(2) {
-  animation-duration: 7s;
-}
-
-.feeling-btn:nth-child(3) {
-  animation-duration: 5.5s;
-}
-
-.feeling-btn:nth-child(4) {
-  animation-duration: 6.5s;
-}
-
-.feeling-btn:nth-child(5) {
-  animation-duration: 8s;
-}
-
-</style>          
+        </div>
       </div>
+    </section>
+        </center>
+    </div>
+    </div>
     </section>
 
 
@@ -1591,9 +1903,12 @@
             <br>
             <br>
 
-            <script>function createProfile(){
+            <script>window.setCreateProfileMode = function(enabled) { document.body.classList.toggle("create-profile-active", !!enabled); };
+            function createProfile(){
               // Show loading popup
               document.getElementById("profileCreate").style.display = "none";
+              document.getElementById("ovProfileCreate").style.display = "none";
+              if (window.setCreateProfileMode) window.setCreateProfileMode(false);
 
               // Get form values
               var nickname = document.getElementById("nickname").value || null;
@@ -1656,8 +1971,9 @@
         </div>
         </div>
 
+        
         <div id="signInCon">
-         <div style="width: 250px; height: 100px; background-color: white; color: black; display: none;"><h2>Are you sure you want to log out?</h2> <button onclick="continueGoog()">Yes</button><button onclick="DontGoog()">No</button></div>
+         <div style="width: 250px; height: 100px; background-color: white; color: black; display: none;"><h2>Are you sure you want to log out?</h2> <button onclick="confirmSwitchAccount()">Yes</button><button onclick="cancelSwitchAccount()">No</button></div>
 
 
    	  <div id="po11" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99;">
@@ -2274,7 +2590,6 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     <input type="text" placeholder="Search artists, songs or albums..." class="search-input" id="searchInput">
     <img src="—Pngtree—vector search icon_3783210.png" alt="Search" class="search-icon">
   </div>
-
   <center>  <div id="result"></div>
   </center>
 
@@ -2334,18 +2649,53 @@ setInterval(flySanta, 10000);
 
 
 
-<div class="lol" style="position: fixed; width: 100%; bottom: 0; left: 0; z-index: 9999;">
-  <div id="tata" style="display: flex; align-items: center; color: #ff7f50; font-weight: 600;">SELECT A SONG</div>
+<div class="lol lol-mini-player" style="position: fixed; width: 100%; bottom: 0; left: 0; z-index: 9999;">
+  <div class="lol-main-row">
+    <div class="lol-now-wrap">
+      <div id="tata" style="display: flex; align-items: center; justify-content: center; color: #ff7f50; font-weight: 600; flex-wrap: wrap; text-align: center;">SELECT A SONG</div>
+      <p class="lol-load-hint" role="note">Songs might take a while to load on different areas of the world</p>
+    </div>
+    <div class="lol-transport">
+      <button type="button" class="lol-transport-btn" id="lolPlayMain" aria-label="Play">
+        <span class="material-symbols-outlined" aria-hidden="true">play_circle</span>
+      </button>
+      <button type="button" class="lol-transport-btn" id="lolPauseMain" aria-label="Pause">
+        <span class="material-symbols-outlined" aria-hidden="true">pause_circle</span>
+      </button>
+    </div>
+  </div>
   <div class="lol-queue-wrap" style="color: white;">
     <p style="color: coral; font-weight: bold;">Music Queue</p>
     <table><tr><td id="queuesMob"></td></tr></table>
   </div>
-  <i class="material-symbols-outlined lol-play" style="cursor: pointer; color: #ff7f50;" onclick="(() => { if (window.action) document.getElementById('gaga_' + window.action).play(); })()">play_circle</i>
-  <i class="material-symbols-outlined lol-pause" style="cursor: pointer; color: #ff7f50;" onclick="(() => { if (window.action) document.getElementById('gaga_' + window.action).pause(); })()">pause_circle</i>
-</div> 
+</div>
 
 <script>
-  
+(function () {
+  function lolCurrentAudio() {
+    return window.currentPlaying ||
+      (window.action && document.getElementById("gaga_" + window.action)) ||
+      null;
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    var lp = document.getElementById("lolPlayMain");
+    var lpa = document.getElementById("lolPauseMain");
+    if (lp) {
+      lp.addEventListener("click", function () {
+        var el = lolCurrentAudio();
+        if (!el || !el.play) return;
+        var pr = el.play();
+        if (pr && typeof pr.then === "function") pr.catch(function () {});
+      });
+    }
+    if (lpa) {
+      lpa.addEventListener("click", function () {
+        var el = lolCurrentAudio();
+        if (el && el.pause) el.pause();
+      });
+    }
+  });
+})();
 </script>
 
 
@@ -2461,10 +2811,6 @@ const audio5 = document.getElementById("audio5");
           
           console.log("940")
 
-          var gsim = document.getElementById("google-sign-in-mobile");
-          if (gsim) gsim.addEventListener('click', () => {
-            document.getElementById("google-sign-in").click()
-          })
           console.log("941")
         </script>
         <script type="module">
@@ -2474,7 +2820,7 @@ console.log("960");
      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
   import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-  import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, GoogleAuthProvider, OAuthProvider, signOut, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+  import { getAuth, signInWithPopup, signInWithCredential, OAuthProvider, signOut, onAuthStateChanged, deleteUser, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
   import { getDatabase, ref as ref2, onValue, update, get, set, remove, push, limitToFirst, startAt, orderByKey, query} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
   import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
 console.log('1050')
@@ -2499,6 +2845,7 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
 let currentFirebaseUser = null;
+setPersistence(auth, browserLocalPersistence).catch((e) => console.warn("[auth persistence]", e && (e.message || e)));
 
 // Helper: ensure DOM element exists (handles iOS WebView timing edge cases)
 function whenElementReady(id, callback, retries = 10) {
@@ -2512,6 +2859,58 @@ function whenElementReady(id, callback, retries = 10) {
 const RTDB_BASE = "https://asteroid-cdc13-default-rtdb.firebaseio.com";
 let songsReceived = false;
 let trendingReceived = false;
+function applySongSearch() {
+  const searchInput = document.getElementById("searchInput");
+  const query = String(searchInput ? searchInput.value : "").toLowerCase().trim();
+  const queryWords = query.split(/\s+/).filter(Boolean);
+  const songs = document.querySelectorAll("#ab .sssh");
+
+  songs.forEach((song) => {
+    const title = song.getAttribute("data-title") || "";
+    const artist = song.getAttribute("data-artist") || "";
+    const album = song.getAttribute("data-album") || "";
+    const textMatch = queryWords.every((word) =>
+      title.includes(word) || artist.includes(word) || album.includes(word)
+    );
+    song.style.display = textMatch ? "block" : "none";
+  });
+
+  document.querySelectorAll("#ab .album-card").forEach((albumCard) => {
+    const hasVisibleTrack = Array.from(albumCard.querySelectorAll(".sssh")).some((track) => track.style.display !== "none");
+    albumCard.style.display = hasVisibleTrack ? "block" : "none";
+  });
+
+  const artistCards = document.querySelectorAll('#artists-grid-8 .artist-card');
+  const artistCardsInAb = document.querySelectorAll('#ab .artist-card');
+
+  function checkArtistMatch(artistCard, value) {
+    const artistNameElement = artistCard.querySelector('p');
+    let artistName = "";
+    if (artistNameElement) {
+      artistName = artistNameElement.textContent.toLowerCase().trim();
+    } else {
+      const clone = artistCard.cloneNode(true);
+      clone.querySelectorAll('a, img').forEach((el) => el.remove());
+      artistName = clone.textContent.toLowerCase().trim().replace(/\s+/g, ' ');
+    }
+    const words = value.split(/\s+/).filter(Boolean);
+    const artistWords = artistName.split(/\s+/);
+    return words.every((w) => artistWords.some((aw) => aw.includes(w)) || artistName.includes(w));
+  }
+
+  if (query.length > 0) {
+    artistCards.forEach((artistCard) => { artistCard.style.display = checkArtistMatch(artistCard, query) ? "block" : "none"; });
+    artistCardsInAb.forEach((artistCard) => { artistCard.style.display = checkArtistMatch(artistCard, query) ? "block" : "none"; });
+    const abContainer = document.getElementById('ab');
+    if (abContainer) {
+      const visibleArtistCards = Array.from(artistCardsInAb).filter((card) => card.style.display !== 'none');
+      visibleArtistCards.reverse().forEach((card) => abContainer.insertBefore(card, abContainer.firstChild));
+    }
+  } else {
+    artistCards.forEach((artistCard) => { artistCard.style.display = "block"; });
+    artistCardsInAb.forEach((artistCard) => { artistCard.style.display = "block"; });
+  }
+}
 
 function renderSongsFromData(songsData) {
   if (!songsData || typeof songsData !== "object") return "<p style='text-align:center;color:#ccc;padding:20px;'>No songs yet. Upload from the studio!</p>";
@@ -2542,20 +2941,24 @@ function renderSongsFromData(songsData) {
     albumMap[key].push(s);
   });
 
+  let nextGagaId = 0;
+  function allocTid() {
+    return "p" + nextGagaId++;
+  }
+
   function songRow(s, idx) {
     const t = esc(s.title), a = esc(s.artist), al = esc(s.album), url = (s.fileInp || "").replace(/"/g,"&quot;");
-    const tid = (s.title || "").replace(/[^a-zA-Z0-9]/g, "_");
-    const tidPlay = (s.title || "").replace(/\s/g, "");
+    const tid = allocTid();
     return `<div class="sssh song-row" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="${al.toLowerCase()}">
-      <audio id="gaga_${tid}" onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="none"><source src="${url}" type="audio/mpeg"></audio>
+      <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
       <div class="song-row-num">${idx + 1}</div>
       <div class="song-row-info">
         <span class="song-row-title">${t}</span>
         <span class="song-row-artist">${a}</span>
       </div>
       <div class="song-row-actions">
-        <i class="fa fa-play-circle song-row-play" onclick="document.getElementById('tata').innerHTML='${escQ(s.title)}';turnToCoral();window.action='${tid}';document.getElementById('gaga_${tid}').play();window.currentPlaying=document.getElementById('gaga_${tid}');"></i>
-        <i class="fa fa-pause-circle-o song-row-pause" onclick="document.getElementById('gaga_${tid}').pause()"></i>
+        <i class="fa fa-play-circle song-row-play" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play ${esc(s.title)}"></i>
+        <i class="fa fa-pause-circle-o song-row-pause" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
         <button class="song-row-queue" onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')"><span class="material-symbols-outlined">queue_music</span></button>
         <a href="policy.html" class="song-row-flag"><span class="material-symbols-outlined">flag</span></a>
       </div>
@@ -2570,9 +2973,9 @@ function renderSongsFromData(songsData) {
     if (key === "__single__" || songs.length === 1) {
       songs.forEach((s, i) => {
         const t = esc(s.title), a = esc(s.artist), url = (s.fileInp || "").replace(/"/g,"&quot;");
-        const tid = (s.title || "").replace(/[^a-zA-Z0-9]/g, "_");
+        const tid = allocTid();
         html += `<div class="sssh single-card" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="">
-          <audio id="gaga_${tid}" onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="none"><source src="${url}" type="audio/mpeg"></audio>
+          <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
           <div class="single-emoji">${pickEmoji(s.title)}</div>
           <div class="single-info">
             <div class="single-title">${t}</div>
@@ -2580,8 +2983,8 @@ function renderSongsFromData(songsData) {
             <div class="single-badge">Single</div>
           </div>
           <div class="single-actions">
-            <i class="fa fa-play-circle" onclick="document.getElementById('tata').innerHTML='${escQ(s.title)}';turnToCoral();window.action='${tid}';document.getElementById('gaga_${tid}').play();window.currentPlaying=document.getElementById('gaga_${tid}');"></i>
-            <i class="fa fa-pause-circle-o" onclick="document.getElementById('gaga_${tid}').pause()"></i>
+            <i class="fa fa-play-circle" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play ${esc(s.title)}"></i>
+            <i class="fa fa-pause-circle-o" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
             <button onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')"><span class="material-symbols-outlined">queue_music</span></button>
           </div>
         </div>`;
@@ -2619,6 +3022,7 @@ function fetchSongsViaREST() {
     whenElementReady("ab", (ab) => {
       const extra = document.getElementById("artists-grid-8");
       ab.innerHTML = html + (extra ? extra.innerHTML : "");
+      applySongSearch();
     });
     console.log("✅ REST fallback: SONGS loaded");
   }).catch(err => {
@@ -2678,6 +3082,7 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
   whenElementReady("ab", (ab) => {
     const extra = document.getElementById("artists-grid-8");
     ab.innerHTML = html + (extra ? extra.innerHTML : "");
+    applySongSearch();
   });
 }, (error) => {
   songsReceived = true;
@@ -2688,18 +3093,68 @@ console.log("✅ SONGS listener attached");
 
 window.turnToCoral = function() { const t = document.getElementById("tata"); if (t) t.style.color = "coral"; };
 
-window.actual1 = function(title) {
+window.pauseAllLibraryAudioExcept = function (except) {
+  document.querySelectorAll('audio[id^="gaga_"]').forEach(function (a) {
+    if (except && a === except) return;
+    try {
+      a.pause();
+    } catch (e) {}
+  });
+};
+
+window.playLibraryTrack = function (tid) {
+  const el = document.getElementById("gaga_" + tid);
+  if (!el) return;
+  window.pauseAllLibraryAudioExcept(el);
+  window.action = tid;
+  window.currentPlaying = el;
+  const tata = document.getElementById("tata");
+  const title = (el.dataset && el.dataset.displayTitle) || "";
+  const artist = (el.dataset && el.dataset.displayArtist) || "";
+  if (tata) {
+    tata.textContent = "";
+    const wrap = document.createElement("span");
+    wrap.style.fontWeight = "600";
+    wrap.style.color = "#ff7f50";
+    wrap.textContent = title + (artist ? " · " + artist : "") || "Playing…";
+    tata.appendChild(wrap);
+  }
+  if (window.turnToCoral) window.turnToCoral();
+  var p = el.play();
+  if (p && typeof p.then === "function") {
+    p.catch(function () {
+      if (tata) {
+        tata.textContent = "";
+        var err = document.createElement("span");
+        err.style.color = "#ffb4a2";
+        err.style.fontSize = "13px";
+        err.textContent = "Still loading — tap play again in a moment.";
+        tata.appendChild(err);
+      }
+    });
+  }
+};
+
+window.actual1 = function (audioDomId) {
   const db = getDatabase(app);
   const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   const ofctime = month[new Date().getMonth()];
-  const title2 = title.replace("gaga_", "");
-  push(ref2(db, 'songplayed'), { title2, ofctime });
-  const tata = document.getElementById('tata');
-  if (tata) tata.innerHTML = `<font color="coral">🎵 NOW PLAYING: ${title2}</font>`;
-  if (typeof currentPlaying !== 'undefined' && currentPlaying) {
-    sorg.unshift(currentPlaying);
-    currentPlaying.play();
-    sorg.slice(1).forEach(a => { if (a) a.pause(); });
+  const el = document.getElementById(audioDomId);
+  const displayTitle =
+    (el && el.dataset && el.dataset.displayTitle) ||
+    (audioDomId || "").replace(/^gaga_/, "").replace(/_/g, " ");
+  push(ref2(db, "songplayed"), { title2: displayTitle, ofctime });
+  window.pauseAllLibraryAudioExcept(el || null);
+  if (el) window.currentPlaying = el;
+  window.action = (audioDomId || "").replace(/^gaga_/, "");
+  const tata = document.getElementById("tata");
+  if (tata) {
+    tata.textContent = "";
+    const sp = document.createElement("span");
+    sp.style.color = "coral";
+    sp.style.fontWeight = "600";
+    sp.textContent = "🎵 NOW PLAYING: " + displayTitle;
+    tata.appendChild(sp);
   }
 };
 
@@ -2707,33 +3162,32 @@ window.jkjk = window.jkjk || [];
 window.ujk = window.ujk || [];
 
 window.queuemusic = function(fileInp, title) {
-  const songqueuesMob = document.getElementById("queuesMob");
-  const songqueuesFr = document.getElementById("queues");
+  const queueDock = document.getElementById("queues");
   const tata = document.getElementById("tata");
-  const isMobile = document.documentElement.clientWidth <= 768;
   window.jkjk.push(fileInp);
   window.ujk.push(title);
-  const el = document.createElement(isMobile ? "div" : "h6");
+  const el = document.createElement("div");
   el.innerText = title;
-  if (isMobile && songqueuesMob) { el.style.cssText = "font-size:16px;margin:5px 0;color:white;padding:5px;border:1px solid coral;border-radius:5px;background:rgba(255,127,80,0.1);"; songqueuesMob.appendChild(el); }
-  else if (!isMobile && songqueuesFr) songqueuesFr.appendChild(el);
+  el.style.cssText = "font-size:12px;margin:3px 0;color:white;padding:4px 8px;border:1px solid coral;border-radius:999px;background:rgba(255,127,80,0.1);white-space:nowrap;";
+  if (queueDock) queueDock.appendChild(el);
   function processQueue() {
     if (window.jkjk.length === 0) { if (tata) tata.innerHTML = '<font color="coral">SELECT A SONG</font>'; return; }
+    if (window.pauseAllLibraryAudioExcept) window.pauseAllLibraryAudioExcept(null);
     const audio = new Audio(window.jkjk[0]);
-    if (typeof currentPlaying !== 'undefined' && currentPlaying) currentPlaying.pause();
+    if (typeof window.currentPlaying !== "undefined" && window.currentPlaying) try { window.currentPlaying.pause(); } catch (e) {}
     window.currentPlaying = audio;
-    audio.play();
-    if (tata) tata.innerHTML = (isMobile ? '<div style="color:white;font-weight:bold;">Now Playing: ' : '') + window.ujk[0] + (isMobile ? '</div>' : '');
+    var qp = audio.play();
+    if (qp && typeof qp.then === "function") qp.catch(function () {});
+    if (tata) tata.innerHTML = '<div style="color:white;font-weight:bold;">Now Playing: ' + window.ujk[0] + '</div>';
     audio.onended = function() {
       window.jkjk.shift();
       window.ujk.shift();
-      if (isMobile && songqueuesMob) { const first = songqueuesMob.querySelector("div"); if (first) first.remove(); }
-      else if (songqueuesFr) { const first = songqueuesFr.querySelector("h6"); if (first) first.remove(); }
+      if (queueDock) { const first = queueDock.querySelector("div"); if (first) first.remove(); }
       if (window.jkjk.length > 0) processQueue(); else if (tata) tata.innerHTML = '<font color="coral">SELECT A SONG</font>';
     };
   }
-  if (typeof currentPlaying === 'undefined' || !currentPlaying || currentPlaying.paused) processQueue();
-  else currentPlaying.onended = processQueue;
+  if (typeof window.currentPlaying === "undefined" || !window.currentPlaying || window.currentPlaying.paused) processQueue();
+  else window.currentPlaying.onended = processQueue;
 };
 
 window.handleKKK = function() {
@@ -2748,8 +3202,11 @@ window.handleKKK = function() {
   if (!artists || artists.length === 0) return;
   const song = artists[0];
   if (!song || !song.fileInp || !song.title) return;
+  if (window.pauseAllLibraryAudioExcept) window.pauseAllLibraryAudioExcept(null);
   const audio = new Audio(song.fileInp);
-  audio.play();
+  var hp = audio.play();
+  if (hp && typeof hp.then === "function") hp.catch(function () {});
+  window.currentPlaying = audio;
   const tata = document.getElementById("tata");
   if (tata) tata.innerHTML = "<font color='coral'>🎵 NOW PLAYING: " + song.title + "</font>";
   audio.onended = function() { window.handleKKK(); };
@@ -2768,6 +3225,170 @@ window.firebaseRemove = remove;
 window.firebaseDeleteUser = deleteUser;
 window.currentFirebaseUser = null;
 
+function idbDeleteDatabaseBestEffort(name, perOpMs) {
+  return Promise.race([
+    new Promise(function (res) {
+      if (typeof indexedDB === "undefined") {
+        res();
+        return;
+      }
+      try {
+        var r = indexedDB.deleteDatabase(name);
+        r.onblocked = r.onsuccess = r.onerror = function () { res(); };
+      } catch (e) {
+        res();
+      }
+    }),
+    new Promise(function (res) {
+      setTimeout(res, perOpMs);
+    }),
+  ]);
+}
+
+async function wipeFirebaseAuthIndexedDB() {
+  if (typeof indexedDB === "undefined") return;
+  var perOp = 800;
+  await idbDeleteDatabaseBestEffort("firebaseLocalStorageDb", perOp);
+  try {
+    if (indexedDB.databases) {
+      var list = await Promise.race([
+        indexedDB.databases(),
+        new Promise(function (_, rej) {
+          setTimeout(function () { rej(new Error("idb-databases-timeout")); }, 1200);
+        }),
+      ]).catch(function () { return []; });
+      for (var i = 0; i < (list || []).length; i++) {
+        var db = list[i];
+        if (db && db.name && /^firebaseLocalStorage/i.test(db.name)) {
+          await idbDeleteDatabaseBestEffort(db.name, perOp);
+        }
+      }
+    }
+  } catch (e) {}
+}
+
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise(function (_, rej) {
+      setTimeout(function () { rej(new Error(label || "timeout")); }, ms);
+    }),
+  ]);
+}
+
+function removeFirebaseAuthLocalStorageKeys() {
+  try {
+    for (var i = localStorage.length - 1; i >= 0; i--) {
+      var k = localStorage.key(i);
+      if (k && /^firebase:auth/i.test(k)) {
+        localStorage.removeItem(k);
+      }
+    }
+  } catch (e) {}
+}
+
+var SIGNOUT_KEYS = [
+  "email", "CurrentUser", "fullName", "asteroidSignedInBefore", "pfp", "emailKey", "name",
+  "pending_inviter", "ref_active", "rewardNotified", "artemail", "pending_referral_code",
+  "appleOnboardingDone", "appleOnboardingSkipped", "profileNickname", "profileSocials",
+  "isLoggedIn", "userEmail", "userName", "localAuthOnly",
+];
+
+function nukeLocalStorage() {
+  SIGNOUT_KEYS.forEach(function (k) {
+    try { localStorage.removeItem(k); } catch (e) {}
+  });
+  removeFirebaseAuthLocalStorageKeys();
+  try { sessionStorage.clear(); } catch (e) {}
+}
+
+function resetSignOutUI() {
+  var overlay = document.getElementById("signOutLoadingOverlay");
+  if (overlay) overlay.style.display = "none";
+  try { document.body.style.overflow = ""; } catch (e) {}
+  var appleBtn = document.getElementById("apple-sign-in");
+  if (appleBtn) appleBtn.style.setProperty("display", "inline-flex", "important");
+  var gcd = document.getElementById("gcd");
+  if (gcd) gcd.textContent = "Continue with Apple";
+}
+
+window.doSignOut = function () {
+  console.log("[doSignOut] Starting sign out — clearing storage FIRST");
+
+  nukeLocalStorage();
+  try { currentFirebaseUser = null; } catch (e) {}
+  window.currentFirebaseUser = null;
+  console.log("[doSignOut] localStorage + sessionStorage cleared");
+
+  signOut(auth).catch(function () {});
+  wipeFirebaseAuthIndexedDB().catch(function () {});
+
+  console.log("[doSignOut] Firebase signOut + IDB wipe fired (non-blocking)");
+
+  setTimeout(function () {
+    console.log("[doSignOut] Resetting UI");
+    nukeLocalStorage();
+    resetSignOutUI();
+  }, 600);
+
+  return Promise.resolve();
+};
+
+window.doDeleteAccount = async function(statusCallback) {
+  console.log("[doDeleteAccount] Starting account deletion");
+  var emailKey = localStorage.getItem("emailKey") || (localStorage.getItem("email") || "").replace(/[.#$[\]]/g, "_");
+  var emailDot = (localStorage.getItem("email") || "").replace(/\./g, ",");
+  console.log("[doDeleteAccount] emailKey:", emailKey, "emailDot:", emailDot);
+
+  var paths = [];
+  if (emailKey) {
+    paths.push("PROFILES/" + emailKey);
+    paths.push("PREMIUM/" + emailKey);
+    paths.push("PROFILEVIEWS/" + emailKey);
+    paths.push("CONCERTUSERS/" + emailKey);
+    paths.push("AGREEMENTS/" + emailKey);
+  }
+  if (emailDot) {
+    paths.push("users/" + emailDot);
+    paths.push("referralCounts/" + emailDot);
+  }
+
+  for (var i = 0; i < paths.length; i++) {
+    statusCallback("Removing data (" + (i + 1) + "/" + paths.length + ")...", "rgba(255,255,255,0.6)");
+    try {
+      await Promise.race([
+        remove(ref2(database, paths[i])),
+        new Promise(function(_, rej) { setTimeout(function() { rej(new Error("timeout")); }, 4000); })
+      ]);
+      console.log("[delete] Removed:", paths[i]);
+    } catch (e) {
+      console.warn("[delete] Skip " + paths[i] + ":", e.message);
+    }
+  }
+
+  statusCallback("Removing account...", "rgba(255,255,255,0.6)");
+  if (auth.currentUser) {
+    try {
+      await Promise.race([
+        deleteUser(auth.currentUser),
+        new Promise(function(_, rej) { setTimeout(function() { rej(new Error("timeout")); }, 6000); })
+      ]);
+      console.log("[delete] Auth user deleted");
+    } catch (authErr) {
+      console.warn("[delete] Auth:", authErr.code || authErr.message);
+      if (authErr.code === "auth/requires-recent-login") {
+        throw new Error("REQUIRES_RECENT_LOGIN");
+      }
+    }
+  }
+
+  statusCallback("Clearing local data...", "rgba(255,255,255,0.6)");
+  ["email","CurrentUser","fullName","asteroidSignedInBefore","pfp","emailKey","name","ref_active","rewardNotified","pending_inviter","artemail","pending_referral_code","isLoggedIn","userEmail","userName","localAuthOnly"].forEach(function(k) { localStorage.removeItem(k); });
+
+  statusCallback("Account deleted. Reloading...", "#44cc44");
+  setTimeout(function() { window.location.reload(); }, 1200);
+};
+
 // Keep track of auth state so UI can react correctly
 onAuthStateChanged(auth, (user) => {
   currentFirebaseUser = user;
@@ -2775,30 +3396,34 @@ onAuthStateChanged(auth, (user) => {
 
   const dashboardLink = document.getElementById("artist-dashboard-link");
   const liveNotifier = document.getElementById("live-notifier");
-  const googleSignInHeader = document.getElementById("google-sign-in");
   const appleSignInHeader = document.getElementById("apple-sign-in");
   // If user is signed in, update UI and check premium status
   if (user) {
-    if (googleSignInHeader) googleSignInHeader.style.setProperty("display", "none", "important");
     if (appleSignInHeader) appleSignInHeader.style.setProperty("display", "none", "important");
     const gcd = document.getElementById("gcd");
     const name =
       user.displayName ||
       localStorage.getItem("fullName") ||
+      localStorage.getItem("profileNickname") ||
       "Profile";
     if (gcd && (!gcd.innerText || /continue with/i.test(gcd.innerText))) {
       gcd.innerText = name;
     }
 
-    // Keep localStorage in sync (Apple often has no user.email — use provider email or uid)
-    const accountId = (user.email || user.providerData[0]?.email || user.uid || "").trim();
+    // Keep localStorage in sync using a stable per-provider account id
+    const accountId = getStableAccountId(user);
+    const rawEmail = (user.email || user.providerData[0]?.email || "").trim();
     const emailKey = (accountId || "").replace(/[.#$[\]]/g, "_");
-    localStorage.setItem("email", accountId);
+    localStorage.setItem("email", rawEmail || accountId);
     localStorage.setItem("CurrentUser", accountId);
     localStorage.setItem("fullName", user.displayName || localStorage.getItem("fullName") || "");
     localStorage.setItem("emailKey", emailKey);
-    localStorage.setItem("hasLoggedInWithGoogle", "true");
+    localStorage.setItem("asteroidSignedInBefore", "true");
     if (user.photoURL) localStorage.setItem("pfp", user.photoURL);
+    localStorage.removeItem("localAuthOnly");
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
     console.log("[index] onAuthStateChanged: signed in as", accountId, "provider:", user.providerData[0]?.providerId);
 
     // Check if this user is a premium artist (PREMIUM/<emailKey>.ITG == true / "true")
@@ -2825,13 +3450,45 @@ onAuthStateChanged(auth, (user) => {
           dashboardLink.style.display = "none";
         }
       });
-  } else {
-    // Not signed in: hide artist dashboard link; show sign-in buttons in header
-    if (dashboardLink) {
-      dashboardLink.style.display = "none";
+
+    const isApple = user.providerData && user.providerData.some((p) => p && p.providerId === "apple.com");
+    if (isApple) {
+      setTimeout(() => {
+        void maybeShowAppleOnboarding();
+      }, 500);
     }
-    if (googleSignInHeader) googleSignInHeader.style.setProperty("display", "inline-flex", "important");
+  } else {
+    // If device has an existing local session, keep user logged in on this device.
+    const localAccount = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim();
+    const localName = (localStorage.getItem("fullName") || localStorage.getItem("profileNickname") || "").trim();
+    const localRemembered = localStorage.getItem("asteroidSignedInBefore") === "true";
+    if (localRemembered && localAccount) {
+      if (appleSignInHeader) appleSignInHeader.style.setProperty("display", "none", "important");
+      const gcd = document.getElementById("gcd");
+      if (gcd) gcd.textContent = localName || localAccount;
+      const localEmailKey = (localStorage.getItem("emailKey") || localAccount.replace(/[.#$[\]]/g, "_")).trim();
+      if (localEmailKey) {
+        const premiumRef = ref2(database, "PREMIUM/" + localEmailKey);
+        get(premiumRef).then((snapshot) => {
+          const val = snapshot.exists() ? snapshot.val() : null;
+          const isPremium = !!val && (val.ITG === true || val.ITG === "true");
+          if (dashboardLink) dashboardLink.style.display = isPremium ? "block" : "none";
+          if (liveNotifier) liveNotifier.style.display = isPremium ? "none" : "block";
+        }).catch(() => {
+          if (dashboardLink) dashboardLink.style.display = "none";
+          if (liveNotifier) liveNotifier.style.display = "block";
+        });
+      }
+      console.log("[index] onAuthStateChanged: restored local device session", localAccount);
+      return;
+    }
+
+    // Not signed in and no local remembered session: show sign-in UI.
+    if (dashboardLink) dashboardLink.style.display = "none";
     if (appleSignInHeader) appleSignInHeader.style.setProperty("display", "inline-flex", "important");
+    const gcd = document.getElementById("gcd");
+    if (gcd) gcd.textContent = "Continue with Apple";
+    console.log("[index] onAuthStateChanged: signed out - no local session");
   }
 });
 let currentMusician = "";
@@ -3233,6 +3890,7 @@ function openLogoutModal(user) {
   const displayName =
     (user && user.displayName) ||
     localStorage.getItem("fullName") ||
+    localStorage.getItem("profileNickname") ||
     "Signed-in user";
   const email =
     (user && user.email) ||
@@ -3250,48 +3908,57 @@ function closeLogoutModal() {
   if (modal) modal.style.display = "none";
 }
 
-async function confirmLogout() {
-  try {
-    const authInstance = window.firebaseAuth || getAuth(app);
-    await signOut(authInstance);
-  } catch (err) {
-    console.error("Error signing out:", err);
-  }
+function showSignOutLoading() {
+  const el = document.getElementById("signOutLoadingOverlay");
+  if (el) el.style.display = "flex";
+  try { document.body.style.overflow = "hidden"; } catch (e) {}
+}
 
-  // Clear any cached user info for consistency
-  localStorage.removeItem("email");
-  localStorage.removeItem("CurrentUser");
-  localStorage.removeItem("fullName");
-  localStorage.removeItem("hasLoggedInWithGoogle");
-
-  // Reset Google button label
-  const gcd = document.getElementById("gcd");
-  if (gcd) {
-    gcd.innerHTML = 'Continue with <i class="fa-brands fa-google"></i>';
-  }
-
+function confirmLogout() {
+  console.log("[confirmLogout] Sign out button clicked");
+  showSignOutLoading();
   closeLogoutModal();
+  if (window.doSignOut) {
+    console.log("[confirmLogout] Calling window.doSignOut()");
+    window.doSignOut().catch(function (err) {
+      console.error("[confirmLogout] Error signing out:", err);
+      try {
+        ["email", "CurrentUser", "fullName", "asteroidSignedInBefore", "pfp", "emailKey", "name", "pending_referral_code", "appleOnboardingDone", "appleOnboardingSkipped", "profileNickname", "profileSocials", "isLoggedIn", "userEmail", "userName", "localAuthOnly"].forEach(function (k) {
+          localStorage.removeItem(k);
+        });
+      } catch (e) {}
+      window.location.reload();
+    });
+  } else {
+    console.error("[confirmLogout] Firebase not ready for sign out");
+    try {
+      ["email", "CurrentUser", "fullName", "asteroidSignedInBefore", "pfp", "emailKey", "name", "appleOnboardingDone", "appleOnboardingSkipped", "profileNickname", "profileSocials", "isLoggedIn", "userEmail", "userName", "localAuthOnly"].forEach(function (k) {
+        localStorage.removeItem(k);
+      });
+    } catch (e) {}
+    window.location.reload();
+  }
 }
 
 // Wire modal buttons
 document.getElementById("logoutCancelBtn")?.addEventListener("click", closeLogoutModal);
 document.getElementById("logoutConfirmBtn")?.addEventListener("click", confirmLogout);
 
-// --- DELETE ACCOUNT ---
+// --- DELETE ACCOUNT (fully self-contained — uses REST API, no module imports needed) ---
 function openDeleteAccountModal() {
   closeLogoutModal();
-  const modal = document.getElementById("deleteAccountModal");
-  const input = document.getElementById("deleteConfirmInput");
-  const confirmBtn = document.getElementById("deleteAccountConfirmBtn");
-  const status = document.getElementById("deleteAccountStatus");
+  var modal = document.getElementById("deleteAccountModal");
+  var input = document.getElementById("deleteConfirmInput");
+  var confirmBtn = document.getElementById("deleteAccountConfirmBtn");
+  var status = document.getElementById("deleteAccountStatus");
   if (input) { input.value = ""; }
-  if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.background = "rgba(255,80,80,0.3)"; confirmBtn.style.color = "rgba(255,255,255,0.4)"; confirmBtn.style.cursor = "not-allowed"; }
+  if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.background = "rgba(255,80,80,0.3)"; confirmBtn.style.color = "rgba(255,255,255,0.4)"; confirmBtn.style.cursor = "not-allowed"; confirmBtn.textContent = "Delete my account"; }
   if (status) { status.style.display = "none"; status.textContent = ""; }
   if (modal) modal.style.display = "flex";
 }
 
 function closeDeleteAccountModal() {
-  const modal = document.getElementById("deleteAccountModal");
+  var modal = document.getElementById("deleteAccountModal");
   if (modal) modal.style.display = "none";
 }
 
@@ -3299,105 +3966,52 @@ document.getElementById("deleteAccountBtn")?.addEventListener("click", openDelet
 document.getElementById("deleteAccountCancelBtn")?.addEventListener("click", closeDeleteAccountModal);
 
 document.getElementById("deleteConfirmInput")?.addEventListener("input", function() {
-  const confirmBtn = document.getElementById("deleteAccountConfirmBtn");
-  const matches = this.value.trim() === "DELETE";
+  var confirmBtn = document.getElementById("deleteAccountConfirmBtn");
+  var ok = this.value.trim().toUpperCase() === "DELETE";
   if (confirmBtn) {
-    confirmBtn.disabled = !matches;
-    confirmBtn.style.background = matches ? "#ff3333" : "rgba(255,80,80,0.3)";
-    confirmBtn.style.color = matches ? "#fff" : "rgba(255,255,255,0.4)";
-    confirmBtn.style.cursor = matches ? "pointer" : "not-allowed";
+    confirmBtn.disabled = !ok;
+    confirmBtn.style.background = ok ? "#ff3333" : "rgba(255,80,80,0.3)";
+    confirmBtn.style.color = ok ? "#fff" : "rgba(255,255,255,0.4)";
+    confirmBtn.style.cursor = ok ? "pointer" : "not-allowed";
   }
 });
 
-document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", async function() {
+document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", function() {
   if (this.disabled) return;
-  const status = document.getElementById("deleteAccountStatus");
-  const showStatus = (msg, color) => { if (status) { status.style.display = "block"; status.style.color = color; status.textContent = msg; } };
+  console.log("[deleteConfirm] Delete account button clicked");
+  var btn = this;
+  var statusEl = document.getElementById("deleteAccountStatus");
+  function showStatus(msg, color) { if (statusEl) { statusEl.style.display = "block"; statusEl.style.color = color; statusEl.textContent = msg; } }
 
-  this.disabled = true;
-  this.textContent = "Deleting...";
-  showStatus("Removing your data...", "rgba(255,255,255,0.6)");
+  btn.disabled = true;
+  btn.textContent = "Deleting...";
+  console.log("[deleteConfirm] Button disabled, calling window.doDeleteAccount");
 
-  try {
-    const authInstance = window.firebaseAuth;
-    const user = authInstance ? authInstance.currentUser : null;
-    const emailKey = localStorage.getItem("emailKey") || (localStorage.getItem("email") || "").replace(/[.#$[\]]/g, "_");
-    const db = window.firebaseDatabase;
-    const dbRef = window.firebaseRef;
-    const fbRemove = window.firebaseRemove;
-    const fbDeleteUser = window.firebaseDeleteUser;
-
-    if (!db || !dbRef || !fbRemove) {
-      showStatus("Firebase not ready. Please wait a moment and try again.", "#ff9900");
-      this.textContent = "Delete my account";
-      this.disabled = false;
-      return;
-    }
-
-    if (emailKey) {
-      const deletePaths = [
-        "PROFILES/" + emailKey,
-        "PREMIUM/" + emailKey,
-        "PROFILEVIEWS/" + emailKey,
-        "CONCERTUSERS/" + emailKey,
-      ];
-      for (const path of deletePaths) {
-        try { await fbRemove(dbRef(db, path)); console.log("Deleted:", path); } catch (e) { console.warn("Delete " + path + ":", e); }
+  if (window.doDeleteAccount) {
+    window.doDeleteAccount(showStatus).catch(function(err) {
+      console.error("[delete] Error:", err);
+      if (err && err.message === "REQUIRES_RECENT_LOGIN") {
+        showStatus("Please sign out, sign back in, then delete right away.", "#ff9900");
+        btn.textContent = "Delete my account";
+        btn.disabled = false;
+      } else {
+        showStatus("Error — clearing local data...", "#ff9900");
+        ["email","CurrentUser","fullName","asteroidSignedInBefore","pfp","emailKey","name","isLoggedIn","userEmail","userName","localAuthOnly"].forEach(function(k) { localStorage.removeItem(k); });
+        setTimeout(function() { window.location.reload(); }, 1500);
       }
-
-      const emailDot = (localStorage.getItem("email") || "").replace(/\./g, ",");
-      if (emailDot) {
-        try { await fbRemove(dbRef(db, "users/" + emailDot)); console.log("Deleted: users/" + emailDot); } catch (e) { console.warn("Delete users/:", e); }
-        try { await fbRemove(dbRef(db, "referralCounts/" + emailDot)); } catch (e) { console.warn("Delete referralCounts/:", e); }
-      }
-    }
-
-    showStatus("Removing your account...", "rgba(255,255,255,0.6)");
-
-    if (user && fbDeleteUser) {
-      try {
-        await fbDeleteUser(user);
-      } catch (authErr) {
-        if (authErr.code === "auth/requires-recent-login") {
-          showStatus("For security, please sign out, sign back in, then delete immediately.", "#ff9900");
-          this.textContent = "Delete my account";
-          this.disabled = false;
-          return;
-        }
-        throw authErr;
-      }
-    }
-
-    localStorage.removeItem("email");
-    localStorage.removeItem("CurrentUser");
-    localStorage.removeItem("fullName");
-    localStorage.removeItem("hasLoggedInWithGoogle");
-    localStorage.removeItem("pfp");
-    localStorage.removeItem("emailKey");
-    localStorage.removeItem("name");
-    localStorage.removeItem("ref_active");
-    localStorage.removeItem("rewardNotified");
-    localStorage.removeItem("pending_inviter");
-    localStorage.removeItem("artemail");
-
-    showStatus("Account deleted. Reloading...", "#44cc44");
-    setTimeout(() => { window.location.reload(); }, 1500);
-
-  } catch (err) {
-    console.error("Account deletion error:", err);
-    showStatus("Deletion failed: " + (err.message || "Unknown error. Please try again."), "#ff5050");
-    this.textContent = "Delete my account";
-    this.disabled = false;
+    });
+  } else {
+    showStatus("Firebase not ready — clearing local data...", "#ff9900");
+    ["email","CurrentUser","fullName","asteroidSignedInBefore","pfp","emailKey","name","isLoggedIn","userEmail","userName","localAuthOnly"].forEach(function(k) { localStorage.removeItem(k); });
+    setTimeout(function() { window.location.reload(); }, 1500);
   }
 });
 
-// Profile button: if signed in, show logout modal; otherwise trigger Google sign-in
+// Profile button: if signed in, show logout modal; otherwise trigger Apple sign-in
 document.getElementById("user-profile-button").addEventListener("click", () => {
   console.log("profile_button_clicked");
-  const authInstance = window.firebaseAuth || getAuth(app);
 
-  // Prefer the tracked auth state, fall back to direct currentUser
-  const firebaseUser = window.currentFirebaseUser || authInstance.currentUser;
+  const firebaseUser = window.currentFirebaseUser || auth.currentUser;
   const hasLocalUser =
     !!localStorage.getItem("email") || !!localStorage.getItem("CurrentUser");
 
@@ -3406,33 +4020,214 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
     // otherwise falling back to what we have in localStorage.
     const modalUser =
       firebaseUser || {
-        displayName: localStorage.getItem("fullName") || "Signed-in user",
+        displayName:
+          localStorage.getItem("fullName") ||
+          localStorage.getItem("profileNickname") ||
+          "Signed-in user",
         email: localStorage.getItem("email") || "",
       };
     openLogoutModal(modalUser);
   } else {
-    document.getElementById("google-sign-in").click();
+    const appleBtn = document.getElementById("apple-sign-in");
+    if (appleBtn) appleBtn.click();
   }
 });
 
           // Store songs data globally for handleKKK function
-          // Setup Google Sign-In (ONCE, outside the Firebase listener)
-            const provider = new GoogleAuthProvider();
+          // Sign in with Apple (Firebase)
           const appleProvider = new OAuthProvider("apple.com");
           appleProvider.addScope("email");
           appleProvider.addScope("name");
 
-          const AUTH_URL = "https://asteroid-cdc13.firebaseapp.com/auth-google.html";
           const APPLE_AUTH_URL = "https://asteroid-cdc13.firebaseapp.com/auth-apple.html";
           const isCapacitorNative = () => typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
           const getAppPlugin = () => { try { return window.Capacitor?.Plugins?.App || null; } catch (e) { return null; } };
           const getBrowserPlugin = () => { try { return window.Capacitor?.Plugins?.Browser || null; } catch (e) { return null; } };
-          async function handleGoogleSignInSuccess(result, hadPreviousUser) {
+          async function dismissInAppBrowser(reason) {
+            const Browser = getBrowserPlugin();
+            if (!Browser || typeof Browser.close !== "function") {
+              console.warn("[Cap Browser] close skipped - plugin missing", reason);
+              return;
+            }
+            const delays = [0, 60, 180, 400, 800];
+            for (let i = 0; i < delays.length; i++) {
+              const ms = delays[i];
+              if (ms > 0) await new Promise((r) => setTimeout(r, ms));
+              try {
+                await Browser.close();
+                console.log("[Cap Browser] closed OK", reason, "afterMs", ms);
+                try { sessionStorage.removeItem("capAuthBrowserOpened"); } catch (e2) {}
+                return;
+              } catch (e) {
+                console.warn("[Cap Browser] close attempt failed", reason, "afterMs", ms, e && (e.message || e));
+              }
+            }
+          }
+
+          let appleOnboardingUiOpen = false;
+          let appleOnboardingCheckLock = false;
+
+          function isAppleAuthUser(user) {
+            if (!user || !user.providerData) return false;
+            return user.providerData.some((p) => p && p.providerId === "apple.com");
+          }
+          function getStableAccountId(user) {
+            if (!user) return "";
+            const isApple = isAppleAuthUser(user);
+            if (isApple) return (user.uid || user.email || user.providerData[0]?.email || "").trim();
+            return (user.email || user.providerData[0]?.email || user.uid || "").trim();
+          }
+
+          function openAppleOnboardingModal() {
+            const m = document.getElementById("appleOnboardingModal");
+            if (!m || appleOnboardingUiOpen) return;
+            appleOnboardingUiOpen = true;
+            if (window.setCreateProfileMode) window.setCreateProfileMode(true);
+            const nick = document.getElementById("appleOnboardingNickname");
+            if (nick) {
+              nick.value = (localStorage.getItem("fullName") || "").trim();
+              setTimeout(() => nick.focus(), 100);
+            }
+            ["appleOnboardingInstagram", "appleOnboardingTwitter", "appleOnboardingTiktok", "appleOnboardingYoutube", "appleOnboardingSpotify", "appleOnboardingSoundcloud", "appleOnboardingWebsite"].forEach((id) => {
+              const el = document.getElementById(id);
+              if (el) el.value = "";
+            });
+            const storedType = (localStorage.getItem("profileType") || "").trim().toLowerCase();
+            const artistRadio = document.getElementById("appleProfileTypeArtist");
+            const listenerRadio = document.getElementById("appleProfileTypeListener");
+            if (artistRadio && listenerRadio) {
+              if (storedType === "artist") {
+                artistRadio.checked = true;
+              } else {
+                listenerRadio.checked = true;
+              }
+            }
+            m.style.display = "flex";
+          }
+
+          function closeAppleOnboardingModal() {
+            const m = document.getElementById("appleOnboardingModal");
+            if (m) m.style.display = "none";
+            appleOnboardingUiOpen = false;
+            if (window.setCreateProfileMode) window.setCreateProfileMode(false);
+          }
+
+          async function maybeShowAppleOnboarding() {
+            if (appleOnboardingUiOpen || appleOnboardingCheckLock) return;
+            const accountId = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim();
+            if (!accountId) return;
+            if (localStorage.getItem("appleOnboardingSkipped") === "1") return;
+            if (localStorage.getItem("appleOnboardingDone") === "1") return;
+            appleOnboardingCheckLock = true;
+            try {
+              const key = accountId.replace(/[.#$[\]]/g, "_");
+              try {
+                const snap = await get(ref2(database, "PROFILES/" + key));
+                const val = snap.exists() ? snap.val() : null;
+                if (val && (val.nickname || val.profileNickname)) return;
+              } catch (e) {
+                console.warn("[apple onboarding] profile read:", e);
+              }
+              openAppleOnboardingModal();
+            } finally {
+              appleOnboardingCheckLock = false;
+            }
+          }
+
+          async function saveAppleOnboardingProfile() {
+            const nickEl = document.getElementById("appleOnboardingNickname");
+            const nickname = (nickEl && nickEl.value ? nickEl.value : "").trim();
+            if (!nickname) {
+              alert("Please enter a nickname.");
+              if (nickEl) nickEl.focus();
+              return;
+            }
+            const accountId = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim();
+            if (!accountId) {
+              alert("Session missing. Please sign in again.");
+              return;
+            }
+            const key = accountId.replace(/[.#$[\]]/g, "_");
+            const gv = (id) => {
+              const el = document.getElementById(id);
+              const v = el && (el.value || "").trim();
+              return v || null;
+            };
+            const selectedTypeEl = document.querySelector('input[name="appleOnboardingProfileType"]:checked');
+            const profileType = selectedTypeEl ? selectedTypeEl.value : "listener";
+            const isPublicArtist = profileType === "artist";
+            const payload = {
+              nickname,
+              profileNickname: nickname,
+              email: accountId,
+              profileType,
+              profileVisibility: isPublicArtist ? "public" : "private",
+              publicProfile: isPublicArtist,
+              hideEmail: !isPublicArtist,
+              role: isPublicArtist ? "Artist" : "Listener",
+              profileRole: isPublicArtist ? "Artist" : "Listener",
+              instagram: gv("appleOnboardingInstagram"),
+              twitter: gv("appleOnboardingTwitter"),
+              tiktok: gv("appleOnboardingTiktok"),
+              youtube: gv("appleOnboardingYoutube"),
+              spotify: gv("appleOnboardingSpotify"),
+              soundcloud: gv("appleOnboardingSoundcloud"),
+              website: gv("appleOnboardingWebsite"),
+              onboardingComplete: true,
+              onboardingUpdatedAt: Date.now(),
+            };
+            Object.keys(payload).forEach((k) => {
+              if (payload[k] == null) delete payload[k];
+            });
+            try {
+              await update(ref2(database, "PROFILES/" + key), payload);
+            } catch (e) {
+              console.warn("[apple onboarding] RTDB save failed:", e);
+              try {
+                localStorage.setItem("profileNickname", nickname);
+                localStorage.setItem("profileSocials", JSON.stringify({
+                  instagram: payload.instagram,
+                  twitter: payload.twitter,
+                  tiktok: payload.tiktok,
+                  youtube: payload.youtube,
+                  spotify: payload.spotify,
+                  soundcloud: payload.soundcloud,
+                  website: payload.website,
+                }));
+              } catch (e2) {}
+            }
+            localStorage.setItem("fullName", nickname);
+            localStorage.setItem("profileType", profileType);
+            localStorage.setItem("appleOnboardingDone", "1");
+            localStorage.removeItem("appleOnboardingSkipped");
+            const gcd = document.getElementById("gcd");
+            if (gcd) gcd.textContent = nickname;
+            closeAppleOnboardingModal();
+          }
+
+          function skipAppleOnboarding() {
+            localStorage.setItem("appleOnboardingSkipped", "1");
+            closeAppleOnboardingModal();
+          }
+
+          (function wireAppleOnboardingButtons() {
+            const saveBtn = document.getElementById("appleOnboardingSaveBtn");
+            const skipBtn = document.getElementById("appleOnboardingSkipBtn");
+            if (saveBtn) saveBtn.addEventListener("click", () => { void saveAppleOnboardingProfile(); });
+            if (skipBtn) skipBtn.addEventListener("click", skipAppleOnboarding);
+          })();
+
+          async function handleSignInSuccess(result, hadPreviousUser) {
             const user = result.user;
-            console.log("google-sign-in-clicked", user);
-            const accountId = (user.email || user.providerData[0]?.email || user.uid || "").trim();
-            localStorage.setItem("hasLoggedInWithGoogle", "true");
-            localStorage.setItem("email", accountId);
+            console.log("sign-in-success", user);
+            localStorage.removeItem("localAuthOnly");
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("userEmail");
+            localStorage.removeItem("userName");
+            const accountId = getStableAccountId(user);
+            const rawEmail = (user.email || user.providerData[0]?.email || "").trim();
+            localStorage.setItem("asteroidSignedInBefore", "true");
+            localStorage.setItem("email", rawEmail || accountId);
             localStorage.setItem("CurrentUser", accountId);
             localStorage.setItem("fullName", user["displayName"] || "");
             localStorage.setItem("pfp", user.photoURL || user.imageUrl || "");
@@ -3443,67 +4238,94 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             const ovProfileCreate = document.getElementById("ovProfileCreate");
             if (profileCreate) profileCreate.style.display = "none";
             if (ovProfileCreate) ovProfileCreate.style.display = "none";
+            if (window.setCreateProfileMode) window.setCreateProfileMode(false);
             const sanitizeEmail = (email) => (email || "").replace(/[.#$[\]]/g, '_');
             const emailKey = sanitizeEmail(accountId);
             localStorage.setItem("emailKey", (accountId || "").replace(/[.#$[\]]/g, "_"));
             const profileRef = ref2(database, 'PROFILES/' + emailKey);
+
+            if (isAppleAuthUser(user)) {
+              try {
+                const snapshot = await get(profileRef);
+                const existingProfile = snapshot.exists() ? snapshot.val() : null;
+                if (hadPreviousUser || existingProfile) {
+                  const signInCon = document.getElementById("signInCon");
+                  if (signInCon && hadPreviousUser) {
+                    signInCon.style.display = "block";
+                    const innerPrompt = signInCon.querySelector("div");
+                    if (innerPrompt) innerPrompt.style.display = "block";
+                  }
+                  window.confirmSwitchAccount = async function() { try { await signOut(auth); } catch (err) { console.error(err); } localStorage.removeItem("email"); localStorage.removeItem("CurrentUser"); localStorage.removeItem("fullName"); document.getElementById("signInCon").style.display = "none"; var ab = document.getElementById("apple-sign-in"); if (ab) ab.click(); };
+                  window.cancelSwitchAccount = function() { document.getElementById("signInCon").style.display = "none"; };
+                }
+              } catch (err) {
+                console.error("Error checking profile (Apple):", err);
+              }
+              await maybeShowAppleOnboarding();
+              return;
+            }
+
             try {
               const snapshot = await get(profileRef);
               const existingProfile = snapshot.exists() ? snapshot.val() : null;
               if (hadPreviousUser || existingProfile) {
                 if (profileCreate) profileCreate.style.display = "none";
                 if (ovProfileCreate) ovProfileCreate.style.display = "none";
+                if (window.setCreateProfileMode) window.setCreateProfileMode(false);
                 const signInCon = document.getElementById("signInCon");
                 if (signInCon && hadPreviousUser) { signInCon.style.display = "block"; const innerPrompt = signInCon.querySelector("div"); if (innerPrompt) innerPrompt.style.display = "block"; }
-                window.continueGoog = async function() { try { await signOut(auth); } catch (err) { console.error(err); } localStorage.removeItem("email"); localStorage.removeItem("CurrentUser"); localStorage.removeItem("fullName"); document.getElementById("signInCon").style.display = "none"; document.getElementById("google-sign-in").click(); };
-                window.DontGoog = function() { document.getElementById("signInCon").style.display = "none"; };
+                window.confirmSwitchAccount = async function() { try { await signOut(auth); } catch (err) { console.error(err); } localStorage.removeItem("email"); localStorage.removeItem("CurrentUser"); localStorage.removeItem("fullName"); document.getElementById("signInCon").style.display = "none"; var ab = document.getElementById("apple-sign-in"); if (ab) ab.click(); };
+                window.cancelSwitchAccount = function() { document.getElementById("signInCon").style.display = "none"; };
               } else {
                 if (profileCreate) profileCreate.style.display = "block";
                 if (ovProfileCreate) ovProfileCreate.style.display = "block";
+                if (window.setCreateProfileMode) window.setCreateProfileMode(true);
               }
-            } catch (err) { console.error("Error checking profile:", err); if (profileCreate) profileCreate.style.display = "none"; if (ovProfileCreate) ovProfileCreate.style.display = "none"; }
+            } catch (err) { console.error("Error checking profile:", err); if (profileCreate) profileCreate.style.display = "none"; if (ovProfileCreate) ovProfileCreate.style.display = "none"; if (window.setCreateProfileMode) window.setCreateProfileMode(false); }
           }
-          function handleAuthRedirectUrl(url) {
+          async function handleAuthRedirectUrl(url) {
             if (!url) return;
-            if (String(url).startsWith("asteroid://auth-apple")) {
-              handleAppleAuthRedirect(url);
-              return;
-            }
-            const match = String(url).match(/asteroid:\/\/auth\?token=([^&]+)/);
-            if (match && match[1]) {
-              const Browser = getBrowserPlugin ? getBrowserPlugin() : null;
-              if (Browser && typeof Browser.close === "function") { try { Browser.close(); } catch (e) {} }
-              const idToken = decodeURIComponent(match[1]);
-              const cred = GoogleAuthProvider.credential(idToken);
-              const hadPreviousUser = localStorage.getItem("hasLoggedInWithGoogle") === "true";
-              signInWithCredential(auth, cred).then((r) => handleGoogleSignInSuccess(r, hadPreviousUser)).catch((err) => console.error("Credential sign-in error:", err));
+            const s = String(url);
+            if (s.startsWith("asteroid://auth-apple")) {
+              await dismissInAppBrowser("apple-deeplink");
+              await handleAppleAuthRedirect(url);
             }
           }
           let _lastAppleRedirectIndex = null;
-          function handleAppleAuthRedirect(url) {
+          let _asteroidCapResumeCloserDone = false;
+          async function handleAppleAuthRedirect(url) {
             if (!url || url === _lastAppleRedirectIndex) return;
             _lastAppleRedirectIndex = url;
             console.log("⚡️ handleAppleAuthRedirect (index)", { url });
 
-            try {
-              const Browser = getBrowserPlugin ? getBrowserPlugin() : null;
-              if (Browser && typeof Browser.close === "function") Browser.close();
-            } catch (e) {}
-
             const params = new URLSearchParams(String(url).split("?")[1] || "");
+            const appleIdToken = params.get("appleIdToken") || "";
+            const appleAccessToken = params.get("appleAccessToken") || "";
+            if (appleIdToken) {
+              try {
+                const credential = appleProvider.credential({
+                  idToken: appleIdToken,
+                  accessToken: appleAccessToken || undefined,
+                });
+                await signInWithCredential(auth, credential);
+                console.log("[index] Firebase Auth restored from Apple deep link");
+              } catch (e) {
+                console.warn("[index] signInWithCredential (Apple)", e);
+              }
+            }
             const email = params.get("email") || "";
             const fullName = params.get("name") || "";
             const uid = params.get("uid") || "";
             const photo = params.get("photo") || "";
             console.log("⚡️ Apple sign-in user info (index):", { email, fullName, uid });
 
-            const appleAccountId = (email || uid || "").trim();
+            const appleAccountId = (uid || email || "").trim();
             if (appleAccountId) {
               localStorage.setItem("email", appleAccountId);
               localStorage.setItem("CurrentUser", appleAccountId);
               localStorage.setItem("fullName", fullName);
               localStorage.setItem("name", fullName);
-              localStorage.setItem("hasLoggedInWithGoogle", "true");
+              localStorage.setItem("asteroidSignedInBefore", "true");
               localStorage.setItem("pfp", photo);
               const emailKey = (appleAccountId || "").replace(/[.#$[\]]/g, "_");
               localStorage.setItem("emailKey", emailKey);
@@ -3512,60 +4334,41 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
               const gcd = document.getElementById("gcd");
               if (gcd) { gcd.innerHTML = displayName; gcd.innerText = displayName; }
 
-              const googleBtn = document.getElementById("google-sign-in");
               const appleBtn = document.getElementById("apple-sign-in");
-              if (googleBtn) googleBtn.style.setProperty("display", "none", "important");
               if (appleBtn) appleBtn.style.setProperty("display", "none", "important");
+
+              void maybeShowAppleOnboarding();
             }
           }
           (async function setupCapacitorAuth() {
             if (!isCapacitorNative()) return;
-            const hadPrev = localStorage.getItem("hasLoggedInWithGoogle") === "true";
-            try {
-              const redirectResult = await getRedirectResult(auth);
-              if (redirectResult) { handleGoogleSignInSuccess(redirectResult, hadPrev); return; }
-            } catch (e) { console.warn("getRedirectResult:", e); }
             const App = getAppPlugin();
             if (App) {
               try {
-                App.addListener("appUrlOpen", (event) => { handleAuthRedirectUrl(event && event.url); });
-                App.getLaunchUrl().then((launch) => { if (launch && launch.url) handleAuthRedirectUrl(launch.url); }).catch(() => {});
+                App.addListener("appUrlOpen", (event) => { void handleAuthRedirectUrl(event && event.url); });
+                App.getLaunchUrl().then((launch) => { if (launch && launch.url) void handleAuthRedirectUrl(launch.url); }).catch(() => {});
+                if (!_asteroidCapResumeCloserDone) {
+                  _asteroidCapResumeCloserDone = true;
+                  App.addListener("resume", () => {
+                    const t = parseInt(sessionStorage.getItem("capAuthBrowserOpened") || "0", 10);
+                    if (t && Date.now() - t < 180000) void dismissInAppBrowser("app-resume-fallback");
+                  });
+                }
               } catch (e) { console.warn("Capacitor App listener:", e); }
             }
           })();
-          const googleSignInBtn = document.getElementById("google-sign-in");
-          if (googleSignInBtn && !googleSignInBtn.hasAttribute('data-listener-added')) {
-            googleSignInBtn.setAttribute('data-listener-added', 'true');
-            googleSignInBtn.addEventListener("click", async (e) => {
-              console.log("gcm_ready");
-              const hadPreviousUser = localStorage.getItem("hasLoggedInWithGoogle") === "true";
-              if (isCapacitorNative()) {
-                const Browser = getBrowserPlugin();
-                if (Browser && typeof Browser.open === "function") {
-                  try {
-                    await Browser.open({ url: AUTH_URL });
-                    return;
-                  } catch (err) { console.warn("Browser.open failed:", err); }
-                }
-                window.location.href = AUTH_URL;
-                return;
-              }
-              signInWithPopup(auth, provider)
-                .then((result) => handleGoogleSignInSuccess(result, hadPreviousUser))
-                .catch((error) => { console.log('1166', error); });
-            });
-          }
 
           const appleSignInBtn = document.getElementById("apple-sign-in");
           if (appleSignInBtn && !appleSignInBtn.hasAttribute('data-listener-added')) {
             appleSignInBtn.setAttribute('data-listener-added', 'true');
             appleSignInBtn.addEventListener("click", async () => {
               console.log("apple-sign-in-clicked");
-              const hadPreviousUser = localStorage.getItem("hasLoggedInWithGoogle") === "true";
+              const hadPreviousUser = localStorage.getItem("asteroidSignedInBefore") === "true";
               if (isCapacitorNative()) {
                 const Browser = getBrowserPlugin();
                 if (Browser && typeof Browser.open === "function") {
                   try {
+                    try { sessionStorage.setItem("capAuthBrowserOpened", String(Date.now())); } catch (e0) {}
                     await Browser.open({ url: APPLE_AUTH_URL });
                     return;
                   } catch (err) { console.warn("Browser.open (Apple) failed:", err); }
@@ -3574,7 +4377,7 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
                 return;
               }
               signInWithPopup(auth, appleProvider)
-                .then((result) => handleGoogleSignInSuccess(result, hadPreviousUser))
+                .then((result) => handleSignInSuccess(result, hadPreviousUser))
                 .catch((error) => {
                   console.error("Apple sign-in:", error);
                   if (error && error.code === "auth/operation-not-allowed") {
@@ -3600,6 +4403,7 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
 
 console.log('1171')
             /* Duplicate SONGS block removed - songs load via early loader on Firebase init */
+
         </script>
     </div>
   </div>
@@ -3684,20 +4488,20 @@ console.log('1171')
 
 
 
-  <div class="mini-player" id="minivis">
+  <div class="mini-player" id="minivis" hidden aria-hidden="true" style="display:none !important;">
     <div class="song-info">
-      <img id="songImg" src="" alt="Song Image">
+      <img id="songImg" src="" alt="">
       <div class="song-details">
-        <div id="songTitle" class="song-title">Song Title</div>
-        <div id="artistName" class="artist-name">Artist Name</div>
+        <div id="songTitle" class="song-title">—</div>
+        <div id="artistName" class="artist-name">—</div>
       </div>
     </div>
 
     <div class="controls">
-      <audio id="audioPlayer" controls style="width: 200px;">
+      <audio id="audioPlayer" preload="none">
         Your browser does not support the audio element.
       </audio>
-      <button onclick="playPause()">Play/Pause</button>
+      <button type="button" onclick="if(typeof playPause==='function')playPause()">Play/Pause</button>
     </div>
   </div>
   </div>
@@ -3721,23 +4525,21 @@ console.log('1171')
     var audio = document.getElementById("audioPlayer");
     var songTitleElement = document.getElementById("songTitle");
     var artistNameElement = document.getElementById("artistName");
-    //var songImgElement = document.getElementById("songImg");
+    if (songTitleElement) songTitleElement.textContent = typeof songTitle !== "undefined" ? songTitle : "—";
+    if (artistNameElement) artistNameElement.textContent = typeof artistName !== "undefined" ? artistName : "—";
 
-    // Set initial song details
-    songTitleElement.textContent = songTitle;
-    artistNameElement.textContent = artistName;
-    //songImgElement.src = songImgSrc;
-    //audio.src = songUrl;
-
-    // Function to play or pause the audio
     function playPause() {
+      if (!audio) return;
       if (audio.paused) {
-        document.getElementById("minivis").style.visibility = "visible";
-        audio.play();
+        var mv = document.getElementById("minivis");
+        if (mv) mv.style.visibility = "visible";
+        var x = audio.play();
+        if (x && typeof x.then === "function") x.catch(function () {});
       } else {
         audio.pause();
       }
     }
+    window.playPause = playPause;
   
     //const items = [title];
 
@@ -3784,102 +4586,101 @@ console.log('1171')
 
 
 
-              document.getElementById("searchInput").addEventListener('input', (e)=>{
-            const query = e.target.value.toLowerCase();
-            const songgh = document.querySelectorAll('#ab .sssh')
-            const artistCards = document.querySelectorAll('#artists-grid-8 .artist-card')
-            const artistCardsInAb = document.querySelectorAll('#ab .artist-card')
+              document.getElementById("searchInput").addEventListener('input', applySongSearch);
+  </script>
 
-            // Search songs (by title, artist, or album)
-            songgh.forEach(song =>{
-              const title = song.getAttribute("data-title") || "";
-              const artist = song.getAttribute("data-artist") || "";
-              const album = song.getAttribute("data-album") || "";
-              const queryWords = query.split(/\s+/); // split into words
+  <script>
+    (function wireCustomArtistProfiles() {
+      const ARTIST_PROFILES = {
+        MB: { name: "Melodic Black", image: "https://i.postimg.cc/vB0FtnYY/image.png", socials: [] },
+        Mark: { name: "Mark Macko", image: "https://i.postimg.cc/7YmDnpLw/image.png", socials: [
+          { label: "Instagram", url: "https://www.instagram.com/markmacko1/" }
+        ]},
+        SYANTE: { name: "Syante", image: "https://i.postimg.cc/MZnyw8Cw/image.png", socials: [
+          { label: "Website", url: "https://syante.lovable.app/" }
+        ]},
+        Blink: { name: "Blink (Dyniah)", image: "https://i.postimg.cc/mgLjw5Ns/image.png", socials: [
+          { label: "SoundCloud", url: "https://soundcloud.com/nerdgamer-11" }
+        ]},
+        tlc: { name: "The Lone Contraband", image: "https://i.postimg.cc/pLTMSKjq/image.png", socials: [
+          { label: "Instagram", url: "https://www.instagram.com/thelonecontraband/" }
+        ]},
+        Cmay: { name: "Cmay", image: "https://i.postimg.cc/v8kpXbNZ/v5-5.jpg", socials: [
+          { label: "YouTube", url: "https://www.youtube.com/channel/UCgyba-b-DmkH4sHnROSNHgA" }
+        ]},
+        Skizi: { name: "Skizi", image: "https://i.postimg.cc/FRzB9Cff/image.png", socials: [
+          { label: "Linktree", url: "https://linktr.ee/_Skizii?utm_source=linktree_admin_share" }
+        ]},
+        TF: { name: "Terrified", image: "https://i.postimg.cc/QCdYM1K0/channels4-profile.jpg", socials: [
+          { label: "YouTube", url: "https://www.youtube.com/@terrifiedmusic" }
+        ]},
+        "47": { name: "Fourty Seven", image: "https://i.postimg.cc/9MZZ3QDM/image.png", socials: [
+          { label: "YouTube", url: "https://www.youtube.com/channel/UCIdCInr3Vg7PDZvE9SsBwog" }
+        ]},
+        Cavemen: { name: "The Cavemen", image: "https://i.postimg.cc/kXhr37RQ/temp-Imaget6sljk.avif", socials: [
+          { label: "Bandcamp", url: "https://the-caveman.bandcamp.com/album/demo-sessions-vol-1" }
+        ]},
+        DCC: { name: "DJ CHRIS CONCEPTS", image: "https://i.postimg.cc/kgdL3w9r/v5-7.png", socials: [
+          { label: "Instagram", url: "https://www.instagram.com/conceptschris/" }
+        ]}
+      };
 
-              function checkti(word){
-                return title.includes(word) || artist.includes(word) || album.includes(word);
-              }
-              const matches = queryWords.every(checkti);
+      const overlay = document.getElementById("artistProfileOverlay");
+      const backBtn = document.getElementById("artistProfileBackBtn");
+      const avatar = document.getElementById("artistProfileAvatar");
+      const nameEl = document.getElementById("artistProfileName");
+      const tagEl = document.getElementById("artistProfileTag");
+      const listEl = document.getElementById("artistSocialList");
+      if (!overlay || !listEl) return;
+      window.setProfileFocusMode = function(enabled) {
+        document.body.classList.toggle("profile-focus-active", !!enabled);
+      };
 
-              if(matches){
-                song.style.display = "block";
-              } else {
-                song.style.display = "none";
-              }
-            })
+      function closeArtistModal() {
+        if (typeof window.__unmountFeaturedProfileStickies === "function") window.__unmountFeaturedProfileStickies();
+        overlay.classList.remove("active");
+        window.setProfileFocusMode(false);
+      }
 
-            // Helper function to check if artist card matches query
-            function checkArtistMatch(artistCard, query) {
-              // Get artist name from <p> tag or text content
-              const artistNameElement = artistCard.querySelector('p');
-              let artistName = "";
-              
-              if (artistNameElement) {
-                artistName = artistNameElement.textContent.toLowerCase().trim();
-              } else {
-                // If no <p> tag, clone the card, remove links and images, get text
-                const clone = artistCard.cloneNode(true);
-                clone.querySelectorAll('a, img').forEach(el => el.remove());
-                artistName = clone.textContent.toLowerCase().trim().replace(/\s+/g, ' ');
-              }
-              
-              // Check if artist name matches query (supports partial matches)
-              // Also check each word in the query matches any word in artist name
-              const queryWords = query.split(/\s+/).filter(w => w.length > 0);
-              const artistWords = artistName.split(/\s+/);
-              
-              // Match if all query words are found in artist name (any order)
-              return queryWords.every(queryWord => 
-                artistWords.some(artistWord => artistWord.includes(queryWord)) || 
-                artistName.includes(queryWord)
-              );
-            }
+      function openArtistModal(profile, artistId) {
+        if (!profile) return;
+        avatar.src = profile.image || "";
+        nameEl.textContent = profile.name || "Artist";
+        tagEl.textContent = "Featured Artist Profile";
+        const socials = Array.isArray(profile.socials) ? profile.socials : [];
+        listEl.innerHTML = socials.length
+          ? socials.map((s) => `<a class="artist-social-link" target="_blank" rel="noopener noreferrer" href="${s.url}"><span>${s.label}</span><span>Open</span></a>`).join("")
+          : `<div class="artist-social-empty">No socials available.</div>`;
+        const stickyKey = "feat_" + String(artistId || "").replace(/[^a-zA-Z0-9_]/g, "_");
+        if (typeof window.__mountFeaturedProfileStickies === "function") window.__mountFeaturedProfileStickies(stickyKey);
+        overlay.classList.add("active");
+        window.setProfileFocusMode(true);
+      }
 
-            // Search artists in artists-grid-8
-            if (query && query.length > 0) {
-              artistCards.forEach(artistCard => {
-                if (checkArtistMatch(artistCard, query)) {
-                  artistCard.style.display = "block";
-                } else {
-                  artistCard.style.display = "none";
-                }
-              });
-              
-              // Search artist cards in #ab section
-              artistCardsInAb.forEach(artistCard => {
-                if (checkArtistMatch(artistCard, query)) {
-                  artistCard.style.display = "block";
-                } else {
-                  artistCard.style.display = "none";
-                }
-              });
+      if (backBtn) backBtn.addEventListener("click", closeArtistModal);
+      overlay.addEventListener("click", (e) => { if (e.target === overlay) closeArtistModal(); });
 
-              // Move visible artist cards in #ab to the top (above songs)
-              const abContainer = document.getElementById('ab');
-              if (abContainer) {
-                const visibleArtistCards = Array.from(artistCardsInAb).filter(card => card.style.display !== 'none');
-                // Insert in reverse so original order is preserved
-                visibleArtistCards.reverse().forEach(card => {
-                  abContainer.insertBefore(card, abContainer.firstChild);
-                });
-              }
-            } else {
-              // If there is no query, show all artists and keep default layout
-              artistCards.forEach(artistCard => {
-                artistCard.style.display = "block";
-              });
-              artistCardsInAb.forEach(artistCard => {
-                artistCard.style.display = "block";
-              });
-            }
-          })
+      document.querySelectorAll("#artists-grid-8 a[href^='#']").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          const hash = link.getAttribute("href") || "";
+          const artistId = hash.replace("#", "");
+          const profile = ARTIST_PROFILES[artistId];
+          if (profile) openArtistModal(profile, artistId);
+        }, true);
+      });
+    })();
   </script>
 
   <!-- Profile Modal -->
   <div id="profileModal" class="profile-modal-overlay">
     <div class="profile-modal-content" id="profileModalContent">
       <div class="profile-modal-header" id="profileModalHeader">
+        <button type="button" class="profile-modal-back-btn" onclick="closeUserProfileModal()">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
+          <span>Back</span>
+        </button>
         <button class="profile-modal-close-btn" onclick="closeUserProfileModal()">
           <i class="fas fa-times"></i>
         </button>
@@ -3913,6 +4714,17 @@ console.log('1171')
             </div>
           </div>
         </div>
+        <div class="profile-modal-section" id="profileModalStickySection" style="display: none;">
+          <div class="profile-modal-section-title">
+            <i class="fas fa-sticky-note"></i> Thank-you notes
+          </div>
+          <p style="margin: 0 0 12px; font-size: 13px; color: rgba(255,255,255,0.55);">Fans can leave anonymous thank-yous (language filtered).</p>
+          <div id="userProfileStickyList" class="profile-sticky-list"></div>
+          <div class="profile-sticky-compose">
+            <textarea id="userProfileStickyInput" maxlength="280" rows="2" placeholder="Thanks for the music…" autocomplete="off"></textarea>
+            <button type="button" id="userProfileStickySend">Post thank-you</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -3920,9 +4732,39 @@ console.log('1171')
   <script type="module">
     // Import Firebase functions needed for users loading
     import { ref as ref2, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+    import { mountThankYouStickies } from "./js/concert-social.js";
     
     // Load and display all users from Firebase (copied from ArtistDashboard)
     let allUsersDataGlobal = [];
+    let featuredProfileStickyCleanup = null;
+    let userProfileStickyCleanup = null;
+
+    window.__mountFeaturedProfileStickies = function (key) {
+      if (featuredProfileStickyCleanup) {
+        featuredProfileStickyCleanup();
+        featuredProfileStickyCleanup = null;
+      }
+      const db = getDb();
+      const list = document.getElementById("featuredProfileStickyList");
+      const input = document.getElementById("featuredProfileStickyInput");
+      const send = document.getElementById("featuredProfileStickySend");
+      if (!db || !key || !list) return;
+      featuredProfileStickyCleanup = mountThankYouStickies(db, key, { list, input, send });
+    };
+    window.__unmountFeaturedProfileStickies = function () {
+      if (featuredProfileStickyCleanup) {
+        featuredProfileStickyCleanup();
+        featuredProfileStickyCleanup = null;
+      }
+    };
+
+    function unmountUserProfileStickies() {
+      if (userProfileStickyCleanup) {
+        userProfileStickyCleanup();
+        userProfileStickyCleanup = null;
+      }
+    }
+    window.__unmountUserProfileStickies = unmountUserProfileStickies;
     
     // Helper function to sanitize email for Firebase keys
     function sanitizeEmail(email) {
@@ -4039,6 +4881,19 @@ console.log('1171')
     function renderUsers(usersToRender) {
       const usersGrid = document.getElementById('usersGrid');
       if (!usersGrid) return;
+      const resolveProfileType = (user) => {
+        const explicitType = (user?.profile?.profileType || "").toString().toLowerCase();
+        if (explicitType === "artist" || explicitType === "listener") return explicitType;
+        const explicitVisibility = (user?.profile?.profileVisibility || "").toString().toLowerCase();
+        if (explicitVisibility === "public") return "artist";
+        if (explicitVisibility === "private") return "listener";
+        const roleText = (user?.role || user?.profile?.role || "").toString().toLowerCase();
+        if (roleText.includes("artist")) return "artist";
+        if (roleText.includes("listener")) return "listener";
+        return "listener";
+      };
+      const getRoleLabel = (user) => resolveProfileType(user) === "artist" ? "Artist (Public)" : "Listener (Private)";
+      const getVisibleEmail = (user) => resolveProfileType(user) === "artist" ? (user.email || user.id || 'No email') : "Hidden for private listener";
 
       const searchQuery = document.getElementById('userSearchInput')?.value?.toLowerCase().trim() || '';
       const clearBtn = document.getElementById('clearSearchBtn');
@@ -4049,16 +4904,15 @@ console.log('1171')
       }
 
       // Filter users based on search query
-      let filteredUsers = usersToRender;
+      let filteredUsers = usersToRender.filter((user) => resolveProfileType(user) === "artist");
       if (searchQuery) {
         filteredUsers = usersToRender.filter(user => {
+          if (resolveProfileType(user) !== "artist") return false;
           const displayName = (user.profile?.nickname || user.fullName || user.email || '').toLowerCase();
-          const email = (user.email || '').toLowerCase();
-          const role = (user.role || '').toLowerCase();
+          const role = (getRoleLabel(user) || '').toLowerCase();
           const bio = (user.profile?.bio || '').toLowerCase();
           
           return displayName.includes(searchQuery) || 
-                 email.includes(searchQuery) || 
                  role.includes(searchQuery) ||
                  bio.includes(searchQuery);
         });
@@ -4081,8 +4935,7 @@ console.log('1171')
         const modalIndex = originalIndex >= 0 ? originalIndex : index;
         
         const displayName = user.profile?.nickname || user.fullName || user.email || user.id || 'User';
-        const email = user.email || user.id || 'No email';
-        const role = user.role || 'User';
+        const role = getRoleLabel(user);
         const profilePicture = (user.isPremium && user.profile?.profilePicture) 
           ? user.profile.profilePicture 
           : null;
@@ -4096,7 +4949,6 @@ console.log('1171')
               }
             </div>
             <div class="user-profile-name">${displayName}</div>
-            <div class="user-profile-email">${email}</div>
             <div class="user-profile-role">${role}</div>
           </div>
         `;
@@ -4171,8 +5023,13 @@ console.log('1171')
       const modalHeader = document.getElementById('profileModalHeader');
       
       const displayName = userData.profile?.nickname || userData.fullName || userData.email || userData.id || 'User';
-      const email = userData.email || userData.id || 'No email';
-      const role = userData.role || 'User';
+      const explicitType = (userData.profile?.profileType || "").toString().toLowerCase();
+      const explicitVisibility = (userData.profile?.profileVisibility || "").toString().toLowerCase();
+      const derivedType = explicitType === "artist" || explicitType === "listener"
+        ? explicitType
+        : (explicitVisibility === "public" ? "artist" : "listener");
+      const isPublicArtist = derivedType === "artist";
+      const role = isPublicArtist ? 'Artist (Public)' : 'Listener (Private)';
       const profilePicture = (userData.isPremium && userData.profile?.profilePicture) 
         ? userData.profile.profilePicture 
         : null;
@@ -4198,8 +5055,8 @@ console.log('1171')
         tinpo.push({ name: 'Donorbox', url: userData.profile.tinp, icon: 'fab fa-gift' });
       }
 
-      // Set email and role
-      document.getElementById('profileModalEmail').textContent = email;
+      // Never expose user emails in public profile modal
+      document.getElementById('profileModalEmail').textContent = 'Hidden';
       document.getElementById('profileModalRole').textContent = role;
 
       // Set social links
@@ -4247,13 +5104,35 @@ console.log('1171')
       modalHeader.style.background = `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`;
       modalContent.style.borderColor = theme.primary;
 
+      unmountUserProfileStickies();
+      const stickySection = document.getElementById('profileModalStickySection');
+      if (stickySection) {
+        if (isPublicArtist && userData.emailKey) {
+          stickySection.style.display = 'block';
+          const dbSticky = getDb();
+          if (dbSticky) {
+            const list = document.getElementById('userProfileStickyList');
+            const input = document.getElementById('userProfileStickyInput');
+            const send = document.getElementById('userProfileStickySend');
+            userProfileStickyCleanup = mountThankYouStickies(dbSticky, userData.emailKey, { list, input, send });
+          }
+        } else {
+          stickySection.style.display = 'none';
+        }
+      }
+
       // Show modal
       modal.classList.add('active');
+      if (window.setProfileFocusMode) window.setProfileFocusMode(true);
+      else document.body.classList.add('profile-focus-active');
     };
 
     // Close user profile modal
     window.closeUserProfileModal = function() {
+      unmountUserProfileStickies();
       document.getElementById('profileModal').classList.remove('active');
+      if (window.setProfileFocusMode) window.setProfileFocusMode(false);
+      else document.body.classList.remove('profile-focus-active');
     };
 
     // Close modal when clicking outside
@@ -4300,13 +5179,17 @@ console.log('1171')
 
 
 
-<!-- Mobile bottom nav bar -->
+<div class="bottom-queue-dock">
+  <div class="bottom-queue-title">Music Queue</div>
+  <div id="queues" class="bottom-queue-list"></div>
+</div>
+<!-- Bottom nav bar -->
 <nav class="mobile-nav">
   <a href="index.html" class="mobile-nav-item mobile-nav-active">
     <span class="material-symbols-outlined">home</span>
     <span>Home</span>
   </a>
-  <a href="lively.html" class="mobile-nav-item">
+  <a href="lively.html" class="mobile-nav-item" id="tour-live-concerts-nav">
     <span class="material-symbols-outlined">mic</span>
     <span>Concerts</span>
   </a>
@@ -4325,13 +5208,51 @@ console.log('1171')
   position: fixed;
   bottom: 0;
   left: 0;
+  right: 0;
   width: 100%;
-  z-index: 10000;
+  max-width: 100vw;
+  box-sizing: border-box;
+  z-index: 99999;
   background: #0a0a0a;
   border-top: 1px solid rgba(255,127,80,0.25);
   padding: 6px 0 max(6px, env(safe-area-inset-bottom));
   justify-content: space-around;
   align-items: center;
+}
+#sidebar {
+  display: none !important;
+}
+.body-layout {
+  display: block !important;
+}
+.main-content {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 20px 18px 150px !important;
+}
+.bottom-queue-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  z-index: 99998;
+  background: #0a0a0a;
+  border-top: 1px solid rgba(255,127,80,0.22);
+  padding: 6px 12px;
+}
+.bottom-queue-title {
+  color: #ff7f50;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.bottom-queue-list {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+  min-height: 20px;
 }
 .mobile-nav-item {
   display: flex;
@@ -4357,9 +5278,10 @@ console.log('1171')
 .mobile-nav-item.mobile-nav-active {
   background: rgba(255,127,80,0.1);
 }
-@media (max-width: 768px) {
-  .mobile-nav { display: flex; }
-  .lol { bottom: 56px !important; }
+@media screen and (max-width: 3840px) {
+  body { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+  .mobile-nav { display: flex !important; }
+  .lol { bottom: 116px !important; }
 }
 </style>
 </body>

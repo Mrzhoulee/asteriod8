@@ -9,7 +9,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
         import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
         import { getDatabase, ref as ref2, update, get, set } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
         import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
 console.log('1050')
@@ -30,8 +30,6 @@ console.log('1050')
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: "select_account" });
 
         const sanitizeEmail = (email) => (email || "").replace(/[.#$[\]]/g, '_');
 
@@ -128,7 +126,6 @@ console.log('1050')
           }
         };
 
-        // Helper to show/hide the Google sign‑in prompt
         function showSignInPrompt() {
           const overlay = document.getElementById("signinOverlay");
           if (overlay) overlay.style.display = "flex";
@@ -139,21 +136,8 @@ console.log('1050')
           if (overlay) overlay.style.display = "none";
         }
 
-        // Expose sign‑in handler globally for the button
-        window.handleGoogleSignIn = async function () {
-          try {
-            await signInWithPopup(auth, provider);
-            // onAuthStateChanged will fire and continue the flow
-          } catch (err) {
-            console.error("Error during Google sign-in:", err);
-            alert("Unable to sign in with Google right now. Please try again.");
-          }
-        };
-
-        // On load, check Firebase Auth instead of localStorage
         onAuthStateChanged(auth, async (user) => {
           if (!user) {
-            // Not signed in: show a nice Google sign‑in prompt
             showSignInPrompt();
             return;
           }
@@ -243,17 +227,15 @@ console.log('1050')
     <!-- Loader container used by createProfile() -->
     <div id="loader" style="display:none;"></div>
 
-    <!-- Google sign-in prompt shown when user is not authenticated -->
     <div id="signinOverlay" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.8); z-index:1500; align-items:center; justify-content:center;">
       <div style="background:#020617; color:#e5e7eb; padding:26px 28px; border-radius:18px; width:90%; max-width:380px; box-shadow:0 20px 45px rgba(15,23,42,0.7); font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; text-align:left;">
         <h2 style="margin:0 0 8px; font-size:20px; font-weight:600; color:#f9fafb;">Sign in to continue</h2>
         <p style="margin:0 0 18px; font-size:13px; color:#9ca3af;">
-          Use your Google account to unlock your Asteroid Artist Dashboard and create your profile.
+          Sign in with Apple from the Asteroid home screen, then return here to finish your artist profile.
         </p>
-        <button onclick="handleGoogleSignIn()" style="width:100%; padding:10px 16px; border-radius:999px; border:none; background:white; color:#111827; font-size:14px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-          <span style="font-size:16px;">🔑</span>
-          <span>Continue with Google</span>
-        </button>
+        <a href="index.html" style="display:flex; width:100%; box-sizing:border-box; padding:10px 16px; border-radius:999px; border:none; background:white; color:#111827; font-size:14px; font-weight:600; cursor:pointer; align-items:center; justify-content:center; gap:8px; text-decoration:none;">
+          <span>Go to home &amp; sign in</span>
+        </a>
       </div>
     </div>
 

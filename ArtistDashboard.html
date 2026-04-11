@@ -224,6 +224,30 @@
             text-transform: uppercase;
         }
 
+        .creator-poll-duo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        @media (max-width: 720px) {
+            .creator-poll-duo { grid-template-columns: 1fr; }
+        }
+        .creator-poll-cell {
+            border: 2px solid rgba(255,127,80,0.35);
+            border-radius: 10px;
+            padding: 8px;
+            overflow: hidden;
+            background: rgba(0,0,0,0.2);
+        }
+        .creator-poll-cell .home-poll-embed iframe {
+            width: 100%;
+            height: 152px;
+            border: 0;
+            border-radius: 8px;
+        }
+        .creator-poll-cell .home-poll-embed--sc iframe { height: 120px; }
+
         /* Profile Customization */
         .profile-editor {
             background: var(--card-bg);
@@ -1000,6 +1024,9 @@
             <button class="tab-btn" onclick="switchTab('subasteroids')">
                 <i class="fas fa-rocket"></i> SubAsteroids
             </button>
+            <button class="tab-btn" onclick="switchTab('creator')">
+                <i class="fas fa-wand-magic-sparkles"></i> Creator tools
+            </button>
             
         </div>
 
@@ -1118,6 +1145,12 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label">Public username (unique, one-time)</label>
+                        <input type="text" id="profilePublicUsername" class="form-input" placeholder="e.g. lunar_beats" maxlength="40" autocomplete="username">
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.35rem;">3–40 chars: letters, numbers, underscores only. Once saved, it stays yours; cannot be taken by someone else.</p>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">Bio / Description</label>
                         <textarea id="profileBio" class="form-textarea" placeholder="Tell your fans about yourself..."></textarea>
                     </div>
@@ -1226,6 +1259,64 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
     </div>
 </div>
 
+        <!-- Creator tools (fans, journeys, polls, follow) -->
+        <div id="creator-tab" class="tab-content">
+            <div class="analytics-section">
+                <h2 class="section-title"><i class="fas fa-heart"></i> First 100 fans (listeners)</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">
+                    Built from plays logged on the home library when your <code>uploader</code> email matches this account. Unsigned listeners appear as “Anonymous”.
+                </p>
+                <div id="creatorFansList" class="songs-list"><div class="loading">Open this tab after sign-in to load fans…</div></div>
+            </div>
+            <div class="analytics-section">
+                <h2 class="section-title"><i class="fas fa-file-signature"></i> Upload agreements (your uploads)</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Rows from AGREEMENTS where the email matches you (checkbox + upload on Studio).</p>
+                <div id="creatorAgreementsList" class="songs-list"><div class="loading">Loading…</div></div>
+            </div>
+            <div class="analytics-section">
+                <h2 class="section-title"><i class="fas fa-route"></i> Listen journey (before → your song)</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">What people played right before one of your tracks, and what they played after (from LISTEN_JOURNEYS).</p>
+                <div id="creatorJourneysList" class="songs-list"><div class="loading">Loading…</div></div>
+            </div>
+            <div class="analytics-section">
+                <h2 class="section-title"><i class="fas fa-poll"></i> Artist vs artist poll</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Preview links: YouTube, Spotify, SoundCloud, Apple Music, or direct MP3. Fans vote <strong>once per week</strong> per account/device.</p>
+                <div class="form-group">
+                    <label class="form-label">Duo theme (your side vs theirs)</label>
+                    <select id="pollThemePreset" class="form-input">
+                        <option value="blue_red">Blue vs red</option>
+                        <option value="coral_navy">Coral vs navy</option>
+                        <option value="purple_gold">Purple vs gold</option>
+                        <option value="teal_rose">Teal vs rose</option>
+                        <option value="green_slate">Green vs slate</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Other artist name</label>
+                    <input type="text" id="pollArtistB" class="form-input" placeholder="Artist B">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Your preview URL</label>
+                    <input type="text" id="pollUrlA" class="form-input" placeholder="Spotify / YouTube / SoundCloud / MP3…">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Their preview URL</label>
+                    <input type="text" id="pollUrlB" class="form-input" placeholder="Spotify / YouTube / SoundCloud / MP3…">
+                </div>
+                <button type="button" class="btn btn-primary" id="pollCreateBtn"><i class="fas fa-plus"></i> Publish poll</button>
+                <div id="creatorPollsList" class="songs-list" style="margin-top: 1.5rem;"><div class="loading">No polls yet.</div></div>
+            </div>
+            <div class="analytics-section">
+                <h2 class="section-title"><i class="fas fa-bell"></i> Followers &amp; notices</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">
+                    Following is stored under <code>FOLLOWS</code> (follower = signed-in email key). Notify fans: full push requires FCM/backend — placeholder message for now.
+                </p>
+                <div id="creatorFollowStatus" style="color: var(--text-secondary); margin-bottom: 12px;"></div>
+                <button type="button" class="btn btn-secondary" id="creatorTestFollowBtn"><i class="fas fa-user-plus"></i> Record test follow (this browser)</button>
+                <p style="color: var(--warning); margin-top: 12px; font-size: 0.9rem;">Unique public username: set when you save your profile; registry is <code>USERNAME_REGISTRY</code> (see console errors if taken).</p>
+            </div>
+        </div>
+
     </div>
 
     <!-- Profile Modal -->
@@ -1273,9 +1364,18 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-        import { getDatabase, ref, get, set, update, onValue, query, orderByChild, limitToLast, push, increment } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+        import { getDatabase, ref, get, set, update, onValue, query, orderByChild, equalTo, limitToLast, push, increment } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+        import { pollPreviewMarkup } from "./js/home-polls.js";
+
+        const POLL_THEME_PRESETS = {
+            blue_red: { colorA: "#2563eb", colorB: "#dc2626" },
+            coral_navy: { colorA: "#ff7f50", colorB: "#1e3a5f" },
+            purple_gold: { colorA: "#7c3aed", colorB: "#d97706" },
+            teal_rose: { colorA: "#0d9488", colorB: "#e11d48" },
+            green_slate: { colorA: "#16a34a", colorB: "#475569" }
+        };
 
         const firebaseConfig = {
             apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
@@ -1334,7 +1434,249 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 console.log('Switching to social tab, loading accounts...');
                 loadSocialAccounts();
             }
+            if (tabName === 'creator' && currentEmailKey) {
+                loadCreatorTools();
+            }
         };
+
+        async function loadCreatorTools() {
+            const safe = currentEmailKey;
+            const fansEl = document.getElementById('creatorFansList');
+            const agrEl = document.getElementById('creatorAgreementsList');
+            const jouEl = document.getElementById('creatorJourneysList');
+            const pollsEl = document.getElementById('creatorPollsList');
+            if (!safe) {
+                if (fansEl) fansEl.innerHTML = '<div class="empty-state">Sign in to view creator tools.</div>';
+                return;
+            }
+
+            try {
+                const feSnap = await get(ref(database, 'FAN_ENGAGEMENT/' + safe + '/events'));
+                const fanRows = [];
+                if (feSnap.exists()) {
+                    feSnap.forEach((c) => fanRows.push({ id: c.key, ...c.val() }));
+                }
+                fanRows.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+                const seen = new Set();
+                const unique = [];
+                for (const r of fanRows) {
+                    const k = (r.listenerEmail || r.label || 'anon') + '|' + (r.songTitle || '');
+                    if (seen.has(k)) continue;
+                    seen.add(k);
+                    unique.push(r);
+                    if (unique.length >= 100) break;
+                }
+                if (fansEl) {
+                    fansEl.innerHTML = unique.length
+                        ? unique.map((r) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(r.label || 'Anonymous')}</div><div class="song-artist">${r.anonymous ? 'Anonymous listener' : 'Signed in'} · ${escapeHtml(r.songTitle || '')}</div></div><div class="song-stats"><span class="song-stat-value" style="font-size:0.85rem;">${r.cameFromTitle ? 'From: ' + escapeHtml(r.cameFromTitle) : '—'}</span></div></div>`).join('')
+                        : '<div class="empty-state">No fan plays recorded yet. Plays from the home library will appear when songs list your uploader email.</div>';
+                }
+            } catch (e) {
+                console.error('Creator tools: FAN_ENGAGEMENT', e);
+                if (fansEl) {
+                    fansEl.innerHTML = '<div class="empty-state">Could not load fan plays. Deploy latest <code>database.rules.json</code> (includes <code>FAN_ENGAGEMENT</code>) with <code>firebase deploy --only database</code>, then hard-refresh.</div>';
+                }
+            }
+
+            try {
+                const agSnap = await get(ref(database, 'AGREEMENTS'));
+                const agreements = [];
+                const me = String(currentUserEmail || '').trim().toLowerCase();
+                if (agSnap.exists()) {
+                    agSnap.forEach((c) => {
+                        const v = c.val();
+                        if (v && String(v.email || '').trim().toLowerCase() === me) {
+                            agreements.push(v);
+                        }
+                    });
+                }
+                if (agrEl) {
+                    agrEl.innerHTML = agreements.length
+                        ? agreements.map((v) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(v.songTitle || '')}</div><div class="song-artist">${escapeHtml(v.artistName || '')} · ${escapeHtml(v.albumName || '')}</div><div class="song-artist" style="margin-top:4px;font-size:0.85rem;opacity:0.9;">${escapeHtml(v.name || '')} · ${escapeHtml(v.email || '')}</div></div><div class="song-stats"><span class="song-stat-label">${v.acceptedAt ? new Date(v.acceptedAt).toLocaleString() : ''}</span></div></div>`).join('')
+                        : `<div class="empty-state">No agreement rows for <strong>${escapeHtml(currentUserEmail || 'this account')}</strong>. Upload a track in Studio with the agreement box checked using the same email you use here (${escapeHtml(localStorage.getItem('artemail') || localStorage.getItem('email') || '') || 'see account menu'}).</div>`;
+                }
+            } catch (e) {
+                console.error('Creator tools: AGREEMENTS', e);
+                if (agrEl) agrEl.innerHTML = '<div class="empty-state">Could not load agreements (rules or network).</div>';
+            }
+
+            try {
+                const journeys = [];
+                const ajSnap = await get(ref(database, 'ARTIST_JOURNEYS/' + safe));
+                if (ajSnap.exists()) {
+                    ajSnap.forEach((c) => {
+                        const v = c.val();
+                        if (v) journeys.push({ id: c.key, ...v });
+                    });
+                }
+                if (journeys.length === 0) {
+                    try {
+                        const jq = query(
+                            ref(database, 'LISTEN_JOURNEYS'),
+                            orderByChild('uploaderKey'),
+                            equalTo(safe),
+                            limitToLast(200)
+                        );
+                        const ljSnap = await get(jq);
+                        if (ljSnap.exists()) {
+                            ljSnap.forEach((c) => {
+                                const v = c.val();
+                                if (v) journeys.push({ id: c.key, ...v });
+                            });
+                        }
+                    } catch (inner) {
+                        console.warn('Creator tools: legacy LISTEN_JOURNEYS query', inner);
+                    }
+                }
+                journeys.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+                if (jouEl) {
+                    jouEl.innerHTML = journeys.length
+                        ? journeys.slice(0, 120).map((j) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(j.playedTitle || '')}</div><div class="song-artist">Before: ${escapeHtml(j.prevTitle || '—')} · After: ${escapeHtml(j.nextTitle || '—')}</div></div><div class="song-stats"><span class="song-stat-label">${j.listenerLabel ? escapeHtml(j.listenerLabel) : ''}</span></div></div>`).join('')
+                        : '<div class="empty-state">No journey rows yet. New plays from the home library are mirrored here automatically. Older data may appear after a successful indexed query once rules are deployed.</div>';
+                }
+            } catch (e) {
+                console.error('Creator tools: journeys', e);
+                if (jouEl) {
+                    jouEl.innerHTML = '<div class="empty-state">Could not load journeys. Deploy latest <code>database.rules.json</code> (includes <code>ARTIST_JOURNEYS</code>) and run <code>firebase deploy --only database</code>, then refresh.</div>';
+                }
+            }
+
+            try {
+                const polSnap = await get(ref(database, 'ARTIST_POLLS'));
+                const mine = [];
+                if (polSnap.exists()) {
+                    polSnap.forEach((c) => {
+                        const v = c.val();
+                        if (v && v.ownerKey === safe) mine.push({ id: c.key, ...v });
+                    });
+                }
+                mine.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                if (pollsEl) {
+                    if (!mine.length) {
+                        pollsEl.innerHTML = '<div class="empty-state">Create a poll above.</div>';
+                    } else {
+                        let pollsHtml = '';
+                        for (const p of mine) {
+                            let ca = 0;
+                            let cb = 0;
+                            try {
+                                const vSnap = await get(ref(database, 'ARTIST_POLLS/' + p.id + '/votes'));
+                                if (vSnap.exists()) {
+                                    vSnap.forEach((c) => {
+                                        const s = (c.val() && c.val().side) || '';
+                                        if (s === 'a') ca++;
+                                        else if (s === 'b') cb++;
+                                    });
+                                }
+                            } catch (ve) {
+                                console.warn(ve);
+                            }
+                            const pidJs = String(p.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                            const cA = p.colorA || '#2563eb';
+                            const cB = p.colorB || '#dc2626';
+                            pollsHtml += `<div class="song-item creator-poll-row"><div class="song-info"><div class="song-title">You vs ${escapeHtml(p.artistBName || '')}</div><div class="creator-poll-duo" style="--pa:${escapeHtml(cA)};--pb:${escapeHtml(cB)};"><div class="creator-poll-cell" style="border-color:${escapeHtml(cA)}">${pollPreviewMarkup(p.songUrlA)}</div><div class="creator-poll-cell" style="border-color:${escapeHtml(cB)}">${pollPreviewMarkup(p.songUrlB)}</div></div><div class="song-stats" style="flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;"><button type="button" class="btn btn-secondary" onclick="window.castPollVote('${pidJs}','a')" style="background:${escapeHtml(cA)};border:none;">Vote you (${ca})</button><button type="button" class="btn btn-secondary" onclick="window.castPollVote('${pidJs}','b')" style="background:${escapeHtml(cB)};border:none;">Vote ${escapeHtml(p.artistBName || 'them')} (${cb})</button></div></div></div>`;
+                        }
+                        pollsEl.innerHTML = pollsHtml;
+                    }
+                }
+            } catch (e) {
+                console.error('Creator tools: ARTIST_POLLS', e);
+                if (pollsEl) pollsEl.innerHTML = '<div class="empty-state">Could not load polls.</div>';
+            }
+        }
+
+        function escapeHtml(s) {
+            if (s == null) return '';
+            const d = document.createElement('div');
+            d.textContent = String(s);
+            return d.innerHTML;
+        }
+
+        const POLL_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+        window.castPollVote = async function (pollId, side) {
+            let vid = sanitizeEmail((currentUserEmail || '').trim() || (localStorage.getItem('email') || '').trim());
+            if (!vid) {
+                let pk = localStorage.getItem('pollVoterKey');
+                if (!pk) {
+                    pk = 'pv_' + Math.random().toString(36).slice(2) + Date.now();
+                    localStorage.setItem('pollVoterKey', pk);
+                }
+                vid = sanitizeEmail(pk);
+            }
+            const voteRef = ref(database, 'ARTIST_POLLS/' + pollId + '/votes/' + vid);
+            const now = Date.now();
+            try {
+                const snap = await get(voteRef);
+                if (snap.exists()) {
+                    const prev = snap.val();
+                    const t = prev && typeof prev.ts === 'number' ? prev.ts : 0;
+                    if (now - t < POLL_WEEK_MS) {
+                        const days = Math.max(1, Math.ceil((POLL_WEEK_MS - (now - t)) / (24 * 60 * 60 * 1000)));
+                        alert('You can vote again in about ' + days + ' day(s).');
+                        return;
+                    }
+                }
+                await set(voteRef, { side: side, ts: now });
+                loadCreatorTools();
+            } catch (e) {
+                console.error(e);
+                alert('Could not record vote (wait a week to change vote, or check network / rules).');
+            }
+        };
+
+        document.getElementById('pollCreateBtn')?.addEventListener('click', async () => {
+            if (!currentEmailKey) {
+                alert('Sign in first.');
+                return;
+            }
+            const artistBName = (document.getElementById('pollArtistB')?.value || '').trim();
+            const songUrlA = (document.getElementById('pollUrlA')?.value || '').trim();
+            const songUrlB = (document.getElementById('pollUrlB')?.value || '').trim();
+            const themeKey = (document.getElementById('pollThemePreset')?.value || 'blue_red').trim();
+            const colors = POLL_THEME_PRESETS[themeKey] || POLL_THEME_PRESETS.blue_red;
+            if (!artistBName || !songUrlA || !songUrlB) {
+                alert('Fill all poll fields.');
+                return;
+            }
+            const pid = 'poll_' + Date.now();
+            try {
+                await set(ref(database, 'ARTIST_POLLS/' + pid), {
+                    ownerKey: currentEmailKey,
+                    ownerEmail: currentUserEmail,
+                    artistBName,
+                    songUrlA,
+                    songUrlB,
+                    colorA: colors.colorA,
+                    colorB: colors.colorB,
+                    themePreset: themeKey,
+                    labelA: 'You',
+                    labelB: artistBName,
+                    createdAt: Date.now()
+                });
+                document.getElementById('pollArtistB').value = '';
+                document.getElementById('pollUrlA').value = '';
+                document.getElementById('pollUrlB').value = '';
+                loadCreatorTools();
+            } catch (e) {
+                console.error(e);
+                alert('Could not save poll (rules?)');
+            }
+        });
+
+        document.getElementById('creatorTestFollowBtn')?.addEventListener('click', async () => {
+            if (!currentEmailKey) {
+                alert('Sign in first.');
+                return;
+            }
+            const follower = sanitizeEmail(localStorage.getItem('email') || currentUserEmail || 'self');
+            try {
+                await set(ref(database, 'FOLLOWS/' + currentEmailKey + '/' + follower), true);
+                document.getElementById('creatorFollowStatus').textContent = 'Recorded follow key: ' + follower;
+            } catch (e) {
+                alert('Follow write failed');
+            }
+        });
 
         // Theme selection
         window.selectTheme = function(theme) {
@@ -1539,7 +1881,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 nickname: document.getElementById('profileNickname').value || null,
                 bio: document.getElementById('profileBio').value || null,
                 theme: selectedTheme,
-                donorbox: tino.value || null,
+                donorbox: tino || null,
                 instagram: document.getElementById('profileInstagram').value || null,
                 youtube: document.getElementById('profileYoutube').value || null,
                 spotify: document.getElementById('profileSpotify').value || null,
@@ -1550,6 +1892,33 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
             try {
                 const profileRef = ref(database, 'PROFILES/' + currentEmailKey);
+                const prevSnap = await get(profileRef);
+                const prevProf = prevSnap.exists() ? prevSnap.val() : {};
+                const rawUsername = (document.getElementById('profilePublicUsername') && document.getElementById('profilePublicUsername').value) || '';
+                const normalized = rawUsername.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+                if (rawUsername.trim() && (normalized.length < 3 || normalized.length > 40)) {
+                    alert('Public username must be 3–40 characters (letters, numbers, underscores only).');
+                    return;
+                }
+                const locked = prevProf.publicUsername ? String(prevProf.publicUsername).toLowerCase() : '';
+                if (locked) {
+                    profileData.publicUsername = prevProf.publicUsername;
+                    const unEl = document.getElementById('profilePublicUsername');
+                    if (unEl) unEl.value = prevProf.publicUsername;
+                } else if (normalized) {
+                    const regRef = ref(database, 'USERNAME_REGISTRY/' + normalized);
+                    const regSnap = await get(regRef);
+                    const owner = regSnap.exists() ? regSnap.val() : null;
+                    if (owner && owner !== currentEmailKey) {
+                        alert('That username is already taken. Pick another.');
+                        return;
+                    }
+                    if (!owner) {
+                        await set(regRef, currentEmailKey);
+                    }
+                    profileData.publicUsername = normalized;
+                }
+
                 await update(profileRef, profileData);
                 alert('Profile saved successfully!');
             } catch (error) {
@@ -1692,15 +2061,8 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
             } catch (error) {
                 console.error('Error loading analytics:', error);
-                const isPermissionDenied = (error && (error.code === 'PERMISSION_DENIED' || error.message === 'Permission denied' || (error.message && error.message.toLowerCase().includes('permission denied'))));
-                const message = isPermissionDenied
-                    ? 'You don\'t have permission to view analytics. If you\'re an artist, your account may need to be verified.'
-                    : 'Error loading analytics';
-                const emptyHtml = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>${message}</p></div>`;
-                const songsEl = document.getElementById('songsList');
-                const monthlyEl = document.getElementById('monthlyBreakdown');
-                if (songsEl) songsEl.innerHTML = emptyHtml;
-                if (monthlyEl) monthlyEl.innerHTML = emptyHtml;
+                document.getElementById('songsList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading analytics</p></div>';
+                document.getElementById('monthlyBreakdown').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading monthly data</p></div>';
             }
         }
 
@@ -1716,6 +2078,11 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     const profile = snapshot.val();
                     
                     document.getElementById('profileNickname').value = profile.nickname || '';
+                    const pu = document.getElementById('profilePublicUsername');
+                    if (pu) {
+                        pu.value = profile.publicUsername || '';
+                        pu.disabled = !!profile.publicUsername;
+                    }
                     document.getElementById('profileBio').value = profile.bio || '';
                     document.getElementById('profileInstagram').value = profile.instagram || '';
                     document.getElementById('profileYoutube').value = profile.youtube || '';
@@ -1742,6 +2109,12 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     }
                     
                     updatePreview();
+                } else {
+                    const pu = document.getElementById('profilePublicUsername');
+                    if (pu) {
+                        pu.value = '';
+                        pu.disabled = false;
+                    }
                 }
             } catch (error) {
                 console.error('Error loading profile:', error);

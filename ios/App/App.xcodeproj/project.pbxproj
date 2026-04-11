@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,6 +15,8 @@
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		504EC3201FED79650016851F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3211FED79650016851F /* SceneDelegate.swift */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
+		55894D502F83BFF70048C7DE /* Capacitor in Frameworks */ = {isa = PBXBuildFile; productRef = CAP003A2B3C4D5E6F7890AB03 /* Capacitor */; };
+		55894D512F83BFF70048C7DE /* CapApp-SPM in Frameworks */ = {isa = PBXBuildFile; productRef = CAP004A2B3C4D5E6F7890AB04 /* CapApp-SPM */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,9 +27,9 @@
 		504EC30C1FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		504EC30E1FED79650016851F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		504EC3211FED79650016851F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+		558C2A1B2F84DC92001FCE87 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -36,6 +38,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				55894D512F83BFF70048C7DE /* CapApp-SPM in Frameworks */,
+				55894D502F83BFF70048C7DE /* Capacitor in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,9 +72,9 @@
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
-				504EC3131FED79650016851F /* Info.plist */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
+				558C2A1B2F84DC92001FCE87 /* Info.plist */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -126,8 +130,8 @@
 			);
 			mainGroup = 504EC2FB1FED79650016851F;
 			packageReferences = (
-				CAP001A2B3C4D5E6F7890AB01 /* CapApp-SPM */,
-				CAP002A2B3C4D5E6F7890AB02 /* capacitor-swift-pm */,
+				CAP001A2B3C4D5E6F7890AB01 /* XCLocalSwiftPackageReference "CapApp-SPM" */,
+				CAP002A2B3C4D5E6F7890AB02 /* XCRemoteSwiftPackageReference "capacitor-swift-pm" */,
 			);
 			productRefGroup = 504EC3051FED79650016851F /* Products */;
 			projectDirPath = "";
@@ -184,37 +188,6 @@
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
-
-/* Begin XCLocalSwiftPackageReference section */
-		CAP001A2B3C4D5E6F7890AB01 /* CapApp-SPM */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = CapApp-SPM;
-		};
-/* End XCLocalSwiftPackageReference section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		CAP002A2B3C4D5E6F7890AB02 /* capacitor-swift-pm */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ionic-team/capacitor-swift-pm.git";
-			requirement = {
-				kind = exactVersion;
-				version = 8.2.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		CAP003A2B3C4D5E6F7890AB03 /* Capacitor */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Capacitor;
-			package = CAP002A2B3C4D5E6F7890AB02 /* capacitor-swift-pm */;
-		};
-		CAP004A2B3C4D5E6F7890AB04 /* CapApp-SPM */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = CapApp-SPM;
-			package = CAP001A2B3C4D5E6F7890AB01 /* CapApp-SPM */;
-		};
-/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCBuildConfiguration section */
 		504EC3141FED79650016851F /* Debug */ = {
@@ -402,6 +375,37 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		CAP001A2B3C4D5E6F7890AB01 /* XCLocalSwiftPackageReference "CapApp-SPM" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "CapApp-SPM";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CAP002A2B3C4D5E6F7890AB02 /* XCRemoteSwiftPackageReference "capacitor-swift-pm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ionic-team/capacitor-swift-pm.git";
+			requirement = {
+				kind = exactVersion;
+				version = 8.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CAP003A2B3C4D5E6F7890AB03 /* Capacitor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CAP002A2B3C4D5E6F7890AB02 /* XCRemoteSwiftPackageReference "capacitor-swift-pm" */;
+			productName = Capacitor;
+		};
+		CAP004A2B3C4D5E6F7890AB04 /* CapApp-SPM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CAP001A2B3C4D5E6F7890AB01 /* XCLocalSwiftPackageReference "CapApp-SPM" */;
+			productName = "CapApp-SPM";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 504EC2FC1FED79650016851F /* Project object */;
 }

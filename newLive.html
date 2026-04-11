@@ -10,7 +10,7 @@
 </head>
 <body>
     <script>
-
+      
     </script>
     <style>
                 .large-input {
@@ -50,6 +50,15 @@
 
 .btn.secondary:hover {
   opacity: 0.85;
+}
+.go-live-btn {
+  background: linear-gradient(90deg,#ff3b3b,#ff7a3b);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 /* Input */
@@ -171,6 +180,19 @@ type="text" placeholder="Create a Live Passcode that you are going to be using. 
     window.database = database;
     window.get = get;
 
+    function normalizeEmbedInput(raw) {
+        const value = (raw || "").trim();
+        if (!value) return "";
+        if (value.includes("<iframe")) return value;
+        // Allow creators to paste a plain YouTube URL.
+        const ytMatch = value.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{6,})/);
+        if (ytMatch && ytMatch[1]) {
+            const id = ytMatch[1];
+            return `<iframe width="100%" height="500" src="https://www.youtube.com/embed/${id}" title="YouTube live stream" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+        }
+        return value;
+    }
+
     window.saveTheLive = function(uinp, selected) {
         let selectes = selected.value; // Get the room value (e.g. "Room1")
         let path = "LiveRooms/" + selectes;
@@ -183,22 +205,106 @@ type="text" placeholder="Create a Live Passcode that you are going to be using. 
         // Create the reference INSIDE the function
         const myRef = ref2(database, path);
 
-        update(myRef, {
-            embed: uinp.value,
+        const embedValue = normalizeEmbedInput(uinp && uinp.value ? uinp.value : "");
+        if (!embedValue) {
+            alert("Please paste your live stream embed code before going live.");
+            return Promise.reject(new Error("missing-embed"));
+        }
+        const passcodeValue = (document.getElementById("passcode").value || "").trim();
+        if (!passcodeValue) {
+            alert("Please create a stream end passcode.");
+            return Promise.reject(new Error("missing-passcode"));
+        }
+
+        return update(myRef, {
+            embed: embedValue,
             donationEmbed: tinp && tinp.value ? tinp.value.trim() : null,
             socials: xinp && xinp.value ? xinp.value.trim() : null,
             startedAt: Date.now(),
-            passcode: document.getElementById("passcode").value,
-            status: "online"
+            passcode: passcodeValue,
+            status: "active"
 
         }).then(() => {
             document.getElementById('helloWorld').style.display = 'block';
+            alert("Room is live! Tap the button below to open your concert room.");
+        }).catch((err) => {
+            console.error("Go Live write failed:", err);
+            alert("Could not save room to Firebase. Please check your rules/network and try again.");
+            throw err;
         });
 
         // Start listening to the specific room chosen
         onValue(myRef, (snapshot) => {
             // Room data listener
         });
+    };
+
+    window.handleGoLiveClick = async function() {
+        const uinp = document.getElementById('uinp');
+        const selected = document.querySelector('input[name=Room]:checked');
+        const goLiveBtn = document.getElementById("goLiveBtn");
+        if (!selected) {
+            alert("Please choose a room first.");
+            return;
+        }
+        if (goLiveBtn) {
+            goLiveBtn.disabled = true;
+            goLiveBtn.textContent = "Checking room...";
+            goLiveBtn.style.opacity = "0.7";
+        }
+
+        const roomPath = 'LiveRooms/' + selected.value;
+        const currentRef = ref2(database, roomPath);
+        try {
+          const snapshot = await get(currentRef);
+            const data = snapshot.val();
+            const status = data && data.status ? String(data.status).toLowerCase().trim() : "";
+            const hasEmbed = !!(data && data.embed && String(data.embed).trim());
+            const roomAlreadyLive = status === "online" || status === "active" || status === "live" || (status !== "offline" && hasEmbed);
+
+            if (roomAlreadyLive) {
+                alert('This room is already live! Please pick another.');
+                document.getElementById('helloWorld').style.display = 'none';
+            } else {
+                if (goLiveBtn) goLiveBtn.textContent = "Going live...";
+                await window.saveTheLive(uinp, selected);
+            }
+        } catch (err) {
+            // Some rule sets allow writes but block reads; don't dead-end creators.
+            console.warn("Room status read failed, proceeding with create:", err);
+            if (goLiveBtn) goLiveBtn.textContent = "Going live...";
+            try {
+              await window.saveTheLive(uinp, selected);
+            } catch (_) {}
+        } finally {
+            if (goLiveBtn) {
+                goLiveBtn.disabled = false;
+                goLiveBtn.textContent = "Go Live";
+                goLiveBtn.style.opacity = "";
+            }
+        }
+    };
+
+    function wireNewLiveButtons() {
+        const goLiveBtn = document.getElementById("goLiveBtn");
+        if (goLiveBtn && !goLiveBtn.hasAttribute("data-wired")) {
+            goLiveBtn.setAttribute("data-wired", "1");
+            goLiveBtn.addEventListener("click", window.handleGoLiveClick);
+        }
+        const helloBtn = document.getElementById("helloWorld");
+        if (helloBtn && !helloBtn.hasAttribute("data-wired")) {
+            helloBtn.setAttribute("data-wired", "1");
+            helloBtn.addEventListener("click", function () {
+                const selected = document.querySelector('input[name=Room]:checked');
+                if (!selected) return;
+                window.location.href = selected.id + '.html';
+            });
+        }
+    }
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", wireNewLiveButtons);
+    } else {
+        wireNewLiveButtons();
     }
 </script>
   <br>
@@ -231,48 +337,12 @@ type="text" placeholder="Create a Live Passcode that you are going to be using. 
   </div>
   <br>
   <br>
-  <button onclick="
-// 1. Get the inputs
-   window.uinp = document.getElementById('uinp');
-  window.selected = document.querySelector('input[name=Room]:checked');
-  
-  // 2. Build the reference (using the window.database and window.ref2 from your script)
-  window.roomPath = 'LiveRooms/' + selected.value;
-   window.currentRef = ref2(database, roomPath);
-
-   // 2. Start the listener with the 'online' check
-  get(currentRef).then((snapshot) => {
-    const data = snapshot.val();
-
-    // Check if the room is already online
-    if (data && data.status === 'online') {
-        alert('This room is already live! Please pick another.');
-    } else {
-        // 3. ONLY save if it's NOT online
-        saveTheLive(uinp, selected);
-        document.getElementById('helloWorld').style.display = 'block';
-    }
-  });
-
-  // 4. Run your save function
-
-
-  // 5. Show the success button
-  document.getElementById('helloWorld').style.display = 'block';
-" style=" 
-  background: linear-gradient(90deg,#ff3b3b,#ff7a3b);
-  color:white;
-  padding:14px 20px;
-  border-radius:14px;
-  border:none;
-  font-weight:600;
-  cursor:pointer;
-">
+  <button id="goLiveBtn" class="go-live-btn" type="button">
   Go Live
 </button>
 <br>
 <br>
-<button id="helloWorld" onclick="let otto = (selected.id); window.location.href = otto + '.html' " style="
+<button id="helloWorld" style="
 display: none;
 background: linear-gradient(90deg,#ff3b3b,#ff7a3b);
 color:white;
@@ -371,5 +441,21 @@ Make sure audio is working in YouTube Studio first
 </font>
 </div>
     </div>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<nav class="mobile-nav" aria-label="Main">
+  <a href="index.html" class="mobile-nav-item"><span class="material-symbols-outlined">home</span><span>Home</span></a>
+  <a href="lively.html" class="mobile-nav-item mobile-nav-active"><span class="material-symbols-outlined">mic</span><span>Concerts</span></a>
+  <a href="studio.html" class="mobile-nav-item"><span class="material-symbols-outlined">upload</span><span>Upload</span></a>
+  <a href="pat.html" class="mobile-nav-item"><span class="material-symbols-outlined">queue_music</span><span>Playlist</span></a>
+</nav>
+<style>
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;width:100%;max-width:100vw;box-sizing:border-box;z-index:99999;background:#0a0a0a;border-top:1px solid rgba(255,127,80,0.25);padding:6px 0 max(6px,env(safe-area-inset-bottom));justify-content:space-around;align-items:center}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:rgba(255,255,255,0.5);font-family:'Poppins',sans-serif;font-size:11px;font-weight:500;padding:4px 12px;border-radius:10px;transition:color .2s,background .2s}
+.mobile-nav-item .material-symbols-outlined{font-size:24px}
+.mobile-nav-item:hover,.mobile-nav-item.mobile-nav-active{color:#ff7f50}
+.mobile-nav-item.mobile-nav-active{background:rgba(255,127,80,0.1)}
+@media screen and (max-width:3840px){body{padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}.mobile-nav{display:flex !important}}
+</style>
 </body>
 </html>

@@ -6,16 +6,29 @@
   <title>Sign in with Apple - Asteroid</title>
   <style>
     body { font-family: -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #000; color: #fff; }
-    #msg { text-align: center; padding: 20px; }
+    #msg { text-align: center; padding: 20px; max-width: 520px; }
     .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,87,34,0.3); border-top-color: coral; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 20px auto; }
+    .open-app-btn { margin-top: 12px; display: inline-block; padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,127,80,0.5); background: rgba(255,127,80,0.2); color: #fff; text-decoration: none; font-weight: 700; }
+    .open-app-btn:active { transform: scale(0.98); }
+    .hint { display: block; margin-top: 10px; color: rgba(255,255,255,0.72); font-size: 12px; }
+    .apple-btn { margin-top: 16px; padding: 14px 22px; border-radius: 12px; border: none; background: #fff; color: #000; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .apple-btn:active { transform: scale(0.98); }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <div id="msg">Signing in with Apple...</div>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, signInWithRedirect, getRedirectResult, OAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithRedirect,
+      getRedirectResult,
+      OAuthProvider,
+      signInWithPopup,
+      setPersistence,
+      browserLocalPersistence,
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
@@ -34,39 +47,144 @@
     provider.addScope("email");
     provider.addScope("name");
 
-    async function run() {
+    function tryOpenApp(redirectUrl) {
+      const msgEl = document.getElementById("msg");
+      const html =
+        "Sign-in successful! Opening app..." +
+        '<br><a id="openAppBtn" class="open-app-btn" href="' + redirectUrl + '">Tap to open app</a>' +
+        '<span class="hint">If it does not open, tap the button again.</span>' +
+        '<span class="hint"><a href="/" style="color:coral;">Continue on web instead</a></span>';
+      msgEl.innerHTML = html;
+
+      const openNow = () => {
+        try {
+          window.location.href = redirectUrl;
+        } catch (e) {}
+      };
+      const btn = document.getElementById("openAppBtn");
+      if (btn) {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          openNow();
+          setTimeout(openNow, 220);
+        });
+      }
+
+      [0, 350, 1100, 2200, 3800].forEach((ms) => setTimeout(openNow, ms));
+    }
+
+    async function finishWithCredential(userCredential) {
+      const user = userCredential.user;
+      const email = user.email || "";
+      const name = user.displayName || "";
+      const uid = user.uid || "";
+      const photo = user.photoURL || "";
+
+      const params = new URLSearchParams();
+      params.set("email", email);
+      params.set("name", name);
+      params.set("uid", uid);
+      params.set("photo", photo);
+      const oauthCred = OAuthProvider.credentialFromResult(userCredential);
+      if (oauthCred && oauthCred.idToken) {
+        params.set("appleIdToken", oauthCred.idToken);
+      }
+      if (oauthCred && oauthCred.accessToken) {
+        params.set("appleAccessToken", oauthCred.accessToken);
+      }
+
+      const redirectUrl = "asteroid://auth-apple?" + params.toString();
+      tryOpenApp(redirectUrl);
+    }
+
+    function cleanOAuthParamsFromUrl() {
+      if (!window.location.search && !window.location.hash) return;
+      const path = window.location.pathname || "/";
+      history.replaceState({}, document.title, path);
+    }
+
+    function isMissingRedirectStateError(err) {
+      const s = (err && (err.message || err.code || String(err))) || "";
+      return /missing initial state/i.test(s) || /storage-partitioned/i.test(s);
+    }
+
+    function showTapToContinue() {
+      const msgEl = document.getElementById("msg");
+      msgEl.innerHTML =
+        "<p>Tap below to sign in with Apple.</p>" +
+        "<p class=\"hint\">Required in some in-app browsers where redirect sign-in cannot store session data.</p>" +
+        '<button type="button" class="apple-btn" id="appleContinueBtn">Continue with Apple</button>';
+      document.getElementById("appleContinueBtn").addEventListener("click", () => {
+        void startAppleWithPopupThenRedirect(true);
+      });
+    }
+
+    async function startAppleWithPopupThenRedirect(fromTap) {
+      const msgEl = document.getElementById("msg");
       try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          const user = result.user;
-          const email = user.email || "";
-          const name = user.displayName || "";
-          const uid = user.uid || "";
-          const photo = user.photoURL || "";
-
-          const params = new URLSearchParams({ email, name, uid, photo });
-          const redirectUrl = "asteroid://auth-apple?" + params.toString();
-
-          document.getElementById("msg").innerHTML =
-            "Sign-in successful! Opening app..." +
-            '<br><a href="' + redirectUrl + '" style="color:coral;margin-top:12px;display:inline-block">Tap here if the app doesn\'t open</a>';
-
-          const a = document.createElement("a");
-          a.href = redirectUrl;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(() => { window.location.href = redirectUrl; }, 300);
+        const popupResult = await signInWithPopup(auth, provider);
+        if (popupResult && popupResult.user) {
+          await finishWithCredential(popupResult);
           return;
         }
-        document.getElementById("msg").innerHTML = '<div class="spinner"></div>Redirecting to Apple...';
-        await signInWithRedirect(auth, provider);
-      } catch (err) {
-        console.error("Apple auth error:", err);
-        document.getElementById("msg").innerHTML = "Sign-in failed. Please try again.<br><a href='#' onclick='location.reload()' style='color:coral'>Retry</a>";
+      } catch (e) {
+        console.warn("[auth-apple] signInWithPopup", e);
+        const code = e && e.code;
+        if (
+          !fromTap &&
+          (code === "auth/popup-blocked" ||
+            code === "auth/cancelled-popup-request" ||
+            code === "auth/popup-closed-by-user")
+        ) {
+          showTapToContinue();
+          return;
+        }
       }
+      msgEl.innerHTML = '<div class="spinner"></div>Redirecting to Apple...';
+      await signInWithRedirect(auth, provider);
     }
-    run();
+
+    async function run() {
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+      } catch (e) {
+        console.warn("[auth-apple] setPersistence", e);
+      }
+
+      try {
+        const redirectResult = await getRedirectResult(auth);
+        if (redirectResult && redirectResult.user) {
+          await finishWithCredential(redirectResult);
+          return;
+        }
+      } catch (e) {
+        console.warn("[auth-apple] getRedirectResult", e);
+        if (isMissingRedirectStateError(e)) {
+          cleanOAuthParamsFromUrl();
+          await startAppleWithPopupThenRedirect(false);
+          return;
+        }
+        throw e;
+      }
+
+      await startAppleWithPopupThenRedirect(false);
+    }
+
+    run().catch((err) => {
+      console.error("Apple auth error:", err);
+      const msgEl = document.getElementById("msg");
+      msgEl.innerHTML =
+        "Sign-in could not finish. This often happens in an in-app browser when storage is limited.<br>" +
+        '<button type="button" class="apple-btn" id="retryAppleBtn">Try again</button>' +
+        "<br><a href=\"#\" onclick=\"location.reload();return false;\" style=\"color:coral;margin-top:12px;display:inline-block\">Reload page</a>";
+      const rb = document.getElementById("retryAppleBtn");
+      if (rb) {
+        rb.addEventListener("click", () => {
+          cleanOAuthParamsFromUrl();
+          location.reload();
+        });
+      }
+    });
   </script>
 </body>
 </html>

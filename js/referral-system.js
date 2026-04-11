@@ -25,14 +25,16 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-// --- Config (inject from your app) ---
+// Must match the main app (index.html / studio.html) so Storage/Auth use one project.
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
+  apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
   authDomain: "asteroid-cdc13.firebaseapp.com",
+  databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
   projectId: "asteroid-cdc13",
   storageBucket: "asteroid-cdc13.appspot.com",
   messagingSenderId: "793353824502",
-  appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+  appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+  measurementId: "G-GV72TMNNGR"
 };
 
 const app = getApps().length ? getApp() : initializeApp(FIREBASE_CONFIG);

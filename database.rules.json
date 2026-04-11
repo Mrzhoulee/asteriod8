@@ -2,13 +2,125 @@
   "rules": {
     "owner_token": { ".read": false, ".write": true },
     "boostSongs": { ".read": true, ".write": true, "$boostId": { ".validate": "newData.hasChildren()" } },
-    "SONGS": { ".read": true, ".write": true },
+    "SONGS": { ".read": true, ".write": "auth != null" },
     "songplayed": { ".read": true, ".write": true },
     "songPlayed": { ".read": true, ".write": true },
     "PREMIUM": { ".read": true, ".write": true },
     "PROFILES": { ".read": true, ".write": true },
-    "PROFILEVIEWS": { ".read": true, ".write": true },
     "users": { ".read": true, ".write": true },
-    "CONCERTUSERS": { ".read": true, ".write": true }
+    "CONCERTUSERS": { ".read": true, ".write": true },
+    "LiveRooms": { ".read": true, ".write": true },
+    "AGREEMENTS": { ".read": true, ".write": "auth != null" },
+    "referralCounts": { ".read": true, ".write": true },
+    "CONCERT_CHATS": {
+      "$room": {
+        "messages": {
+          ".read": true,
+          "$msgId": {
+            ".write": "!data.exists()",
+            ".validate": "newData.hasChildren(['text','ts']) && newData.child('text').isString() && newData.child('text').val().length <= 500 && newData.child('ts').isNumber()"
+          }
+        }
+      }
+    },
+    "CONCERT_STICKIES": {
+      "$room": {
+        "notes": {
+          ".read": true,
+          "$noteId": {
+            ".write": "!data.exists()",
+            ".validate": "newData.hasChildren(['text','ts']) && newData.child('text').isString() && newData.child('text').val().length <= 280 && newData.child('ts').isNumber()"
+          }
+        }
+      }
+    },
+    "PROFILE_STICKIES": {
+      "$profileKey": {
+        "notes": {
+          ".read": true,
+          "$noteId": {
+            ".write": "!data.exists()",
+            ".validate": "newData.hasChildren(['text','ts']) && newData.child('text').isString() && newData.child('text').val().length <= 280 && newData.child('ts').isNumber()"
+          }
+        }
+      }
+    },
+    "FAN_ENGAGEMENT": {
+      "$artistKey": {
+        "events": {
+          ".read": true,
+          "$eid": {
+            ".write": "!data.exists()",
+            ".validate": "newData.hasChildren(['ts','songTitle']) && newData.child('ts').isNumber() && newData.child('songTitle').isString() && newData.child('songTitle').val().length <= 300"
+          }
+        }
+      }
+    },
+    "LISTEN_JOURNEYS": {
+      ".indexOn": ["uploaderKey", "ts"],
+      "$jid": {
+        ".read": true,
+        ".write": "!data.exists() || (!data.child('nextTitle').exists() && newData.hasChild('nextTitle'))",
+        ".validate": "newData.hasChildren(['ts','playedTitle']) && newData.child('ts').isNumber() && newData.child('playedTitle').isString() && newData.child('playedTitle').val().length <= 300 && (!newData.hasChild('nextTitle') || (newData.child('nextTitle').isString() && newData.child('nextTitle').val().length <= 300))"
+      }
+    },
+    "ARTIST_JOURNEYS": {
+      "$artistKey": {
+        "$jid": {
+          ".read": true,
+          ".write": "!data.exists() || (!data.child('nextTitle').exists() && newData.hasChild('nextTitle'))",
+          ".validate": "newData.hasChildren(['ts','playedTitle']) && newData.child('ts').isNumber() && newData.child('playedTitle').isString() && newData.child('playedTitle').val().length <= 300 && (!newData.hasChild('nextTitle') || (newData.child('nextTitle').isString() && newData.child('nextTitle').val().length <= 300))"
+        }
+      }
+    },
+    "ARTIST_POLLS": {
+      ".read": true,
+      "$pollId": {
+        ".write": true,
+        ".validate": "newData.hasChildren()",
+        "votes": {
+          "$vid": {
+            ".read": true,
+            ".write": "!data.exists() || (data.hasChild('ts') && data.hasChild('side') && newData.hasChild('ts') && newData.hasChild('side') && newData.child('ts').isNumber() && newData.child('side').isString() && (newData.child('side').val() == 'a' || newData.child('side').val() == 'b') && newData.child('ts').val() >= data.child('ts').val() + 604800000)",
+            ".validate": "newData.hasChildren(['ts','side']) && newData.child('ts').isNumber() && newData.child('side').isString() && (newData.child('side').val() == 'a' || newData.child('side').val() == 'b')"
+          }
+        }
+      }
+    },
+    "FOLLOWS": {
+      "$artistKey": {
+        ".read": true,
+        "$followerKey": {
+          ".write": true,
+          ".validate": "newData.isBoolean()"
+        }
+      }
+    },
+    "FOLLOWING": {
+      "$fanKey": {
+        "$artistKey": {
+          ".read": true,
+          ".write": true,
+          ".validate": "newData.isBoolean()"
+        }
+      }
+    },
+    "ARTIST_NOTICES": {
+      "$artistKey": {
+        ".indexOn": "ts",
+        "$noticeId": {
+          ".read": true,
+          ".write": "!data.exists()",
+          ".validate": "newData.hasChildren(['text','ts','ownerKey']) && newData.child('text').isString() && newData.child('text').val().length <= 800 && newData.child('ts').isNumber() && newData.child('ownerKey').isString() && newData.child('ownerKey').val() == $artistKey"
+        }
+      }
+    },
+    "USERNAME_REGISTRY": {
+      ".read": true,
+      "$uname": {
+        ".write": "!data.exists()",
+        ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40"
+      }
+    }
   }
 }

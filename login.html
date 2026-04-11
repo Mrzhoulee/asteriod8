@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0a0a0a;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      padding: 28px 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 127, 80, 0.35);
+      background: linear-gradient(165deg, #121212 0%, #0a0a0a 100%);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      font-weight: 600;
+    }
+    p.sub {
+      margin: 0 0 22px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.55);
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: rgba(255, 255, 255, 0.75);
+    }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font-size: 15px;
+      font-family: inherit;
+    }
+    input::placeholder { color: rgba(255, 255, 255, 0.35); }
+    button[type="submit"] {
+      width: 100%;
+      margin-top: 8px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff7f50, #e85d2c);
+      color: #fff;
+    }
+    button[type="submit"]:hover { filter: brightness(1.06); }
+    .err {
+      min-height: 20px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #ff6b6b;
+      text-align: center;
+    }
+    .back-row {
+      margin: 0 0 18px;
+      text-align: left;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255, 127, 80, 0.95);
+      text-decoration: none;
+      font-family: inherit;
+    }
+    .back-link:hover { color: #ffa07a; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="back-row">
+      <a class="back-link" href="index.html">← Back to home</a>
+    </div>
+    <h1>Sign in</h1>
+    <p class="sub">Enter your email and password to continue.</p>
+    <form id="loginForm" novalidate>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" autocomplete="username" required placeholder="you@example.com">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required placeholder="Password">
+      <button type="submit">Sign In</button>
+      <div id="loginErr" class="err" role="alert"></div>
+    </form>
+  </div>
+  <script>
+    let demoEmail = "SET_THIS_MANUALLY";
+    let demoPassword = "SET_THIS_MANUALLY";
+  </script>
+  <script src="auth.js"></script>
+  <script>
+    (function () {
+      function postLoginRedirect() {
+        var q = new URLSearchParams(window.location.search);
+        var ret = (q.get("return") || "").trim();
+        var allow = { "index.html": 1, "studio.html": 1, "pat.html": 1 };
+        window.location.replace(allow[ret] ? ret : "index.html");
+      }
+
+      if (typeof isSessionValid === "function" && isSessionValid()) {
+        postLoginRedirect();
+        return;
+      }
+
+      var form = document.getElementById("loginForm");
+      var errEl = document.getElementById("loginErr");
+      form.addEventListener("submit", function (ev) {
+        ev.preventDefault();
+        if (errEl) errEl.textContent = "";
+        var email = (document.getElementById("email").value || "").trim();
+        var password = document.getElementById("password").value || "";
+        if (email === demoEmail && password === demoPassword) {
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("userEmail", email);
+          localStorage.setItem("userName", "User");
+          localStorage.setItem("localAuthOnly", "1");
+          var key = email.replace(/[.#$[\]]/g, "_");
+          localStorage.setItem("email", email);
+          localStorage.setItem("CurrentUser", email);
+          localStorage.setItem("fullName", "User");
+          localStorage.setItem("asteroidSignedInBefore", "true");
+          localStorage.setItem("emailKey", key);
+          postLoginRedirect();
+        } else {
+          if (errEl) errEl.textContent = "Invalid login";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

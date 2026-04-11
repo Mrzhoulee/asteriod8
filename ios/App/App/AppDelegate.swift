@@ -1,3 +1,4 @@
+import Foundation
 import UIKit
 import Capacitor
 
@@ -5,11 +6,31 @@ import Capacitor
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        clearStaleCapacitorWebRootIfNeeded()
         return true
     }
 
+    /// Live Reload stores a Library snapshot path; if that folder is gone, Capacitor can fail to load the web app.
+    private func clearStaleCapacitorWebRootIfNeeded() {
+        guard let persisted = KeyValueStore.standard["serverBasePath", as: String.self], !persisted.isEmpty,
+              let lib = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first else { return }
+        let lastComponent = Foundation.URL(fileURLWithPath: persisted, isDirectory: true).lastPathComponent
+        let snapshotDir = Foundation.URL(fileURLWithPath: lib, isDirectory: true)
+            .appendingPathComponent("NoCloud", isDirectory: true)
+            .appendingPathComponent("ionic_built_snapshots", isDirectory: true)
+            .appendingPathComponent(lastComponent)
+        var isDir: ObjCBool = false
+        let exists = FileManager.default.fileExists(atPath: snapshotDir.path, isDirectory: &isDir)
+        if !exists || !isDir.boolValue {
+            KeyValueStore.standard["serverBasePath"] = nil as String?
+        }
+    }
+
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+        let configuration = UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+        // Ensure the scene delegate is wired even if Info.plist substitution fails for UISceneDelegateClassName.
+        configuration.delegateClass = SceneDelegate.self
+        return configuration
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -27,7 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        // Restart any tasks that were paused (or not yet started) while the application was inactive.
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

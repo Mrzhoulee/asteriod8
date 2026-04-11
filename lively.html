@@ -1,135 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add_circle" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Concerts Menu</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Concerts — Asteroid</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Material Symbols: separate request (bundling with text fonts often breaks); ligatures need this font on the element -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet">
+  <style>
+    /* Required: body uses Montserrat — icons must not inherit or you see literal names like "home" */
+    .material-symbols-outlined {
+      font-family: "Material Symbols Outlined";
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    }
+    :root {
+      --bg0: #07080d;
+      --bg1: #12141c;
+      --card: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 127, 80, 0.35);
+      --accent: #ff7f50;
+      --accent2: #ff5c8a;
+      --text: #f4f4f8;
+      --muted: rgba(244, 244, 248, 0.55);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Montserrat', system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(255, 92, 138, 0.18), transparent 55%),
+        radial-gradient(900px 500px at 90% 20%, rgba(255, 127, 80, 0.2), transparent 50%),
+        linear-gradient(165deg, var(--bg0), var(--bg1) 45%, #0a0c12);
+      padding: 24px 20px calc(88px + env(safe-area-inset-bottom, 0px));
+    }
+    .lv-wrap {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .lv-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .lv-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.25);
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .lv-back:hover {
+      color: var(--text);
+      border-color: var(--border);
+      background: rgba(255, 127, 80, 0.08);
+    }
+    .lv-back .material-symbols-outlined { font-size: 20px; }
+    .lv-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 127, 80, 0.08);
+    }
+    .lv-hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .lv-hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.65rem, 5vw, 2.1rem);
+      font-weight: 700;
+      background: linear-gradient(120deg, #fff, rgba(255, 200, 180, 0.95));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .lv-hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      max-width: 36ch;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .lv-create {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      text-decoration: none;
+      color: var(--text);
+      background: linear-gradient(135deg, rgba(255, 127, 80, 0.22), rgba(255, 92, 138, 0.15));
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      margin-bottom: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .lv-create:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 48px rgba(255, 127, 80, 0.15);
+    }
+    .lv-create .material-symbols-outlined {
+      font-size: 48px;
+      color: var(--accent);
+      font-variation-settings: 'FILL' 1;
+    }
+    .lv-create h2 {
+      margin: 0 0 4px;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .lv-create span.sub {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .lv-section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 12px 4px;
+    }
+    .lv-rooms {
+      display: grid;
+      gap: 10px;
+    }
+    .lv-room {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+    .lv-room:hover {
+      background: rgba(255, 127, 80, 0.12);
+      border-color: rgba(255, 127, 80, 0.35);
+      transform: translateX(4px);
+    }
+    .lv-room .material-symbols-outlined {
+      font-size: 28px;
+      color: var(--accent2);
+    }
+    .lv-room b { font-weight: 600; }
+    .lv-room small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 2px;
+    }
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 10000;
+      background: #0a0a0a;
+      border-top: 1px solid rgba(255, 127, 80, 0.25);
+      padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+      justify-content: space-around;
+      align-items: center;
+    }
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.5);
+      font-family: 'Poppins', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 10px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .mobile-nav-item .material-symbols-outlined { font-size: 24px; }
+    .mobile-nav-item:hover,
+    .mobile-nav-item.mobile-nav-active {
+      color: #ff7f50;
+    }
+    .mobile-nav-item.mobile-nav-active {
+      background: rgba(255, 127, 80, 0.1);
+    }
+    @media screen and (max-width: 3840px) {
+      .mobile-nav { display: flex !important; }
+    }
+  </style>
 </head>
 <body>
-    <style>
-body {
-display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-    }
-        .material-symbols-outlined {
-          font-variation-settings:
-          'FILL' 0,
-          'wght' 400,
-          'GRAD' 0,
-          'opsz' 24
-        }
-        </style>
-    <style>
- .rooms-section {
-  width: 320px;
-  background: #121212;
-  padding: 16px;
-  border-radius: 20px;
-  color: white;
-  font-family: Arial, sans-serif;
-  align-items: center;
-}
+  <div class="lv-wrap">
+    <div class="lv-top">
+      <a class="lv-back" href="index.html">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Home
+      </a>
+      <span class="lv-badge">Live</span>
+    </div>
 
-.rooms-section h2 {
-  margin: 0 0 12px;
-  font-size: 18px;
-}
+    <header class="lv-hero">
+      <h1>Online concerts</h1>
+      <p>Pick a room for live chat, thank-you stickies, and the stream. Each room has its own Firebase chat.</p>
+    </header>
 
-.rooms {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.room {
-  display: block;
-  background: #1e1e1e;
-  padding: 10px;
-  border-radius: 12px;
-  text-decoration: none; /* remove underline */
-  color: white;
-  cursor: pointer;
-}
-
-.room:hover {
-  background: #2a2a2a;
-}
-
-.big-icon {
-  font-size: 63px; /* try 24, 32, 40, 48 */
-  color: red;
-
-
-  a {
-  text-decoration: none;
-}
-
-
-}
-.create-live {
-  display: flex;
-  align-items: center;     /* vertical alignment */
-  gap: 10px;               /* space between icon & text */
-  text-decoration: none;
-}
-
-.create-live h3 {
-  margin: 0;               /* removes default h3 spacing */
-  font-family: Montserrat, sans-serif;
-  color: red;
-}
-
-
-  </style>  
-
-        
-<div class="rooms-section">
-    <a href="newLive.html" class="create-live">
-      <span class="material-symbols-outlined big-icon">
-        add_circle
-      </span>
-      <h3>Create Live Stream</h3>
+    <a href="newLive.html" class="lv-create">
+      <span class="material-symbols-outlined">add_circle</span>
+      <div>
+        <h2>Create a live stream</h2>
+        <span class="sub">Host your own show — fans join from any room.</span>
+      </div>
     </a>
 
-  
-            <center>
-        <h1><font face="Montserrat">Live Concerts Rooms</font></h1>
-            <div class="rooms">
-                <div class="rooms">
-                    <a href="liveroom1.html" class="room">Room 1</a>
-                    <a href="liveroom2.html" class="room">Room 2</a>
-                    <a href="liveroom3.html" class="room">Room 3</a>
-                    <a href="liveroom4.html" class="room">Room 4</a>
-                    <a href="liveroom5.html" class="room">Room 5</a>
+    <p class="lv-section-title">Concert rooms</p>
+    <div class="lv-rooms">
+      <a class="lv-room" href="liveroom1.html">
+        <span class="material-symbols-outlined">door_front</span>
+        <div><b>Room 1</b><small>Open stage · chat &amp; stickies</small></div>
+      </a>
+      <a class="lv-room" href="liveroom2.html">
+        <span class="material-symbols-outlined">door_front</span>
+        <div><b>Room 2</b><small>Open stage · chat &amp; stickies</small></div>
+      </a>
+      <a class="lv-room" href="liveroom3.html">
+        <span class="material-symbols-outlined">door_front</span>
+        <div><b>Room 3</b><small>Open stage · chat &amp; stickies</small></div>
+      </a>
+      <a class="lv-room" href="liveroom4.html">
+        <span class="material-symbols-outlined">door_front</span>
+        <div><b>Room 4</b><small>Open stage · chat &amp; stickies</small></div>
+      </a>
+      <a class="lv-room" href="liveroom5.html">
+        <span class="material-symbols-outlined">door_front</span>
+        <div><b>Room 5</b><small>Open stage · chat &amp; stickies</small></div>
+      </a>
+    </div>
+  </div>
 
-                    <a href="1O.html" class="room">Weekly Online Concerts (Hosted by Asteroid)</a>
-                  </div>
-            </div>
-          </div>
-          
-    </center>
-<!-- Mobile bottom nav -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-<nav class="mobile-nav">
-  <a href="index.html" class="mobile-nav-item"><span class="material-symbols-outlined">home</span><span>Home</span></a>
-  <a href="lively.html" class="mobile-nav-item mobile-nav-active"><span class="material-symbols-outlined">mic</span><span>Concerts</span></a>
-  <a href="studio.html" class="mobile-nav-item"><span class="material-symbols-outlined">upload</span><span>Upload</span></a>
-  <a href="pat.html" class="mobile-nav-item"><span class="material-symbols-outlined">queue_music</span><span>Playlist</span></a>
-</nav>
-<style>
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;width:100%;z-index:10000;background:#0a0a0a;border-top:1px solid rgba(255,127,80,0.25);padding:6px 0 max(6px,env(safe-area-inset-bottom));justify-content:space-around;align-items:center}
-.mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:rgba(255,255,255,0.5);font-family:'Poppins',sans-serif;font-size:11px;font-weight:500;padding:4px 12px;border-radius:10px;transition:color .2s,background .2s}
-.mobile-nav-item .material-symbols-outlined{font-size:24px}
-.mobile-nav-item:hover,.mobile-nav-item.mobile-nav-active{color:#ff7f50}
-.mobile-nav-item.mobile-nav-active{background:rgba(255,127,80,0.1)}
-@media(max-width:768px){.mobile-nav{display:flex}}
-</style>
+  <nav class="mobile-nav" aria-label="Main">
+    <a href="index.html" class="mobile-nav-item"><span class="material-symbols-outlined">home</span><span>Home</span></a>
+    <a href="lively.html" class="mobile-nav-item mobile-nav-active"><span class="material-symbols-outlined">mic</span><span>Concerts</span></a>
+    <a href="studio.html" class="mobile-nav-item"><span class="material-symbols-outlined">upload</span><span>Upload</span></a>
+    <a href="pat.html" class="mobile-nav-item"><span class="material-symbols-outlined">queue_music</span><span>Playlist</span></a>
+  </nav>
 </body>
 </html>

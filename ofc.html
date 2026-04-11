@@ -34,9 +34,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Asteroid is a music discovery platform with NO ads supporting indie artists and listeners with curated playlists and ad-supported streaming.">
   <meta property="og:image" content="https://www.asteroid8.net/logo.png">
-  <meta name="google-signin-scope" content="profile email">
-  <meta name="google-signin-client_id"
-    content="793353824502-lev9l8rli2v813bi4ie48qs4bf1pm0nk.apps.googleusercontent.com">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=artist" />
   <!-- Google tag (gtag.js) -->
@@ -89,11 +86,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <meta name="google-signin-scope" content="profile email">
-  <meta name="google-signin-client_id"
-    content="793353824502-lev9l8rli2v813bi4ie48qs4bf1pm0nk.apps.googleusercontent.com">
-  <!-- To integrate Google Sign-in -->
-  <script src="https://apis.google.com/js/platform.js" async defer></script>
   <meta name="description" content="Asteroid is a music universe for everyone, with no ads and no interruptions">
   <meta name="google-adsense-account" content="ca-pub-9005824789597666">
   <meta property="og:image" content="https://www.asteroid8.net/logo.png">
@@ -151,17 +143,7 @@
 <button id="user-profile-button" class="user-profile-button">
     <img src="I12_417_1_10701.svg" alt="User Profile" class="user-profile-icon">
   </button>
-      <div style="position: absolute; top: 15px; right: 90px;">
-
-<div style="color: black;">
-    <button style="position: relative; top:2px;  right:2px; background-color: white; display: none !important;" id="google-sign-in"><span id="gcd" style="font-size: medium; color: black;"><font color="black">Continue With
-        <i class="fa-brands fa-google"></i> </font></span></button>
-
-</div>
-
-
-
-  </div>
+      <div style="position: absolute; top: 15px; right: 90px;"></div>
 </header>
 <style>
 .live-circle:hover {
@@ -1493,10 +1475,6 @@ const audio5 = document.getElementById("audio5");
 
           
           console.log("940")
-
-          document.getElementById("google-sign-in-mobile").addEventListener('click', () => {
-            document.getElementById("google-sign-in").click()
-          })
           console.log("941")
         </script>
         <script type="module">
@@ -1506,7 +1484,6 @@ console.log("960");
      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
   import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
   import { getDatabase, ref as ref2, onValue, update, get, set, remove, push} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
   import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
 console.log('1050')
@@ -1888,59 +1865,14 @@ let viewportWidth = window.innerWidth;
 let viewportHeight = window.innerHeight;
 document.getElementById("user-profile-button").addEventListener('click', () => {
   console.log('1140')
-document.getElementById('google-sign-in').click()
-
+  window.location.href = 'index.html';
 })
 
           // Initialize Firebase
           onValue(ref2(database, "SONGS/"), (snapshot) => {
             console.log(Object.values(snapshot.val()))
 console.log('1133')
-            const auth = getAuth(app);
-            const provider = new GoogleAuthProvider();
             console.log('1136')
-
-            document.getElementById("google-sign-in").addEventListener("click", (e) => {
-              console.log("gcm_ready");
-              signInWithPopup(auth, provider)
-                .then((result) => {
-                  
-                console.log('1143')
-                  // This gives you a Google Access Token. You can use it to access the Google API.
-                  const credential = GoogleAuthProvider.credentialFromResult(result);
-                  const token = credential.accessToken;
-                  // The signed-in user info.
-                  const user = result.user;
-                  console.log(user)
-                  console.log("google-sign-in-clicked")
-                  localStorage.setItem("email", user["email"]);
-                  localStorage.setItem("CurrentUser", user["email"]);
-                  localStorage.setItem("fullName", user["displayName"]);
-                  localStorage.setItem("pfp", user.imageUrl);
-                  localStorage.setItem("pfp", user.photoURL); // 
-                  var fullName = user.displayName;
-                  console.log(fullName)
-                  document.getElementById('gcd').innerHTML = fullName;
-                  document.getElementById("gcm").innerHTML = fullName;
-                  document.getElementById("gcd").innerText = fullName;
-                  console.log("Photo URL:", user.photoURL);
-                  console.log('1160')
-
-
-                  // IdP data available using getAdditionalUserInfo(result)
-                  // ...
-                }).catch((error) => {
-                  console.log('1166')
-                  // Handle Errors here.
-                  const errorCode = error.code;
-                  const errorMessage = error.message;
-                  // The email of the user's account used.
-                  const email = error.customData.email;
-                  // The AuthCredential type that was used.
-                  const credential = GoogleAuthProvider.credentialFromError(error);
-                  // ...
-                });
-            })
 
 
 

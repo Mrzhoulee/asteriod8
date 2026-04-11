@@ -51,17 +51,23 @@ service cloud.firestore {
 
 ### A. Signup (e.g. `studio.html`)
 
-When a user signs in with Google, call the referral system:
+When a user signs in with Apple (or your chosen provider), call the referral system:
 
 ```html
 <script type="module">
   import { handleNewUserSignup, processReferralURL } from "./js/referral-system.js";
-  
+  import { getAuth, signInWithPopup, OAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+  const auth = getAuth();
+  const appleProvider = new OAuthProvider("apple.com");
+  appleProvider.addScope("email");
+  appleProvider.addScope("name");
+
   // On page load (before sign-in)
   processReferralURL();
-  
-  // After successful Google sign-in:
-  signInWithPopup(auth, provider).then(async (res) => {
+
+  // After successful Apple sign-in (web):
+  signInWithPopup(auth, appleProvider).then(async (res) => {
     const user = res.user;
     await handleNewUserSignup(user);  // Creates Firestore user, processes referral
     // ... rest of your sign-in logic

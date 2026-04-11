@@ -347,8 +347,6 @@ let linkToSong1 = localStorage.getItem("linkToSong");
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getDatabase, ref as ref2, update, get, onValue, increment } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
   
     const firebaseConfig = {
       apiKey: "AIzaSyAAvcxcXXNezL5Jip4A9WMkv_r5fpmsDoY",
@@ -362,9 +360,6 @@ let linkToSong1 = localStorage.getItem("linkToSong");
   
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const auth = getAuth(app);
-    const storage = getStorage(app);
-    const provider = new GoogleAuthProvider();
 
     (async () => {
 
