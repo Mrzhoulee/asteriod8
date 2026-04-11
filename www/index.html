@@ -877,6 +877,15 @@
   color: rgba(255,255,255,0.38);
   text-align: center;
 }
+#featuredSection .home-polls-section {
+  margin-top: 28px;
+  margin-bottom: 8px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255, 127, 80, 0.22);
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
 /* Followed artist updates */
 .followed-notices-section {
@@ -1966,6 +1975,14 @@ body.create-profile-active {
         
         
       </div>
+
+      <section id="homePollsSection" class="home-polls-section" aria-label="Artist polls">
+        <h2 class="home-polls-head">Artist battles</h2>
+        <p class="home-polls-sub">Pick a side · Same vote again after one week · YouTube, Spotify, SoundCloud, or MP3 previews</p>
+        <div id="homePollsMount" class="home-polls-mount">
+          <p class="home-polls-empty">Loading polls…</p>
+        </div>
+      </section>
     </section>
     
 
@@ -2813,14 +2830,6 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
         <h2 class="followed-notices-head">From artists you follow</h2>
         <p class="followed-notices-sub">Posts from the dashboard show up here in real time.</p>
         <div id="followedNoticesMount"></div>
-      </section>
-
-      <section id="homePollsSection" class="home-polls-section" aria-label="Artist polls">
-        <h2 class="home-polls-head">Artist battles</h2>
-        <p class="home-polls-sub">Pick a side · Same vote again after one week · YouTube, Spotify, SoundCloud, or MP3 previews</p>
-        <div id="homePollsMount" class="home-polls-mount">
-          <p class="home-polls-empty">Loading polls…</p>
-        </div>
       </section>
 
       <section id="becauseYouLikedSection" class="because-you-liked" aria-live="polite">

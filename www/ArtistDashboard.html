@@ -1418,10 +1418,16 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             const k2 = sanitizeEmail(s.toLowerCase());
             return k1 === k2 ? (k1 ? [k1] : []) : [k1, k2].filter(Boolean);
         }
+        /** Must match <code>engagementPathKey</code> on the home page (<code>www/index.html</code>). */
+        function engagementPathKeyHome(raw) {
+            return String(raw || "").trim().toLowerCase().replace(/[.#$[\]]/g, "_");
+        }
         function collectFanEngagementReadKeys() {
             const set = new Set();
             const add = (raw) => {
                 fanEngagementKeyVariants(raw).forEach((k) => set.add(k));
+                const h = engagementPathKeyHome(raw);
+                if (h) set.add(h);
             };
             add(currentUserEmail);
             add(localStorage.getItem("artemail"));
@@ -1434,6 +1440,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     add(u.uid);
                 }
             } catch (e) {}
+            if (currentEmailKey) set.add(currentEmailKey);
             return [...set].filter(Boolean);
         }
 
@@ -1530,7 +1537,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 }
                 fanRows.sort((a, b) => (b.ts || 0) - (a.ts || 0));
                 const seen = new Set();
-                const unique = [];
+                let unique = [];
                 for (const r of fanRows) {
                     const k = (r.listenerEmail || r.label || 'anon') + '|' + (r.songTitle || '');
                     if (seen.has(k)) continue;
@@ -1538,10 +1545,44 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     unique.push(r);
                     if (unique.length >= 100) break;
                 }
+                if (unique.length === 0) {
+                    const ljKeys = [...new Set(collectFanEngagementReadKeys())];
+                    for (const k of ljKeys) {
+                        if (!k) continue;
+                        try {
+                            const jq = query(
+                                ref(database, 'LISTEN_JOURNEYS'),
+                                orderByChild('uploaderKey'),
+                                equalTo(k),
+                                limitToLast(80)
+                            );
+                            const ljSnap = await get(jq);
+                            if (!ljSnap.exists()) continue;
+                            ljSnap.forEach((c) => {
+                                const v = c.val();
+                                if (!v || !v.playedTitle) return;
+                                const dk = (v.listenerEmail || v.listenerLabel || 'anon') + '|' + (v.playedTitle || '');
+                                if (seen.has(dk)) return;
+                                seen.add(dk);
+                                unique.push({
+                                    label: v.listenerLabel || 'Anonymous',
+                                    songTitle: v.playedTitle,
+                                    anonymous: !v.listenerEmail,
+                                    cameFromTitle: v.prevTitle || null,
+                                    ts: v.ts || 0
+                                });
+                            });
+                        } catch (e2) {
+                            console.warn('Creator tools: LISTEN_JOURNEYS fan fallback', k, e2);
+                        }
+                    }
+                    unique.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+                    unique = unique.slice(0, 100);
+                }
                 if (fansEl) {
                     fansEl.innerHTML = unique.length
                         ? unique.map((r) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(r.label || 'Anonymous')}</div><div class="song-artist">${r.anonymous ? 'Anonymous listener' : 'Signed in'} · ${escapeHtml(r.songTitle || '')}</div></div><div class="song-stats"><span class="song-stat-value" style="font-size:0.85rem;">${r.cameFromTitle ? 'From: ' + escapeHtml(r.cameFromTitle) : '—'}</span></div></div>`).join('')
-                        : '<div class="empty-state">No fan plays yet. Home plays are saved under the <code>uploader</code> on each track (set when you upload in Studio — same Apple/Google account as here). If you use Sign in with Apple, plays may be stored under your user id; this list checks email and id.</div>';
+                        : '<div class="empty-state">No fan plays yet. Use the <strong>same</strong> deployed site as your home library (e.g. <code>www/</code> if Studio uses <code>www/</code>). Tracks need a <code>uploader</code> field (set on upload). This list reads <code>FAN_ENGAGEMENT</code> and, if empty, recent <code>LISTEN_JOURNEYS</code> for your email and user id.</div>';
                 }
             } catch (e) {
                 console.error('Creator tools: FAN_ENGAGEMENT', e);
@@ -2027,59 +2068,57 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             }
         };
 
-        // Load analytics
+        // Load analytics (songplayed is global; tolerate bad rows and missing DOM nodes)
         async function loadAnalytics() {
             if (!currentEmailKey) return;
 
+            const songsList = document.getElementById('songsList');
+            const monthlyBreakdown = document.getElementById('monthlyBreakdown');
+            const emptySong = '<div class="empty-state"><i class="fas fa-music"></i><p>No song plays yet</p></div>';
+            const emptyMonth = '<div class="empty-state"><i class="fas fa-calendar"></i><p>No monthly data available</p></div>';
+            const errSong = (detail) =>
+                `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading analytics</p>${detail ? `<p style="font-size:0.85rem;opacity:0.85;margin-top:8px;">${escapeHtml(detail)}</p>` : ''}</div>`;
+            const errMonth = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading monthly data</p></div>';
+
+            function setStat(id, text) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = text;
+            }
+
+            // Same English month names as home page (index actual1 / songplayed.ofctime)
+            const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const currentMonth = MONTH_NAMES[new Date().getMonth()];
+            const currentYear = new Date().getFullYear();
+
             try {
-                // Get all song plays
                 const songplaysRef = ref(database, 'songplayed');
                 const snapshot = await get(songplaysRef);
-                
-                if (!snapshot.exists()) {
-                    document.getElementById('songsList').innerHTML = '<div class="empty-state"><i class="fas fa-music"></i><p>No song plays yet</p></div>';
-                    return;
-                }
+                const playsRaw = snapshot.exists() ? snapshot.val() : null;
 
-                const plays = snapshot.val();
-                const currentMonth = new Date().toLocaleString('default', { month: 'long' });
-                const currentYear = new Date().getFullYear();
-                
-                // Count plays by song title and by month
                 const songCounts = {};
                 const monthlyPlays = {};
                 let currentMonthCount = 0;
                 let totalCount = 0;
 
-                Object.values(plays).forEach(play => {
-                    const songTitle = play.title2 || play.title || 'Unknown';
-                    const playMonth = play.ofctime || 'Unknown';
-                    
-                    // Count by song
-                    if (!songCounts[songTitle]) {
-                        songCounts[songTitle] = 0;
-                    }
-                    songCounts[songTitle]++;
-                    totalCount++;
-                    
-                    // Count by month
-                    if (!monthlyPlays[playMonth]) {
-                        monthlyPlays[playMonth] = 0;
-                    }
-                    monthlyPlays[playMonth]++;
-                    
-                    // Count current month
-                    if (playMonth === currentMonth) {
-                        currentMonthCount++;
-                    }
-                });
+                if (playsRaw != null && typeof playsRaw === 'object') {
+                    const rows = Array.isArray(playsRaw) ? playsRaw : Object.values(playsRaw);
+                    rows.forEach((play) => {
+                        if (play == null || typeof play !== 'object') return;
+                        const songTitle = String(play.title2 != null ? play.title2 : play.title != null ? play.title : 'Unknown').trim() || 'Unknown';
+                        const playMonth = play.ofctime != null && String(play.ofctime).trim() !== '' ? String(play.ofctime).trim() : 'Unknown';
+                        if (!songCounts[songTitle]) songCounts[songTitle] = 0;
+                        songCounts[songTitle]++;
+                        totalCount++;
+                        if (!monthlyPlays[playMonth]) monthlyPlays[playMonth] = 0;
+                        monthlyPlays[playMonth]++;
+                        if (playMonth === currentMonth) currentMonthCount++;
+                    });
+                }
 
-                // Update stats - Total Plays shows current month
-                document.getElementById('totalPlays').textContent = currentMonthCount.toLocaleString();
-                document.getElementById('currentMonthName').textContent = currentMonth + ' ' + currentYear;
-                document.getElementById('allTimePlays').textContent = totalCount.toLocaleString();
+                setStat('totalPlays', currentMonthCount.toLocaleString());
+                setStat('currentMonthName', currentMonth + ' ' + currentYear);
+                setStat('allTimePlays', totalCount.toLocaleString());
 
-                // Find top song
                 let topSong = '-';
                 let topSongPlays = 0;
                 Object.entries(songCounts).forEach(([song, count]) => {
@@ -2088,31 +2127,40 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                         topSong = song;
                     }
                 });
+                const topStr = typeof topSong === 'string' ? topSong : String(topSong);
+                setStat('topSong', topStr.length > 20 ? topStr.substring(0, 20) + '...' : topStr);
+                setStat('topSongPlays', topSongPlays + ' plays');
 
-                document.getElementById('topSong').textContent = topSong.length > 20 ? topSong.substring(0, 20) + '...' : topSong;
-                document.getElementById('topSongPlays').textContent = topSongPlays + ' plays';
-
-                // Load profile views
                 const profileViewsRef = ref(database, 'PROFILEVIEWS/' + currentEmailKey);
                 const viewsSnapshot = await get(profileViewsRef);
-                const viewCount = viewsSnapshot.exists() ? (viewsSnapshot.val() || 0) : 0;
-                document.getElementById('profileViews').textContent = viewCount.toLocaleString();
+                let viewCount = 0;
+                if (viewsSnapshot.exists()) {
+                    const v = viewsSnapshot.val();
+                    viewCount = typeof v === 'number' ? v : parseInt(String(v), 10) || 0;
+                }
+                setStat('profileViews', Number.isFinite(viewCount) ? viewCount.toLocaleString() : '0');
 
-                // Display songs list
-                const songsList = document.getElementById('songsList');
+                if (!songsList || !monthlyBreakdown) return;
+
+                if (totalCount === 0) {
+                    songsList.innerHTML = emptySong;
+                    monthlyBreakdown.innerHTML = emptyMonth;
+                    return;
+                }
+
                 const sortedSongs = Object.entries(songCounts)
                     .sort((a, b) => b[1] - a[1])
                     .slice(0, 10);
 
-                if (sortedSongs.length === 0) {
-                    songsList.innerHTML = '<div class="empty-state"><i class="fas fa-music"></i><p>No song plays yet</p></div>';
-                    return;
-                }
-
-                songsList.innerHTML = sortedSongs.map(([song, count]) => `
+                songsList.innerHTML =
+                    sortedSongs.length === 0
+                        ? emptySong
+                        : sortedSongs
+                              .map(
+                                  ([song, count]) => `
                     <div class="song-item">
                         <div class="song-info">
-                            <div class="song-title">${song}</div>
+                            <div class="song-title">${escapeHtml(song)}</div>
                         </div>
                         <div class="song-stats">
                             <div class="song-stat">
@@ -2120,32 +2168,28 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                                 <div class="song-stat-label">Plays</div>
                             </div>
                         </div>
-                    </div>
-                `).join('');
+                    </div>`
+                              )
+                              .join('');
 
-                // Display monthly breakdown
-                const monthlyBreakdown = document.getElementById('monthlyBreakdown');
-                const sortedMonths = Object.entries(monthlyPlays)
-                    .sort((a, b) => {
-                        // Sort by month name (simple alphabetical, or you could use date parsing)
-                        const monthOrder = ['January', 'February', 'March', 'April', 'May', 'June', 
-                                          'July', 'August', 'September', 'October', 'November', 'December'];
-                        const aIndex = monthOrder.indexOf(a[0]);
-                        const bIndex = monthOrder.indexOf(b[0]);
-                        if (aIndex !== -1 && bIndex !== -1) return bIndex - aIndex;
-                        return b[1] - a[1]; // Fallback to count
-                    })
-                    .reverse(); // Show most recent first
+                const monthOrder = MONTH_NAMES;
+                const sortedMonths = Object.entries(monthlyPlays).sort((a, b) => {
+                    const aIndex = monthOrder.indexOf(a[0]);
+                    const bIndex = monthOrder.indexOf(b[0]);
+                    if (aIndex !== -1 && bIndex !== -1) return bIndex - aIndex;
+                    return b[1] - a[1];
+                });
 
-                if (sortedMonths.length === 0) {
-                    monthlyBreakdown.innerHTML = '<div class="empty-state"><i class="fas fa-calendar"></i><p>No monthly data available</p></div>';
-                } else {
-                    monthlyBreakdown.innerHTML = sortedMonths.map(([month, count]) => {
-                        const isCurrentMonth = month === currentMonth;
-                        return `
+                monthlyBreakdown.innerHTML =
+                    sortedMonths.length === 0
+                        ? emptyMonth
+                        : sortedMonths
+                              .map(([month, count]) => {
+                                  const isCurrentMonth = month === currentMonth;
+                                  return `
                             <div class="song-item" style="${isCurrentMonth ? 'border-color: var(--primary); background: rgba(255, 127, 80, 0.1);' : ''}">
                                 <div class="song-info">
-                                    <div class="song-title">${month} ${isCurrentMonth ? '<span style="color: var(--primary); font-size: 0.75rem;">(Current)</span>' : ''}</div>
+                                    <div class="song-title">${escapeHtml(month)} ${isCurrentMonth ? '<span style="color: var(--primary); font-size: 0.75rem;">(Current)</span>' : ''}</div>
                                     <div class="song-artist">Total plays for this month</div>
                                 </div>
                                 <div class="song-stats">
@@ -2154,15 +2198,16 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                                         <div class="song-stat-label">Plays</div>
                                     </div>
                                 </div>
-                            </div>
-                        `;
-                    }).join('');
-                }
-
+                            </div>`;
+                              })
+                              .join('');
             } catch (error) {
+                const code = error && error.code ? String(error.code) : '';
+                const msg = error && error.message ? String(error.message) : String(error);
                 console.error('Error loading analytics:', error);
-                document.getElementById('songsList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading analytics</p></div>';
-                document.getElementById('monthlyBreakdown').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading monthly data</p></div>';
+                const detail = [code, msg].filter(Boolean).join(' · ');
+                if (songsList) songsList.innerHTML = errSong(detail);
+                if (monthlyBreakdown) monthlyBreakdown.innerHTML = errMonth;
             }
         }
 

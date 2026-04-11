@@ -15,6 +15,17 @@ function esc(s) {
   return d.innerHTML;
 }
 
+/** Pasted links without a scheme become https://… so browsers don't treat them as paths on this site. */
+function normalizePollUrl(raw) {
+  const s = String(raw || "").trim();
+  if (!s) return "";
+  if (/^blob:/i.test(s) || /^data:/i.test(s)) return s;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(s)) return s;
+  if (s.startsWith("//")) return "https:" + s;
+  if (s.startsWith("/")) return s;
+  return "https://" + s.replace(/^\/+/, "");
+}
+
 function getPollVoterId() {
   let vid = sanitizeEmail((localStorage.getItem("email") || "").trim());
   if (!vid) {
@@ -42,7 +53,7 @@ function countVotes(votesObj) {
 }
 
 export function pollPreviewMarkup(url) {
-  const u = String(url || "").trim();
+  const u = normalizePollUrl(url);
   if (!u) return '<div class="home-poll-no-prev">No preview link</div>';
   const yt = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
   if (yt) {
