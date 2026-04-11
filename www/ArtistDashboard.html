@@ -1410,6 +1410,33 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
         const sanitizeEmail = (email) => (email || "").replace(/[.#$[\]]/g, '_');
 
+        /** Keys that might hold FAN_ENGAGEMENT for this account (email vs uid vs casing). */
+        function fanEngagementKeyVariants(raw) {
+            const s = String(raw || "").trim();
+            if (!s) return [];
+            const k1 = sanitizeEmail(s);
+            const k2 = sanitizeEmail(s.toLowerCase());
+            return k1 === k2 ? (k1 ? [k1] : []) : [k1, k2].filter(Boolean);
+        }
+        function collectFanEngagementReadKeys() {
+            const set = new Set();
+            const add = (raw) => {
+                fanEngagementKeyVariants(raw).forEach((k) => set.add(k));
+            };
+            add(currentUserEmail);
+            add(localStorage.getItem("artemail"));
+            add(localStorage.getItem("email"));
+            add(localStorage.getItem("CurrentUser"));
+            try {
+                const u = auth.currentUser;
+                if (u) {
+                    add(u.email);
+                    add(u.uid);
+                }
+            } catch (e) {}
+            return [...set].filter(Boolean);
+        }
+
         const TRIAL_DAYS = 30;
         const MS_PER_DAY = 24 * 60 * 60 * 1000;
         const isWithinTrial = (trialStart) => {
@@ -1489,10 +1516,17 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             }
 
             try {
-                const feSnap = await get(ref(database, 'FAN_ENGAGEMENT/' + safe + '/events'));
+                const readKeys = collectFanEngagementReadKeys();
                 const fanRows = [];
-                if (feSnap.exists()) {
-                    feSnap.forEach((c) => fanRows.push({ id: c.key, ...c.val() }));
+                const seenEventIds = new Set();
+                for (const k of readKeys) {
+                    const feSnap = await get(ref(database, 'FAN_ENGAGEMENT/' + k + '/events'));
+                    if (!feSnap.exists()) continue;
+                    feSnap.forEach((c) => {
+                        if (seenEventIds.has(c.key)) return;
+                        seenEventIds.add(c.key);
+                        fanRows.push({ id: c.key, ...c.val() });
+                    });
                 }
                 fanRows.sort((a, b) => (b.ts || 0) - (a.ts || 0));
                 const seen = new Set();
@@ -1507,7 +1541,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 if (fansEl) {
                     fansEl.innerHTML = unique.length
                         ? unique.map((r) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(r.label || 'Anonymous')}</div><div class="song-artist">${r.anonymous ? 'Anonymous listener' : 'Signed in'} · ${escapeHtml(r.songTitle || '')}</div></div><div class="song-stats"><span class="song-stat-value" style="font-size:0.85rem;">${r.cameFromTitle ? 'From: ' + escapeHtml(r.cameFromTitle) : '—'}</span></div></div>`).join('')
-                        : '<div class="empty-state">No fan plays recorded yet. Plays from the home library will appear when songs list your uploader email.</div>';
+                        : '<div class="empty-state">No fan plays yet. Home plays are saved under the <code>uploader</code> on each track (set when you upload in Studio — same Apple/Google account as here). If you use Sign in with Apple, plays may be stored under your user id; this list checks email and id.</div>';
                 }
             } catch (e) {
                 console.error('Creator tools: FAN_ENGAGEMENT', e);
@@ -2288,10 +2322,16 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
           try {
             let emailToUse = null;
 
-            if (user && user.email) {
-              emailToUse = user.email;
-            } else {
-                    emailToUse = localStorage.getItem("artemail") || localStorage.getItem("email") || null;
+            if (user) {
+              emailToUse =
+                (localStorage.getItem("email") || "").trim() ||
+                user.email ||
+                (user.providerData && user.providerData[0] && user.providerData[0].email) ||
+                user.uid ||
+                null;
+            }
+            if (!emailToUse) {
+              emailToUse = localStorage.getItem("artemail") || localStorage.getItem("email") || null;
             }
 
             if (!emailToUse) {

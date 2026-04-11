@@ -3145,6 +3145,12 @@ function applySongSearch() {
   }
 }
 
+window.applySongSearch = applySongSearch;
+(function wireSongSearchInput() {
+  const si = document.getElementById("searchInput");
+  if (si) si.addEventListener("input", applySongSearch);
+})();
+
 function renderSongsFromData(songsData) {
   if (!songsData || typeof songsData !== "object") return "<p style='text-align:center;color:#ccc;padding:20px;'>No songs yet. Upload from the studio!</p>";
 
@@ -3152,6 +3158,9 @@ function renderSongsFromData(songsData) {
   function pickEmoji(name) { let h = 0; for (let i = 0; i < name.length; i++) h = ((h << 5) - h + name.charCodeAt(i)) | 0; return albumEmojis[Math.abs(h) % albumEmojis.length]; }
   function esc(s) { return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
   function escQ(s) { return (s || "").replace(/'/g,"\\'"); }
+  function songUploaderRaw(s) {
+    return (s.uploader || s.uploaderEmail || s.uploadedBy || s.userEmail || s.email || "").toString().trim();
+  }
 
   const allSongs = [];
   for (const [titleKey, albums] of Object.entries(songsData)) {
@@ -3159,8 +3168,10 @@ function renderSongsFromData(songsData) {
     for (const [albumKey, artists] of Object.entries(albums)) {
       if (!artists || typeof artists !== "object") continue;
       for (const [artistKey, songData] of Object.entries(artists)) {
-        if (songData && typeof songData === "object" && songData.title && songData.fileInp)
-          allSongs.push(songData);
+        if (songData && typeof songData === "object" && songData.title && songData.fileInp) {
+          const up = songUploaderRaw(songData);
+          allSongs.push(up ? { ...songData, uploader: up } : { ...songData });
+        }
       }
     }
   }
@@ -3188,7 +3199,7 @@ function renderSongsFromData(songsData) {
     const t = esc(s.title), a = esc(s.artist), al = esc(s.album), url = (s.fileInp || "").replace(/"/g,"&quot;");
     const tid = allocTid();
     const mood = primaryMoodForSong(s);
-    const up = esc((s.uploader || "").toString());
+    const up = esc(songUploaderRaw(s));
     return `<div class="sssh song-row" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="${al.toLowerCase()}">
       <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
       <div class="song-row-num">${idx + 1}</div>
@@ -3215,7 +3226,7 @@ function renderSongsFromData(songsData) {
         const t = esc(s.title), a = esc(s.artist), url = (s.fileInp || "").replace(/"/g,"&quot;");
         const tid = allocTid();
         const mood = primaryMoodForSong(s);
-        const up = esc((s.uploader || "").toString());
+        const up = esc(songUploaderRaw(s));
         html += `<div class="sssh single-card" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="">
           <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
           <div class="single-emoji">${pickEmoji(s.title)}</div>
@@ -3347,11 +3358,19 @@ function flattenAllSongsFlat(data) {
     for (const artists of Object.values(albums)) {
       if (!artists || typeof artists !== "object") continue;
       for (const song of Object.values(artists)) {
-        if (song && typeof song === "object" && song.title && song.fileInp) out.push(song);
+        if (song && typeof song === "object" && song.title && song.fileInp) {
+          const up = (song.uploader || song.uploaderEmail || song.uploadedBy || song.userEmail || song.email || "").toString().trim();
+          out.push(up ? { ...song, uploader: up } : { ...song });
+        }
       }
     }
   }
   return out;
+}
+
+/** RTDB path segment for FAN_ENGAGEMENT / ARTIST_JOURNEYS (must match dashboard lookup). */
+function engagementPathKey(raw) {
+  return String(raw || "").trim().toLowerCase().replace(/[.#$[\]]/g, "_");
 }
 
 function logListenEngagement(el) {
@@ -3370,9 +3389,10 @@ function logListenEngagement(el) {
     const anon = !email;
     const label = anon ? "Anonymous" : (name || email);
     const prev = window.__lastPlayMeta;
-    const safeUp = String(uploader || "").replace(/[.#$[\]]/g, "_");
+    const safeUp = engagementPathKey(uploader);
     if (safeUp) {
-      pushFn(refP(db, "FAN_ENGAGEMENT/" + safeUp + "/events"), {
+      const refEng = refP(db, "FAN_ENGAGEMENT/" + safeUp + "/events");
+      const pend = pushFn(refEng, {
         songTitle: title,
         songArtist: artist,
         album: album || null,
@@ -3382,6 +3402,13 @@ function logListenEngagement(el) {
         listenerEmail: email || null,
         cameFromTitle: prev && prev.title ? prev.title : null
       });
+      if (pend && typeof pend.catch === "function") {
+        pend.catch(function (e) {
+          console.warn("[FAN_ENGAGEMENT] write failed (check database rules):", e && (e.message || e));
+        });
+      }
+    } else if (title) {
+      console.warn("[Fan plays] Skipped — song has no uploader field. Re-upload from Studio or add uploader on the track in the database.");
     }
     const upd = window.firebaseUpdate;
     const lastKey = window.__lastJourneyKey;
@@ -3394,7 +3421,7 @@ function logListenEngagement(el) {
         };
         upd(refP(db, "LISTEN_JOURNEYS/" + lastKey), nextPatch);
         const prevArtistKey =
-          prev && prev.uploader ? String(prev.uploader).replace(/[.#$[\]]/g, "_") : "";
+          prev && prev.uploader ? engagementPathKey(prev.uploader) : "";
         if (prevArtistKey) {
           upd(refP(db, "ARTIST_JOURNEYS/" + prevArtistKey + "/" + lastKey), nextPatch);
         }
@@ -5010,10 +5037,6 @@ console.log('1171')
       }
     };
 
-
-
-
-              document.getElementById("searchInput").addEventListener('input', applySongSearch);
   </script>
 
   <script>
