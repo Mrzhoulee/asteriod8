@@ -127,6 +127,13 @@
         ".write": "!data.exists()",
         ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40"
       }
+    },
+    "CONTENT_REPORTS": {
+      "$reportId": {
+        ".read": false,
+        ".write": "!data.exists()",
+        ".validate": "newData.hasChildren(['ts','targetType','summary']) && newData.child('ts').isNumber() && newData.child('targetType').isString() && newData.child('targetType').val().length <= 32 && newData.child('summary').isString() && newData.child('summary').val().length <= 2000 && (!newData.hasChild('reporterKey') || (newData.child('reporterKey').isString() && newData.child('reporterKey').val().length <= 200)) && (!newData.hasChild('songTitle') || (newData.child('songTitle').isString() && newData.child('songTitle').val().length <= 400)) && (!newData.hasChild('artistName') || (newData.child('artistName').isString() && newData.child('artistName').val().length <= 400)) && (!newData.hasChild('uploaderKey') || (newData.child('uploaderKey').isString() && newData.child('uploaderKey').val().length <= 200))"
+      }
     }
   }
 }

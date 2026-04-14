@@ -1071,6 +1071,22 @@
 .song-row-actions i:hover, .song-row-actions .material-symbols-outlined:hover { color: #fff; transform: scale(1.15); }
 .song-row-actions button { background: none; border: none; padding: 0; cursor: pointer; display: flex; }
 .song-row-actions a { text-decoration: none; display: flex; }
+.song-row-action-labeled {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.song-row-action-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+}
+.song-row-action-labeled:hover .song-row-action-label { color: rgba(255, 255, 255, 0.85); }
 
 /* Single card */
 .single-card {
@@ -1105,9 +1121,201 @@
 .single-actions i.fa-pause-circle-o { color: #ff7f50; font-size: 38px; cursor: pointer; transition: color 0.15s, transform 0.15s; }
 .single-actions i { color: #ff7f50; font-size: 30px; cursor: pointer; transition: color 0.15s, transform 0.15s; }
 .single-actions i:hover { color: #fff; transform: scale(1.15); }
-.single-actions button { background: none; border: none; padding: 0; cursor: pointer; display: flex; }
+.single-actions button { background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.single-actions .song-row-action-labeled { gap: 6px; }
 .single-actions .material-symbols-outlined { color: #ff7f50; font-size: 22px; cursor: pointer; transition: color 0.15s; }
 .single-actions .material-symbols-outlined:hover { color: #fff; }
+.song-row-actions button.song-row-flag,
+.single-actions button.song-row-flag { color: #ff7f50; }
+.song-row-actions button.song-row-flag:hover .material-symbols-outlined,
+.single-actions button.song-row-flag:hover .material-symbols-outlined { color: #fff; transform: scale(1.15); }
+.song-row-actions button.song-row-block,
+.single-actions button.song-row-block { color: #ff7f50; }
+.song-row-actions button.song-row-block:hover .material-symbols-outlined,
+.single-actions button.song-row-block:hover .material-symbols-outlined { color: #fff; transform: scale(1.15); }
+
+.ugc-policy-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  background: rgba(0, 0, 0, 0.94);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.ugc-policy-overlay.is-visible { display: flex; }
+.ugc-policy-card {
+  max-width: 440px;
+  width: min(100%, 440px);
+  box-sizing: border-box;
+  background: #121212;
+  border: 1px solid rgba(255, 127, 80, 0.4);
+  border-radius: 16px;
+  padding: 24px;
+  color: #eee;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.ugc-policy-card h2 { margin: 0 0 12px; font-size: 18px; color: #fff; font-family: 'Montserrat', sans-serif; text-align: center; }
+.ugc-policy-card a { color: #ff9a6e; text-decoration: underline; text-underline-offset: 2px; }
+.ugc-policy-actions { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
+.ugc-policy-check-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-align: left;
+}
+.ugc-policy-check-row input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0 0;
+  cursor: pointer;
+}
+.ugc-policy-check-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.ugc-policy-continue {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  background: #ffffff;
+  color: #111827;
+  font-family: inherit;
+}
+.ugc-policy-continue:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+.ugc-policy-continue:disabled {
+  cursor: not-allowed;
+  background: #4b5563;
+  color: #e5e7eb;
+  border-color: #374151;
+}
+
+.report-content-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483010;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+.report-content-overlay.is-visible { display: flex; }
+.report-content-card {
+  width: 100%;
+  max-width: 400px;
+  background: #141414;
+  border: 1px solid rgba(255, 127, 80, 0.35);
+  border-radius: 14px;
+  padding: 20px;
+  color: #eee;
+  font-family: 'Poppins', sans-serif;
+}
+.report-content-card h3 { margin: 0 0 10px; font-size: 17px; color: #fff; }
+.report-content-meta { font-size: 12px; color: rgba(255,255,255,0.55); margin-bottom: 12px; }
+.report-content-card textarea {
+  width: 100%;
+  min-height: 100px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.report-content-btns { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.report-content-btns button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.report-cancel { background: rgba(255,255,255,0.1); color: #fff; }
+.report-submit { background: #ff7f50; color: #111; }
+
+.profile-modal-safety-wrap {
+  margin-top: 14px;
+  padding: 14px 12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(10, 10, 10, 0.88);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+.profile-block-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 120, 120, 0.85);
+  background: #2a1010;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+.profile-block-btn:hover {
+  background: #3d1818;
+  border-color: #ff9a9a;
+}
+.profile-report-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: #141414;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+.profile-report-btn:hover {
+  background: #1f1f1f;
+  border-color: rgba(255, 200, 170, 0.9);
+}
+.profile-safety-mail {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+}
+.profile-safety-mail:hover {
+  color: #ffe8dc;
+}
 
 @media (max-width: 600px) {
   .album-cover { padding: 14px 16px; gap: 12px; }
@@ -1743,9 +1951,12 @@ body.create-profile-active {
 <div id="appleOnboardingModal" class="apple-onboarding-modal" aria-modal="true" role="dialog" aria-labelledby="appleOnboardingTitle">
   <div class="apple-onboarding-box">
     <h2 id="appleOnboardingTitle">Finish your profile</h2>
-    <p class="apple-onboarding-sub">Choose a nickname that other listeners will see. Add social links if you like — all optional except your nickname.</p>
+    <p class="apple-onboarding-sub">Choose a display name and a unique username (letters, numbers, underscores). Usernames cannot repeat. Social links are optional.</p>
     <label for="appleOnboardingNickname">Nickname</label>
     <input type="text" id="appleOnboardingNickname" maxlength="80" placeholder="Your artist or display name" autocomplete="nickname">
+    <label for="appleOnboardingHandle">Public username</label>
+    <input type="text" id="appleOnboardingHandle" maxlength="40" placeholder="e.g. indie_alex" autocomplete="username" spellcheck="false" autocapitalize="off">
+    <p class="apple-onboarding-hint" style="margin:-6px 0 10px;font-size:12px;color:rgba(255,255,255,0.5);">3–40 characters: a–z, 0–9, underscore only. This is your unique @handle for search and follows.</p>
     <label>Profile type</label>
     <div class="apple-onboarding-choice-group" role="radiogroup" aria-label="Profile type">
       <label class="apple-onboarding-choice" for="appleProfileTypeArtist">
@@ -2900,6 +3111,292 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
         <h2 class="section-title">Songs that You Don’t Want to Miss</h2>
 
 	<h3>ⓘ Songs might take a few moments to load before playing since there is a problem with the configuration</h3>
+
+<div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
+  <div class="ugc-policy-card">
+    <h2 id="ugcPolicyTitle">Before you continue</h2>
+    <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;">Asteroid includes user-uploaded music and profiles. You can report content, block users you do not want to see, and reach our team at any time. <strong>Each time</strong> you use Sign in with Apple, confirm the policies below.</p>
+    <div class="ugc-policy-actions">
+      <label class="ugc-policy-check-row" for="ugcPolicyCheck">
+        <input type="checkbox" id="ugcPolicyCheck" autocomplete="off">
+        <span class="ugc-policy-check-text">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>
+      </label>
+      <button type="button" class="ugc-policy-continue" id="ugcPolicyContinue" disabled>Continue to Asteroid</button>
+      <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.5);text-align:center;">Questions: <a href="mailto:asteroidcontactbussiness@gmail.com?subject=Asteroid%20app%20-%20moderation">asteroidcontactbussiness@gmail.com</a></p>
+    </div>
+  </div>
+</div>
+
+<div id="reportContentOverlay" class="report-content-overlay" aria-modal="true" role="dialog" aria-labelledby="reportContentTitle">
+  <div class="report-content-card" onclick="event.stopPropagation()">
+    <h3 id="reportContentTitle">Report content</h3>
+    <div id="reportContentMeta" class="report-content-meta"></div>
+    <label for="reportContentDetails" style="font-size:12px;color:rgba(255,255,255,0.65);display:block;margin-bottom:6px;">What is wrong? (optional details)</label>
+    <textarea id="reportContentDetails" maxlength="2000" placeholder="Describe the issue (e.g. copyright, harassment, spam)…" autocomplete="off"></textarea>
+    <div class="report-content-btns">
+      <button type="button" class="report-cancel" id="reportContentCancel">Cancel</button>
+      <button type="button" class="report-submit" id="reportContentSubmit">Submit report</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var BLOCK_KEY = "asteroidBlockedUserKeys";
+  window.getBlockedUserKeys = function () {
+    try {
+      var a = JSON.parse(localStorage.getItem(BLOCK_KEY) || "[]");
+      return Array.isArray(a) ? a.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
+  };
+  window.addBlockedUserKey = function (emailKey) {
+    var k = String(emailKey || "").trim();
+    if (!k) return;
+    var arr = window.getBlockedUserKeys();
+    if (arr.indexOf(k) === -1) {
+      arr.push(k);
+      localStorage.setItem(BLOCK_KEY, JSON.stringify(arr));
+    }
+  };
+  var BLOCK_SONG_KEY = "asteroidBlockedSongKeys";
+  window.normalizeSongBlockKey = function (fileInp, title) {
+    return String(fileInp || "").trim() + "\u0001" + String(title || "").trim();
+  };
+  window.getBlockedSongKeys = function () {
+    try {
+      var a = JSON.parse(localStorage.getItem(BLOCK_SONG_KEY) || "[]");
+      return Array.isArray(a) ? a.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
+  };
+  window.addBlockedSongKey = function (key) {
+    var k = String(key || "").trim();
+    if (!k) return;
+    var arr = window.getBlockedSongKeys();
+    if (arr.indexOf(k) === -1) {
+      arr.push(k);
+      localStorage.setItem(BLOCK_SONG_KEY, JSON.stringify(arr));
+    }
+  };
+  window.isSongBlockedByUser = function (song) {
+    if (!song || !song.fileInp) return false;
+    var sk = window.normalizeSongBlockKey(song.fileInp, song.title);
+    return window.getBlockedSongKeys().indexOf(sk) !== -1;
+  };
+  window.isUploaderInBlocklist = function (rawUploader) {
+    var u = String(rawUploader || "").trim().toLowerCase().replace(/[.#$[\]]/g, "_");
+    if (!u) return false;
+    var list = typeof window.getBlockedUserKeys === "function" ? window.getBlockedUserKeys() : [];
+    for (var i = 0; i < list.length; i++) {
+      var b = String(list[i] || "").trim().toLowerCase().replace(/[.#$[\]]/g, "_");
+      if (b === u) return true;
+    }
+    return false;
+  };
+  window.isEmailKeyBlocked = function (emailKey) {
+    return window.isUploaderInBlocklist(String(emailKey || ""));
+  };
+  window.applyLocalHideAfterReport = function (d) {
+    d = d || {};
+    var tt = String(d.targetType || "song").toLowerCase();
+    if (tt === "user" || tt === "profile") {
+      var uk = String(d.uploaderKey || "").trim();
+      if (uk && typeof window.addBlockedUserKey === "function") window.addBlockedUserKey(uk);
+    } else {
+      var fi = String(d.fileInp || "").trim();
+      var tit = String(d.songTitle || "").trim();
+      if (fi && tit && typeof window.addBlockedSongKey === "function") {
+        window.addBlockedSongKey(window.normalizeSongBlockKey(fi, tit));
+      }
+      var up = String(d.uploaderKey || "").trim();
+      if (up && typeof window.addBlockedUserKey === "function") window.addBlockedUserKey(up);
+    }
+  };
+  window._pickSongUploaderForBlock = function (s) {
+    if (!s) return "";
+    return (s.uploader || s.uploaderEmail || s.uploadedBy || s.userEmail || s.email || "").toString().trim();
+  };
+  window.shouldHideSongInLibrary = function (song) {
+    if (!song) return true;
+    if (window.isSongBlockedByUser(song)) return true;
+    var raw = window._pickSongUploaderForBlock(song);
+    return window.isUploaderInBlocklist(raw);
+  };
+  window.blockSongFromDataset = function (btn) {
+    if (!btn) return;
+    var fi = (btn.getAttribute("data-block-file") || "").trim();
+    var t = (btn.getAttribute("data-block-title") || "").trim();
+    if (!fi) return;
+    if (!confirm("Hide this song on this device? It will disappear from your library until you clear site data for this site.")) return;
+    window.addBlockedSongKey(window.normalizeSongBlockKey(fi, t));
+    var row = btn.closest(".profile-modal-song-row");
+    if (row) row.remove();
+    if (typeof window.refreshLibraryAfterBlock === "function") window.refreshLibraryAfterBlock();
+  };
+  var UGC_KEY = "asteroidUgcPolicyAccepted";
+  function ugcAccepted() {
+    return localStorage.getItem(UGC_KEY) === "v1";
+  }
+  function restoreUgcAppleGateCopy() {
+    var d = window.__ugcAppleGateDefaults;
+    if (!d) return;
+    var t = document.getElementById("ugcPolicyTitle");
+    var b = document.getElementById("ugcPolicyContinue");
+    if (t && d.title) t.textContent = d.title;
+    if (b && d.btn) b.textContent = d.btn;
+  }
+  function dismissAppleUgcGate() {
+    try {
+      delete window.__appleUgcPendingRunner;
+    } catch (e) {}
+    restoreUgcAppleGateCopy();
+    var ov = document.getElementById("ugcPolicyOverlay");
+    var chk = document.getElementById("ugcPolicyCheck");
+    var btn = document.getElementById("ugcPolicyContinue");
+    if (ov) ov.classList.remove("is-visible");
+    if (chk) chk.checked = false;
+    if (btn) btn.disabled = true;
+  }
+  window.__reportDraft = { targetType: "song", songTitle: "", artistName: "", uploaderKey: "", userDisplayName: "", fileInp: "" };
+  window.openReportContentModal = function (el) {
+    var o = document.getElementById("reportContentOverlay");
+    var meta = document.getElementById("reportContentMeta");
+    var ta = document.getElementById("reportContentDetails");
+    if (!o || !meta) return;
+    var ds = el && el.dataset ? el.dataset : {};
+    window.__reportDraft = {
+      targetType: ds.targetType || "song",
+      songTitle: ds.songTitle || "",
+      artistName: ds.artistName || "",
+      uploaderKey: ds.uploaderKey || "",
+      userDisplayName: ds.userDisplayName || "",
+      fileInp: ds.fileInp || ""
+    };
+    var lines = [];
+    var tt = String(window.__reportDraft.targetType || "song").toLowerCase();
+    if (tt === "user" || tt === "profile") {
+      if (window.__reportDraft.userDisplayName) lines.push("User: " + window.__reportDraft.userDisplayName);
+      if (window.__reportDraft.uploaderKey) lines.push("Account key: " + window.__reportDraft.uploaderKey);
+    } else {
+      if (window.__reportDraft.songTitle) lines.push("Track: " + window.__reportDraft.songTitle);
+      if (window.__reportDraft.artistName) lines.push("Artist: " + window.__reportDraft.artistName);
+      if (window.__reportDraft.uploaderKey) lines.push("Uploader key: " + window.__reportDraft.uploaderKey);
+    }
+    meta.textContent = lines.length ? lines.join(" · ") : "General report";
+    if (ta) ta.value = "";
+    o.classList.add("is-visible");
+  };
+  window.closeReportContentModal = function () {
+    var o = document.getElementById("reportContentOverlay");
+    if (o) o.classList.remove("is-visible");
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    var ov = document.getElementById("ugcPolicyOverlay");
+    var chk = document.getElementById("ugcPolicyCheck");
+    var btn = document.getElementById("ugcPolicyContinue");
+    if (ov) {
+      ov.addEventListener("click", function (e) {
+        if (e.target === ov) dismissAppleUgcGate();
+      });
+    }
+    if (chk && btn) {
+      chk.addEventListener("change", function () {
+        btn.disabled = !chk.checked;
+      });
+      btn.addEventListener("click", function () {
+        if (!chk || !chk.checked) return;
+        var runner = window.__appleUgcPendingRunner;
+        if (typeof runner === "function") {
+          try {
+            delete window.__appleUgcPendingRunner;
+          } catch (e2) {}
+          ov.classList.remove("is-visible");
+          chk.checked = false;
+          btn.disabled = true;
+          restoreUgcAppleGateCopy();
+          void runner();
+          return;
+        }
+        localStorage.setItem(UGC_KEY, "v1");
+        ov.classList.remove("is-visible");
+      });
+    }
+    var ro = document.getElementById("reportContentOverlay");
+    if (ro) {
+      ro.addEventListener("click", function (e) {
+        if (e.target === ro) window.closeReportContentModal();
+      });
+    }
+    var c = document.getElementById("reportContentCancel");
+    if (c) c.addEventListener("click", window.closeReportContentModal);
+    var s = document.getElementById("reportContentSubmit");
+    if (s) {
+      s.addEventListener("click", function () {
+        var db = window.firebaseDatabase;
+        var refFn = window.firebaseRef;
+        var pushFn = window.firebasePush;
+        if (!db || !refFn || !pushFn) {
+          alert("Connection not ready. Please wait a moment and try again.");
+          return;
+        }
+        var d = window.__reportDraft || {};
+        var details = (document.getElementById("reportContentDetails") || {}).value || "";
+        details = String(details).trim().slice(0, 2000);
+        var reporterRaw =
+          localStorage.getItem("CurrentUser") ||
+          localStorage.getItem("email") ||
+          (window.firebaseAuth && window.firebaseAuth.currentUser
+            ? window.firebaseAuth.currentUser.email ||
+              (window.firebaseAuth.currentUser.providerData &&
+                window.firebaseAuth.currentUser.providerData[0] &&
+                window.firebaseAuth.currentUser.providerData[0].email) ||
+              ""
+            : "") ||
+          "";
+        var reporterKey = String(reporterRaw || "")
+          .trim()
+          .toLowerCase()
+          .replace(/[.#$[\]]/g, "_");
+        var payload = {
+          ts: Date.now(),
+          targetType: String(d.targetType || "song").slice(0, 32),
+          summary: details || "(no additional details)",
+          reporterKey: reporterKey || "anonymous",
+          songTitle: String(d.songTitle || "").slice(0, 400),
+          artistName: String(d.artistName || "").slice(0, 400),
+          uploaderKey: String(d.uploaderKey || "").slice(0, 200),
+          userDisplayName: String(d.userDisplayName || "").slice(0, 400),
+          fileInp: String(d.fileInp || "").slice(0, 800)
+        };
+        try {
+          pushFn(refFn(db, "CONTENT_REPORTS"), payload);
+          if (typeof window.applyLocalHideAfterReport === "function") window.applyLocalHideAfterReport(d);
+          var rtt = String(d.targetType || "song").toLowerCase();
+          if (
+            (rtt === "user" || rtt === "profile" || String(d.uploaderKey || "").trim()) &&
+            typeof window.closeUserProfileModal === "function"
+          ) {
+            try {
+              window.closeUserProfileModal();
+            } catch (e1) {}
+          }
+          alert("Thank you. Your report was sent. This content will be hidden on this device.");
+          window.closeReportContentModal();
+          if (typeof window.refreshLibraryAfterBlock === "function") window.refreshLibraryAfterBlock();
+          if (typeof window.__refreshUsersGridAfterHide === "function") window.__refreshUsersGridAfterHide();
+        } catch (err) {
+          console.error(err);
+          alert("Could not send report. Check your connection and try again.");
+        }
+      });
+    }
+  });
+})();
+</script>
+
   <div class="search-box">
     <input type="text" placeholder="Search artists, songs or albums..." class="search-input" id="searchInput">
     <img src="—Pngtree—vector search icon_3783210.png" alt="Search" class="search-icon">
@@ -3003,6 +3500,27 @@ setInterval(flySanta, 10000);
       (window.action && document.getElementById("gaga_" + window.action)) ||
       null;
   }
+  window.pauseAllPlaybackMaster = function () {
+    try {
+      if (window.currentPlaying && typeof window.currentPlaying.pause === "function") {
+        window.currentPlaying.pause();
+      }
+    } catch (e0) {}
+    try {
+      if (typeof window.pauseAllLibraryAudioExcept === "function") {
+        window.pauseAllLibraryAudioExcept(null);
+      }
+    } catch (e1) {}
+    try {
+      document.querySelectorAll("audio").forEach(function (a) {
+        if (a && typeof a.pause === "function") a.pause();
+      });
+    } catch (e2) {}
+    try {
+      var el = lolCurrentAudio();
+      if (el && typeof el.pause === "function") el.pause();
+    } catch (e3) {}
+  };
   document.addEventListener("DOMContentLoaded", function () {
     var lp = document.getElementById("lolPlayMain");
     var lpa = document.getElementById("lolPauseMain");
@@ -3016,8 +3534,9 @@ setInterval(flySanta, 10000);
     }
     if (lpa) {
       lpa.addEventListener("click", function () {
-        var el = lolCurrentAudio();
-        if (el && el.pause) el.pause();
+        if (typeof window.pauseAllPlaybackMaster === "function") {
+          window.pauseAllPlaybackMaster();
+        }
       });
     }
   });
@@ -3146,7 +3665,7 @@ console.log("960");
      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
   import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-  import { getAuth, signInWithPopup, signInWithCredential, OAuthProvider, signOut, onAuthStateChanged, deleteUser, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+  import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, OAuthProvider, signOut, onAuthStateChanged, deleteUser, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
   import { getDatabase, ref as ref2, onValue, update, get, set, remove, push, limitToFirst, startAt, orderByKey, query} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
   import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
 console.log('1050')
@@ -3268,10 +3787,15 @@ function renderSongsFromData(songsData) {
       }
     }
   }
-  if (allSongs.length === 0) return "<p style='text-align:center;color:#ffaa00;padding:20px;'>Songs found but format may differ.</p>";
+  const visibleSongs = allSongs.filter((s) => !window.shouldHideSongInLibrary(s));
+  if (visibleSongs.length === 0) {
+    return allSongs.length === 0
+      ? "<p style='text-align:center;color:#ffaa00;padding:20px;'>Songs found but format may differ.</p>"
+      : "<p style='text-align:center;color:rgba(255,255,255,0.65);padding:20px;'>No songs to show (blocked or hidden).</p>";
+  }
 
   const albumMap = {};
-  allSongs.forEach(s => {
+  visibleSongs.forEach(s => {
     const rawAlbum = (s.album || "").trim();
     const key = (!rawAlbum || rawAlbum.toLowerCase() === "single" || rawAlbum.toLowerCase() === "singles") ? "__single__" : rawAlbum;
     if (!albumMap[key]) albumMap[key] = [];
@@ -3303,8 +3827,9 @@ function renderSongsFromData(songsData) {
       <div class="song-row-actions">
         <i class="fa fa-play-circle song-row-play" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play ${esc(s.title)}"></i>
         <i class="fa fa-pause-circle-o song-row-pause" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
-        <button class="song-row-queue" onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')"><span class="material-symbols-outlined">queue_music</span></button>
-        <a href="policy.html" class="song-row-flag"><span class="material-symbols-outlined">flag</span></a>
+        <span class="song-row-action-labeled"><button type="button" class="song-row-queue" onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button><span class="song-row-action-label">Queue</span></span>
+        <span class="song-row-action-labeled"><button type="button" class="song-row-block" aria-label="Block song" title="Hide this song" onclick="window.blockSongFromDataset(this)" data-block-file="${esc(s.fileInp)}" data-block-title="${esc(s.title)}"><span class="material-symbols-outlined">block</span></button><span class="song-row-action-label">Block</span></span>
+        <span class="song-row-action-labeled"><button type="button" class="song-row-flag" aria-label="Report song" title="Report" onclick="window.openReportContentModal(this)" data-target-type="song" data-file-inp="${esc(s.fileInp)}" data-song-title="${esc(s.title)}" data-artist-name="${esc(s.artist)}" data-uploader-key="${up}"><span class="material-symbols-outlined">flag</span></button><span class="song-row-action-label">Report</span></span>
       </div>
     </div>`;
   }
@@ -3331,7 +3856,9 @@ function renderSongsFromData(songsData) {
           <div class="single-actions">
             <i class="fa fa-play-circle" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play ${esc(s.title)}"></i>
             <i class="fa fa-pause-circle-o" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
-            <button onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')"><span class="material-symbols-outlined">queue_music</span></button>
+            <span class="song-row-action-labeled"><button type="button" class="song-row-queue" onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button><span class="song-row-action-label">Queue</span></span>
+            <span class="song-row-action-labeled"><button type="button" class="song-row-block" aria-label="Block song" title="Hide this song" onclick="window.blockSongFromDataset(this)" data-block-file="${esc(s.fileInp)}" data-block-title="${esc(s.title)}"><span class="material-symbols-outlined">block</span></button><span class="song-row-action-label">Block</span></span>
+            <span class="song-row-action-labeled"><button type="button" class="song-row-flag" aria-label="Report song" title="Report" onclick="window.openReportContentModal(this)" data-target-type="song" data-file-inp="${esc(s.fileInp)}" data-song-title="${esc(s.title)}" data-artist-name="${esc(s.artist)}" data-uploader-key="${up}"><span class="material-symbols-outlined">flag</span></button><span class="song-row-action-label">Report</span></span>
           </div>
         </div>`;
       });
@@ -3438,6 +3965,16 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
 console.log("✅ SONGS listener attached");
 
 window.turnToCoral = function() { const t = document.getElementById("tata"); if (t) t.style.color = "coral"; };
+
+window.refreshLibraryAfterBlock = function () {
+  if (!globalSongsData) return;
+  const html = renderSongsFromData(globalSongsData);
+  whenElementReady("ab", function (ab) {
+    const extra = document.getElementById("artists-grid-8");
+    ab.innerHTML = html + (extra ? extra.innerHTML : "");
+    applySongSearch();
+  });
+};
 
 window.__lastPlayMeta = null;
 window.__lastJourneyKey = null;
@@ -3573,7 +4110,7 @@ window.updateBecauseYouLiked = function (seedTitle, moodRaw) {
     sec.style.display = "none";
     return;
   }
-  const all = flattenAllSongsFlat(globalSongsData);
+  const all = flattenAllSongsFlat(globalSongsData).filter((s) => !window.shouldHideSongInLibrary(s));
   const picks = all
     .filter((s) => {
       const m = String(s.mood || s.primaryMood || (Array.isArray(s.moods) && s.moods[0] ? s.moods[0] : "") || "")
@@ -3767,6 +4304,7 @@ window.firebaseApp = app;
 window.firebaseAuth = auth;
 window.firebaseRemove = remove;
 window.firebaseDeleteUser = deleteUser;
+window.firebasePush = push;
 window.currentFirebaseUser = null;
 
 function idbDeleteDatabaseBestEffort(name, perOpMs) {
@@ -4583,7 +5121,6 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
           appleProvider.addScope("email");
           appleProvider.addScope("name");
 
-          const APPLE_AUTH_URL = "https://asteroid-cdc13.firebaseapp.com/auth-apple.html";
           const isCapacitorNative = () => typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
           const getAppPlugin = () => { try { return window.Capacitor?.Plugins?.App || null; } catch (e) { return null; } };
           const getBrowserPlugin = () => { try { return window.Capacitor?.Plugins?.Browser || null; } catch (e) { return null; } };
@@ -4622,6 +5159,16 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             return (user.email || user.providerData[0]?.email || user.uid || "").trim();
           }
 
+          function slugPublicUsernameFromLabel(label) {
+            let s = String(label || "")
+              .trim()
+              .toLowerCase()
+              .replace(/[^a-z0-9_]+/g, "_")
+              .replace(/^_+|_+$/g, "");
+            if (s.length > 40) s = s.slice(0, 40);
+            return s;
+          }
+
           function openAppleOnboardingModal() {
             const m = document.getElementById("appleOnboardingModal");
             if (!m || appleOnboardingUiOpen) return;
@@ -4629,8 +5176,15 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             if (window.setCreateProfileMode) window.setCreateProfileMode(true);
             const nick = document.getElementById("appleOnboardingNickname");
             if (nick) {
-              nick.value = (localStorage.getItem("fullName") || "").trim();
+              const pre = typeof window.__appleOnboardingPrefillNick === "string" ? window.__appleOnboardingPrefillNick : "";
+              delete window.__appleOnboardingPrefillNick;
+              nick.value = (pre || (localStorage.getItem("fullName") || "")).trim();
               setTimeout(() => nick.focus(), 100);
+            }
+            const hdl = document.getElementById("appleOnboardingHandle");
+            if (hdl) {
+              hdl.dataset.userEdited = "";
+              hdl.value = slugPublicUsernameFromLabel(nick ? nick.value : "");
             }
             ["appleOnboardingInstagram", "appleOnboardingTwitter", "appleOnboardingTiktok", "appleOnboardingYoutube", "appleOnboardingSpotify", "appleOnboardingSoundcloud", "appleOnboardingWebsite"].forEach((id) => {
               const el = document.getElementById(id);
@@ -4661,16 +5215,28 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             const accountId = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim();
             if (!accountId) return;
             if (localStorage.getItem("appleOnboardingSkipped") === "1") return;
-            if (localStorage.getItem("appleOnboardingDone") === "1") return;
             appleOnboardingCheckLock = true;
             try {
               const key = accountId.replace(/[.#$[\]]/g, "_");
               try {
                 const snap = await get(ref2(database, "PROFILES/" + key));
                 const val = snap.exists() ? snap.val() : null;
-                if (val && (val.nickname || val.profileNickname)) return;
+                if (val && (val.nickname || val.profileNickname)) {
+                  const pu = String(val.publicUsername || "")
+                    .trim()
+                    .toLowerCase()
+                    .replace(/[^a-z0-9_]/g, "");
+                  if (pu.length >= 3 && /^[a-z0-9_]{3,40}$/.test(pu)) return;
+                  window.__appleOnboardingPrefillNick = String(val.nickname || val.profileNickname || "").trim();
+                } else if (localStorage.getItem("appleOnboardingDone") === "1") {
+                  return;
+                } else {
+                  window.__appleOnboardingPrefillNick = "";
+                }
               } catch (e) {
                 console.warn("[apple onboarding] profile read:", e);
+                if (localStorage.getItem("appleOnboardingDone") === "1") return;
+                window.__appleOnboardingPrefillNick = "";
               }
               openAppleOnboardingModal();
             } finally {
@@ -4692,6 +5258,43 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
               return;
             }
             const key = accountId.replace(/[.#$[\]]/g, "_");
+            const hdlEl = document.getElementById("appleOnboardingHandle");
+            let handleRaw = (hdlEl && hdlEl.value ? hdlEl.value : "").trim().toLowerCase().replace(/^@+/, "").replace(/[^a-z0-9_]/g, "");
+            if (!handleRaw) handleRaw = slugPublicUsernameFromLabel(nickname);
+            if (handleRaw.length < 3) {
+              alert("Public username must be at least 3 characters (letters, numbers, underscores only).");
+              if (hdlEl) hdlEl.focus();
+              return;
+            }
+            if (handleRaw.length > 40 || !/^[a-z0-9_]{3,40}$/.test(handleRaw)) {
+              alert("Public username must be 3–40 characters: lowercase letters, numbers, and underscores only.");
+              if (hdlEl) hdlEl.focus();
+              return;
+            }
+            const regRef = ref2(database, "USERNAME_REGISTRY/" + handleRaw);
+            let regSnap;
+            try {
+              regSnap = await get(regRef);
+            } catch (e1) {
+              console.warn("[apple onboarding] registry read", e1);
+              alert("Could not verify username. Check your connection and try again.");
+              return;
+            }
+            const owner = regSnap.exists() ? String(regSnap.val() || "").trim() : "";
+            if (owner && owner !== key) {
+              alert("That username is already taken. Pick another.");
+              if (hdlEl) hdlEl.focus();
+              return;
+            }
+            if (!owner) {
+              try {
+                await set(regRef, key);
+              } catch (e2) {
+                console.warn("[apple onboarding] registry claim", e2);
+                alert("That username was just taken or could not be saved. Try a different one.");
+                return;
+              }
+            }
             const gv = (id) => {
               const el = document.getElementById(id);
               const v = el && (el.value || "").trim();
@@ -4703,6 +5306,7 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             const payload = {
               nickname,
               profileNickname: nickname,
+              publicUsername: handleRaw,
               email: accountId,
               profileType,
               profileVisibility: isPublicArtist ? "public" : "private",
@@ -4759,6 +5363,17 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             const skipBtn = document.getElementById("appleOnboardingSkipBtn");
             if (saveBtn) saveBtn.addEventListener("click", () => { void saveAppleOnboardingProfile(); });
             if (skipBtn) skipBtn.addEventListener("click", skipAppleOnboarding);
+            const nick = document.getElementById("appleOnboardingNickname");
+            const hdl = document.getElementById("appleOnboardingHandle");
+            if (nick && hdl) {
+              nick.addEventListener("input", () => {
+                if (hdl.dataset.userEdited === "1") return;
+                hdl.value = slugPublicUsernameFromLabel(nick.value);
+              });
+              hdl.addEventListener("input", () => {
+                hdl.dataset.userEdited = "1";
+              });
+            }
           })();
 
           async function handleSignInSuccess(result, hadPreviousUser) {
@@ -4833,6 +5448,10 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             if (s.startsWith("asteroid://auth-apple")) {
               await dismissInAppBrowser("apple-deeplink");
               await handleAppleAuthRedirect(url);
+              return;
+            }
+            if (s.includes("/__/auth/handler")) {
+              await dismissInAppBrowser("firebase-auth-handler");
             }
           }
           let _lastAppleRedirectIndex = null;
@@ -4907,23 +5526,97 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             appleSignInBtn.setAttribute('data-listener-added', 'true');
             appleSignInBtn.addEventListener("click", async () => {
               console.log("apple-sign-in-clicked");
+              var ovU = document.getElementById("ugcPolicyOverlay");
+              var chkU = document.getElementById("ugcPolicyCheck");
+              var btnU = document.getElementById("ugcPolicyContinue");
+              var titleU = document.getElementById("ugcPolicyTitle");
+              if (ovU && chkU && btnU) {
+                if (!window.__ugcAppleGateDefaults && titleU && btnU) {
+                  window.__ugcAppleGateDefaults = { title: titleU.textContent, btn: btnU.textContent };
+                }
+                chkU.checked = false;
+                btnU.disabled = true;
+                if (titleU) titleU.textContent = "Sign in with Apple";
+                btnU.textContent = "Continue with Apple";
+                window.__appleUgcPendingRunner = async function () {
+                  const hadPreviousUser = localStorage.getItem("asteroidSignedInBefore") === "true";
+                  if (isCapacitorNative()) {
+                    try {
+                      await signInWithRedirect(auth, appleProvider);
+                    } catch (redirectErr) {
+                      console.error("Apple redirect sign-in (native):", redirectErr);
+                      alert(
+                        "Could not start Apple sign-in.\n\n" +
+                          "A 403 on Apple’s page usually means Return URL / domain mismatch:\n" +
+                          "Apple Developer → Services ID → Sign in with Apple → Return URLs must include exactly:\n" +
+                          "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
+                          "Web domains must include your live hostname (e.g. asteroid8.net and www.asteroid8.net)."
+                      );
+                    }
+                    return;
+                  }
+                  signInWithPopup(auth, appleProvider)
+                    .then((result) => handleSignInSuccess(result, hadPreviousUser))
+                    .catch(async (error) => {
+                      console.error("Apple sign-in:", error);
+                      const code = error && error.code ? String(error.code) : "";
+                      if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+                        try {
+                          await signInWithRedirect(auth, appleProvider);
+                          return;
+                        } catch (redirectErr) {
+                          console.error("Apple redirect sign-in:", redirectErr);
+                        }
+                      }
+                      if (error && error.code === "auth/operation-not-allowed") {
+                        alert(
+                          "Sign in with Apple is not enabled for this app in Firebase.\n\n" +
+                            "Open Firebase Console → Authentication → Sign-in method → Apple → Enable, " +
+                            "and complete Apple’s Services ID / key setup. Add your site to Authorized domains."
+                        );
+                      } else if (error) {
+                        alert(
+                          "Could not start Apple sign-in.\n\n" +
+                            "A 403 on Apple’s page usually means Return URL / domain mismatch:\n" +
+                            "Apple Developer → Services ID → Sign in with Apple → Return URLs must include exactly:\n" +
+                            "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
+                            "Web domains must include your live hostname (e.g. asteroid8.net and www.asteroid8.net)."
+                        );
+                      }
+                    });
+                };
+                ovU.classList.add("is-visible");
+                return;
+              }
               const hadPreviousUser = localStorage.getItem("asteroidSignedInBefore") === "true";
               if (isCapacitorNative()) {
-                const Browser = getBrowserPlugin();
-                if (Browser && typeof Browser.open === "function") {
-                  try {
-                    try { sessionStorage.setItem("capAuthBrowserOpened", String(Date.now())); } catch (e0) {}
-                    await Browser.open({ url: APPLE_AUTH_URL });
-                    return;
-                  } catch (err) { console.warn("Browser.open (Apple) failed:", err); }
+                try {
+                  await signInWithRedirect(auth, appleProvider);
+                } catch (redirectErr) {
+                  console.error("Apple redirect sign-in (native):", redirectErr);
+                  alert(
+                    "Could not start Apple sign-in.\n\n" +
+                      "A 403 on Apple’s page usually means Return URL / domain mismatch:\n" +
+                      "Apple Developer → Services ID → Sign in with Apple → Return URLs must include exactly:\n" +
+                      "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
+                      "Web domains must include your live hostname (e.g. asteroid8.net and www.asteroid8.net)."
+                  );
                 }
-                window.location.href = APPLE_AUTH_URL;
                 return;
               }
               signInWithPopup(auth, appleProvider)
                 .then((result) => handleSignInSuccess(result, hadPreviousUser))
-                .catch((error) => {
+                .catch(async (error) => {
                   console.error("Apple sign-in:", error);
+                  const code = error && error.code ? String(error.code) : "";
+                  if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+                    try {
+                      await signInWithRedirect(auth, appleProvider);
+                      return;
+                    } catch (redirectErr) {
+                      console.error("Apple redirect sign-in:", redirectErr);
+                    }
+                  }
                   if (error && error.code === "auth/operation-not-allowed") {
                     alert(
                       "Sign in with Apple is not enabled for this app in Firebase.\n\n" +
@@ -4943,6 +5636,21 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             });
           }
 
+          void (async function consumeFirebaseRedirectSignIn() {
+            try {
+              const hadPreviousUser = localStorage.getItem("asteroidSignedInBefore") === "true";
+              const result = await getRedirectResult(auth);
+              if (result && result.user) {
+                console.log("[auth] getRedirectResult: completed redirect sign-in");
+                await handleSignInSuccess(result, hadPreviousUser);
+              }
+            } catch (e) {
+              const code = e && e.code ? String(e.code) : "";
+              if (code && code.indexOf("auth/") === 0) {
+                console.warn("[auth] getRedirectResult:", code, e.message || e);
+              }
+            }
+          })();
 
 
 console.log('1171')
@@ -5344,6 +6052,11 @@ console.log('1171')
           <button type="button" class="profile-follow-btn" id="profileFollowBtn">Follow artist</button>
           <p class="profile-follow-hint" id="profileFollowHint"></p>
         </div>
+        <div id="profileModalSafetyWrap" class="profile-modal-safety-wrap" style="display: none;">
+          <button type="button" id="profileModalBlockBtn" class="profile-block-btn">Block this profile</button>
+          <button type="button" id="profileModalReportBtn" class="profile-report-btn" onclick="window.openReportContentModal(this)">Report this profile</button>
+          <a class="profile-safety-mail" href="mailto:asteroidcontactbussiness@gmail.com?subject=Report%20content%20on%20Asteroid">Email support</a>
+        </div>
       </div>
       <div class="profile-modal-body">
         <div class="profile-modal-section">
@@ -5530,6 +6243,36 @@ console.log('1171')
 
     window.getViewerFollowKeyForFollow = getViewerFollowKeyForFollow;
     window.isSignedInForFollow = isSignedInForFollow;
+
+    function refreshProfileSafetyWrap(userData) {
+      const safety = document.getElementById("profileModalSafetyWrap");
+      const blockBtn = document.getElementById("profileModalBlockBtn");
+      const reportBtn = document.getElementById("profileModalReportBtn");
+      if (!safety || !blockBtn || !userData?.emailKey) return;
+      const targetKey = String(userData.emailKey || "");
+      const viewerKey = getViewerFollowKeyForFollow();
+      if (!targetKey) {
+        safety.style.display = "none";
+        return;
+      }
+      if (viewerKey && viewerKey === targetKey) {
+        safety.style.display = "none";
+        return;
+      }
+      safety.style.display = "flex";
+      blockBtn.dataset.targetKey = targetKey;
+      if (reportBtn) {
+        const dn =
+          userData.profile?.nickname ||
+          userData.fullName ||
+          userData.email ||
+          userData.emailKey ||
+          "User";
+        reportBtn.dataset.targetType = "user";
+        reportBtn.dataset.uploaderKey = targetKey;
+        reportBtn.dataset.userDisplayName = dn;
+      }
+    }
     
     // Function to get database instance
     function getDb() {
@@ -5657,6 +6400,7 @@ console.log('1171')
 
       const searchQuery = document.getElementById('userSearchInput')?.value?.toLowerCase().trim() || '';
       const clearBtn = document.getElementById('clearSearchBtn');
+      const isUserBlockedFn = typeof window.isEmailKeyBlocked === "function" ? window.isEmailKeyBlocked : function () { return false; };
       
       // Show/hide clear button
       if (clearBtn) {
@@ -5664,10 +6408,10 @@ console.log('1171')
       }
 
       // Filter users based on search query
-      let filteredUsers = usersToRender.filter((user) => resolveProfileType(user) === "artist");
+      let filteredUsers = usersToRender.filter((user) => resolveProfileType(user) === "artist" && !isUserBlockedFn(user.emailKey));
       if (searchQuery) {
         filteredUsers = usersToRender.filter(user => {
-          if (resolveProfileType(user) !== "artist") return false;
+          if (resolveProfileType(user) !== "artist" || isUserBlockedFn(user.emailKey)) return false;
           const displayName = (user.profile?.nickname || user.fullName || user.email || '').toLowerCase();
           const role = (getRoleLabel(user) || '').toLowerCase();
           const bio = (user.profile?.bio || '').toLowerCase();
@@ -5714,6 +6458,10 @@ console.log('1171')
         `;
       }).join('');
     }
+
+    window.__refreshUsersGridAfterHide = function () {
+      renderUsers(allUsersDataGlobal);
+    };
 
     // Clear search function
     window.clearUserSearch = function() {
@@ -5863,7 +6611,9 @@ console.log('1171')
           const snap = await get(ref2(dbSongs, "SONGS"));
           const val = snap.exists() ? snap.val() : null;
           const all = flattenSongsFromRtdb(val);
-          const mine = all.filter((s) => songBelongsToUserProfile(s, userData));
+          const mine = all
+            .filter((s) => songBelongsToUserProfile(s, userData))
+            .filter((s) => !window.shouldHideSongInLibrary(s));
           mine.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
           if (!mine.length) {
             songsMount.innerHTML =
@@ -5891,7 +6641,9 @@ console.log('1171')
   <div class="profile-modal-song-actions">
     <i class="fa fa-play-circle" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play"></i>
     <i class="fa fa-pause-circle-o" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
-    <button type="button" onclick="queuemusic('${escProfileSongQ(s.fileInp)}','${escProfileSongQ(s.title)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button>
+    <span class="song-row-action-labeled"><button type="button" class="song-row-queue" onclick="queuemusic('${escProfileSongQ(s.fileInp)}','${escProfileSongQ(s.title)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button><span class="song-row-action-label">Queue</span></span>
+    <span class="song-row-action-labeled"><button type="button" class="song-row-block" aria-label="Block song" title="Hide this song" onclick="window.blockSongFromDataset(this)" data-block-file="${escProfileSongAttr(s.fileInp || "")}" data-block-title="${escProfileSongAttr(s.title || "")}"><span class="material-symbols-outlined">block</span></button><span class="song-row-action-label">Block</span></span>
+    <span class="song-row-action-labeled"><button type="button" class="song-row-flag" aria-label="Report song" title="Report" onclick="window.openReportContentModal(this)" data-target-type="song" data-file-inp="${urlAttr}" data-song-title="${t}" data-artist-name="${a}" data-uploader-key="${up}"><span class="material-symbols-outlined">flag</span></button><span class="song-row-action-label">Report</span></span>
   </div>
 </div>`;
           });
@@ -5946,6 +6698,8 @@ console.log('1171')
         }
       }
 
+      refreshProfileSafetyWrap(userData);
+
       // Apply theme color
       const themes = {
         coral: { primary: '#ff7f50', secondary: '#ff6347' },
@@ -5983,9 +6737,25 @@ console.log('1171')
       else document.body.classList.add('profile-focus-active');
     };
 
+    const profileBlockBtn = document.getElementById("profileModalBlockBtn");
+    if (profileBlockBtn) {
+      profileBlockBtn.addEventListener("click", function () {
+        const k = profileBlockBtn.dataset.targetKey;
+        if (!k) return;
+        if (!confirm("Block this user? Their public profile will be hidden from your Artists list on this device.")) return;
+        if (typeof window.addBlockedUserKey === "function") window.addBlockedUserKey(k);
+        closeUserProfileModal();
+        if (typeof window.__refreshUsersGridAfterHide === "function") window.__refreshUsersGridAfterHide();
+        else renderUsers(allUsersDataGlobal);
+        if (typeof window.refreshLibraryAfterBlock === "function") window.refreshLibraryAfterBlock();
+      });
+    }
+
     // Close user profile modal
     window.closeUserProfileModal = function() {
       unmountUserProfileStickies();
+      const sw = document.getElementById("profileModalSafetyWrap");
+      if (sw) sw.style.display = "none";
       const songsList = document.getElementById("profileModalSongsList");
       if (songsList) {
         songsList.querySelectorAll("audio").forEach((a) => {

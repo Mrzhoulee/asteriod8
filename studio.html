@@ -204,9 +204,148 @@
     .upload-success-btn:active {
       transform: scale(0.98);
     }
+    .ugc-policy-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483000;
+      background: rgba(0, 0, 0, 0.94);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .ugc-policy-overlay.is-visible { display: flex; }
+    .ugc-policy-card {
+      max-width: 440px;
+      width: min(100%, 440px);
+      box-sizing: border-box;
+      background: #121212;
+      border: 1px solid rgba(255, 127, 80, 0.4);
+      border-radius: 16px;
+      padding: 24px;
+      color: #eee;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .ugc-policy-card h2 { margin: 0 0 12px; font-size: 18px; color: #fff; font-family: 'Montserrat', sans-serif; text-align: center; }
+    .ugc-policy-card a { color: #ff9a6e; text-decoration: underline; text-underline-offset: 2px; }
+    .ugc-policy-actions { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
+    .ugc-policy-check-row {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 12px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      cursor: pointer;
+      text-align: left;
+    }
+    .ugc-policy-check-row input[type="checkbox"] {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin: 2px 0 0 0;
+      cursor: pointer;
+    }
+    .ugc-policy-check-text {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.92);
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .ugc-policy-continue {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 16px;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      background: #ffffff;
+      color: #111827;
+      font-family: inherit;
+    }
+    .ugc-policy-continue:hover:not(:disabled) {
+      background: #f3f4f6;
+    }
+    .ugc-policy-continue:disabled {
+      cursor: not-allowed;
+      background: #4b5563;
+      color: #e5e7eb;
+      border-color: #374151;
+    }
   </style>
 </head>
 <body>
+  <div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
+    <div class="ugc-policy-card">
+      <h2 id="ugcPolicyTitle">Before you continue</h2>
+      <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;line-height:1.45;text-align:center;">Sign in with Apple requires accepting our policies on each sign-in.</p>
+      <div class="ugc-policy-actions">
+        <label class="ugc-policy-check-row" for="ugcPolicyCheck">
+          <input type="checkbox" id="ugcPolicyCheck" autocomplete="off">
+          <span class="ugc-policy-check-text">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>
+        </label>
+        <button type="button" class="ugc-policy-continue" id="ugcPolicyContinue" disabled>Continue with Apple</button>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function () {
+    function restoreUgcAppleGateCopy() {
+      var d = window.__ugcAppleGateDefaults;
+      if (!d) return;
+      var t = document.getElementById("ugcPolicyTitle");
+      var b = document.getElementById("ugcPolicyContinue");
+      if (t && d.title) t.textContent = d.title;
+      if (b && d.btn) b.textContent = d.btn;
+    }
+    function dismissAppleUgcGate() {
+      try { delete window.__appleUgcPendingRunner; } catch (e) {}
+      restoreUgcAppleGateCopy();
+      var ov = document.getElementById("ugcPolicyOverlay");
+      var chk = document.getElementById("ugcPolicyCheck");
+      var btn = document.getElementById("ugcPolicyContinue");
+      if (ov) ov.classList.remove("is-visible");
+      if (chk) chk.checked = false;
+      if (btn) btn.disabled = true;
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+      var ov = document.getElementById("ugcPolicyOverlay");
+      var chk = document.getElementById("ugcPolicyCheck");
+      var btn = document.getElementById("ugcPolicyContinue");
+      if (ov) {
+        ov.addEventListener("click", function (e) {
+          if (e.target === ov) dismissAppleUgcGate();
+        });
+      }
+      if (chk && btn) {
+        chk.addEventListener("change", function () {
+          btn.disabled = !chk.checked;
+        });
+        btn.addEventListener("click", function () {
+          if (!chk || !chk.checked) return;
+          var runner = window.__appleUgcPendingRunner;
+          if (typeof runner === "function") {
+            try { delete window.__appleUgcPendingRunner; } catch (e2) {}
+            ov.classList.remove("is-visible");
+            chk.checked = false;
+            btn.disabled = true;
+            restoreUgcAppleGateCopy();
+            void runner();
+          }
+        });
+      }
+    });
+  })();
+  </script>
   <script src="auth.js"></script>
   <script>
     if (typeof window.setCreateProfileMode !== "function") {
@@ -679,8 +818,8 @@
 
 <script type="module">
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getDatabase, goOnline, ref as ref2, update, get, onValue, increment, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-  import { getAuth, signInWithPopup, signInWithCredential, signInAnonymously, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getDatabase, goOnline, ref as ref2, update, get, set, onValue, increment, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInAnonymously, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
   import { processReferralURL, createOrUpdateUserOnSignup, getReferralFromURL, onSongUploaded } from "./js/referral-system.js";
 
@@ -717,6 +856,16 @@
   let appleOnboardingUiOpen = false;
   let appleOnboardingCheckLock = false;
 
+  function slugPublicUsernameFromLabel(label) {
+    let s = String(label || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+    if (s.length > 40) s = s.slice(0, 40);
+    return s;
+  }
+
   function openAppleOnboardingModal() {
     const m = document.getElementById("appleOnboardingModal");
     if (!m || appleOnboardingUiOpen) return;
@@ -724,8 +873,15 @@
     if (window.setCreateProfileMode) window.setCreateProfileMode(true);
     const nick = document.getElementById("appleOnboardingNickname");
     if (nick) {
-      nick.value = (localStorage.getItem("fullName") || "").trim();
+      const pre = typeof window.__appleOnboardingPrefillNick === "string" ? window.__appleOnboardingPrefillNick : "";
+      delete window.__appleOnboardingPrefillNick;
+      nick.value = (pre || (localStorage.getItem("fullName") || "")).trim();
       setTimeout(() => nick.focus(), 100);
+    }
+    const hdl = document.getElementById("appleOnboardingHandle");
+    if (hdl) {
+      hdl.dataset.userEdited = "";
+      hdl.value = slugPublicUsernameFromLabel(nick ? nick.value : "");
     }
     ["appleOnboardingInstagram", "appleOnboardingTwitter", "appleOnboardingTiktok", "appleOnboardingYoutube", "appleOnboardingSpotify", "appleOnboardingSoundcloud", "appleOnboardingWebsite"].forEach((id) => {
       const el = document.getElementById(id);
@@ -753,16 +909,28 @@
     const accountId = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim();
     if (!accountId) return;
     if (localStorage.getItem("appleOnboardingSkipped") === "1") return;
-    if (localStorage.getItem("appleOnboardingDone") === "1") return;
     appleOnboardingCheckLock = true;
     try {
       const key = accountId.replace(/[.#$[\]]/g, "_");
       try {
         const snap = await get(ref2(db, "PROFILES/" + key));
         const val = snap.exists() ? snap.val() : null;
-        if (val && (val.nickname || val.profileNickname)) return;
+        if (val && (val.nickname || val.profileNickname)) {
+          const pu = String(val.publicUsername || "")
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9_]/g, "");
+          if (pu.length >= 3 && /^[a-z0-9_]{3,40}$/.test(pu)) return;
+          window.__appleOnboardingPrefillNick = String(val.nickname || val.profileNickname || "").trim();
+        } else if (localStorage.getItem("appleOnboardingDone") === "1") {
+          return;
+        } else {
+          window.__appleOnboardingPrefillNick = "";
+        }
       } catch (e) {
         console.warn("[studio][apple onboarding] profile read:", e);
+        if (localStorage.getItem("appleOnboardingDone") === "1") return;
+        window.__appleOnboardingPrefillNick = "";
       }
       openAppleOnboardingModal();
     } finally {
@@ -784,6 +952,43 @@
       return;
     }
     const key = accountId.replace(/[.#$[\]]/g, "_");
+    const hdlEl = document.getElementById("appleOnboardingHandle");
+    let handleRaw = (hdlEl && hdlEl.value ? hdlEl.value : "").trim().toLowerCase().replace(/^@+/, "").replace(/[^a-z0-9_]/g, "");
+    if (!handleRaw) handleRaw = slugPublicUsernameFromLabel(nickname);
+    if (handleRaw.length < 3) {
+      alert("Public username must be at least 3 characters (letters, numbers, underscores only).");
+      if (hdlEl) hdlEl.focus();
+      return;
+    }
+    if (handleRaw.length > 40 || !/^[a-z0-9_]{3,40}$/.test(handleRaw)) {
+      alert("Public username must be 3–40 characters: lowercase letters, numbers, and underscores only.");
+      if (hdlEl) hdlEl.focus();
+      return;
+    }
+    const regRef = ref2(db, "USERNAME_REGISTRY/" + handleRaw);
+    let regSnap;
+    try {
+      regSnap = await get(regRef);
+    } catch (e1) {
+      console.warn("[studio][apple onboarding] registry read", e1);
+      alert("Could not verify username. Check your connection and try again.");
+      return;
+    }
+    const owner = regSnap.exists() ? String(regSnap.val() || "").trim() : "";
+    if (owner && owner !== key) {
+      alert("That username is already taken. Pick another.");
+      if (hdlEl) hdlEl.focus();
+      return;
+    }
+    if (!owner) {
+      try {
+        await set(regRef, key);
+      } catch (e2) {
+        console.warn("[studio][apple onboarding] registry claim", e2);
+        alert("That username was just taken or could not be saved. Try a different one.");
+        return;
+      }
+    }
     const gv = (id) => {
       const el = document.getElementById(id);
       const v = el && (el.value || "").trim();
@@ -795,6 +1000,7 @@
     const payload = {
       nickname,
       profileNickname: nickname,
+      publicUsername: handleRaw,
       email: accountId,
       profileType,
       profileVisibility: isPublicArtist ? "public" : "private",
@@ -859,6 +1065,18 @@
     if (skipBtn && !skipBtn.dataset.studioOnboardBound) {
       skipBtn.dataset.studioOnboardBound = "1";
       skipBtn.addEventListener("click", skipAppleOnboarding);
+    }
+    const nick = document.getElementById("appleOnboardingNickname");
+    const hdl = document.getElementById("appleOnboardingHandle");
+    if (nick && hdl && !nick.dataset.studioHandleSync) {
+      nick.dataset.studioHandleSync = "1";
+      nick.addEventListener("input", () => {
+        if (hdl.dataset.userEdited === "1") return;
+        hdl.value = slugPublicUsernameFromLabel(nick.value);
+      });
+      hdl.addEventListener("input", () => {
+        hdl.dataset.userEdited = "1";
+      });
     }
   }
   function initStudioAppleOnboardingDom() {
@@ -1020,7 +1238,6 @@
     return false;
   }
 
-  const APPLE_AUTH_URL = "https://asteroid-cdc13.firebaseapp.com/auth-apple.html";
   let _studioCapResumeCloserDone = false;
   const isCapacitorNative = () => typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
   const getBrowserPlugin = () => { try { return window.Capacitor?.Plugins?.Browser || null; } catch (e) { return null; } };
@@ -1096,20 +1313,32 @@
       try {
         App.addListener("appUrlOpen", (event) => {
           const u = event && event.url;
-          if (u && String(u).startsWith("asteroid://auth-apple")) {
+          if (!u) return;
+          const s = String(u);
+          if (s.startsWith("asteroid://auth-apple")) {
             void (async () => {
               await dismissInAppBrowser("studio-apple-deeplink");
               await handleAppleAuthRedirect(u);
             })();
+            return;
+          }
+          if (s.includes("/__/auth/handler")) {
+            void dismissInAppBrowser("firebase-auth-handler");
           }
         });
         App.getLaunchUrl().then((launch) => {
           const u = launch && launch.url;
-          if (u && String(u).startsWith("asteroid://auth-apple")) {
+          if (!u) return;
+          const s = String(u);
+          if (s.startsWith("asteroid://auth-apple")) {
             void (async () => {
               await dismissInAppBrowser("studio-apple-launch");
               await handleAppleAuthRedirect(u);
             })();
+            return;
+          }
+          if (s.includes("/__/auth/handler")) {
+            void dismissInAppBrowser("firebase-auth-handler");
           }
         }).catch(() => {});
         if (!_studioCapResumeCloserDone) {
@@ -1269,26 +1498,73 @@
     console.error("[studio] Apple sign-in button missing from DOM");
   }
   if (appleBtn) {
-    appleBtn.addEventListener("click", () => {
+    appleBtn.addEventListener("click", async () => {
       console.log("[studio] Apple sign-in clicked");
-      if (isCapacitorNative()) {
-        const Browser = getBrowserPlugin();
-        if (Browser && typeof Browser.open === "function") {
-          try {
-            try { sessionStorage.setItem("capAuthBrowserOpened", String(Date.now())); } catch (e0) {}
-            Browser.open({ url: APPLE_AUTH_URL });
-          } catch (err) { console.warn("[studio] Browser.open (Apple):", err); }
-        } else { window.location.href = APPLE_AUTH_URL; }
+      var ovU = document.getElementById("ugcPolicyOverlay");
+      var chkU = document.getElementById("ugcPolicyCheck");
+      var btnU = document.getElementById("ugcPolicyContinue");
+      var titleU = document.getElementById("ugcPolicyTitle");
+      if (ovU && chkU && btnU) {
+        if (!window.__ugcAppleGateDefaults && titleU && btnU) {
+          window.__ugcAppleGateDefaults = { title: titleU.textContent, btn: btnU.textContent };
+        }
+        chkU.checked = false;
+        btnU.disabled = true;
+        if (titleU) titleU.textContent = "Sign in with Apple";
+        btnU.textContent = "Continue with Apple";
+        window.__appleUgcPendingRunner = async function () {
+          if (isCapacitorNative()) {
+            try {
+              await signInWithRedirect(auth, appleProvider);
+            } catch (redirectErr) {
+              console.error("[studio] Apple redirect sign-in (native):", redirectErr);
+              alert(
+                "Could not start Apple sign-in.\n\n" +
+                  "If you see 403 on Apple’s page, open Apple Developer → your Services ID → " +
+                  "Sign in with Apple → Return URLs must include exactly:\n" +
+                  "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
+                  "Domains must list the site you use (e.g. asteroid8.net and www.asteroid8.net)."
+              );
+            }
+            return;
+          }
+          signInWithPopup(auth, appleProvider)
+            .then((res) => completeStudioSignIn(res))
+            .catch(async (err) => {
+              console.error("Apple sign-in:", err?.code || err);
+              const code = err && err.code ? String(err.code) : "";
+              if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+                try {
+                  await signInWithRedirect(auth, appleProvider);
+                  return;
+                } catch (redirectErr) {
+                  console.error("[studio] Apple redirect sign-in:", redirectErr);
+                }
+              }
+              if (err && err.code === "auth/operation-not-allowed") {
+                alert(
+                  "Sign in with Apple is not enabled for this app in Firebase yet.\n\n" +
+                    "Firebase Console → Authentication → Sign-in method → Apple → Enable."
+                );
+              } else if (err) {
+                alert(
+                  "Could not start Apple sign-in.\n\n" +
+                    "If you see 403 on Apple’s page, open Apple Developer → your Services ID → " +
+                    "Sign in with Apple → Return URLs must include exactly:\n" +
+                    "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
+                    "Domains must list the site you use (e.g. asteroid8.net and www.asteroid8.net)."
+                );
+              }
+            });
+        };
+        ovU.classList.add("is-visible");
         return;
       }
-      signInWithPopup(auth, appleProvider).then((res) => completeStudioSignIn(res)).catch((err) => {
-        console.error("Apple sign-in:", err?.code || err);
-        if (err && err.code === "auth/operation-not-allowed") {
-          alert(
-            "Sign in with Apple is not enabled for this app in Firebase yet.\n\n" +
-              "Firebase Console → Authentication → Sign-in method → Apple → Enable."
-          );
-        } else if (err) {
+      if (isCapacitorNative()) {
+        try {
+          await signInWithRedirect(auth, appleProvider);
+        } catch (redirectErr) {
+          console.error("[studio] Apple redirect sign-in (native):", redirectErr);
           alert(
             "Could not start Apple sign-in.\n\n" +
               "If you see 403 on Apple’s page, open Apple Developer → your Services ID → " +
@@ -1297,9 +1573,53 @@
               "Domains must list the site you use (e.g. asteroid8.net and www.asteroid8.net)."
           );
         }
-      });
+        return;
+      }
+      signInWithPopup(auth, appleProvider)
+        .then((res) => completeStudioSignIn(res))
+        .catch(async (err) => {
+          console.error("Apple sign-in:", err?.code || err);
+          const code = err && err.code ? String(err.code) : "";
+          if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+            try {
+              await signInWithRedirect(auth, appleProvider);
+              return;
+            } catch (redirectErr) {
+              console.error("[studio] Apple redirect sign-in:", redirectErr);
+            }
+          }
+          if (err && err.code === "auth/operation-not-allowed") {
+            alert(
+              "Sign in with Apple is not enabled for this app in Firebase yet.\n\n" +
+                "Firebase Console → Authentication → Sign-in method → Apple → Enable."
+            );
+          } else if (err) {
+            alert(
+              "Could not start Apple sign-in.\n\n" +
+                "If you see 403 on Apple’s page, open Apple Developer → your Services ID → " +
+                "Sign in with Apple → Return URLs must include exactly:\n" +
+                "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
+                "Domains must list the site you use (e.g. asteroid8.net and www.asteroid8.net)."
+            );
+          }
+        });
     });
   }
+
+  void (async function consumeStudioFirebaseRedirectSignIn() {
+    try {
+      const result = await getRedirectResult(auth);
+      if (result && result.user) {
+        console.log("[studio] getRedirectResult: completed redirect sign-in");
+        await completeStudioSignIn(result);
+      }
+    } catch (e) {
+      const code = e && e.code ? String(e.code) : "";
+      if (code && code.indexOf("auth/") === 0) {
+        console.warn("[studio] getRedirectResult:", code, e.message || e);
+      }
+    }
+  })();
 
   function loadUserProgress(name) {
     const cleanName = name.replace(/\s+/g, '_');
@@ -1573,9 +1893,12 @@ boostBtn.addEventListener("click", async (e) => {
 <div id="appleOnboardingModal" class="apple-onboarding-modal" aria-modal="true" role="dialog" aria-labelledby="appleOnboardingTitle">
   <div class="apple-onboarding-box">
     <h2 id="appleOnboardingTitle">Finish your profile</h2>
-    <p class="apple-onboarding-sub">Choose a nickname that other listeners will see. Add social links if you like — all optional except your nickname.</p>
+    <p class="apple-onboarding-sub">Choose a display name and a unique username (letters, numbers, underscores). Usernames cannot repeat. Social links are optional.</p>
     <label for="appleOnboardingNickname">Nickname</label>
     <input type="text" id="appleOnboardingNickname" maxlength="80" placeholder="Your artist or display name" autocomplete="nickname">
+    <label for="appleOnboardingHandle">Public username</label>
+    <input type="text" id="appleOnboardingHandle" maxlength="40" placeholder="e.g. indie_alex" autocomplete="username" spellcheck="false" autocapitalize="off">
+    <p class="apple-onboarding-hint" style="margin:-6px 0 10px;font-size:12px;color:rgba(255,255,255,0.5);">3–40 characters: a–z, 0–9, underscore only. Your unique @handle for search and follows.</p>
     <label>Profile type</label>
     <div class="apple-onboarding-choice-group" role="radiogroup" aria-label="Profile type">
       <label class="apple-onboarding-choice" for="appleProfileTypeArtist">
