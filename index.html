@@ -401,6 +401,22 @@
   font-size: 1.1rem;
 }
 
+.user-profile-username {
+  color: rgba(158, 207, 255, 0.92);
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-top: -0.25rem;
+  margin-bottom: 0.45rem;
+}
+.artist-card-username,
+.featured-card-username {
+  display: block;
+  margin-top: 4px;
+  color: rgba(158, 207, 255, 0.9);
+  font-size: 11px;
+  font-weight: 600;
+}
+
 .user-profile-email {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.85rem;
@@ -3139,14 +3155,28 @@ function flattenSongsData(songsData) {
   if (!songsData || typeof songsData !== "object") return out;
   for (const albums of Object.values(songsData)) {
     if (!albums || typeof albums !== "object") continue;
-    for (const artists of Object.values(albums)) {
+    for (const [albumKey, artists] of Object.entries(albums)) {
       if (!artists || typeof artists !== "object") continue;
-      for (const songData of Object.values(artists)) {
-        if (songData && typeof songData === "object" && songData.title && songData.fileInp) out.push(songData);
+      for (const [artistKey, songData] of Object.entries(artists)) {
+        if (songData && typeof songData === "object" && songData.title && songData.fileInp) {
+          out.push({ ...songData, __artistKey: artistKey, __albumKey: albumKey });
+        }
       }
     }
   }
   return out;
+}
+
+function pickSongUploader(song) {
+  const raw = [
+    song?.uploader,
+    song?.uploaderEmail,
+    song?.ownerEmail,
+    song?.email,
+    song?.artemail,
+    song?.__artistKey
+  ].find((v) => String(v || "").trim().length > 0);
+  return String(raw || "").trim();
 }
 
 function renderDiscoveryRows(list, mountId) {
@@ -3161,7 +3191,8 @@ function renderDiscoveryRows(list, mountId) {
     const t = String(s.title || "Untitled").replace(/&/g,"&amp;").replace(/</g,"&lt;");
     const a = String(s.artist || "Unknown").replace(/&/g,"&amp;").replace(/</g,"&lt;");
     const url = String(s.fileInp || "").replace(/"/g, "&quot;");
-    return `<div class="song-row"><audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio><div class="song-row-num">${idx + 1}</div><div class="song-row-info"><span class="song-row-title">${t}</span><span class="song-row-artist">${a}</span></div><div class="song-row-actions"><i class="fa fa-play-circle song-row-play" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play ${t}"></i><i class="fa fa-pause-circle-o song-row-pause" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i></div></div>`;
+    const up = String(pickSongUploader(s) || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+    return `<div class="song-row"><audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" data-uploader="${up}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio><div class="song-row-num">${idx + 1}</div><div class="song-row-info"><span class="song-row-title">${t}</span><span class="song-row-artist">${a}</span></div><div class="song-row-actions"><i class="fa fa-play-circle song-row-play" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play ${t}"></i><i class="fa fa-pause-circle-o song-row-pause" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i></div></div>`;
   }).join("");
 }
 
@@ -3202,7 +3233,7 @@ function renderSongsFromData(songsData) {
       if (!artists || typeof artists !== "object") continue;
       for (const [artistKey, songData] of Object.entries(artists)) {
         if (songData && typeof songData === "object" && songData.title && songData.fileInp)
-          allSongs.push(songData);
+          allSongs.push({ ...songData, __artistKey: artistKey, __albumKey: albumKey });
       }
     }
   }
@@ -3223,9 +3254,10 @@ function renderSongsFromData(songsData) {
 
   function songRow(s, idx) {
     const t = esc(s.title), a = esc(s.artist), al = esc(s.album), url = (s.fileInp || "").replace(/"/g,"&quot;");
+    const up = esc(pickSongUploader(s));
     const tid = allocTid();
     return `<div class="sssh song-row" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="${al.toLowerCase()}">
-      <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
+      <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-uploader="${up}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
       <div class="song-row-num">${idx + 1}</div>
       <div class="song-row-info">
         <span class="song-row-title">${t}</span>
@@ -3248,9 +3280,10 @@ function renderSongsFromData(songsData) {
     if (key === "__single__" || songs.length === 1) {
       songs.forEach((s, i) => {
         const t = esc(s.title), a = esc(s.artist), url = (s.fileInp || "").replace(/"/g,"&quot;");
+        const up = esc(pickSongUploader(s));
         const tid = allocTid();
         html += `<div class="sssh single-card" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="">
-          <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
+          <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-uploader="${up}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
           <div class="single-emoji">${pickEmoji(s.title)}</div>
           <div class="single-info">
             <div class="single-title">${t}</div>
@@ -3420,7 +3453,69 @@ window.actual1 = function (audioDomId) {
   const displayTitle =
     (el && el.dataset && el.dataset.displayTitle) ||
     (audioDomId || "").replace(/^gaga_/, "").replace(/_/g, " ");
+  const uploaderRaw = (el && el.dataset && el.dataset.uploader) ? String(el.dataset.uploader).trim() : "";
+  const uploaderKey = uploaderRaw ? uploaderRaw.toLowerCase().replace(/[.#$[\]]/g, "_") : "";
   push(ref2(db, "songplayed"), { title2: displayTitle, ofctime });
+
+  // Listener identity used by creator analytics.
+  const viewerEmailRaw = (
+    localStorage.getItem("CurrentUser") ||
+    localStorage.getItem("email") ||
+    (window.firebaseAuth && window.firebaseAuth.currentUser
+      ? (window.firebaseAuth.currentUser.email || window.firebaseAuth.currentUser.providerData?.[0]?.email || "")
+      : "")
+  );
+  const viewerEmail = String(viewerEmailRaw || "").trim().toLowerCase();
+  let listenerKey = viewerEmail ? viewerEmail.replace(/[.#$[\]]/g, "_") : "";
+  if (!listenerKey) {
+    let anon = localStorage.getItem("anonListenerKey");
+    if (!anon) {
+      anon = "anon_" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("anonListenerKey", anon);
+    }
+    listenerKey = anon;
+  }
+  const listenerLabel = String(localStorage.getItem("fullName") || localStorage.getItem("profileNickname") || (viewerEmail ? viewerEmail.split("@")[0] : "Anonymous")).trim() || "Anonymous";
+
+  // Per-uploader analytics writes used by Artist Dashboard creator tools.
+  if (uploaderKey) {
+    const now = Date.now();
+    const prevTitle = String(localStorage.getItem("lastPlayedTitle") || "").trim() || null;
+    const lastJourneyId = localStorage.getItem("lastJourneyId");
+    const lastJourneyArtist = localStorage.getItem("lastJourneyArtistKey");
+    const journeyId = "j_" + now + "_" + Math.random().toString(36).slice(2, 8);
+    const journeyPayload = {
+      ts: now,
+      uploaderKey,
+      playedTitle: displayTitle,
+      prevTitle,
+      listenerKey,
+      listenerLabel,
+      listenerEmail: viewerEmail || null
+    };
+    set(ref2(db, "LISTEN_JOURNEYS/" + journeyId), journeyPayload).catch(function (e) { console.warn("LISTEN_JOURNEYS write failed", e); });
+    set(ref2(db, "ARTIST_JOURNEYS/" + uploaderKey + "/" + journeyId), journeyPayload).catch(function (e) { console.warn("ARTIST_JOURNEYS write failed", e); });
+    const fanEventId = "e_" + now + "_" + Math.random().toString(36).slice(2, 8);
+    set(ref2(db, "FAN_ENGAGEMENT/" + uploaderKey + "/events/" + fanEventId), {
+      ts: now,
+      songTitle: displayTitle,
+      listenerKey,
+      listenerEmail: viewerEmail || null,
+      label: listenerLabel,
+      anonymous: !viewerEmail,
+      cameFromTitle: prevTitle || null
+    }).catch(function (e) { console.warn("FAN_ENGAGEMENT write failed", e); });
+
+    // Link previous journey to this song as "nextTitle" when valid.
+    if (lastJourneyId && lastJourneyArtist === uploaderKey) {
+      set(ref2(db, "LISTEN_JOURNEYS/" + lastJourneyId + "/nextTitle"), displayTitle).catch(function () {});
+      set(ref2(db, "ARTIST_JOURNEYS/" + uploaderKey + "/" + lastJourneyId + "/nextTitle"), displayTitle).catch(function () {});
+    }
+    localStorage.setItem("lastJourneyId", journeyId);
+    localStorage.setItem("lastJourneyArtistKey", uploaderKey);
+  }
+  localStorage.setItem("lastPlayedTitle", displayTitle);
+
   window.pauseAllLibraryAudioExcept(el || null);
   if (el) window.currentPlaying = el;
   window.action = (audioDomId || "").replace(/^gaga_/, "");
@@ -5042,6 +5137,31 @@ console.log('1171')
       });
     })();
   </script>
+  <script>
+    (function addVisibleUsernamesToCards() {
+      function toHandle(label) {
+        const base = String(label || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+        return "@" + (base || "artist");
+      }
+      document.querySelectorAll("#artists-grid-8 .artist-card").forEach((card) => {
+        if (card.querySelector(".artist-card-username")) return;
+        const p = card.querySelector("p");
+        const nameText = p ? p.textContent : card.textContent;
+        const handleEl = document.createElement("span");
+        handleEl.className = "artist-card-username";
+        handleEl.textContent = toHandle(nameText);
+        card.appendChild(handleEl);
+      });
+      document.querySelectorAll("#featuredContainer .featuredCard").forEach((card) => {
+        if (card.querySelector(".featured-card-username")) return;
+        const title = card.querySelector("h3");
+        const handleEl = document.createElement("span");
+        handleEl.className = "featured-card-username";
+        handleEl.textContent = toHandle(title ? title.textContent : card.textContent);
+        card.appendChild(handleEl);
+      });
+    })();
+  </script>
 
   <!-- Profile Modal -->
   <div id="profileModal" class="profile-modal-overlay">
@@ -5336,6 +5456,15 @@ console.log('1171')
       };
       const getRoleLabel = (user) => resolveProfileType(user) === "artist" ? "Artist (Public)" : "Listener (Private)";
       const getVisibleEmail = (user) => resolveProfileType(user) === "artist" ? (user.email || user.id || 'No email') : "Hidden for private listener";
+      const getPublicUsername = (user) => {
+        const explicit = String(user?.profile?.publicUsername || user?.profile?.username || "").trim().toLowerCase();
+        if (/^[a-z0-9_]{3,40}$/.test(explicit)) return "@" + explicit;
+        const fallbackBase = String(user?.profile?.nickname || user?.fullName || user?.email || "artist")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/^_+|_+$/g, "");
+        return "@" + (fallbackBase || "artist");
+      };
 
       const searchQuery = document.getElementById('userSearchInput')?.value?.toLowerCase().trim() || '';
       const clearBtn = document.getElementById('clearSearchBtn');
@@ -5351,10 +5480,12 @@ console.log('1171')
         filteredUsers = usersToRender.filter(user => {
           if (resolveProfileType(user) !== "artist") return false;
           const displayName = (user.profile?.nickname || user.fullName || user.email || '').toLowerCase();
+          const username = (getPublicUsername(user) || '').toLowerCase();
           const role = (getRoleLabel(user) || '').toLowerCase();
           const bio = (user.profile?.bio || '').toLowerCase();
           
           return displayName.includes(searchQuery) || 
+                 username.includes(searchQuery) ||
                  role.includes(searchQuery) ||
                  bio.includes(searchQuery);
         });
@@ -5377,6 +5508,7 @@ console.log('1171')
         const modalIndex = originalIndex >= 0 ? originalIndex : index;
         
         const displayName = user.profile?.nickname || user.fullName || user.email || user.id || 'User';
+        const publicUsername = getPublicUsername(user);
         const role = getRoleLabel(user);
         const profilePicture = (user.isPremium && user.profile?.profilePicture) 
           ? user.profile.profilePicture 
@@ -5391,6 +5523,7 @@ console.log('1171')
               }
             </div>
             <div class="user-profile-name">${displayName}</div>
+            <div class="user-profile-username">${publicUsername}</div>
             <div class="user-profile-role">${role}</div>
           </div>
         `;
