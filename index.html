@@ -141,12 +141,12 @@
 <div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
   <div class="ugc-policy-card">
     <h2 id="ugcPolicyTitle">Before you continue</h2>
-    <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;">Asteroid includes user-uploaded music and profiles. You can report content, block users you do not want to see, and reach our team at any time. <strong>Each time</strong> you use Sign in with Apple, confirm the policies below.</p>
+    <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;"><strong>First visit:</strong> check the box and tap Continue to accept the Terms of Service and Privacy Policy before using Asteroid. Asteroid includes user-uploaded music and profiles; you can report content, block users, and reach our team at any time. <strong>Each time</strong> you use Sign in with Apple, confirm the policies again below.</p>
     <div class="ugc-policy-actions">
-      <label class="ugc-policy-check-row" for="ugcPolicyCheck">
-        <input type="checkbox" id="ugcPolicyCheck" autocomplete="off">
-        <span class="ugc-policy-check-text">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>
-      </label>
+      <div class="ugc-policy-check-row" id="ugcPolicyCheckRow" role="group" aria-label="Legal acceptance">
+        <input type="checkbox" id="ugcPolicyCheck" autocomplete="off" aria-describedby="ugcPolicyLegalText">
+        <span class="ugc-policy-check-text" id="ugcPolicyLegalText">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>
+      </div>
       <button type="button" class="ugc-policy-continue" id="ugcPolicyContinue" disabled>Continue to Asteroid</button>
       <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.5);text-align:center;">Questions: <a href="mailto:asteroidcontactbussiness@gmail.com?subject=Asteroid%20app%20-%20moderation">asteroidcontactbussiness@gmail.com</a></p>
     </div>
@@ -366,8 +366,33 @@
     } catch (e2) {}
   }
   var UGC_KEY = "asteroidUgcPolicyAccepted";
+  var LEGAL_FIRST_KEY = "asteroidTermsPrivacyAccepted";
   function ugcAccepted() {
     return localStorage.getItem(UGC_KEY) === "v1";
+  }
+  function legalFirstVisitDone() {
+    return localStorage.getItem(LEGAL_FIRST_KEY) === "v1";
+  }
+  function ensureUgcGateDefaultCopy() {
+    var t = document.getElementById("ugcPolicyTitle");
+    var b = document.getElementById("ugcPolicyContinue");
+    if (t && b && !window.__ugcAppleGateDefaults) {
+      window.__ugcAppleGateDefaults = { title: t.textContent, btn: b.textContent };
+    }
+  }
+  function showFirstVisitLegalGateIfNeeded() {
+    if (legalFirstVisitDone()) return;
+    ensureUgcGateDefaultCopy();
+    var ov = document.getElementById("ugcPolicyOverlay");
+    var chk = document.getElementById("ugcPolicyCheck");
+    var btn = document.getElementById("ugcPolicyContinue");
+    try {
+      delete window.__appleUgcPendingRunner;
+    } catch (e0) {}
+    restoreUgcAppleGateCopy();
+    if (chk) chk.checked = false;
+    if (btn) btn.disabled = true;
+    if (ov) ov.classList.add("is-visible");
   }
   function restoreUgcAppleGateCopy() {
     var d = window.__ugcAppleGateDefaults;
@@ -428,10 +453,20 @@
     var btn = document.getElementById("ugcPolicyContinue");
     if (ov) {
       ov.addEventListener("click", function (e) {
-        if (e.target === ov) dismissAppleUgcGate();
+        if (e.target === ov && typeof window.__appleUgcPendingRunner === "function") dismissAppleUgcGate();
       });
     }
     if (chk && btn) {
+      var checkRow = document.getElementById("ugcPolicyCheckRow");
+      if (checkRow) {
+        checkRow.addEventListener("click", function (e) {
+          if (e.target === chk) return;
+          if (e.target.closest && e.target.closest("a")) return;
+          e.preventDefault();
+          chk.checked = !chk.checked;
+          chk.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+      }
       chk.addEventListener("change", function () {
         btn.disabled = !chk.checked;
       });
@@ -450,9 +485,11 @@
           return;
         }
         localStorage.setItem(UGC_KEY, "v1");
+        localStorage.setItem(LEGAL_FIRST_KEY, "v1");
         ov.classList.remove("is-visible");
       });
     }
+    showFirstVisitLegalGateIfNeeded();
     var ro = document.getElementById("reportContentOverlay");
     if (ro) {
       ro.addEventListener("click", function (e) {
@@ -972,6 +1009,82 @@
   text-align: center;
 }
 
+.profile-modal-songs-list {
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 0 2px 4px;
+  text-align: left;
+}
+.profile-modal-songs-loading,
+.profile-modal-songs-empty {
+  margin: 0;
+  padding: 12px 8px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+}
+.profile-modal-song-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.profile-modal-song-row audio {
+  display: none;
+}
+.profile-modal-song-info {
+  flex: 1;
+  min-width: 0;
+}
+.profile-modal-song-title {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.profile-modal-song-meta {
+  display: block;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.profile-modal-song-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.profile-modal-song-actions i {
+  font-size: 28px;
+  color: #ff7f50;
+  cursor: pointer;
+}
+.profile-modal-song-actions i:hover {
+  color: #fff;
+}
+.profile-modal-song-actions button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #ff7f50;
+  display: flex;
+}
+.profile-modal-song-actions .material-symbols-outlined {
+  font-size: 22px;
+}
+
 .profile-modal-body {
   padding: 2rem;
 }
@@ -1153,6 +1266,9 @@
   color: rgba(255, 255, 255, 0.5);
 }
 .profile-sticky-list .cr-sticky {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   background: linear-gradient(145deg, rgba(255, 127, 80, 0.12), rgba(255, 180, 100, 0.06));
   border: 1px solid rgba(255, 127, 80, 0.25);
   border-radius: 12px;
@@ -1259,7 +1375,11 @@
 .song-row:hover { background: rgba(255,127,80,0.08); }
 .song-row-num { width: 24px; text-align: center; font-size: 13px; color: rgba(255,255,255,0.35); font-weight: 600; flex-shrink: 0; }
 .song-row-info { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.song-row-title-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.song-row-title-row .song-row-title,
 .song-row-title { font-weight: 600; font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.song-row-title-row .song-row-title { flex: 1; min-width: 0; }
+.explicit-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; font-size: 10px; font-weight: 800; letter-spacing: 0.03em; color: #1a1a1a; background: linear-gradient(145deg, #ff9a6b, #ff7f50); border-radius: 4px; flex-shrink: 0; line-height: 1; }
 .song-row-artist { font-size: 12px; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .song-row-actions { display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0; }
 .song-row-actions i, .song-row-actions .material-symbols-outlined { color: #ff7f50; cursor: pointer; transition: transform 0.15s, color 0.15s; }
@@ -1312,6 +1432,8 @@
   flex-shrink: 0;
 }
 .single-info { flex-grow: 1; min-width: 0; }
+.single-title-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.single-title-row .single-title { flex: 1; min-width: 0; }
 .single-title { font-weight: 600; font-size: 15px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .single-artist { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
 .single-badge { display: inline-block; margin-top: 6px; padding: 2px 10px; font-size: 11px; font-weight: 600; color: #ff7f50; background: rgba(255,127,80,0.15); border-radius: 8px; }
@@ -1363,7 +1485,7 @@
   line-height: 1.5;
 }
 .ugc-policy-card h2 { margin: 0 0 12px; font-size: 18px; color: #fff; font-family: 'Montserrat', sans-serif; text-align: center; }
-.ugc-policy-card a { color: #ff9a6e; text-decoration: underline; text-underline-offset: 2px; }
+.ugc-policy-card a { color: #ff9a6e; text-decoration: underline; text-underline-offset: 2px; position: relative; z-index: 2; cursor: pointer; }
 .ugc-policy-actions { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
 .ugc-policy-check-row {
   display: flex;
@@ -3585,6 +3707,7 @@ console.log("960");
   import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, OAuthProvider, signOut, onAuthStateChanged, deleteUser, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
   import { getDatabase, ref as ref2, onValue, update, get, set, remove, push, limitToFirst, startAt, orderByKey, query} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
   import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
+  import { songShowsExplicitBadge } from "./js/explicit-appendix.js";
 console.log('1050')
           // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -3826,7 +3949,8 @@ function renderDiscoveryRows(list, mountId) {
     const st = String(s.title || "Untitled").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
     const sa = String(s.artist || "Unknown").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
     const sfile = String(s.fileInp || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
-    return `<div class="song-row"><audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" data-uploader="${up}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio><div class="song-row-num">${idx + 1}</div><div class="song-row-info"><span class="song-row-title">${t}</span><span class="song-row-artist">${a}</span></div><div class="song-row-actions"><i class="fa fa-play-circle song-row-play" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play ${t}"></i><i class="fa fa-pause-circle-o song-row-pause" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i><span class="song-row-action-labeled"><button type="button" class="song-row-queue" onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button><span class="song-row-action-label">Queue</span></span><span class="song-row-action-labeled"><button type="button" class="song-row-block" aria-label="Block song" title="Hide this song" onclick="window.blockSongFromDataset(this)" data-block-file="${sfile}" data-block-title="${st}"><span class="material-symbols-outlined">block</span></button><span class="song-row-action-label">Block</span></span><span class="song-row-action-labeled"><button type="button" class="song-row-not-rec" aria-label="Don't recommend" title="Remove from mood &amp; genre discovery" onclick="window.dontRecommendSongFromDataset(this)" data-notrec-file="${sfile}" data-notrec-title="${st}"><span class="material-symbols-outlined">not_interested</span></button><span class="song-row-action-label">Don't recommend</span></span><span class="song-row-action-labeled"><button type="button" class="song-row-flag" aria-label="Report song" title="Report" onclick="window.openReportContentModal(this)" data-target-type="song" data-file-inp="${sfile}" data-song-title="${st}" data-artist-name="${sa}" data-uploader-key="${up}"><span class="material-symbols-outlined">flag</span></button><span class="song-row-action-label">Report</span></span></div></div>`;
+    const eb = songShowsExplicitBadge(s) ? '<span class="explicit-badge" title="Explicit language">E</span>' : "";
+    return `<div class="song-row"><audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" data-uploader="${up}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio><div class="song-row-num">${idx + 1}</div><div class="song-row-info"><div class="song-row-title-row">${eb}<span class="song-row-title">${t}</span></div><span class="song-row-artist">${a}</span></div><div class="song-row-actions"><i class="fa fa-play-circle song-row-play" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play ${t}"></i><i class="fa fa-pause-circle-o song-row-pause" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i><span class="song-row-action-labeled"><button type="button" class="song-row-queue" onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button><span class="song-row-action-label">Queue</span></span><span class="song-row-action-labeled"><button type="button" class="song-row-block" aria-label="Block song" title="Hide this song" onclick="window.blockSongFromDataset(this)" data-block-file="${sfile}" data-block-title="${st}"><span class="material-symbols-outlined">block</span></button><span class="song-row-action-label">Block</span></span><span class="song-row-action-labeled"><button type="button" class="song-row-not-rec" aria-label="Don't recommend" title="Remove from mood &amp; genre discovery" onclick="window.dontRecommendSongFromDataset(this)" data-notrec-file="${sfile}" data-notrec-title="${st}"><span class="material-symbols-outlined">not_interested</span></button><span class="song-row-action-label">Don't recommend</span></span><span class="song-row-action-labeled"><button type="button" class="song-row-flag" aria-label="Report song" title="Report" onclick="window.openReportContentModal(this)" data-target-type="song" data-file-inp="${sfile}" data-song-title="${st}" data-artist-name="${sa}" data-uploader-key="${up}"><span class="material-symbols-outlined">flag</span></button><span class="song-row-action-label">Report</span></span></div></div>`;
   }).join("");
 }
 
@@ -3863,6 +3987,9 @@ function renderSongsFromData(songsData) {
   function pickEmoji(name) { let h = 0; for (let i = 0; i < name.length; i++) h = ((h << 5) - h + name.charCodeAt(i)) | 0; return albumEmojis[Math.abs(h) % albumEmojis.length]; }
   function esc(s) { return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
   function escQ(s) { return (s || "").replace(/'/g,"\\'"); }
+  function explicitBadge(s) {
+    return songShowsExplicitBadge(s) ? '<span class="explicit-badge" title="Explicit language">E</span>' : "";
+  }
 
   const allSongs = [];
   for (const [titleKey, albums] of Object.entries(songsData)) {
@@ -3903,7 +4030,7 @@ function renderSongsFromData(songsData) {
       <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-uploader="${up}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
       <div class="song-row-num">${idx + 1}</div>
       <div class="song-row-info">
-        <span class="song-row-title">${t}</span>
+        <div class="song-row-title-row">${explicitBadge(s)}<span class="song-row-title">${t}</span></div>
         <span class="song-row-artist">${a}</span>
       </div>
       <div class="song-row-actions">
@@ -3931,7 +4058,7 @@ function renderSongsFromData(songsData) {
           <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-uploader="${up}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
           <div class="single-emoji">${pickEmoji(s.title)}</div>
           <div class="single-info">
-            <div class="single-title">${t}</div>
+            <div class="single-title-row">${explicitBadge(s)}<div class="single-title">${t}</div></div>
             <div class="single-artist">${a}</div>
             <div class="single-badge">Single</div>
           </div>
@@ -6040,6 +6167,12 @@ console.log('1171')
         </div>
         <div class="profile-modal-section">
           <div class="profile-modal-section-title">
+            <i class="fas fa-music"></i> Their music on Asteroid
+          </div>
+          <div id="profileModalSongsList" class="profile-modal-songs-list" aria-live="polite"></div>
+        </div>
+        <div class="profile-modal-section">
+          <div class="profile-modal-section-title">
             <i class="fas fa-info-circle"></i> Profile Information
           </div>
           <div class="profile-modal-info">
@@ -6105,7 +6238,93 @@ console.log('1171')
     function sanitizeEmail(email) {
       return (email || "").replace(/[.#$[\]]/g, '_');
     }
-    
+
+    function rtdbUploaderKey(raw) {
+      return String(raw || "").trim().replace(/[.#$[\]]/g, "_");
+    }
+
+    function humanizeRtdbPathSegment(seg) {
+      const s = String(seg || "")
+        .replace(/_/g, " ")
+        .trim();
+      return s || "Unknown";
+    }
+
+    function flattenSongsFromRtdb(songsData) {
+      const allSongs = [];
+      if (!songsData || typeof songsData !== "object") return allSongs;
+      for (const [titleKey, albums] of Object.entries(songsData)) {
+        if (!albums || typeof albums !== "object") continue;
+        for (const [albumKey, artists] of Object.entries(albums)) {
+          if (!artists || typeof artists !== "object") continue;
+          for (const [artistKey, songData] of Object.entries(artists)) {
+            if (!songData || typeof songData !== "object" || !songData.fileInp) continue;
+            const up = (
+              songData.uploader ||
+              songData.uploaderEmail ||
+              songData.uploadedBy ||
+              songData.userEmail ||
+              songData.email ||
+              ""
+            )
+              .toString()
+              .trim();
+            const title = String(songData.title || "").trim() || humanizeRtdbPathSegment(titleKey);
+            const artist = String(songData.artist || "").trim() || humanizeRtdbPathSegment(artistKey);
+            const album = String(songData.album || "").trim() || humanizeRtdbPathSegment(albumKey);
+            const row = { ...songData, title, artist, album, __pathTitleKey: titleKey, __pathAlbumKey: albumKey, __pathArtistKey: artistKey };
+            if (up) row.uploader = up;
+            allSongs.push(row);
+          }
+        }
+      }
+      return allSongs;
+    }
+
+    function songBelongsToUserProfile(song, userData) {
+      const raw = (
+        song.uploader ||
+        song.uploaderEmail ||
+        song.uploadedBy ||
+        song.userEmail ||
+        song.email ||
+        ""
+      )
+        .toString()
+        .trim();
+      if (!raw) return false;
+      const ek = (userData.emailKey || "").trim();
+      if (!ek) return false;
+      const k = rtdbUploaderKey(raw);
+      if (k === ek || k.toLowerCase() === ek.toLowerCase()) return true;
+      const pe = userData.profile && userData.profile.email ? String(userData.profile.email).trim() : "";
+      if (pe && (raw === pe || k === rtdbUploaderKey(pe))) return true;
+      const em = (userData.email || "").trim();
+      if (em && (raw === em || k === rtdbUploaderKey(em))) return true;
+      return false;
+    }
+
+    function profileSongLineText(value, pathKeyFallback, emptyLabel) {
+      const cleaned = String(value ?? "")
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")
+        .trim();
+      if (cleaned) return cleaned;
+      const fb = humanizeRtdbPathSegment(pathKeyFallback);
+      if (fb && fb !== "Unknown") return fb;
+      if (emptyLabel !== undefined) return emptyLabel;
+      return "Untitled track";
+    }
+
+    function escProfileSongQ(s) {
+      return String(s || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    }
+    function escProfileSongAttr(s) {
+      return String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;");
+    }
+
     // Function to get database instance
     function getDb() {
       if (window.firebaseDatabase) {
@@ -6540,6 +6759,67 @@ console.log('1171')
       } else {
         socialsContainer.innerHTML = '<div style="padding: 1rem; color: rgba(255,255,255,0.6);">No social media links</div>';
       }
+
+      const songsMount = document.getElementById("profileModalSongsList");
+      async function fillProfileSongs() {
+        if (!songsMount) return;
+        songsMount.innerHTML = '<p class="profile-modal-songs-loading">Loading tracks…</p>';
+        const dbSongs = getDb();
+        if (!dbSongs) {
+          songsMount.innerHTML = '<p class="profile-modal-songs-empty">Library is not connected.</p>';
+          return;
+        }
+        function moodFor(s) {
+          return String(s.mood || s.primaryMood || (Array.isArray(s.moods) && s.moods.length ? s.moods[0] : "") || "").trim();
+        }
+        try {
+          const snap = await get(ref2(dbSongs, "SONGS"));
+          const val = snap.exists() ? snap.val() : null;
+          const all = flattenSongsFromRtdb(val);
+          const mine = all
+            .filter((s) => songBelongsToUserProfile(s, userData))
+            .filter((s) => !window.shouldHideSongInLibrary(s));
+          mine.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+          if (!mine.length) {
+            songsMount.innerHTML =
+              '<p class="profile-modal-songs-empty">No tracks uploaded through Asteroid Studio for this profile yet.</p>';
+            return;
+          }
+          const tidBase = "pm" + Date.now();
+          let html = "";
+          mine.slice(0, 80).forEach((s, i) => {
+            const tid = tidBase + "_" + i;
+            const titlePlain = profileSongLineText(s.title, s.__pathTitleKey);
+            const artistPlain = profileSongLineText(s.artist, s.__pathArtistKey, "Unknown artist");
+            const albumPlain = profileSongLineText(s.album, s.__pathAlbumKey, "");
+            const t = escProfileSongAttr(titlePlain);
+            const a = escProfileSongAttr(artistPlain);
+            const al = escProfileSongAttr(albumPlain);
+            const urlAttr = escProfileSongAttr(s.fileInp || "");
+            const up = escProfileSongAttr(s.uploader || "");
+            const m = escProfileSongAttr(moodFor(s));
+            html += `<div class="profile-modal-song-row">
+  <audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" data-display-album="${al}" data-mood="${m}" data-uploader="${up}" playsinline preload="metadata"><source src="${urlAttr}" type="audio/mpeg"></audio>
+  <div class="profile-modal-song-info">
+    <span class="profile-modal-song-title">${t}</span>
+    <span class="profile-modal-song-meta">${a}${albumPlain ? " · " + al : ""}</span>
+  </div>
+  <div class="profile-modal-song-actions">
+    <i class="fa fa-play-circle" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play"></i>
+    <i class="fa fa-pause-circle-o" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
+    <span class="song-row-action-labeled"><button type="button" class="song-row-queue" onclick="queuemusic('${escProfileSongQ(s.fileInp)}','${escProfileSongQ(titlePlain)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button><span class="song-row-action-label">Queue</span></span>
+    <span class="song-row-action-labeled"><button type="button" class="song-row-block" aria-label="Block song" title="Hide this song" onclick="window.blockSongFromDataset(this)" data-block-file="${escProfileSongAttr(s.fileInp || "")}" data-block-title="${escProfileSongAttr(titlePlain)}"><span class="material-symbols-outlined">block</span></button><span class="song-row-action-label">Block</span></span>
+    <span class="song-row-action-labeled"><button type="button" class="song-row-flag" aria-label="Report song" title="Report" onclick="window.openReportContentModal(this)" data-target-type="song" data-file-inp="${urlAttr}" data-song-title="${t}" data-artist-name="${a}" data-uploader-key="${up}"><span class="material-symbols-outlined">flag</span></button><span class="song-row-action-label">Report</span></span>
+  </div>
+</div>`;
+          });
+          songsMount.innerHTML = html;
+        } catch (e) {
+          console.warn("profile songs", e);
+          songsMount.innerHTML = '<p class="profile-modal-songs-empty">Could not load tracks.</p>';
+        }
+      }
+      void fillProfileSongs();
 
       // Apply theme color
       const themes = {

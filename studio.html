@@ -230,7 +230,7 @@
       line-height: 1.5;
     }
     .ugc-policy-card h2 { margin: 0 0 12px; font-size: 18px; color: #fff; font-family: 'Montserrat', sans-serif; text-align: center; }
-    .ugc-policy-card a { color: #ff9a6e; text-decoration: underline; text-underline-offset: 2px; }
+    .ugc-policy-card a { color: #ff9a6e; text-decoration: underline; text-underline-offset: 2px; position: relative; z-index: 2; cursor: pointer; }
     .ugc-policy-actions { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
     .ugc-policy-check-row {
       display: flex;
@@ -287,18 +287,44 @@
   <div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
     <div class="ugc-policy-card">
       <h2 id="ugcPolicyTitle">Before you continue</h2>
-      <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;line-height:1.45;text-align:center;">Sign in with Apple requires accepting our policies on each sign-in.</p>
+      <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;line-height:1.45;text-align:center;">You must accept our policies before using Studio. Sign in with Apple will ask you to confirm again at each sign-in.</p>
       <div class="ugc-policy-actions">
-        <label class="ugc-policy-check-row" for="ugcPolicyCheck">
-          <input type="checkbox" id="ugcPolicyCheck" autocomplete="off">
-          <span class="ugc-policy-check-text">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>
-        </label>
-        <button type="button" class="ugc-policy-continue" id="ugcPolicyContinue" disabled>Continue with Apple</button>
+        <div class="ugc-policy-check-row" id="ugcPolicyCheckRow" role="group" aria-label="Legal acceptance">
+          <input type="checkbox" id="ugcPolicyCheck" autocomplete="off" aria-describedby="ugcPolicyLegalText">
+          <span class="ugc-policy-check-text" id="ugcPolicyLegalText">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>
+        </div>
+        <button type="button" class="ugc-policy-continue" id="ugcPolicyContinue" disabled>Continue to Studio</button>
       </div>
     </div>
   </div>
   <script>
   (function () {
+    var UGC_KEY = "asteroidUgcPolicyAccepted";
+    var LEGAL_FIRST_KEY = "asteroidTermsPrivacyAccepted";
+    function legalFirstVisitDone() {
+      return localStorage.getItem(LEGAL_FIRST_KEY) === "v1";
+    }
+    function ensureUgcGateDefaultCopy() {
+      var t = document.getElementById("ugcPolicyTitle");
+      var b = document.getElementById("ugcPolicyContinue");
+      if (t && b && !window.__ugcAppleGateDefaults) {
+        window.__ugcAppleGateDefaults = { title: t.textContent, btn: b.textContent };
+      }
+    }
+    function showFirstVisitLegalGateIfNeeded() {
+      if (legalFirstVisitDone()) return;
+      ensureUgcGateDefaultCopy();
+      var ov = document.getElementById("ugcPolicyOverlay");
+      var chk = document.getElementById("ugcPolicyCheck");
+      var btn = document.getElementById("ugcPolicyContinue");
+      try {
+        delete window.__appleUgcPendingRunner;
+      } catch (e0) {}
+      restoreUgcAppleGateCopy();
+      if (chk) chk.checked = false;
+      if (btn) btn.disabled = true;
+      if (ov) ov.classList.add("is-visible");
+    }
     function restoreUgcAppleGateCopy() {
       var d = window.__ugcAppleGateDefaults;
       if (!d) return;
@@ -323,10 +349,20 @@
       var btn = document.getElementById("ugcPolicyContinue");
       if (ov) {
         ov.addEventListener("click", function (e) {
-          if (e.target === ov) dismissAppleUgcGate();
+          if (e.target === ov && typeof window.__appleUgcPendingRunner === "function") dismissAppleUgcGate();
         });
       }
       if (chk && btn) {
+        var checkRow = document.getElementById("ugcPolicyCheckRow");
+        if (checkRow) {
+          checkRow.addEventListener("click", function (e) {
+            if (e.target === chk) return;
+            if (e.target.closest && e.target.closest("a")) return;
+            e.preventDefault();
+            chk.checked = !chk.checked;
+            chk.dispatchEvent(new Event("change", { bubbles: true }));
+          });
+        }
         chk.addEventListener("change", function () {
           btn.disabled = !chk.checked;
         });
@@ -340,7 +376,22 @@
             btn.disabled = true;
             restoreUgcAppleGateCopy();
             void runner();
+            return;
           }
+          localStorage.setItem(UGC_KEY, "v1");
+          localStorage.setItem(LEGAL_FIRST_KEY, "v1");
+          ov.classList.remove("is-visible");
+        });
+      }
+      showFirstVisitLegalGateIfNeeded();
+      var agRow = document.getElementById("agreementLabelRow");
+      var agChk = document.getElementById("agreement");
+      if (agRow && agChk) {
+        agRow.addEventListener("click", function (e) {
+          if (e.target === agChk) return;
+          if (e.target.closest && e.target.closest("a")) return;
+          e.preventDefault();
+          agChk.checked = !agChk.checked;
         });
       }
     });
@@ -664,8 +715,10 @@
     </script>
     
     <div style="margin: 15px; text-align: left; max-width: 400px; display: inline-block;">
-        <input type="checkbox" id="agreement" style="width: auto; vertical-align: top; margin-top: 4px;"> 
-        <label for="agreement" id="agreementLabel" style="display: inline; line-height: 1.5;">I confirm that I own <strong id="agreementSongTitle">this song</strong> and I accept the <a href="Asteroid%20Terms.html" target="_blank" style="color: coral;">Terms of Service</a> and <a href="policy.html" target="_blank" style="color: coral;">Privacy Policy</a> of Asteroid.</label>
+        <div id="agreementLabelRow" style="display: flex; align-items: flex-start; gap: 10px; line-height: 1.5;">
+        <input type="checkbox" id="agreement" style="width: auto; flex-shrink: 0; margin-top: 4px;" aria-describedby="agreementLabel">
+        <span id="agreementLabel">I confirm that I own <strong id="agreementSongTitle">this song</strong> and I accept the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer" style="color: coral;">Terms of Service</a> and <a href="policy.html" target="_blank" rel="noopener noreferrer" style="color: coral;">Privacy Policy</a> of Asteroid.</span>
+        </div>
     </div>
     <button type="button" id="btn" class="upload-btn">UPLOAD NOW</button>
     <label for="uploadStatusArea" style="display:block;margin:16px auto 6px;max-width:400px;text-align:left;font-size:12px;font-weight:700;color:#333;font-family:Montserrat,sans-serif;">Upload status</label>
@@ -822,6 +875,7 @@
   import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInAnonymously, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
   import { processReferralURL, createOrUpdateUserOnSignup, getReferralFromURL, onSongUploaded } from "./js/referral-system.js";
+  import { songMetadataExplicit } from "./js/explicit-appendix.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
@@ -1710,7 +1764,8 @@
         uploader: email,
         uploaderName: fullName,
         campaign: "ARTISTSOFFEB26",
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        isExplicit: songMetadataExplicit({ title, artist, album }),
       };
       const dbPath = `SONGS/${safeTitle}/${safeAlbum}/${safeArtist}`;
       const rtdbTimeoutMs = 45000;

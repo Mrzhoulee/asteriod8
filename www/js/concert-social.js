@@ -1,5 +1,6 @@
 import { ref, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 import { censorProfanity } from "./text-censor.js";
+import { textContainsAppendixExplicit } from "./explicit-appendix.js";
 
 function anonId() {
   let k = localStorage.getItem("concertAnonId");
@@ -120,7 +121,14 @@ export function mountConcertDock(db, roomNum) {
     }
     stickyList.innerHTML = rows
       .map((n) => {
-        return `<div class="cr-sticky">${esc(n.text || "")}</div>`;
+        const e =
+          n.isExplicit === true ||
+          n.isExplicit === 1 ||
+          String(n.isExplicit || "").toLowerCase() === "true" ||
+          textContainsAppendixExplicit(n.text || "")
+            ? '<span class="explicit-badge" title="Explicit">E</span>'
+            : "";
+        return `<div class="cr-sticky">${e}${esc(n.text || "")}</div>`;
       })
       .join("");
   });
@@ -153,10 +161,16 @@ export function mountConcertDock(db, roomNum) {
 
   function sendSticky() {
     const raw = (stickyInput && stickyInput.value) || "";
-    const text = censorProfanity(raw.trim()).slice(0, 280);
+    const trimmed = raw.trim();
+    const text = censorProfanity(trimmed).slice(0, 280);
     if (!text) return;
     const authorKey = stickiesAuthorKeyForPush();
-    const payload = { text, ts: Date.now(), anonId: anonId() };
+    const payload = {
+      text,
+      ts: Date.now(),
+      anonId: anonId(),
+      isExplicit: textContainsAppendixExplicit(trimmed),
+    };
     if (authorKey) payload.authorKey = authorKey;
     push(stickiesRef, payload);
     stickyInput.value = "";
@@ -208,7 +222,18 @@ export function mountThankYouStickies(db, profileKey, els) {
         '<p class="profile-sticky-empty">No thank-you notes to show (or all hidden based on your blocks).</p>';
       return;
     }
-    list.innerHTML = rows.map((n) => `<div class="cr-sticky">${esc(n.text || "")}</div>`).join("");
+    list.innerHTML = rows
+      .map((n) => {
+        const e =
+          n.isExplicit === true ||
+          n.isExplicit === 1 ||
+          String(n.isExplicit || "").toLowerCase() === "true" ||
+          textContainsAppendixExplicit(n.text || "")
+            ? '<span class="explicit-badge" title="Explicit">E</span>'
+            : "";
+        return `<div class="cr-sticky">${e}${esc(n.text || "")}</div>`;
+      })
+      .join("");
   }
 
   const unsub = onValue(stickiesRef, (snap) => {
@@ -220,10 +245,16 @@ export function mountThankYouStickies(db, profileKey, els) {
 
   function sendSticky() {
     const raw = (input && "value" in input && input.value) || "";
-    const text = censorProfanity(String(raw).trim()).slice(0, 280);
+    const trimmed = String(raw).trim();
+    const text = censorProfanity(trimmed).slice(0, 280);
     if (!text) return;
     const authorKey = stickiesAuthorKeyForPush();
-    const payload = { text, ts: Date.now(), anonId: anonId() };
+    const payload = {
+      text,
+      ts: Date.now(),
+      anonId: anonId(),
+      isExplicit: textContainsAppendixExplicit(trimmed),
+    };
     if (authorKey) payload.authorKey = authorKey;
     push(stickiesRef, payload);
     if (input) input.value = "";
