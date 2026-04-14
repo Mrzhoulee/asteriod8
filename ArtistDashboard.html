@@ -1112,10 +1112,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     </div>
                     <div class="profile-modal-info" id="profileModalInfo">
                         <div class="profile-modal-info-item">
-                            <div class="profile-modal-info-label">Email</div>
-                            <div class="profile-modal-info-value" id="profileModalEmail">-</div>
-                        </div>
-                        <div class="profile-modal-info-item">
                             <div class="profile-modal-info-label">Role</div>
                             <div class="profile-modal-info-value" id="profileModalRole">-</div>
                         </div>
@@ -1320,8 +1316,8 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 }
                 if (agrEl) {
                     agrEl.innerHTML = agreements.length
-                        ? agreements.map((v) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(v.songTitle || '')}</div><div class="song-artist">${escapeHtml(v.artistName || '')} · ${escapeHtml(v.albumName || '')}</div><div class="song-artist" style="margin-top:4px;font-size:0.85rem;opacity:0.9;">${escapeHtml(v.name || '')} · ${escapeHtml(v.email || '')}</div></div><div class="song-stats"><span class="song-stat-label">${v.acceptedAt ? new Date(v.acceptedAt).toLocaleString() : ''}</span></div></div>`).join('')
-                        : `<div class="empty-state">No agreement rows for <strong>${escapeHtml(currentUserEmail || 'this account')}</strong>. Upload a track in Studio with the agreement box checked using the same email you use here (${escapeHtml(localStorage.getItem('artemail') || localStorage.getItem('email') || '') || 'see account menu'}).</div>`;
+                        ? agreements.map((v) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(v.songTitle || '')}</div><div class="song-artist">${escapeHtml(v.artistName || '')} · ${escapeHtml(v.albumName || '')}</div>${v.name ? `<div class="song-artist" style="margin-top:4px;font-size:0.85rem;opacity:0.9;">${escapeHtml(v.name || '')}</div>` : ''}</div><div class="song-stats"><span class="song-stat-label">${v.acceptedAt ? new Date(v.acceptedAt).toLocaleString() : ''}</span></div></div>`).join('')
+                        : `<div class="empty-state">No agreement rows for this account yet. Upload a track in Studio with the agreement box checked using the same account you use to sign in here.</div>`;
                 }
             } catch (e) {
                 console.error('Creator tools: AGREEMENTS', e);
@@ -1650,7 +1646,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             const modalHeader = document.getElementById('profileModalHeader');
             
             const displayName = userData.profile?.nickname || userData.fullName || userData.email || userData.id || 'User';
-            const email = userData.email || userData.id || 'No email';
             const role = userData.role || 'User';
             const profilePicture = (userData.isPremium && userData.profile?.profilePicture) 
                 ? userData.profile.profilePicture 
@@ -1671,8 +1666,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             const bio = userData.profile?.bio || 'No bio available';
             document.getElementById('profileModalBio').textContent = bio;
 
-            // Set email and role
-            document.getElementById('profileModalEmail').textContent = email;
             document.getElementById('profileModalRole').textContent = role;
 
             // Set social links
@@ -2077,7 +2070,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
                 usersList.innerHTML = usersWithProfiles.map((user, index) => {
                     const displayName = user.profile?.nickname || user.fullName || user.email || user.id || 'User';
-                    const email = user.email || user.id || 'No email';
                     const role = user.role || 'User';
                     const profilePicture = (user.isPremium && user.profile?.profilePicture) 
                         ? user.profile.profilePicture 
@@ -2092,7 +2084,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                                 }
                             </div>
                             <div class="user-name">${displayName}</div>
-                            <div class="user-email">${email}</div>
                             <div class="user-role">${role}</div>
                         </div>
                     `;

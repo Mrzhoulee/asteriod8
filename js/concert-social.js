@@ -16,6 +16,28 @@ function esc(s) {
   return d.innerHTML;
 }
 
+function stickiesAuthorKeyForPush() {
+  try {
+    if (typeof window !== "undefined" && typeof window.getStickiesPosterAuthorKey === "function") {
+      return String(window.getStickiesPosterAuthorKey() || "").trim();
+    }
+  } catch (e) {}
+  return "";
+}
+
+/** Hide sticky notes left while signed in, when that account is on the local block list. */
+function filterStickyNotesByBlocklist(rows) {
+  const blocked =
+    typeof window !== "undefined" && typeof window.isEmailKeyBlocked === "function"
+      ? (ak) => {
+          const k = String(ak || "").trim();
+          if (!k) return false;
+          return window.isEmailKeyBlocked(k);
+        }
+      : () => false;
+  return rows.filter((n) => !blocked(n.authorKey));
+}
+
 /**
  * @param {import('firebase/database').Database} db
  * @param {number} roomNum 1-5
@@ -88,10 +110,14 @@ export function mountConcertDock(db, roomNum) {
       stickyList.innerHTML = '<p class="cr-empty">No notes yet.</p>';
       return;
     }
-    const rows = Object.entries(v)
+    const sorted = Object.entries(v)
       .map(([id, n]) => ({ id, ...n }))
-      .sort((a, b) => (b.ts || 0) - (a.ts || 0))
-      .slice(0, 40);
+      .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    const rows = filterStickyNotesByBlocklist(sorted).slice(0, 40);
+    if (!rows.length) {
+      stickyList.innerHTML = '<p class="cr-empty">No notes to show.</p>';
+      return;
+    }
     stickyList.innerHTML = rows
       .map((n) => {
         return `<div class="cr-sticky">${esc(n.text || "")}</div>`;
@@ -129,11 +155,10 @@ export function mountConcertDock(db, roomNum) {
     const raw = (stickyInput && stickyInput.value) || "";
     const text = censorProfanity(raw.trim()).slice(0, 280);
     if (!text) return;
-    push(stickiesRef, {
-      text,
-      ts: Date.now(),
-      anonId: anonId(),
-    });
+    const authorKey = stickiesAuthorKeyForPush();
+    const payload = { text, ts: Date.now(), anonId: anonId() };
+    if (authorKey) payload.authorKey = authorKey;
+    push(stickiesRef, payload);
     stickyInput.value = "";
   }
 
@@ -167,28 +192,40 @@ export function mountThankYouStickies(db, profileKey, els) {
 
   const stickiesRef = ref(db, "PROFILE_STICKIES/" + safeKey + "/notes");
 
-  const unsub = onValue(stickiesRef, (snap) => {
-    const v = snap.val();
+  let lastProfileStickyVal = null;
+  function renderProfileThankYouList() {
+    const v = lastProfileStickyVal;
     if (!v) {
       list.innerHTML = '<p class="profile-sticky-empty">No thank-you notes yet.</p>';
       return;
     }
-    const rows = Object.entries(v)
+    const sorted = Object.entries(v)
       .map(([id, n]) => ({ id, ...n }))
-      .sort((a, b) => (b.ts || 0) - (a.ts || 0))
-      .slice(0, 40);
+      .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    const rows = filterStickyNotesByBlocklist(sorted).slice(0, 40);
+    if (!rows.length) {
+      list.innerHTML =
+        '<p class="profile-sticky-empty">No thank-you notes to show (or all hidden based on your blocks).</p>';
+      return;
+    }
     list.innerHTML = rows.map((n) => `<div class="cr-sticky">${esc(n.text || "")}</div>`).join("");
+  }
+
+  const unsub = onValue(stickiesRef, (snap) => {
+    lastProfileStickyVal = snap.val();
+    renderProfileThankYouList();
   });
+  const onBlocklistChanged = () => renderProfileThankYouList();
+  window.addEventListener("asteroid-blocklist-changed", onBlocklistChanged);
 
   function sendSticky() {
     const raw = (input && "value" in input && input.value) || "";
     const text = censorProfanity(String(raw).trim()).slice(0, 280);
     if (!text) return;
-    push(stickiesRef, {
-      text,
-      ts: Date.now(),
-      anonId: anonId(),
-    });
+    const authorKey = stickiesAuthorKeyForPush();
+    const payload = { text, ts: Date.now(), anonId: anonId() };
+    if (authorKey) payload.authorKey = authorKey;
+    push(stickiesRef, payload);
     if (input) input.value = "";
   }
 
@@ -204,6 +241,7 @@ export function mountThankYouStickies(db, profileKey, els) {
 
   return () => {
     unsub();
+    window.removeEventListener("asteroid-blocklist-changed", onBlocklistChanged);
     if (send) send.removeEventListener("click", sendSticky);
     if (input) input.removeEventListener("keydown", onKey);
   };

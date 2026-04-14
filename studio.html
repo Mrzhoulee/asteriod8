@@ -1905,17 +1905,18 @@ boostBtn.addEventListener("click", async (e) => {
         <input type="radio" id="appleProfileTypeArtist" name="appleOnboardingProfileType" value="artist">
         <div>
           <strong>Public / Artist</strong>
-          <span>Discoverable profile. Email can be shown in profile details.</span>
+          <span>Your profile shows in the app so others can find you, follow you, and hear your music.</span>
         </div>
       </label>
       <label class="apple-onboarding-choice" for="appleProfileTypeListener">
         <input type="radio" id="appleProfileTypeListener" name="appleOnboardingProfileType" value="listener" checked>
         <div>
           <strong>Private / Listener</strong>
-          <span>Email stays hidden from other users.</span>
+          <span>Your profile stays private—you are not shown to others in the app.</span>
         </div>
       </label>
     </div>
+    <p class="apple-onboarding-hint" style="margin:8px 0 0;font-size:12px;color:rgba(255,255,255,0.55);line-height:1.45;">Public shows you in the app; private keeps you private.</p>
     <p class="apple-onboarding-optional">Socials (optional)</p>
     <label for="appleOnboardingInstagram">Instagram URL</label>
     <input type="url" id="appleOnboardingInstagram" placeholder="https://instagram.com/…">

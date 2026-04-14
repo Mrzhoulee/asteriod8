@@ -1133,6 +1133,10 @@
 .single-actions button.song-row-block { color: #ff7f50; }
 .song-row-actions button.song-row-block:hover .material-symbols-outlined,
 .single-actions button.song-row-block:hover .material-symbols-outlined { color: #fff; transform: scale(1.15); }
+.song-row-actions button.song-row-not-rec,
+.single-actions button.song-row-not-rec { color: rgba(255, 200, 160, 0.95); }
+.song-row-actions button.song-row-not-rec:hover .material-symbols-outlined,
+.single-actions button.song-row-not-rec:hover .material-symbols-outlined { color: #fff; transform: scale(1.12); }
 
 .ugc-policy-overlay {
   position: fixed;
@@ -1929,7 +1933,6 @@ body.create-profile-active {
     </div>
     <div class="logout-modal-user">
       <div id="logoutUserName" class="logout-modal-name"></div>
-      <div id="logoutUserEmail" class="logout-modal-email"></div>
     </div>
     <div class="logout-modal-actions">
       <button id="logoutCancelBtn" class="logout-btn-cancel">Cancel</button>
@@ -1963,17 +1966,18 @@ body.create-profile-active {
         <input type="radio" id="appleProfileTypeArtist" name="appleOnboardingProfileType" value="artist">
         <div>
           <strong>Public / Artist</strong>
-          <span>Discoverable profile. Email can be shown in profile details.</span>
+          <span>Your profile shows in the app so others can find you, follow you, and hear your music.</span>
         </div>
       </label>
       <label class="apple-onboarding-choice" for="appleProfileTypeListener">
         <input type="radio" id="appleProfileTypeListener" name="appleOnboardingProfileType" value="listener" checked>
         <div>
           <strong>Private / Listener</strong>
-          <span>Email stays hidden from other users.</span>
+          <span>Your profile stays private—you are not shown to others in the app.</span>
         </div>
       </label>
     </div>
+    <p class="apple-onboarding-hint" style="margin:8px 0 0;font-size:12px;color:rgba(255,255,255,0.55);line-height:1.45;">Public shows you in the app; private keeps you private.</p>
     <p class="apple-onboarding-optional">Socials (optional)</p>
     <label for="appleOnboardingInstagram">Instagram URL</label>
     <input type="url" id="appleOnboardingInstagram" placeholder="https://instagram.com/…">
@@ -2133,6 +2137,10 @@ body.create-profile-active {
           <div id="artistProfileFollowWrap" class="profile-modal-follow-wrap artist-profile-follow-wrap" style="display: none;">
             <button type="button" class="profile-follow-btn" id="artistProfileFollowBtn">Follow artist</button>
             <p class="profile-follow-hint" id="artistProfileFollowHint"></p>
+          </div>
+          <div id="artistProfileFeaturedBlockWrap" style="margin-top:12px;width:100%;max-width:280px;">
+            <button type="button" id="artistProfileFeaturedBlockBtn" class="profile-block-btn" style="width:100%;font-size:12px;padding:10px 12px;">Don't show this featured artist</button>
+            <p style="margin:8px 0 0;font-size:11px;color:rgba(255,255,255,0.5);line-height:1.35;">Hides this curated artist card on this device only (clear site data to restore).</p>
           </div>
         </div>
       </div>
@@ -3159,6 +3167,9 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
       arr.push(k);
       localStorage.setItem(BLOCK_KEY, JSON.stringify(arr));
     }
+    try {
+      window.dispatchEvent(new CustomEvent("asteroid-blocklist-changed"));
+    } catch (e2) {}
   };
   var BLOCK_SONG_KEY = "asteroidBlockedSongKeys";
   window.normalizeSongBlockKey = function (fileInp, title) {
@@ -3199,6 +3210,18 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
   window.isEmailKeyBlocked = function (emailKey) {
     return window.isUploaderInBlocklist(String(emailKey || ""));
   };
+  /** Normalized account key for thank-you / concert stickies (matches PROFILES emailKey style). */
+  window.getStickiesPosterAuthorKey = function () {
+    try {
+      var ek = String(localStorage.getItem("emailKey") || "").trim();
+      if (ek) return ek.toLowerCase().replace(/[.#$[\]]/g, "_");
+    } catch (e) {}
+    var cu = String(localStorage.getItem("CurrentUser") || "").trim();
+    var em = String(localStorage.getItem("email") || "").trim();
+    var id = (cu || em).toLowerCase();
+    if (!id) return "";
+    return id.replace(/[.#$[\]]/g, "_");
+  };
   window.applyLocalHideAfterReport = function (d) {
     d = d || {};
     var tt = String(d.targetType || "song").toLowerCase();
@@ -3236,6 +3259,97 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     if (row) row.remove();
     if (typeof window.refreshLibraryAfterBlock === "function") window.refreshLibraryAfterBlock();
   };
+  var NOTREC_KEY = "asteroidNotRecommendSongKeys";
+  window.getNotRecommendSongKeys = function () {
+    try {
+      var a = JSON.parse(localStorage.getItem(NOTREC_KEY) || "[]");
+      return Array.isArray(a) ? a.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
+  };
+  window.addNotRecommendSongKey = function (fileInp, title) {
+    if (typeof window.normalizeSongBlockKey !== "function") return;
+    var k = window.normalizeSongBlockKey(fileInp, title);
+    if (!String(k || "").trim()) return;
+    var arr = window.getNotRecommendSongKeys();
+    if (arr.indexOf(k) === -1) {
+      arr.push(k);
+      localStorage.setItem(NOTREC_KEY, JSON.stringify(arr));
+    }
+  };
+  window.isSongNotRecommended = function (song) {
+    if (!song || !song.fileInp) return false;
+    var sk = window.normalizeSongBlockKey(song.fileInp, song.title);
+    return window.getNotRecommendSongKeys().indexOf(sk) !== -1;
+  };
+  window.dontRecommendSongFromDataset = function (btn) {
+    if (!btn) return;
+    var fi = (btn.getAttribute("data-notrec-file") || "").trim();
+    var t = (btn.getAttribute("data-notrec-title") || "").trim();
+    if (!fi) return;
+    if (!confirm("Don't recommend this song? On this build it will be hidden from your library list on this device (clear site data to undo).")) return;
+    window.addNotRecommendSongKey(fi, t);
+    var row = btn.closest(".song-row") || btn.closest(".single-card");
+    if (row && row.closest && (row.closest("#moodDiscoveryList") || row.closest("#genreDiscoveryList"))) row.remove();
+    try {
+      if (typeof window.refreshDiscoveryPanels === "function" && window.__asteroidSongsDataForDiscovery) {
+        window.refreshDiscoveryPanels(window.__asteroidSongsDataForDiscovery);
+      } else if (typeof window.refreshLibraryAfterBlock === "function") {
+        window.refreshLibraryAfterBlock();
+      }
+    } catch (e) {}
+  };
+  var FEAT_BLOCK_KEY = "asteroidBlockedFeaturedKeys";
+  window.normalizeFeaturedBlockKey = function (artistId) {
+    return "feat_" + String(artistId || "").replace(/[^a-zA-Z0-9_]/g, "_");
+  };
+  window.getBlockedFeaturedKeys = function () {
+    try {
+      var a = JSON.parse(localStorage.getItem(FEAT_BLOCK_KEY) || "[]");
+      return Array.isArray(a) ? a.filter(Boolean) : [];
+    } catch (e) {
+      return [];
+    }
+  };
+  window.addBlockedFeaturedKey = function (artistId) {
+    var k = window.normalizeFeaturedBlockKey(artistId);
+    if (!k || k === "feat_") return;
+    var arr = window.getBlockedFeaturedKeys();
+    if (arr.indexOf(k) === -1) {
+      arr.push(k);
+      localStorage.setItem(FEAT_BLOCK_KEY, JSON.stringify(arr));
+    }
+  };
+  window.isFeaturedArtistBlocked = function (artistId) {
+    var k = window.normalizeFeaturedBlockKey(artistId);
+    return window.getBlockedFeaturedKeys().indexOf(k) !== -1;
+  };
+  window.applyFeaturedArtistBlocksToDom = function () {
+    try {
+      document.querySelectorAll("#artists-grid-8 .artist-card").forEach(function (card) {
+        var a = card.querySelector('a[href^="#"]');
+        if (!a) return;
+        var hash = String(a.getAttribute("href") || "").replace(/^#/, "");
+        if (hash && window.isFeaturedArtistBlocked(hash)) {
+          card.style.display = "none";
+          card.setAttribute("data-featured-blocked", "1");
+        } else if (card.getAttribute("data-featured-blocked") === "1") {
+          card.style.display = "";
+          card.removeAttribute("data-featured-blocked");
+        }
+      });
+    } catch (e) {}
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
+    });
+  } else {
+    try {
+      if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
+    } catch (e2) {}
+  }
   var UGC_KEY = "asteroidUgcPolicyAccepted";
   function ugcAccepted() {
     return localStorage.getItem(UGC_KEY) === "v1";
@@ -3787,7 +3901,11 @@ function renderSongsFromData(songsData) {
       }
     }
   }
-  const visibleSongs = allSongs.filter((s) => !window.shouldHideSongInLibrary(s));
+  const visibleSongs = allSongs.filter((s) => {
+    if (window.shouldHideSongInLibrary(s)) return false;
+    if (typeof window.isSongNotRecommended === "function" && window.isSongNotRecommended(s)) return false;
+    return true;
+  });
   if (visibleSongs.length === 0) {
     return allSongs.length === 0
       ? "<p style='text-align:center;color:#ffaa00;padding:20px;'>Songs found but format may differ.</p>"
@@ -3829,6 +3947,7 @@ function renderSongsFromData(songsData) {
         <i class="fa fa-pause-circle-o song-row-pause" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
         <span class="song-row-action-labeled"><button type="button" class="song-row-queue" onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button><span class="song-row-action-label">Queue</span></span>
         <span class="song-row-action-labeled"><button type="button" class="song-row-block" aria-label="Block song" title="Hide this song" onclick="window.blockSongFromDataset(this)" data-block-file="${esc(s.fileInp)}" data-block-title="${esc(s.title)}"><span class="material-symbols-outlined">block</span></button><span class="song-row-action-label">Block</span></span>
+        <span class="song-row-action-labeled"><button type="button" class="song-row-not-rec" aria-label="Don't recommend" title="Hide from your library list" onclick="window.dontRecommendSongFromDataset(this)" data-notrec-file="${esc(s.fileInp)}" data-notrec-title="${esc(s.title)}"><span class="material-symbols-outlined">not_interested</span></button><span class="song-row-action-label">Don't recommend</span></span>
         <span class="song-row-action-labeled"><button type="button" class="song-row-flag" aria-label="Report song" title="Report" onclick="window.openReportContentModal(this)" data-target-type="song" data-file-inp="${esc(s.fileInp)}" data-song-title="${esc(s.title)}" data-artist-name="${esc(s.artist)}" data-uploader-key="${up}"><span class="material-symbols-outlined">flag</span></button><span class="song-row-action-label">Report</span></span>
       </div>
     </div>`;
@@ -3858,6 +3977,7 @@ function renderSongsFromData(songsData) {
             <i class="fa fa-pause-circle-o" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
             <span class="song-row-action-labeled"><button type="button" class="song-row-queue" onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button><span class="song-row-action-label">Queue</span></span>
             <span class="song-row-action-labeled"><button type="button" class="song-row-block" aria-label="Block song" title="Hide this song" onclick="window.blockSongFromDataset(this)" data-block-file="${esc(s.fileInp)}" data-block-title="${esc(s.title)}"><span class="material-symbols-outlined">block</span></button><span class="song-row-action-label">Block</span></span>
+            <span class="song-row-action-labeled"><button type="button" class="song-row-not-rec" aria-label="Don't recommend" title="Hide from your library list" onclick="window.dontRecommendSongFromDataset(this)" data-notrec-file="${esc(s.fileInp)}" data-notrec-title="${esc(s.title)}"><span class="material-symbols-outlined">not_interested</span></button><span class="song-row-action-label">Don't recommend</span></span>
             <span class="song-row-action-labeled"><button type="button" class="song-row-flag" aria-label="Report song" title="Report" onclick="window.openReportContentModal(this)" data-target-type="song" data-file-inp="${esc(s.fileInp)}" data-song-title="${esc(s.title)}" data-artist-name="${esc(s.artist)}" data-uploader-key="${up}"><span class="material-symbols-outlined">flag</span></button><span class="song-row-action-label">Report</span></span>
           </div>
         </div>`;
@@ -3891,11 +4011,13 @@ function fetchSongsViaREST() {
   fetch(RTDB_BASE + "/SONGS.json").then(r => r.json()).then(songsData => {
     songsReceived = true;
     globalSongsData = songsData;
+    window.__asteroidSongsDataForDiscovery = songsData;
     const html = renderSongsFromData(songsData);
     whenElementReady("ab", (ab) => {
       const extra = document.getElementById("artists-grid-8");
       ab.innerHTML = html + (extra ? extra.innerHTML : "");
       applySongSearch();
+      if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
     });
     console.log("✅ REST fallback: SONGS loaded");
   }).catch(err => {
@@ -3946,9 +4068,11 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
     console.log("❌ No songs in database yet");
     whenElementReady("ab", (ab) => { ab.innerHTML = "<p style='text-align:center;color:#ccc;padding:20px;'>No songs yet. Upload from the studio!</p>"; });
     globalSongsData = null;
+    window.__asteroidSongsDataForDiscovery = null;
     return;
   }
   globalSongsData = songsData;
+  window.__asteroidSongsDataForDiscovery = songsData;
   const html = renderSongsFromData(songsData);
   const songCount = html ? (html.match(/class="sssh"/g) || []).length : 0;
   console.log("✅ Songs rendered:", songCount);
@@ -3956,6 +4080,7 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
     const extra = document.getElementById("artists-grid-8");
     ab.innerHTML = html + (extra ? extra.innerHTML : "");
     applySongSearch();
+    if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
   });
 }, (error) => {
   songsReceived = true;
@@ -3973,6 +4098,7 @@ window.refreshLibraryAfterBlock = function () {
     const extra = document.getElementById("artists-grid-8");
     ab.innerHTML = html + (extra ? extra.innerHTML : "");
     applySongSearch();
+    if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
   });
 };
 
@@ -4110,7 +4236,11 @@ window.updateBecauseYouLiked = function (seedTitle, moodRaw) {
     sec.style.display = "none";
     return;
   }
-  const all = flattenAllSongsFlat(globalSongsData).filter((s) => !window.shouldHideSongInLibrary(s));
+  const all = flattenAllSongsFlat(globalSongsData).filter((s) => {
+    if (window.shouldHideSongInLibrary(s)) return false;
+    if (typeof window.isSongNotRecommended === "function" && window.isSongNotRecommended(s)) return false;
+    return true;
+  });
   const picks = all
     .filter((s) => {
       const m = String(s.mood || s.primaryMood || (Array.isArray(s.moods) && s.moods[0] ? s.moods[0] : "") || "")
@@ -4967,20 +5097,14 @@ function openLogoutModal(user) {
   if (!modal) return;
 
   const nameEl = document.getElementById("logoutUserName");
-  const emailEl = document.getElementById("logoutUserEmail");
 
   const displayName =
     (user && user.displayName) ||
     localStorage.getItem("fullName") ||
     localStorage.getItem("profileNickname") ||
     "Signed-in user";
-  const email =
-    (user && user.email) ||
-    localStorage.getItem("email") ||
-    "";
 
   if (nameEl) nameEl.textContent = displayName;
-  if (emailEl) emailEl.textContent = email;
 
   modal.style.display = "flex";
 }
@@ -5959,12 +6083,14 @@ console.log('1171')
         if (typeof window.__unmountFeaturedProfileStickies === "function") window.__unmountFeaturedProfileStickies();
         overlay.classList.remove("active");
         delete overlay.dataset.followArtistKey;
+        delete overlay.dataset.featuredArtistId;
         if (followWrap) followWrap.style.display = "none";
         window.setProfileFocusMode(false);
       }
 
       function openArtistModal(profile, artistId) {
         if (!profile) return;
+        overlay.dataset.featuredArtistId = artistId != null ? String(artistId) : "";
         avatar.src = profile.image || "";
         nameEl.textContent = profile.name || "Artist";
         tagEl.textContent = "Featured Artist Profile";
@@ -6019,12 +6145,28 @@ console.log('1171')
         });
       }
 
+      const featuredBlockBtn = document.getElementById("artistProfileFeaturedBlockBtn");
+      if (featuredBlockBtn) {
+        featuredBlockBtn.addEventListener("click", function () {
+          var id = overlay.dataset.featuredArtistId;
+          if (!id) return;
+          if (!confirm("Don't show this featured artist on this device?\n\nTheir card will be removed from the curated grid. Clear site data for this site to undo.")) return;
+          if (typeof window.addBlockedFeaturedKey === "function") window.addBlockedFeaturedKey(id);
+          if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
+          closeArtistModal();
+        });
+      }
+
       document.querySelectorAll("#artists-grid-8 a[href^='#']").forEach((link) => {
         link.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopImmediatePropagation();
           const hash = link.getAttribute("href") || "";
           const artistId = hash.replace("#", "");
+          if (typeof window.isFeaturedArtistBlocked === "function" && window.isFeaturedArtistBlocked(artistId)) {
+            alert("You chose to hide this featured artist. Clear this site's data to show them again.");
+            return;
+          }
           const profile = ARTIST_PROFILES[artistId];
           if (profile) openArtistModal(profile, artistId);
         }, true);
@@ -6078,10 +6220,6 @@ console.log('1171')
             <i class="fas fa-info-circle"></i> Profile Information
           </div>
           <div class="profile-modal-info">
-            <div class="profile-modal-info-item">
-              <div class="profile-modal-info-label">Email</div>
-              <div class="profile-modal-info-value" id="profileModalEmail">-</div>
-            </div>
             <div class="profile-modal-info-item">
               <div class="profile-modal-info-label">Role</div>
               <div class="profile-modal-info-value" id="profileModalRole">-</div>
@@ -6265,8 +6403,9 @@ console.log('1171')
         const dn =
           userData.profile?.nickname ||
           userData.fullName ||
-          userData.email ||
-          userData.emailKey ||
+          userData.profile?.publicUsername ||
+          userData.profile?.username ||
+          userData.id ||
           "User";
         reportBtn.dataset.targetType = "user";
         reportBtn.dataset.uploaderKey = targetKey;
@@ -6396,7 +6535,6 @@ console.log('1171')
         return "listener";
       };
       const getRoleLabel = (user) => resolveProfileType(user) === "artist" ? "Artist (Public)" : "Listener (Private)";
-      const getVisibleEmail = (user) => resolveProfileType(user) === "artist" ? (user.email || user.id || 'No email') : "Hidden for private listener";
 
       const searchQuery = document.getElementById('userSearchInput')?.value?.toLowerCase().trim() || '';
       const clearBtn = document.getElementById('clearSearchBtn');
@@ -6563,8 +6701,6 @@ console.log('1171')
         tinpo.push({ name: 'Donorbox', url: userData.profile.tinp, icon: 'fab fa-gift' });
       }
 
-      // Never expose user emails in public profile modal
-      document.getElementById('profileModalEmail').textContent = 'Hidden';
       document.getElementById('profileModalRole').textContent = role;
 
       // Set social links
@@ -6742,7 +6878,11 @@ console.log('1171')
       profileBlockBtn.addEventListener("click", function () {
         const k = profileBlockBtn.dataset.targetKey;
         if (!k) return;
-        if (!confirm("Block this user? Their public profile will be hidden from your Artists list on this device.")) return;
+        const msg =
+          "Do you want to block this user—and block their posts, songs, and comments—on this device?\n\n" +
+          "OK: hide their profile from your Artists list, hide their uploads from your library and discovery, and hide thank-you notes they left while signed in (anonymous-only notes cannot be tied to an account).\n\n" +
+          "Cancel: go back without blocking.";
+        if (!confirm(msg)) return;
         if (typeof window.addBlockedUserKey === "function") window.addBlockedUserKey(k);
         closeUserProfileModal();
         if (typeof window.__refreshUsersGridAfterHide === "function") window.__refreshUsersGridAfterHide();
