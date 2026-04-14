@@ -5,6 +5,12 @@
     "SONGS": { ".read": true, ".write": "auth != null" },
     "songplayed": { ".read": true, ".write": true },
     "songPlayed": { ".read": true, ".write": true },
+    "PROFILEVIEWS": {
+      "$profileKey": {
+        ".read": true,
+        ".write": true
+      }
+    },
     "PREMIUM": { ".read": true, ".write": true },
     "PROFILES": { ".read": true, ".write": true },
     "users": { ".read": true, ".write": true },

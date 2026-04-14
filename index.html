@@ -133,6 +133,10 @@
     </button>
   </div>
 </header>
+<div class="search-box search-box-modern" style="margin-top: 12px;">
+  <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+  <input type="text" placeholder="Search songs, artists, albums, moods, or genres…" class="search-input" id="searchInput">
+</div>
 <style>
 /* Header: sign-in column + profile — no overlap (replaces absolute positioning) */
 .header {
@@ -278,6 +282,69 @@
   color: #111;
   border-color: #ff7f50;
 }
+.search-box-modern {
+  position: relative;
+  width: min(960px, calc(100% - 32px));
+  margin: 10px auto 18px;
+}
+.search-box-modern .search-input {
+  width: 100%;
+  height: 54px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,127,80,0.35);
+  background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+  color: #fff;
+  font-size: 15px;
+  padding: 0 52px 0 46px;
+  outline: none;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.26);
+}
+.search-box-modern .search-input:focus {
+  border-color: #ff7f50;
+  box-shadow: 0 0 0 2px rgba(255,127,80,0.24), 0 10px 24px rgba(0,0,0,0.3);
+}
+.search-box-modern .search-input::placeholder { color: rgba(255,255,255,0.58); }
+.search-box-modern .search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255,255,255,0.68);
+  font-size: 16px;
+  pointer-events: none;
+}
+.discovery-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+  width: min(980px, 100%);
+  margin: 0 auto;
+}
+.discovery-card {
+  border: 1px solid rgba(255,127,80,0.24);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+.discovery-card-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.discovery-card-title { font-size: 15px; font-weight: 700; }
+.discovery-card-sub { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+.discover-chevron { color: rgba(255,255,255,0.58); transition: transform .2s ease; }
+.discovery-card.open .discover-chevron { transform: rotate(180deg); color: #ff7f50; }
+.discovery-card-body { display: none; padding: 2px 12px 12px; }
+.discovery-card.open .discovery-card-body { display: block; }
+.discovery-empty { color: rgba(255,255,255,0.62); font-size: 12px; padding: 8px 4px; text-align: center; }
 
 /* Users Grid Styles */
 .users-grid-container {
@@ -469,6 +536,36 @@
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
   margin-top: 1rem;
+}
+
+.profile-modal-follow-wrap {
+  padding: 0 1.25rem 1rem;
+}
+
+.profile-follow-btn {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.profile-follow-btn:disabled {
+  opacity: 0.65;
+  cursor: default;
+  background: rgba(255,255,255,0.15);
+}
+
+.profile-follow-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
 }
 
 .profile-modal-body {
@@ -1617,6 +1714,10 @@ body.create-profile-active {
         <div>
           <h2 id="artistProfileName" class="artist-profile-name">Artist</h2>
           <div id="artistProfileTag" class="artist-profile-tag">Featured artist</div>
+          <div id="artistProfileFollowWrap" class="profile-modal-follow-wrap artist-profile-follow-wrap" style="display: none;">
+            <button type="button" class="profile-follow-btn" id="artistProfileFollowBtn">Follow artist</button>
+            <p class="profile-follow-hint" id="artistProfileFollowHint"></p>
+          </div>
         </div>
       </div>
     </div>
@@ -1838,12 +1939,32 @@ body.create-profile-active {
     <center>
     <section id="discover-modes" style="margin-top:10px;text-align:center;">
       <h3 class="section-title" style="font-size:16px;margin:0 0 4px;text-align:center;">Discover Songs</h3>
-      <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0 0 12px;text-align:center;">Mood-based discovery</p>
-      <div class="discover-modes-grid horizontal-scroll">
-        <div class="mode-card">
-          <div class="moods-unavailable" style="max-width:360px;margin:0 auto;padding:22px 18px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,127,80,0.3);border-radius:16px;font-family:Poppins,sans-serif;box-sizing:border-box;">
-            <p style="margin:0 0 8px;font-size:16px;font-weight:600;color:#ff7f50;">Currently unavailable</p>
-            <p style="margin:0;font-size:13px;line-height:1.55;color:rgba(255,255,255,0.7);">Song moods are turned off for now. Use the main library above to browse and play tracks.</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0 0 12px;text-align:center;">Mood + genre discovery with playable song cards</p>
+      <div class="discovery-grid">
+        <div class="discovery-card open" id="moodDiscoveryCard">
+          <button type="button" class="discovery-card-head" onclick="toggleDiscoveryCard('moodDiscoveryCard')">
+            <div>
+              <div class="discovery-card-title">Mood discovery</div>
+              <div class="discovery-card-sub">Mapped by title energy cues (volume/pitch feel)</div>
+            </div>
+            <span class="material-symbols-outlined discover-chevron">expand_more</span>
+          </button>
+          <div class="discovery-card-body">
+            <div class="chip-wrap" id="moodChipWrap"></div>
+            <div id="moodDiscoveryList" style="margin-top:10px;"></div>
+          </div>
+        </div>
+        <div class="discovery-card open" id="genreDiscoveryCard">
+          <button type="button" class="discovery-card-head" onclick="toggleDiscoveryCard('genreDiscoveryCard')">
+            <div>
+              <div class="discovery-card-title">Genre discovery</div>
+              <div class="discovery-card-sub">At least 9 genre buckets, auto-grouped from title/album/artist text</div>
+            </div>
+            <span class="material-symbols-outlined discover-chevron">expand_more</span>
+          </button>
+          <div class="discovery-card-body">
+            <div class="chip-wrap" id="genreChipWrap"></div>
+            <div id="genreDiscoveryList" style="margin-top:10px;"></div>
           </div>
         </div>
       </div>
@@ -2586,10 +2707,6 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
         <h2 class="section-title">Songs that You Don’t Want to Miss</h2>
 
 	<h3>ⓘ Songs might take a few moments to load before playing since there is a problem with the configuration</h3>
-  <div class="search-box">
-    <input type="text" placeholder="Search artists, songs or albums..." class="search-input" id="searchInput">
-    <img src="—Pngtree—vector search icon_3783210.png" alt="Search" class="search-icon">
-  </div>
   <center>  <div id="result"></div>
   </center>
 
@@ -2906,6 +3023,17 @@ function applySongSearch() {
       const visibleArtistCards = Array.from(artistCardsInAb).filter((card) => card.style.display !== 'none');
       visibleArtistCards.reverse().forEach((card) => abContainer.insertBefore(card, abContainer.firstChild));
     }
+
+    const isVisible = (el) => !!el && el.style.display !== "none" && getComputedStyle(el).display !== "none";
+    const firstSong = Array.from(document.querySelectorAll("#ab .sssh")).find(isVisible);
+    const firstAlbum = Array.from(document.querySelectorAll("#ab .album-card")).find(isVisible);
+    const firstArtist = Array.from(document.querySelectorAll("#artists-grid-8 .artist-card")).find(isVisible);
+    const firstMatch = firstSong || firstAlbum || firstArtist;
+    if (firstMatch) {
+      firstMatch.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else if (abContainer) {
+      abContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   } else {
     artistCards.forEach((artistCard) => { artistCard.style.display = "block"; });
     artistCardsInAb.forEach((artistCard) => { artistCard.style.display = "block"; });
@@ -2917,6 +3045,147 @@ window.applySongSearch = applySongSearch;
   const si = document.getElementById("searchInput");
   if (si) si.addEventListener("input", applySongSearch);
 })();
+
+function songMoodFromTitle(title) {
+  const t = String(title || "").toLowerCase();
+  if (/(rage|hype|turn up|lit|fast|energy|hard)/.test(t)) return "Hype";
+  if (/(love|heart|dear|miss|cry|alone|sad|tears)/.test(t)) return "Emotional";
+  if (/(night|dream|chill|calm|moon|lofi|slow)/.test(t)) return "Chill";
+  if (/(smoke|fire|flash|run|drill|trap|heat)/.test(t)) return "Intense";
+  if (/(sun|bright|happy|smile|joy|perfect)/.test(t)) return "Uplifting";
+  return "Vibey";
+}
+
+function songGenreGuess(song) {
+  const title = String(song?.title || "").toLowerCase();
+  const artist = String(song?.artist || "").toLowerCase();
+  const album = String(song?.album || "").toLowerCase();
+  const explicit = String(song?.genre || song?.genres || song?.style || "").toLowerCase();
+  const fullText = [title, artist, album, explicit].join(" ");
+
+  // Weighted scoring: explicit metadata > title > album/artist keywords.
+  const genreRules = {
+    "Hip-Hop": [
+      { re: /\b(hip[\s-]?hop|rap|trap|drill|boom bap|808|freestyle|cypher)\b/, w: 6 },
+      { re: /\b(flow|bars|mc|spit|lyric)\b/, w: 3 }
+    ],
+    "Rock": [
+      { re: /\b(rock|hard rock|alt rock|punk|grunge|metal|heavy metal)\b/, w: 6 },
+      { re: /\b(guitar|riff|solo|band)\b/, w: 3 }
+    ],
+    "EDM": [
+      { re: /\b(edm|electronic|house|deep house|techno|trance|dubstep|dnb|drum and bass)\b/, w: 6 },
+      { re: /\b(remix|club|festival|dj|drop)\b/, w: 3 }
+    ],
+    "R&B": [
+      { re: /\b(r&b|rnb|neo soul|soul)\b/, w: 6 },
+      { re: /\b(smooth|slow jam|groove)\b/, w: 3 }
+    ],
+    "Pop": [
+      { re: /\b(pop|synthpop|dance pop|electropop)\b/, w: 6 },
+      { re: /\b(hit|chart|radio)\b/, w: 3 }
+    ],
+    "Afrobeats": [
+      { re: /\b(afrobeats?|afrobeat|naija|amapiano)\b/, w: 6 },
+      { re: /\b(afro|lagos)\b/, w: 2 }
+    ],
+    "Reggae": [
+      { re: /\b(reggae|dancehall|dub|roots reggae)\b/, w: 6 },
+      { re: /\b(island|jah)\b/, w: 2 }
+    ],
+    "Latin": [
+      { re: /\b(latin|reggaeton|bachata|salsa|cumbia|corrido|dembow)\b/, w: 6 },
+      { re: /\b(latino|spanish)\b/, w: 2 }
+    ],
+    "Jazz": [
+      { re: /\b(jazz|bebop|swing|blues|fusion)\b/, w: 6 },
+      { re: /\b(sax|trumpet|piano trio)\b/, w: 3 }
+    ],
+    "Country": [
+      { re: /\b(country|americana|bluegrass|folk)\b/, w: 6 },
+      { re: /\b(acoustic|western)\b/, w: 2 }
+    ],
+    "Alternative": [
+      { re: /\b(alternative|indie|experimental|lo[-\s]?fi)\b/, w: 3 }
+    ]
+  };
+
+  let bestGenre = "Alternative";
+  let bestScore = 0;
+  for (const [genre, rules] of Object.entries(genreRules)) {
+    let score = 0;
+    for (const rule of rules) {
+      if (rule.re.test(fullText)) score += rule.w;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestGenre = genre;
+    }
+  }
+
+  // Fallbacks that use mood/title cues when no strong genre hit exists.
+  if (bestScore < 3) {
+    const mood = songMoodFromTitle(title);
+    if (mood === "Intense") return "Hip-Hop";
+    if (mood === "Chill") return "Alternative";
+    if (mood === "Uplifting") return "Pop";
+    return "Alternative";
+  }
+  return bestGenre;
+}
+
+function flattenSongsData(songsData) {
+  const out = [];
+  if (!songsData || typeof songsData !== "object") return out;
+  for (const albums of Object.values(songsData)) {
+    if (!albums || typeof albums !== "object") continue;
+    for (const artists of Object.values(albums)) {
+      if (!artists || typeof artists !== "object") continue;
+      for (const songData of Object.values(artists)) {
+        if (songData && typeof songData === "object" && songData.title && songData.fileInp) out.push(songData);
+      }
+    }
+  }
+  return out;
+}
+
+function renderDiscoveryRows(list, mountId) {
+  const mount = document.getElementById(mountId);
+  if (!mount) return;
+  if (!Array.isArray(list) || list.length === 0) {
+    mount.innerHTML = '<div class="discovery-empty">No songs found in this section yet.</div>';
+    return;
+  }
+  mount.innerHTML = list.slice(0, 18).map((s, idx) => {
+    const tid = "discover_" + mountId + "_" + idx + "_" + Date.now();
+    const t = String(s.title || "Untitled").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+    const a = String(s.artist || "Unknown").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+    const url = String(s.fileInp || "").replace(/"/g, "&quot;");
+    return `<div class="song-row"><audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio><div class="song-row-num">${idx + 1}</div><div class="song-row-info"><span class="song-row-title">${t}</span><span class="song-row-artist">${a}</span></div><div class="song-row-actions"><i class="fa fa-play-circle song-row-play" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play ${t}"></i><i class="fa fa-pause-circle-o song-row-pause" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i></div></div>`;
+  }).join("");
+}
+
+window.toggleDiscoveryCard = function(id) {
+  const card = document.getElementById(id);
+  if (card) card.classList.toggle("open");
+};
+
+window.refreshDiscoveryPanels = function(songsData) {
+  const songs = flattenSongsData(songsData);
+  const moodWrap = document.getElementById("moodChipWrap");
+  const genreWrap = document.getElementById("genreChipWrap");
+  if (!moodWrap || !genreWrap) return;
+  const moods = ["Hype", "Chill", "Emotional", "Intense", "Uplifting", "Vibey"];
+  const genres = ["Hip-Hop","Rock","EDM","R&B","Pop","Afrobeats","Reggae","Latin","Jazz","Country","Alternative"];
+  const activeMood = window.__activeMoodDiscovery || moods[0];
+  const activeGenre = window.__activeGenreDiscovery || genres[0];
+  moodWrap.innerHTML = moods.map((m) => `<button type="button" class="filter-chip ${m === activeMood ? "active" : ""}" data-mood-chip="${m}">${m}</button>`).join("");
+  genreWrap.innerHTML = genres.slice(0, 9).map((g) => `<button type="button" class="filter-chip ${g === activeGenre ? "active" : ""}" data-genre-chip="${g}">${g}</button>`).join("");
+  renderDiscoveryRows(songs.filter((s) => songMoodFromTitle(s.title) === activeMood), "moodDiscoveryList");
+  renderDiscoveryRows(songs.filter((s) => songGenreGuess(s) === activeGenre), "genreDiscoveryList");
+  moodWrap.querySelectorAll("[data-mood-chip]").forEach((btn) => btn.addEventListener("click", () => { window.__activeMoodDiscovery = btn.getAttribute("data-mood-chip") || moods[0]; refreshDiscoveryPanels(songsData); }));
+  genreWrap.querySelectorAll("[data-genre-chip]").forEach((btn) => btn.addEventListener("click", () => { window.__activeGenreDiscovery = btn.getAttribute("data-genre-chip") || genres[0]; refreshDiscoveryPanels(songsData); }));
+};
 
 function renderSongsFromData(songsData) {
   if (!songsData || typeof songsData !== "object") return "<p style='text-align:center;color:#ccc;padding:20px;'>No songs yet. Upload from the studio!</p>";
@@ -3029,6 +3298,7 @@ function fetchSongsViaREST() {
       const extra = document.getElementById("artists-grid-8");
       ab.innerHTML = html + (extra ? extra.innerHTML : "");
       applySongSearch();
+      refreshDiscoveryPanels(songsData);
     });
     console.log("✅ REST fallback: SONGS loaded");
   }).catch(err => {
@@ -3089,6 +3359,7 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
     const extra = document.getElementById("artists-grid-8");
     ab.innerHTML = html + (extra ? extra.innerHTML : "");
     applySongSearch();
+    refreshDiscoveryPanels(songsData);
   });
 }, (error) => {
   songsReceived = true;
@@ -4633,7 +4904,67 @@ console.log('1171')
       const nameEl = document.getElementById("artistProfileName");
       const tagEl = document.getElementById("artistProfileTag");
       const listEl = document.getElementById("artistSocialList");
+      const followWrap = document.getElementById("artistProfileFollowWrap");
+      const followBtn = document.getElementById("artistProfileFollowBtn");
+      const followHint = document.getElementById("artistProfileFollowHint");
       if (!overlay || !listEl) return;
+
+      function getViewerFollowKeyForFollow() {
+        const email = (
+          localStorage.getItem("CurrentUser") ||
+          localStorage.getItem("email") ||
+          (window.firebaseAuth && window.firebaseAuth.currentUser
+            ? (window.firebaseAuth.currentUser.email || window.firebaseAuth.currentUser.providerData?.[0]?.email || "")
+            : "")
+        );
+        return String(email || "").trim().toLowerCase().replace(/[.#$[\]]/g, "_");
+      }
+
+      function isSignedInForFollow() {
+        return !!getViewerFollowKeyForFollow();
+      }
+
+      function featuredFollowKey(artistId) {
+        return "feat_" + String(artistId || "").replace(/[^a-zA-Z0-9_]/g, "_");
+      }
+
+      function refreshFeaturedFollowUI(artistFollowKey) {
+        if (!followWrap || !followBtn || !followHint || !artistFollowKey) return;
+        const viewerKey = getViewerFollowKeyForFollow();
+        if (!viewerKey || !isSignedInForFollow()) {
+          followWrap.style.display = "block";
+          followBtn.dataset.artistKey = artistFollowKey;
+          followBtn.dataset.mode = "signin";
+          followBtn.textContent = "Sign in to follow";
+          followBtn.disabled = false;
+          followHint.textContent = "Sign in with Apple to follow this featured artist.";
+          return;
+        }
+        if (viewerKey === artistFollowKey) {
+          followWrap.style.display = "none";
+          return;
+        }
+        followWrap.style.display = "block";
+        followBtn.dataset.artistKey = artistFollowKey;
+        followBtn.dataset.mode = "follow";
+        followBtn.textContent = "Follow artist";
+        followBtn.disabled = false;
+        followHint.textContent = "Updates from followed artists appear in your feed.";
+
+        const db = window.firebaseDatabase;
+        const refFn = window.firebaseRef;
+        const getFn = window.firebaseGet;
+        if (db && refFn && getFn) {
+          getFn(refFn(db, "FOLLOWING/" + viewerKey + "/" + artistFollowKey))
+            .then(function (snap) {
+              if (snap.exists() && snap.val() === true) {
+                followBtn.textContent = "Following";
+                followBtn.disabled = true;
+              }
+            })
+            .catch(function () {});
+        }
+      }
       window.setProfileFocusMode = function(enabled) {
         document.body.classList.toggle("profile-focus-active", !!enabled);
       };
@@ -4641,6 +4972,8 @@ console.log('1171')
       function closeArtistModal() {
         if (typeof window.__unmountFeaturedProfileStickies === "function") window.__unmountFeaturedProfileStickies();
         overlay.classList.remove("active");
+        delete overlay.dataset.followArtistKey;
+        if (followWrap) followWrap.style.display = "none";
         window.setProfileFocusMode(false);
       }
 
@@ -4655,12 +4988,47 @@ console.log('1171')
           : `<div class="artist-social-empty">No socials available.</div>`;
         const stickyKey = "feat_" + String(artistId || "").replace(/[^a-zA-Z0-9_]/g, "_");
         if (typeof window.__mountFeaturedProfileStickies === "function") window.__mountFeaturedProfileStickies(stickyKey);
+        const artistFollowKey = featuredFollowKey(artistId);
+        overlay.dataset.followArtistKey = artistFollowKey;
+        refreshFeaturedFollowUI(artistFollowKey);
         overlay.classList.add("active");
         window.setProfileFocusMode(true);
       }
 
       if (backBtn) backBtn.addEventListener("click", closeArtistModal);
       overlay.addEventListener("click", (e) => { if (e.target === overlay) closeArtistModal(); });
+      if (followBtn) {
+        followBtn.addEventListener("click", async function () {
+          if (followBtn.disabled) return;
+          if (followBtn.dataset.mode === "signin") {
+            document.getElementById("apple-sign-in")?.click();
+            return;
+          }
+          const artistKey = followBtn.dataset.artistKey || overlay.dataset.followArtistKey;
+          if (!artistKey) return;
+          const viewerKey = getViewerFollowKeyForFollow();
+          if (!viewerKey) {
+            document.getElementById("apple-sign-in")?.click();
+            return;
+          }
+          const db = window.firebaseDatabase;
+          const refFn = window.firebaseRef;
+          const setFn = window.firebaseSet;
+          if (!db || !refFn || !setFn) {
+            alert("Connection not ready. Try again in a moment.");
+            return;
+          }
+          try {
+            await setFn(refFn(db, "FOLLOWS/" + artistKey + "/" + viewerKey), true);
+            await setFn(refFn(db, "FOLLOWING/" + viewerKey + "/" + artistKey), true);
+            followBtn.textContent = "Following";
+            followBtn.disabled = true;
+          } catch (e) {
+            console.error(e);
+            alert("Could not follow right now.");
+          }
+        });
+      }
 
       document.querySelectorAll("#artists-grid-8 a[href^='#']").forEach((link) => {
         link.addEventListener("click", (e) => {
@@ -4691,6 +5059,10 @@ console.log('1171')
         </div>
         <div class="profile-modal-name-large" id="profileModalName">User Name</div>
         <div class="profile-modal-bio" id="profileModalBio">No bio available</div>
+        <div id="profileModalFollowWrap" class="profile-modal-follow-wrap" style="display: none;">
+          <button type="button" class="profile-follow-btn" id="profileFollowBtn">Follow user</button>
+          <p class="profile-follow-hint" id="profileFollowHint"></p>
+        </div>
       </div>
       <div class="profile-modal-body">
         <div class="profile-modal-section">
@@ -4779,6 +5151,74 @@ console.log('1171')
         return window.firebaseDatabase;
       }
       return null;
+    }
+
+    function getViewerFollowKeyForFollow() {
+      const currentEmail = (
+        localStorage.getItem("CurrentUser") ||
+        localStorage.getItem("email") ||
+        (window.firebaseAuth && window.firebaseAuth.currentUser
+          ? (window.firebaseAuth.currentUser.email || window.firebaseAuth.currentUser.providerData?.[0]?.email || "")
+          : "")
+      );
+      return String(currentEmail || "").trim().toLowerCase().replace(/[.#$[\]]/g, "_");
+    }
+
+    function isSignedInForFollow() {
+      return !!getViewerFollowKeyForFollow();
+    }
+
+    window.getViewerFollowKeyForFollow = getViewerFollowKeyForFollow;
+    window.isSignedInForFollow = isSignedInForFollow;
+
+    async function refreshProfileFollowUI(userData, isPublicArtist) {
+      const wrap = document.getElementById("profileModalFollowWrap");
+      const button = document.getElementById("profileFollowBtn");
+      const hint = document.getElementById("profileFollowHint");
+      if (!wrap || !button || !hint || !userData?.emailKey) return;
+
+      const targetKey = String(userData.emailKey || "");
+      const viewerKey = getViewerFollowKeyForFollow();
+      const targetType = isPublicArtist ? "artist" : "user";
+      const actionLabel = isPublicArtist ? "artist" : "user";
+      if (!targetKey) {
+        wrap.style.display = "none";
+        return;
+      }
+
+      if (!viewerKey) {
+        wrap.style.display = "block";
+        button.dataset.targetKey = targetKey;
+        button.dataset.targetType = targetType;
+        button.dataset.mode = "signin";
+        button.textContent = "Sign in to follow";
+        button.disabled = false;
+        hint.textContent = "Sign in with Apple to follow this " + actionLabel + ".";
+        return;
+      }
+
+      if (viewerKey === targetKey) {
+        wrap.style.display = "none";
+        return;
+      }
+
+      wrap.style.display = "block";
+      button.dataset.targetKey = targetKey;
+      button.dataset.targetType = targetType;
+      button.dataset.mode = "follow";
+      button.textContent = "Follow " + actionLabel;
+      button.disabled = false;
+      hint.textContent = isPublicArtist
+        ? "Follow to keep up with this artist."
+        : "Follow to stay connected with this user.";
+
+      const db = getDb();
+      if (!db) return;
+      const existingFollowSnap = await get(ref2(db, "FOLLOWING/" + viewerKey + "/" + targetKey));
+      if (existingFollowSnap.exists() && existingFollowSnap.val() === true) {
+        button.textContent = "Following";
+        button.disabled = true;
+      }
     }
 
     async function loadAllUsers() {
@@ -5035,6 +5475,7 @@ console.log('1171')
       const profilePicture = (userData.isPremium && userData.profile?.profilePicture) 
         ? userData.profile.profilePicture 
         : null;
+      await refreshProfileFollowUI(userData, isPublicArtist);
       
       // Set profile picture
       const avatar = document.getElementById('profileModalAvatar');
@@ -5128,6 +5569,45 @@ console.log('1171')
       if (window.setProfileFocusMode) window.setProfileFocusMode(true);
       else document.body.classList.add('profile-focus-active');
     };
+
+    const profileFollowBtn = document.getElementById("profileFollowBtn");
+    if (profileFollowBtn) {
+      profileFollowBtn.addEventListener("click", async function () {
+        if (profileFollowBtn.disabled) return;
+        if (profileFollowBtn.dataset.mode === "signin") {
+          document.getElementById("apple-sign-in")?.click();
+          return;
+        }
+        const targetKey = profileFollowBtn.dataset.targetKey;
+        const targetType = profileFollowBtn.dataset.targetType || "user";
+        const viewerKey = getViewerFollowKeyForFollow();
+        if (!targetKey) return;
+        if (!viewerKey) {
+          document.getElementById("apple-sign-in")?.click();
+          return;
+        }
+        const db = getDb();
+        if (!db) {
+          alert("Connection not ready. Try again in a moment.");
+          return;
+        }
+        try {
+          await set(ref2(db, "FOLLOWS/" + targetKey + "/" + viewerKey), true);
+          await set(ref2(db, "FOLLOWING/" + viewerKey + "/" + targetKey), true);
+          profileFollowBtn.textContent = "Following";
+          profileFollowBtn.disabled = true;
+          const hint = document.getElementById("profileFollowHint");
+          if (hint) {
+            hint.textContent = targetType === "artist"
+              ? "You are following this artist."
+              : "You are following this user.";
+          }
+        } catch (error) {
+          console.error("Error following profile:", error);
+          alert("Could not follow right now.");
+        }
+      });
+    }
 
     // Close user profile modal
     window.closeUserProfileModal = function() {

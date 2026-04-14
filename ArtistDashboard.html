@@ -594,218 +594,6 @@
             cursor: pointer;
         }
 
-        /* Social Accounts Styles */
-        .social-accounts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .social-account-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .social-account-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(255, 127, 80, 0.2);
-            border-color: var(--primary);
-        }
-
-        .social-account-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .social-account-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .social-account-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .social-account-icon.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
-        .social-account-icon.youtube { background: #ff0000; }
-        .social-account-icon.tiktok { background: #000000; }
-        .social-account-icon.spotify { background: #1db954; }
-        .social-account-icon.soundcloud { background: #ff5500; }
-
-        .social-account-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .connection-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .connection-status.connected {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success);
-            border: 1px solid var(--success);
-        }
-
-        .connection-status.disconnected {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-secondary);
-            border: 1px solid var(--card-border);
-        }
-
-        .social-account-stats {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--card-border);
-        }
-
-        .social-stat-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .social-stat-label {
-            color: var(--text-secondary);
-        }
-
-        .social-stat-value {
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .social-stat-value.positive {
-            color: var(--success);
-        }
-
-        .social-stat-value.negative {
-            color: #ef4444;
-        }
-
-        .social-account-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .btn-connect {
-            flex: 1;
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-connect:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 127, 80, 0.4);
-        }
-
-        .btn-disconnect {
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-disconnect:hover {
-            border-color: #ef4444;
-            color: #ef4444;
-        }
-
-        .btn-refresh {
-            padding: 0.75rem 1.5rem;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-refresh:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        /* Unified Analytics Styles */
-        .unified-analytics-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .unified-stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 1.5rem;
-        }
-
-        .unified-stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .unified-stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .unified-stat-value.positive {
-            color: var(--success);
-        }
-
-        .unified-stat-value.negative {
-            color: #ef4444;
-        }
-
-        .unified-stat-breakdown {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--card-border);
-        }
-
-        .breakdown-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.85rem;
-        }
-
         /* Profile Modal */
         .profile-modal {
             display: none;
@@ -1012,9 +800,6 @@
             <button class="tab-btn active" onclick="switchTab('analytics')">
                 <i class="fas fa-chart-bar"></i> Analytics
             </button>
-            <button class="tab-btn" onclick="switchTab('social')">
-                <i class="fas fa-link"></i> Social Accounts
-            </button>
             <button class="tab-btn" onclick="switchTab('profile')">
                 <i class="fas fa-user-edit"></i> Customize Profile
             </button>
@@ -1074,33 +859,6 @@
                 </h2>
                 <div id="monthlyBreakdown" class="songs-list">
                     <div class="loading">Loading monthly data...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Social Accounts Tab -->
-        <div id="social-tab" class="tab-content">
-            <div class="analytics-section">
-                <h2 class="section-title">
-                    <i class="fas fa-link"></i> Connected Social Accounts
-                </h2>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-                    Connect your social media accounts to view unified analytics and track your growth across all platforms.
-                </p>
-
-                <!-- Social Accounts Grid -->
-                <div id="socialAccountsGrid" class="social-accounts-grid">
-                    <div class="loading">Loading social accounts...</div>
-                </div>
-
-                <!-- Unified Analytics Section -->
-                <div class="analytics-section" style="margin-top: 3rem;">
-                    <h2 class="section-title">
-                        <i class="fas fa-chart-pie"></i> Unified Analytics
-                    </h2>
-                    <div id="unifiedAnalytics" class="unified-analytics-container">
-                        <div class="loading">Loading unified analytics...</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1309,11 +1067,16 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             <div class="analytics-section">
                 <h2 class="section-title"><i class="fas fa-bell"></i> Followers &amp; notices</h2>
                 <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">
-                    Following is stored under <code>FOLLOWS</code> (follower = signed-in email key). Notify fans: full push requires FCM/backend — placeholder message for now.
+                    Followers are stored under <code>FOLLOWS/{yourAccountKey}/{followerKey}</code>. To follow someone else by their public username, look them up in <code>USERNAME_REGISTRY</code> (same as the home page).
                 </p>
                 <div id="creatorFollowStatus" style="color: var(--text-secondary); margin-bottom: 12px;"></div>
-                <button type="button" class="btn btn-secondary" id="creatorTestFollowBtn"><i class="fas fa-user-plus"></i> Record test follow (this browser)</button>
-                <p style="color: var(--warning); margin-top: 12px; font-size: 0.9rem;">Unique public username: set when you save your profile; registry is <code>USERNAME_REGISTRY</code> (see console errors if taken).</p>
+                <div class="form-group">
+                    <label class="form-label">Follow user by public username</label>
+                    <input type="text" id="creatorFollowUsername" class="form-input" placeholder="e.g. lunar_beats" maxlength="40" autocomplete="off">
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.35rem;">They must have saved a unique username on their profile. Uses the same <code>FOLLOWS</code> / <code>FOLLOWING</code> paths as the main site.</p>
+                </div>
+                <button type="button" class="btn btn-primary" id="creatorFollowUserBtn"><i class="fas fa-user-plus"></i> Follow this user</button>
+                <p style="color: var(--text-secondary); margin-top: 12px; font-size: 0.9rem;">Set your own public username under <strong>Customize Profile</strong>; registry is <code>USERNAME_REGISTRY</code>.</p>
             </div>
         </div>
 
@@ -1392,10 +1155,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
         const database = getDatabase(app);
         const auth = getAuth(app);
         const storage = getStorage(app);
-        
-        // Store project ID and region for Cloud Functions URLs
-        const FIREBASE_PROJECT_ID = firebaseConfig.projectId;
-        const FIREBASE_REGION = 'us-central1';
 
         const sanitizeEmail = (email) => (email || "").replace(/[.#$[\]]/g, '_');
 
@@ -1462,10 +1221,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             }
             
             // Load social accounts when switching to social tab
-            if (tabName === 'social' && currentEmailKey) {
-                console.log('Switching to social tab, loading accounts...');
-                loadSocialAccounts();
-            }
             if (tabName === 'creator' && currentEmailKey) {
                 loadCreatorTools();
             }
@@ -1656,6 +1411,18 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 console.error('Creator tools: ARTIST_POLLS', e);
                 if (pollsEl) pollsEl.innerHTML = '<div class="empty-state">Could not load polls.</div>';
             }
+
+            try {
+                const fs = document.getElementById('creatorFollowStatus');
+                if (fs && safe) {
+                    const folSnap = await get(ref(database, 'FOLLOWS/' + safe));
+                    let n = 0;
+                    if (folSnap.exists()) folSnap.forEach(() => { n++; });
+                    fs.textContent = n === 0 ? 'No followers recorded yet under FOLLOWS/' + safe + '.' : n + ' follower(s) under FOLLOWS/' + safe + '.';
+                }
+            } catch (fe) {
+                console.warn('Creator tools: follower count', fe);
+            }
         }
 
         function escapeHtml(s) {
@@ -1737,17 +1504,44 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             }
         });
 
-        document.getElementById('creatorTestFollowBtn')?.addEventListener('click', async () => {
+        document.getElementById('creatorFollowUserBtn')?.addEventListener('click', async () => {
             if (!currentEmailKey) {
                 alert('Sign in first.');
                 return;
             }
-            const follower = sanitizeEmail(localStorage.getItem('email') || currentUserEmail || 'self');
+            const raw = (document.getElementById('creatorFollowUsername')?.value || '').trim().toLowerCase();
+            const normalized = raw.replace(/[^a-z0-9_]/g, '');
+            if (!normalized || normalized.length < 3) {
+                alert('Enter a valid public username (letters, numbers, underscores; 3–40 characters).');
+                return;
+            }
+            const viewerKey = sanitizeEmail((localStorage.getItem('email') || localStorage.getItem('CurrentUser') || currentUserEmail || '').trim().toLowerCase());
+            if (!viewerKey) {
+                alert('Could not resolve your account email. Sign in again.');
+                return;
+            }
             try {
-                await set(ref(database, 'FOLLOWS/' + currentEmailKey + '/' + follower), true);
-                document.getElementById('creatorFollowStatus').textContent = 'Recorded follow key: ' + follower;
+                const regSnap = await get(ref(database, 'USERNAME_REGISTRY/' + normalized));
+                if (!regSnap.exists()) {
+                    alert('That username is not registered yet.');
+                    return;
+                }
+                const targetKey = String(regSnap.val() || '').trim();
+                if (!targetKey) {
+                    alert('Invalid registry entry.');
+                    return;
+                }
+                if (targetKey === viewerKey) {
+                    alert('You cannot follow yourself.');
+                    return;
+                }
+                await set(ref(database, 'FOLLOWS/' + targetKey + '/' + viewerKey), true);
+                await set(ref(database, 'FOLLOWING/' + viewerKey + '/' + targetKey), true);
+                document.getElementById('creatorFollowUsername').value = '';
+                await loadCreatorTools();
             } catch (e) {
-                alert('Follow write failed');
+                console.error(e);
+                alert('Could not complete follow. Check network and database rules.');
             }
         });
 
@@ -2062,12 +1856,16 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 setStat('topSong', topStr.length > 20 ? topStr.substring(0, 20) + '...' : topStr);
                 setStat('topSongPlays', topSongPlays + ' plays');
 
-                const profileViewsRef = ref(database, 'PROFILEVIEWS/' + currentEmailKey);
-                const viewsSnapshot = await get(profileViewsRef);
                 let viewCount = 0;
-                if (viewsSnapshot.exists()) {
-                    const v = viewsSnapshot.val();
-                    viewCount = typeof v === 'number' ? v : parseInt(String(v), 10) || 0;
+                try {
+                    const profileViewsRef = ref(database, 'PROFILEVIEWS/' + currentEmailKey);
+                    const viewsSnapshot = await get(profileViewsRef);
+                    if (viewsSnapshot.exists()) {
+                        const v = viewsSnapshot.val();
+                        viewCount = typeof v === 'number' ? v : parseInt(String(v), 10) || 0;
+                    }
+                } catch (pvErr) {
+                    console.warn('Profile views unavailable (deploy PROFILEVIEWS rules):', pvErr);
                 }
                 setStat('profileViews', Number.isFinite(viewCount) ? viewCount.toLocaleString() : '0');
 
@@ -2211,10 +2009,23 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 }
 
                 const profiles = snapshot.val();
-                const profilesArray = Object.entries(profiles).map(([key, value]) => ({
-                    emailKey: key,
-                    profile: value
-                }));
+                const resolveProfileType = (user) => {
+                    const explicitType = (user?.profile?.profileType || "").toString().toLowerCase();
+                    if (explicitType === "artist" || explicitType === "listener") return explicitType;
+                    const explicitVisibility = (user?.profile?.profileVisibility || "").toString().toLowerCase();
+                    if (explicitVisibility === "public") return "artist";
+                    if (explicitVisibility === "private") return "listener";
+                    const roleText = (user?.role || user?.profile?.role || "").toString().toLowerCase();
+                    if (roleText.includes("artist")) return "artist";
+                    if (roleText.includes("listener")) return "listener";
+                    return "listener";
+                };
+                const profilesArray = Object.entries(profiles)
+                    .map(([key, value]) => ({
+                        emailKey: key,
+                        profile: value
+                    }))
+                    .filter((item) => resolveProfileType({ profile: item.profile, role: null }) === "artist");
 
                 if (profilesArray.length === 0) {
                     usersList.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
@@ -2386,343 +2197,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
         // Update preview on input
         document.getElementById('profileNickname').addEventListener('input', updatePreview);
         document.getElementById('profileBio').addEventListener('input', updatePreview);
-
-        // ============================================
-        // SOCIAL ACCOUNTS INTEGRATION
-        // ============================================
-
-        // Social platforms configuration
-        const SOCIAL_PLATFORMS = {
-            instagram: {
-                name: 'Instagram',
-                icon: 'fab fa-instagram',
-                color: 'instagram',
-                oauthUrl: '/api/oauth/instagram/connect'
-            },
-            youtube: {
-                name: 'YouTube',
-                icon: 'fab fa-youtube',
-                color: 'youtube',
-                oauthUrl: '/api/oauth/youtube/connect'
-            },
-            tiktok: {
-                name: 'TikTok',
-                icon: 'fab fa-tiktok',
-                color: 'tiktok',
-                oauthUrl: '/api/oauth/tiktok/connect'
-            },
-            spotify: {
-                name: 'Spotify',
-                icon: 'fab fa-spotify',
-                color: 'spotify',
-                oauthUrl: '/api/oauth/spotify/connect'
-            },
-            soundcloud: {
-                name: 'SoundCloud',
-                icon: 'fab fa-soundcloud',
-                color: 'soundcloud',
-                oauthUrl: '/api/oauth/soundcloud/connect'
-            }
-        };
-
-        // Load social accounts status
-        async function loadSocialAccounts() {
-            if (!currentEmailKey) {
-                console.log('loadSocialAccounts: No currentEmailKey');
-                return;
-            }
-
-            try {
-                console.log('Loading social accounts for:', currentEmailKey);
-                
-                // Fetch connected accounts from Firebase Realtime Database
-                const accountsRef = ref(database, `artists/${currentEmailKey}/socialAccounts`);
-                const snapshot = await get(accountsRef);
-
-                const accounts = snapshot.exists() ? snapshot.val() : {};
-                console.log('Loaded accounts:', accounts);
-                
-                const accountsGrid = document.getElementById('socialAccountsGrid');
-                
-                if (!accountsGrid) {
-                    console.error('socialAccountsGrid element not found');
-                    return;
-                }
-
-                // Always show all platforms, even if not connected
-                accountsGrid.innerHTML = Object.keys(SOCIAL_PLATFORMS).map(platformKey => {
-                    const platform = SOCIAL_PLATFORMS[platformKey];
-                    const accountData = accounts[platformKey] || null;
-                    const isConnected = accountData && accountData.accessToken;
-
-                    return `
-                        <div class="social-account-card">
-                            <div class="social-account-header">
-                                <div class="social-account-info">
-                                    <div class="social-account-icon ${platform.color}">
-                                        <i class="${platform.icon}"></i>
-                                    </div>
-                                    <div>
-                                        <div class="social-account-name">${platform.name}</div>
-                                        <div class="connection-status ${isConnected ? 'connected' : 'disconnected'}">
-                                            <i class="fas fa-${isConnected ? 'check-circle' : 'times-circle'}"></i>
-                                            ${isConnected ? 'Connected' : 'Not Connected'}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            ${isConnected ? `
-                                <div class="social-account-stats">
-                                    <div class="social-stat-item">
-                                        <span class="social-stat-label">Followers</span>
-                                        <span class="social-stat-value">${formatNumber(accountData.stats?.followers || 0)}</span>
-                                    </div>
-                                    <div class="social-stat-item">
-                                        <span class="social-stat-label">Weekly Growth</span>
-                                        <span class="social-stat-value ${(accountData.stats?.weeklyGrowth || 0) >= 0 ? 'positive' : 'negative'}">
-                                            ${(accountData.stats?.weeklyGrowth || 0) >= 0 ? '+' : ''}${formatNumber(accountData.stats?.weeklyGrowth || 0)}
-                                        </span>
-                                    </div>
-                                    <div class="social-stat-item">
-                                        <span class="social-stat-label">Total Views</span>
-                                        <span class="social-stat-value">${formatNumber(accountData.stats?.totalViews || 0)}</span>
-                                    </div>
-                                </div>
-                                <div class="social-account-actions">
-                                    <button class="btn-refresh" onclick="refreshAccountStats('${platformKey}')">
-                                        <i class="fas fa-sync-alt"></i> Refresh
-                                    </button>
-                                    <button class="btn-disconnect" onclick="disconnectAccount('${platformKey}')">
-                                        <i class="fas fa-unlink"></i> Disconnect
-                                    </button>
-                                </div>
-                            ` : `
-                                <div class="social-account-actions">
-                                    <button class="btn-connect" onclick="connectAccount('${platformKey}')">
-                                        <i class="fas fa-link"></i> Connect ${platform.name}
-                                    </button>
-                                </div>
-                            `}
-                        </div>
-                    `;
-                }).join('');
-
-                // Load unified analytics
-                await loadUnifiedAnalytics(accounts);
-
-            } catch (error) {
-                console.error('Error loading social accounts:', error);
-                const accountsGrid = document.getElementById('socialAccountsGrid');
-                if (accountsGrid) {
-                    // Show platforms even on error (they'll all show as "Not Connected")
-                    accountsGrid.innerHTML = Object.keys(SOCIAL_PLATFORMS).map(platformKey => {
-                        const platform = SOCIAL_PLATFORMS[platformKey];
-                        return `
-                            <div class="social-account-card">
-                                <div class="social-account-header">
-                                    <div class="social-account-info">
-                                        <div class="social-account-icon ${platform.color}">
-                                            <i class="${platform.icon}"></i>
-                                        </div>
-                                        <div>
-                                            <div class="social-account-name">${platform.name}</div>
-                                            <div class="connection-status disconnected">
-                                                <i class="fas fa-times-circle"></i>
-                                                Not Connected
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="social-account-actions">
-                                    <button class="btn-connect" onclick="connectAccount('${platformKey}')">
-                                        <i class="fas fa-link"></i> Connect ${platform.name}
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                }
-            }
-        }
-
-        // Connect social account (redirects to OAuth)
-        window.connectAccount = async function(platform) {
-            if (!currentEmailKey) {
-                alert('Please sign in to connect accounts.');
-                return;
-            }
-
-            // Check if Cloud Functions are deployed
-            const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
-            const oauthUrl = `https://${FIREBASE_REGION}-${FIREBASE_PROJECT_ID}.cloudfunctions.net/connect${platformName}?userId=${currentEmailKey}`;
-            
-            console.log('Redirecting to OAuth URL:', oauthUrl);
-            
-            // Show loading message
-            const accountsGrid = document.getElementById('socialAccountsGrid');
-            if (accountsGrid) {
-                accountsGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i><p>Redirecting to ' + SOCIAL_PLATFORMS[platform].name + '...</p></div>';
-            }
-            
-            // Try to verify function exists first (optional check)
-            try {
-                // Just redirect - if function doesn't exist, user will see error
-                window.location.href = oauthUrl;
-            } catch (error) {
-                console.error('Error connecting account:', error);
-                alert('Error connecting to ' + SOCIAL_PLATFORMS[platform].name + '. Please make sure Cloud Functions are deployed.\n\nTo deploy:\n1. cd functions\n2. npm install\n3. firebase deploy --only functions');
-                if (accountsGrid) {
-                    loadSocialAccounts(); // Reload to show platforms again
-                }
-            }
-        };
-
-        // Disconnect social account
-        window.disconnectAccount = async function(platform) {
-            if (!currentEmailKey) {
-                alert('Please sign in to disconnect accounts.');
-                return;
-            }
-
-            if (!confirm(`Are you sure you want to disconnect ${SOCIAL_PLATFORMS[platform].name}?`)) {
-                return;
-            }
-
-            try {
-                // Get Firebase Auth token for authenticated request
-                const auth = getAuth();
-                const user = auth.currentUser;
-                if (!user) {
-                    throw new Error('User not authenticated');
-                }
-                const idToken = await user.getIdToken();
-
-                // Call Cloud Function to disconnect (using callable function)
-                const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
-                const disconnectFunction = httpsCallable(functions, `disconnect${platformName}`);
-                await disconnectFunction({ userId: currentEmailKey });
-
-                alert(`${SOCIAL_PLATFORMS[platform].name} disconnected successfully.`);
-                await loadSocialAccounts();
-            } catch (error) {
-                console.error('Error disconnecting account:', error);
-                alert('Error disconnecting account. Please try again.');
-            }
-        };
-
-        // Refresh account stats
-        window.refreshAccountStats = async function(platform) {
-            if (!currentEmailKey) return;
-
-            try {
-                // Get Firebase Auth token for authenticated request
-                const auth = getAuth();
-                const user = auth.currentUser;
-                if (!user) {
-                    throw new Error('User not authenticated');
-                }
-
-                // Call Cloud Function to refresh stats (using callable function)
-                const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
-                const refreshFunction = httpsCallable(functions, `refresh${platformName}Stats`);
-                await refreshFunction({ userId: currentEmailKey });
-
-                await loadSocialAccounts();
-            } catch (error) {
-                console.error('Error refreshing stats:', error);
-                alert('Error refreshing stats. Please try again.');
-            }
-        };
-
-        // Load unified analytics
-        async function loadUnifiedAnalytics(accounts) {
-            try {
-                const aggregatedRef = ref(database, `artists/${currentEmailKey}/aggregatedStats`);
-                const snapshot = await get(aggregatedRef);
-
-                const stats = snapshot.exists() ? snapshot.val() : {
-                    totalFollowers: 0,
-                    totalViews: 0,
-                    weeklyGrowth: 0,
-                    engagementRate: 0,
-                    platforms: {}
-                };
-
-                const analyticsContainer = document.getElementById('unifiedAnalytics');
-                analyticsContainer.innerHTML = `
-                    <div class="unified-stat-card">
-                        <div class="unified-stat-label">Total Followers</div>
-                        <div class="unified-stat-value">${formatNumber(stats.totalFollowers || 0)}</div>
-                        <div class="unified-stat-breakdown">
-                            ${Object.keys(SOCIAL_PLATFORMS).map(platform => {
-                                const platformStats = stats.platforms?.[platform] || {};
-                                if (!platformStats.followers) return '';
-                                return `
-                                    <div class="breakdown-item">
-                                        <span>${SOCIAL_PLATFORMS[platform].name}</span>
-                                        <span>${formatNumber(platformStats.followers)}</span>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                    <div class="unified-stat-card">
-                        <div class="unified-stat-label">Total Views</div>
-                        <div class="unified-stat-value">${formatNumber(stats.totalViews || 0)}</div>
-                        <div class="unified-stat-breakdown">
-                            ${Object.keys(SOCIAL_PLATFORMS).map(platform => {
-                                const platformStats = stats.platforms?.[platform] || {};
-                                if (!platformStats.views) return '';
-                                return `
-                                    <div class="breakdown-item">
-                                        <span>${SOCIAL_PLATFORMS[platform].name}</span>
-                                        <span>${formatNumber(platformStats.views)}</span>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                    <div class="unified-stat-card">
-                        <div class="unified-stat-label">Weekly Growth</div>
-                        <div class="unified-stat-value ${(stats.weeklyGrowth || 0) >= 0 ? 'positive' : 'negative'}">
-                            ${(stats.weeklyGrowth || 0) >= 0 ? '+' : ''}${formatNumber(stats.weeklyGrowth || 0)}
-                        </div>
-                    </div>
-                    <div class="unified-stat-card">
-                        <div class="unified-stat-label">Engagement Rate</div>
-                        <div class="unified-stat-value">${(stats.engagementRate || 0).toFixed(2)}%</div>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('Error loading unified analytics:', error);
-            }
-        }
-
-        // Helper function to format numbers
-        function formatNumber(num) {
-            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-            return num.toString();
-        }
-
-        // Check for OAuth callback
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const oauthCode = urlParams.get('code');
-            const platform = urlParams.get('platform');
-            const state = urlParams.get('state');
-
-            if (oauthCode && platform && state === currentEmailKey) {
-                // OAuth callback - Cloud Function will handle this
-                // Just show success message and reload accounts
-                setTimeout(async () => {
-                    await loadSocialAccounts();
-                    alert(`${SOCIAL_PLATFORMS[platform]?.name || platform} connected successfully!`);
-                    // Clean URL
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }, 1000);
-            }
-        });
 
         // =============================
 // SUBASTEROID COMMUNITY SYSTEM
