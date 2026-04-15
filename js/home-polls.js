@@ -1,9 +1,14 @@
 /**
  * Home page artist vs artist polls (ARTIST_POLLS).
  * Uses window.firebaseDatabase, firebaseRef, firebaseGet, firebaseSet, firebaseOnValue.
+ * REST fallback: iOS WKWebView sometimes never delivers onValue over WebSocket.
  */
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+const RTDB_REST_FALLBACK =
+  (typeof window !== "undefined" && window.__ASTER_RTDB_REST_BASE) ||
+  "https://asteroid-cdc13-default-rtdb.firebaseio.com";
 
 function sanitizeEmail(email) {
   return String(email || "").replace(/[.#$[\]]/g, "_");
@@ -103,6 +108,51 @@ function cardHtml(p) {
   </article>`;
 }
 
+function rowsFromSnapshot(snap) {
+  const rows = [];
+  if (!snap || !snap.exists || !snap.exists()) return rows;
+  snap.forEach((child) => {
+    const v = child.val();
+    if (!v || typeof v !== "object") return;
+    if (!v.songUrlA || !v.songUrlB) return;
+    rows.push({ id: child.key, ...v });
+  });
+  return rows;
+}
+
+function rowsFromObject(obj) {
+  const rows = [];
+  if (!obj || typeof obj !== "object") return rows;
+  Object.entries(obj).forEach(([key, v]) => {
+    if (!v || typeof v !== "object") return;
+    if (!v.songUrlA || !v.songUrlB) return;
+    rows.push({ id: key, ...v });
+  });
+  return rows;
+}
+
+function renderPollRows(mount, rows, db, refFn, getFn, setFn) {
+  rows.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const lim = rows.slice(0, 12);
+  if (!lim.length) {
+    mount.innerHTML = '<p class="home-polls-empty">No artist battles yet.</p>';
+    return;
+  }
+  mount.innerHTML = lim.map((p) => cardHtml({ ...p, id: p.id })).join("");
+  const canVote = db && refFn && getFn && setFn;
+  if (canVote) {
+    mount.querySelectorAll("[data-home-poll-vote]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const pollId = btn.getAttribute("data-poll-id");
+        const side = btn.getAttribute("data-side");
+        if (!pollId || (side !== "a" && side !== "b")) return;
+        const res = await submitVote(db, refFn, getFn, setFn, pollId, side);
+        if (!res.ok) alert(res.message);
+      });
+    });
+  }
+}
+
 async function submitVote(db, ref, getFn, setFn, pollId, side) {
   const vid = getPollVoterId();
   const r = ref(db, "ARTIST_POLLS/" + pollId + "/votes/" + vid);
@@ -126,43 +176,60 @@ async function submitVote(db, ref, getFn, setFn, pollId, side) {
 }
 
 export function initHomePolls() {
+  const mount = document.getElementById("homePollsMount");
+  if (!mount) return;
+
   const db = window.firebaseDatabase;
   const refFn = window.firebaseRef;
   const getFn = window.firebaseGet;
   const setFn = window.firebaseSet;
   const onValue = window.firebaseOnValue;
-  const mount = document.getElementById("homePollsMount");
-  if (!db || !refFn || !getFn || !setFn || !onValue || !mount) return;
 
-  const pollsRef = refFn(db, "ARTIST_POLLS");
-  onValue(pollsRef, (snap) => {
-    if (!snap.exists()) {
-      mount.innerHTML = '<p class="home-polls-empty">No artist battles yet — check back soon.</p>';
-      return;
-    }
-    const rows = [];
-    snap.forEach((child) => {
-      const v = child.val();
-      if (!v || typeof v !== "object") return;
-      if (!v.songUrlA || !v.songUrlB) return;
-      rows.push({ id: child.key, ...v });
-    });
-    rows.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-    const lim = rows.slice(0, 12);
-    if (!lim.length) {
-      mount.innerHTML = '<p class="home-polls-empty">No artist battles yet.</p>';
-      return;
-    }
-    mount.innerHTML = lim.map((p) => cardHtml({ ...p, id: p.id })).join("");
+  let liveChannelOk = false;
 
-    mount.querySelectorAll("[data-home-poll-vote]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const pollId = btn.getAttribute("data-poll-id");
-        const side = btn.getAttribute("data-side");
-        if (!pollId || (side !== "a" && side !== "b")) return;
-        const res = await submitVote(db, refFn, getFn, setFn, pollId, side);
-        if (!res.ok) alert(res.message);
+  if (db && refFn && getFn && setFn && onValue) {
+    const pollsRef = refFn(db, "ARTIST_POLLS");
+    onValue(
+      pollsRef,
+      (snap) => {
+        liveChannelOk = true;
+        if (!snap.exists()) {
+          mount.innerHTML = '<p class="home-polls-empty">No artist battles yet — check back soon.</p>';
+          return;
+        }
+        const rows = rowsFromSnapshot(snap);
+        if (!rows.length) {
+          mount.innerHTML = '<p class="home-polls-empty">No artist battles yet.</p>';
+          return;
+        }
+        renderPollRows(mount, rows, db, refFn, getFn, setFn);
+      },
+      (err) => {
+        console.warn("[home-polls] onValue error:", err);
+      }
+    );
+  }
+
+  setTimeout(() => {
+    if (liveChannelOk) return;
+    fetch(RTDB_REST_FALLBACK + "/ARTIST_POLLS.json", { cache: "no-store" })
+      .then((r) => {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then((obj) => {
+        if (liveChannelOk) return;
+        const rows = rowsFromObject(obj || {});
+        if (!rows.length) {
+          mount.innerHTML = '<p class="home-polls-empty">No artist battles yet — check back soon.</p>';
+          return;
+        }
+        renderPollRows(mount, rows, db, refFn, getFn, setFn);
+      })
+      .catch((e) => {
+        console.warn("[home-polls] REST fallback failed:", e);
+        mount.innerHTML =
+          '<p class="home-polls-empty">Could not load polls. Check your connection and pull to refresh.</p>';
       });
-    });
-  });
+  }, 4500);
 }

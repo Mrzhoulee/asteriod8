@@ -134,9 +134,37 @@
   </div>
 </header>
 <style>
+/* ofc.css sets #tata { font-size: 70px } — keep now-playing readable */
+#tata {
+  font-size: 1rem !important;
+  line-height: 1.35 !important;
+}
 /* Header: sign-in column + profile — no overlap (replaces absolute positioning) */
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 26000;
+  background: #0a0a0a;
+  pointer-events: auto;
+  isolation: isolate;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 12px 18px;
+  padding-top: max(12px, env(safe-area-inset-top, 0px));
+  border-bottom: 1px solid rgba(255, 127, 80, 0.2);
+  box-sizing: border-box;
+}
+.header .header-sign-in-group,
+.header #apple-sign-in,
+.header .user-profile-button {
   position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255, 127, 80, 0.2);
 }
 .header-right {
   display: flex;
@@ -196,17 +224,37 @@
   gap: 6px;
 }
 @media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 14px 12px;
+  }
+  .header .logo-container {
+    width: 100%;
+  }
   .header-right {
     margin-left: 0;
     width: 100%;
     justify-content: space-between;
-    flex-wrap: wrap;
-    row-gap: 10px;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    gap: 10px;
+    row-gap: 8px;
   }
   .header-sign-in-group {
     flex: 1 1 auto;
-    min-width: min(100%, 200px);
-    max-width: calc(100% - 56px);
+    min-width: 0;
+    max-width: calc(100% - 52px);
+  }
+  .header-sign-in-btn {
+    max-width: 100%;
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  .user-profile-button {
+    flex-shrink: 0;
+    margin-top: 2px;
   }
 }
 /* === Coral / Black / White theme overrides === */
@@ -278,9 +326,118 @@
   color: #111;
   border-color: #ff7f50;
 }
+.discovery-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+  width: min(980px, 100%);
+  margin: 0 auto;
+}
+.discovery-card {
+  border: 1px solid rgba(255,127,80,0.24);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+.discovery-card-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.discovery-card-title { font-size: 15px; font-weight: 700; }
+.discovery-card-sub { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+.discover-chevron { color: rgba(255,255,255,0.58); transition: transform .2s ease; }
+.discovery-card.open .discover-chevron { transform: rotate(180deg); color: #ff7f50; }
+.discovery-card-body { display: none; padding: 2px 12px 12px; }
+.discovery-card.open .discovery-card-body { display: block; }
+.discovery-card.open {
+  overflow: visible;
+}
+.discovery-empty { color: rgba(255,255,255,0.62); font-size: 12px; padding: 8px 4px; text-align: center; }
+
+/* Mood / genre discovery: title must stay horizontal (avoid flex-shrink letter-stacking) */
+#moodDiscoveryList .song-row.song-row--discovery,
+#genreDiscoveryList .song-row.song-row--discovery {
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+  position: relative;
+}
+#moodDiscoveryList .song-row--discovery > audio:first-of-type,
+#genreDiscoveryList .song-row--discovery > audio:first-of-type {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  clip-path: inset(50%);
+  border: 0;
+}
+#moodDiscoveryList .song-row--discovery .song-row-title-row,
+#genreDiscoveryList .song-row--discovery .song-row-title-row {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  min-width: 0;
+}
+#moodDiscoveryList .song-row--discovery .song-row-info,
+#genreDiscoveryList .song-row--discovery .song-row-info {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+#moodDiscoveryList .song-row--discovery .song-row-actions,
+#genreDiscoveryList .song-row--discovery .song-row-actions {
+  flex: 0 0 auto;
+  align-self: center;
+  flex-shrink: 0;
+  gap: 6px;
+  padding-right: max(0px, env(safe-area-inset-right, 0px));
+}
+#moodDiscoveryList .song-row--discovery .song-row-title,
+#genreDiscoveryList .song-row--discovery .song-row-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: normal;
+  overflow-wrap: normal;
+  line-height: 1.35;
+  color: #ffffff !important;
+  flex: 1;
+  min-width: 0;
+}
+#moodDiscoveryList .song-row--discovery .song-row-artist,
+#genreDiscoveryList .song-row--discovery .song-row-artist {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+@media (max-width: 600px) {
+  #moodDiscoveryList .song-row--discovery .song-row-transport .material-symbols-outlined,
+  #genreDiscoveryList .song-row--discovery .song-row-transport .material-symbols-outlined {
+    font-size: 30px !important;
+    width: 30px;
+    height: 30px;
+  }
+}
 
 /* Users Grid Styles */
 .users-grid-container {
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 1.5rem;
@@ -288,6 +445,11 @@
 }
 
 .user-profile-card {
+  position: relative;
+  z-index: 6;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
@@ -348,6 +510,103 @@
   border-radius: 12px;
   font-size: 0.75rem;
   color: #ff7f50;
+}
+
+.promote-cta-wrap {
+  margin: 20px auto 14px;
+  max-width: 760px;
+  width: min(100%, 760px);
+}
+.promote-cta-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(255,127,80,0.2) 0%, rgba(27,27,27,0.96) 38%, rgba(10,10,10,0.96) 100%);
+  border: 1px solid rgba(255, 127, 80, 0.35);
+  border-radius: 22px;
+  padding: 18px 18px 16px;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.42);
+  text-align: left;
+}
+.promote-cta-card::after {
+  content: "";
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(255,127,80,0.24) 0%, rgba(255,127,80,0) 68%);
+  pointer-events: none;
+}
+.promote-cta-title {
+  margin: 0 0 7px;
+  color: #fff;
+  font-size: clamp(18px, 2.2vw, 24px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.promote-cta-sub {
+  margin: 0 0 12px;
+  color: rgba(255,255,255,0.74);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.promote-cta-steps {
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+.promote-cta-steps li {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px;
+  padding: 10px 11px;
+  color: rgba(255,255,255,0.9);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.promote-step-num {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  border-radius: 999px;
+  background: rgba(255,127,80,0.2);
+  border: 1px solid rgba(255,127,80,0.35);
+  color: #ffb08f;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+.promote-cta-btn {
+  appearance: none;
+  border: 1px solid rgba(255,127,80,0.5);
+  background: linear-gradient(135deg, #ff7f50 0%, #ef5f2d 100%);
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  border-radius: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(255,127,80,0.3);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.promote-cta-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.promote-cta-btn:active { transform: translateY(0); }
+.promote-cta-note {
+  margin-left: 10px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
 }
 
 /* Profile Modal Styles */
@@ -752,7 +1011,10 @@
 .album-tracks.album-open ~ .album-cover .album-chevron,
 .album-card:has(.album-open) .album-chevron { transform: rotate(180deg); color: #ff7f50; }
 .album-tracks { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-.album-tracks.album-open { max-height: 2000px; }
+.album-tracks.album-open {
+  max-height: 2000px;
+  overflow: visible;
+}
 
 /* Song row inside album */
 .song-row {
@@ -967,6 +1229,11 @@
   padding: 0 1.25rem 1rem;
 }
 .profile-follow-btn {
+  position: relative;
+  z-index: 40;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   width: 100%;
   padding: 12px 16px;
   border: none;
@@ -1021,14 +1288,21 @@
   min-width: 0;
 }
 .profile-modal-song-title {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
   font-weight: 700;
   font-size: 14px;
   color: #fff;
   font-family: 'Poppins', sans-serif;
+}
+.profile-modal-song-title-text {
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
 }
 .profile-modal-song-meta {
   display: block;
@@ -1042,8 +1316,9 @@
 .profile-modal-song-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
+  flex-wrap: nowrap;
 }
 .profile-modal-song-actions i {
   font-size: 28px;
@@ -1064,9 +1339,15 @@
 .profile-modal-song-actions .material-symbols-outlined {
   font-size: 22px;
 }
+.profile-modal-song-actions .song-row-transport .material-symbols-outlined {
+  font-size: 36px !important;
+  width: 36px;
+  height: 36px;
+}
 
 .because-card { background: rgba(255,127,80,0.07); border: 1px solid rgba(255,127,80,0.28); border-radius: 14px; padding: 14px; text-align: left; }
-.because-card-title { font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 4px; line-height: 1.3; }
+.because-card-title { font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 4px; line-height: 1.3; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+.because-card-title .because-card-title-text { min-width: 0; flex: 1; }
 .because-card-artist { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 10px; }
 .because-play-btn { width: 100%; padding: 8px 12px; border: none; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; background: linear-gradient(135deg,#ff7f50,#e85d2c); color: #fff; font-family: 'Poppins', sans-serif; }
 .song-row-actions { display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0; }
@@ -1094,6 +1375,171 @@
   user-select: none;
 }
 .song-row-action-labeled:hover .song-row-action-label { color: rgba(255, 255, 255, 0.85); }
+
+/* Play/pause + overflow (Material Symbols — works without Font Awesome) */
+.song-transport-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.song-row-transport {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.song-row-transport .material-symbols-outlined {
+  font-size: 40px !important;
+  width: 40px;
+  height: 40px;
+  color: #ff7f50 !important;
+  transition: color 0.15s, transform 0.15s;
+}
+.song-row-transport:hover .material-symbols-outlined {
+  color: #fff !important;
+  transform: scale(1.06);
+}
+.song-row-actions {
+  flex-wrap: nowrap;
+  gap: 8px;
+  min-width: 0;
+}
+.song-overflow-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.song-overflow-trigger {
+  background: rgba(255, 127, 80, 0.12);
+  border: 1px solid rgba(255, 127, 80, 0.35);
+  border-radius: 10px;
+  padding: 4px 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.song-overflow-trigger .material-symbols-outlined {
+  font-size: 22px;
+  color: #ff7f50;
+}
+.song-overflow-trigger:hover {
+  background: rgba(255, 127, 80, 0.22);
+}
+.song-overflow-menu {
+  display: none;
+  box-sizing: border-box;
+}
+/* Full-screen sheet: hides the rest of the page until Back, scrim tap, action, or Escape */
+.song-overflow-menu.is-open {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  min-height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  background: rgba(0, 0, 0, 0.94);
+  z-index: 500000;
+  border: none;
+  border-radius: 0;
+  animation: song-overflow-fs-in 0.18s ease-out;
+}
+@keyframes song-overflow-fs-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.song-overflow-fs-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.song-overflow-fs-card {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  max-height: min(86vh, 720px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(165deg, #1e1e26 0%, #121214 100%);
+  border: 1px solid rgba(255, 127, 80, 0.4);
+  border-radius: 22px;
+  padding: 10px 10px 16px;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.profile-modal-song-row .song-overflow-menu.is-open {
+  z-index: 500000;
+}
+.song-overflow-menu.is-open .song-overflow-item {
+  font-size: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+}
+.song-overflow-menu.is-open .song-overflow-item .material-symbols-outlined {
+  font-size: 24px;
+}
+.song-overflow-fs-back {
+  font-weight: 600;
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px 14px 10px 10px !important;
+}
+body.song-overflow-menu-open,
+html.song-overflow-menu-open {
+  overflow: hidden;
+}
+.song-overflow-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+}
+.song-overflow-item:hover {
+  background: rgba(255, 127, 80, 0.15);
+}
+.song-overflow-item .material-symbols-outlined {
+  font-size: 20px;
+  color: #ff7f50;
+  flex-shrink: 0;
+}
 
 /* Single card */
 .single-card {
@@ -1125,11 +1571,23 @@
 .single-title { font-weight: 600; font-size: 15px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .single-artist { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
 .single-badge { display: inline-block; margin-top: 6px; padding: 2px 10px; font-size: 11px; font-weight: 600; color: #ff7f50; background: rgba(255,127,80,0.15); border-radius: 8px; }
-.single-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-shrink: 0; }
+.single-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
 .single-actions i.fa-play-circle { color: #ff7f50; font-size: 44px; cursor: pointer; transition: color 0.15s, transform 0.15s; }
 .single-actions i.fa-pause-circle-o { color: #ff7f50; font-size: 38px; cursor: pointer; transition: color 0.15s, transform 0.15s; }
 .single-actions i { color: #ff7f50; font-size: 30px; cursor: pointer; transition: color 0.15s, transform 0.15s; }
 .single-actions i:hover { color: #fff; transform: scale(1.15); }
+.single-actions .song-row-transport .material-symbols-outlined {
+  font-size: 44px !important;
+  width: 44px;
+  height: 44px;
+}
 .single-actions button { background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .single-actions .song-row-action-labeled { gap: 6px; }
 .single-actions .material-symbols-outlined { color: #ff7f50; font-size: 22px; cursor: pointer; transition: color 0.15s; }
@@ -1157,8 +1615,14 @@
   justify-content: center;
   padding: 20px;
   box-sizing: border-box;
+  pointer-events: none;
+  visibility: hidden;
 }
-.ugc-policy-overlay.is-visible { display: flex; }
+.ugc-policy-overlay.is-visible {
+  display: flex;
+  pointer-events: auto;
+  visibility: visible;
+}
 .ugc-policy-card {
   max-width: 440px;
   width: min(100%, 440px);
@@ -1173,7 +1637,17 @@
   line-height: 1.5;
 }
 .ugc-policy-card h2 { margin: 0 0 12px; font-size: 18px; color: #fff; font-family: 'Montserrat', sans-serif; text-align: center; }
-.ugc-policy-card a { color: #ff9a6e; text-decoration: underline; text-underline-offset: 2px; position: relative; z-index: 2; cursor: pointer; }
+.ugc-policy-card a {
+  color: #ff9a6e;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  position: relative;
+  z-index: 3;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255, 127, 80, 0.25);
+}
 .ugc-policy-actions { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
 .ugc-policy-check-row {
   display: flex;
@@ -1365,12 +1839,6 @@
   margin: 0 !important;
 }
 .lol #tata * { font-size: inherit !important; }
-.lol .lol-queue-wrap {
-  font-size: 13px !important;
-  text-align: left;
-  min-width: 140px;
-}
-.lol .lol-queue-wrap p { margin: 0 0 4px 0 !important; font-size: 12px !important; }
 .lol-mini-player {
   flex-direction: column !important;
   align-items: stretch !important;
@@ -1439,11 +1907,24 @@
   height: 68px;
   color: #ff7f50 !important;
 }
-.lol-mini-player .lol-queue-wrap {
-  width: 100%;
-  border-top: 1px solid rgba(255, 127, 80, 0.18);
-  padding-top: 10px;
-  margin-top: 2px;
+@media (max-width: 600px) {
+  .lol-mini-player .lol-transport {
+    gap: 20px;
+  }
+  .lol-mini-player .lol-transport-btn .material-symbols-outlined {
+    font-size: 44px !important;
+    width: 44px;
+    height: 44px;
+  }
+  .lol-mini-player .lol-main-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .lol-mini-player .lol-now-wrap {
+    flex: 1 1 auto;
+    width: 100%;
+  }
 }
 .artists-section { display: block; overflow: visible; gap: 16px; scroll-behavior: smooth; white-space: normal; }
 /* Keep featured artists/songs visible on iPad-sized layouts */
@@ -1947,6 +2428,15 @@ body.create-profile-active {
       <button id="logoutCancelBtn" class="logout-btn-cancel">Cancel</button>
       <button id="logoutConfirmBtn" class="logout-btn-confirm">Sign out</button>
     </div>
+    <div style="margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+      <label for="hideExplicitToggle" style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.86);font-family:'Poppins',sans-serif;">
+        <input type="checkbox" id="hideExplicitToggle" style="accent-color:#ff7f50;">
+        <span>Hide explicit content</span>
+      </label>
+      <button id="reviewLegalBtn" type="button" style="margin-top:10px;background:none;border:1px solid rgba(255,255,255,0.22);color:rgba(255,255,255,0.86);font-size:12px;cursor:pointer;font-family:'Poppins',sans-serif;padding:7px 10px;border-radius:10px;">
+        Review Terms &amp; Privacy
+      </button>
+    </div>
     <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
       <button id="deleteAccountBtn" style="background: none; border: none; color: rgba(255,80,80,0.8); font-size: 12px; cursor: pointer; font-family: 'Poppins', sans-serif; padding: 4px 8px; transition: color 0.2s;">Delete my account permanently</button>
     </div>
@@ -2144,7 +2634,7 @@ body.create-profile-active {
           <h2 id="artistProfileName" class="artist-profile-name">Artist</h2>
           <div id="artistProfileTag" class="artist-profile-tag">Featured artist</div>
           <div id="artistProfileFollowWrap" class="profile-modal-follow-wrap artist-profile-follow-wrap" style="display: none;">
-            <button type="button" class="profile-follow-btn" id="artistProfileFollowBtn">Follow artist</button>
+            <button type="button" class="profile-follow-btn" id="artistProfileFollowBtn" onclick="window.__runFollowFromButtonById('artistProfileFollowBtn'); return false;">Follow artist</button>
             <p class="profile-follow-hint" id="artistProfileFollowHint"></p>
           </div>
           <div id="artistProfileFeaturedBlockWrap" style="margin-top:12px;width:100%;max-width:280px;">
@@ -2365,13 +2855,21 @@ body.create-profile-active {
       </div>
     </section>
 
-<div style=" width:500px; height: 198px;">
-	  <img src="https://i.postimg.cc/wvxQD7SC/image.png">
-</div>
-<br>
-<br>
-<br>
-<br>
+<section class="promote-cta-wrap" aria-label="Get featured for free">
+  <div class="promote-cta-card">
+    <h3 class="promote-cta-title">Sign in to get your songs promoted/featured for free</h3>
+    <p class="promote-cta-sub">Complete these steps to submit for free featuring. We review every request before it goes live.</p>
+    <ul class="promote-cta-steps">
+      <li><span class="promote-step-num">1</span><span>Upload a song in Studio.</span></li>
+      <li><span class="promote-step-num">2</span><span>Refer 2 friends using your referral code.</span></li>
+      <li><span class="promote-step-num">3</span><span>Wait 48 hours for verification; we notify you after review.</span></li>
+    </ul>
+    <div>
+      <button type="button" id="promoteFeatureCtaBtn" class="promote-cta-btn">Start Free Feature Flow</button>
+      <span class="promote-cta-note">No payment required</span>
+    </div>
+  </div>
+</section>
     <section id="hot-tracks" class="content-section">
             <h2 class="section-title">🔥 Trending Songs of the Month</h2>
 <div id="asteroidLeaderboard"></div>
@@ -2380,12 +2878,32 @@ body.create-profile-active {
     <center>
     <section id="discover-modes" style="margin-top:10px;text-align:center;">
       <h3 class="section-title" style="font-size:16px;margin:0 0 4px;text-align:center;">Discover Songs</h3>
-      <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0 0 12px;text-align:center;">Mood-based discovery</p>
-      <div class="discover-modes-grid horizontal-scroll">
-        <div class="mode-card">
-          <div class="moods-unavailable" style="max-width:360px;margin:0 auto;padding:22px 18px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,127,80,0.3);border-radius:16px;font-family:Poppins,sans-serif;box-sizing:border-box;">
-            <p style="margin:0 0 8px;font-size:16px;font-weight:600;color:#ff7f50;">Currently unavailable</p>
-            <p style="margin:0;font-size:13px;line-height:1.55;color:rgba(255,255,255,0.7);">Song moods are turned off for now. Use the main library above to browse and play tracks.</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0 0 12px;text-align:center;">Mood + genre discovery with playable song cards</p>
+      <div class="discovery-grid">
+        <div class="discovery-card open" id="moodDiscoveryCard">
+          <button type="button" class="discovery-card-head" onclick="toggleDiscoveryCard('moodDiscoveryCard')">
+            <div>
+              <div class="discovery-card-title">Mood discovery</div>
+              <div class="discovery-card-sub">Mapped by title energy cues (volume/pitch feel)</div>
+            </div>
+            <span class="material-symbols-outlined discover-chevron">expand_more</span>
+          </button>
+          <div class="discovery-card-body">
+            <div class="chip-wrap" id="moodChipWrap"></div>
+            <div id="moodDiscoveryList" style="margin-top:10px;"></div>
+          </div>
+        </div>
+        <div class="discovery-card open" id="genreDiscoveryCard">
+          <button type="button" class="discovery-card-head" onclick="toggleDiscoveryCard('genreDiscoveryCard')">
+            <div>
+              <div class="discovery-card-title">Genre discovery</div>
+              <div class="discovery-card-sub">At least 9 genre buckets, auto-grouped from title/album/artist text</div>
+            </div>
+            <span class="material-symbols-outlined discover-chevron">expand_more</span>
+          </button>
+          <div class="discovery-card-body">
+            <div class="chip-wrap" id="genreChipWrap"></div>
+            <div id="genreDiscoveryList" style="margin-top:10px;"></div>
           </div>
         </div>
       </div>
@@ -3132,11 +3650,15 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 <div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
   <div class="ugc-policy-card">
     <h2 id="ugcPolicyTitle">Before you continue</h2>
-    <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;"><strong>First visit:</strong> check the box and tap Continue to accept the Terms of Service and Privacy Policy before using Asteroid. Asteroid includes user-uploaded music and profiles; you can report content, block users, and reach our team at any time. <strong>Each time</strong> you use Sign in with Apple, confirm the policies again below.</p>
+    <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;">Check the box and tap Continue to accept the Terms of Service and Privacy Policy before using Asteroid. You only need to do this once on this device (saved in browser storage). Asteroid includes user-uploaded music and profiles; you can report content, block users, and reach our team at any time. <strong>App Store age rating:</strong> Apple lists Asteroid as <strong>16+</strong> in most countries and regions, and <strong>15+</strong> in Australia, Brazil, and the Republic of Korea—the badge shown on your local App Store is the one that applies to you. By continuing you confirm you meet that minimum age.</p>
     <div class="ugc-policy-actions">
       <div class="ugc-policy-check-row" id="ugcPolicyCheckRow" role="group" aria-label="Legal acceptance">
         <input type="checkbox" id="ugcPolicyCheck" autocomplete="off" aria-describedby="ugcPolicyLegalText">
-        <span class="ugc-policy-check-text" id="ugcPolicyLegalText">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>
+        <span class="ugc-policy-check-text" id="ugcPolicyLegalText">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer" onclick="return window.openAsteroidLegalPageFromClick(event, 'Asteroid%20Terms.html');">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer" onclick="return window.openAsteroidLegalPageFromClick(event, 'policy.html');">Privacy Policy</a>.</span>
+      </div>
+      <div class="ugc-policy-check-row" id="ugcExplicitCheckRow" role="group" aria-label="Content preference">
+        <input type="checkbox" id="ugcHideExplicitCheck" autocomplete="off" aria-describedby="ugcHideExplicitText">
+        <span class="ugc-policy-check-text" id="ugcHideExplicitText">Hide explicit content (recommended for younger listeners).</span>
       </div>
       <button type="button" class="ugc-policy-continue" id="ugcPolicyContinue" disabled>Continue to Asteroid</button>
       <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.5);text-align:center;">Questions: <a href="mailto:asteroidcontactbussiness@gmail.com?subject=Asteroid%20app%20-%20moderation">asteroidcontactbussiness@gmail.com</a></p>
@@ -3159,6 +3681,75 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 
 <script>
 (function () {
+  window.openAsteroidLegalPageFromClick = function (ev, path) {
+    try {
+      if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+    } catch (e0) {}
+    var rel = String(path || "").trim();
+    if (!rel) return false;
+    var url = "";
+    try {
+      url = new URL(rel, window.location.href).href;
+    } catch (e1) {
+      url = rel;
+    }
+    var isCap =
+      window.Capacitor &&
+      typeof window.Capacitor.isNativePlatform === "function" &&
+      window.Capacitor.isNativePlatform();
+    if (isCap) {
+      var pubBase = "https://www.asteroid8.net/";
+      try {
+        var pu = new URL(url);
+        var needRewrite =
+          pu.protocol === "ionic:" ||
+          pu.protocol === "capacitor:" ||
+          pu.protocol === "file:";
+        if (needRewrite) {
+          url = pubBase + rel.replace(/^\/+/, "");
+        }
+      } catch (eRew) {
+        try {
+          url = pubBase + rel.replace(/^\/+/, "");
+        } catch (eFb) {}
+      }
+    }
+    try {
+      if (isCap) {
+        var C = window.Capacitor;
+        var P = C.Plugins || {};
+        var Br = P.Browser;
+        if (Br && typeof Br.open === "function") {
+          void Br.open({ url: url, presentationStyle: "fullscreen" });
+          return false;
+        }
+        if (typeof C.nativePromise === "function") {
+          void C.nativePromise("Browser", "open", { url: url, presentationStyle: "fullscreen" });
+          return false;
+        }
+      }
+    } catch (e2) {}
+    try {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (e3) {
+      try {
+        window.location.href = url;
+      } catch (e4) {}
+    }
+    return false;
+  };
+  function ugcEventTargetIsInsideAnchor(target) {
+    var n = target;
+    while (n) {
+      if (n.nodeType === 1 && n.tagName && String(n.tagName).toLowerCase() === "a") return true;
+      n = n.parentNode;
+    }
+    return false;
+  }
+  window.__ugcEventTargetIsInsideAnchor = ugcEventTargetIsInsideAnchor;
   var BLOCK_KEY = "asteroidBlockedUserKeys";
   window.getBlockedUserKeys = function () {
     try {
@@ -3264,7 +3855,10 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     if (!fi) return;
     if (!confirm("Hide this song on this device? It will disappear from your library until you clear site data for this site.")) return;
     window.addBlockedSongKey(window.normalizeSongBlockKey(fi, t));
-    var row = btn.closest(".profile-modal-song-row");
+    var row =
+      btn.closest(".song-row") ||
+      btn.closest(".single-card") ||
+      btn.closest(".profile-modal-song-row");
     if (row) row.remove();
     if (typeof window.refreshLibraryAfterBlock === "function") window.refreshLibraryAfterBlock();
   };
@@ -3297,15 +3891,20 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     var fi = (btn.getAttribute("data-notrec-file") || "").trim();
     var t = (btn.getAttribute("data-notrec-title") || "").trim();
     if (!fi) return;
-    if (!confirm("Don't recommend this song? On this build it will be hidden from your library list on this device (clear site data to undo).")) return;
-    window.addNotRecommendSongKey(fi, t);
-    var row = btn.closest(".song-row") || btn.closest(".single-card");
-    if (row && row.closest && (row.closest("#moodDiscoveryList") || row.closest("#genreDiscoveryList"))) row.remove();
+    if (!confirm("Hide this song on this device? It will disappear from your library and discovery (same as Block). Clear site data to undo.")) return;
+    window.addBlockedSongKey(window.normalizeSongBlockKey(fi, t));
+    try {
+      window.addNotRecommendSongKey(fi, t);
+    } catch (eNR) {}
+    var row =
+      btn.closest(".song-row") ||
+      btn.closest(".single-card") ||
+      btn.closest(".profile-modal-song-row");
+    if (row) row.remove();
+    if (typeof window.refreshLibraryAfterBlock === "function") window.refreshLibraryAfterBlock();
     try {
       if (typeof window.refreshDiscoveryPanels === "function" && window.__asteroidSongsDataForDiscovery) {
         window.refreshDiscoveryPanels(window.__asteroidSongsDataForDiscovery);
-      } else if (typeof window.refreshLibraryAfterBlock === "function") {
-        window.refreshLibraryAfterBlock();
       }
     } catch (e) {}
   };
@@ -3361,12 +3960,42 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
   }
   var UGC_KEY = "asteroidUgcPolicyAccepted";
   var LEGAL_FIRST_KEY = "asteroidTermsPrivacyAccepted";
+  var EXPLICIT_HIDE_KEY = "asteroidHideExplicitContent";
   function ugcAccepted() {
     return localStorage.getItem(UGC_KEY) === "v1";
   }
   function legalFirstVisitDone() {
     return localStorage.getItem(LEGAL_FIRST_KEY) === "v1";
   }
+  function hideExplicitContentEnabled() {
+    return localStorage.getItem(EXPLICIT_HIDE_KEY) === "1";
+  }
+  function setHideExplicitContentEnabled(nextValue) {
+    localStorage.setItem(EXPLICIT_HIDE_KEY, nextValue ? "1" : "0");
+    try {
+      window.dispatchEvent(new CustomEvent("asteroid-explicit-pref-changed", { detail: { hide: !!nextValue } }));
+    } catch (e) {}
+  }
+  window.shouldHideExplicitSong = function (song) {
+    try {
+      return hideExplicitContentEnabled() && typeof songShowsExplicitBadge === "function" && songShowsExplicitBadge(song);
+    } catch (e) {
+      return false;
+    }
+  };
+  window.openLegalReviewOverlay = function () {
+    ensureUgcGateDefaultCopy();
+    restoreUgcAppleGateCopy();
+    var ov = document.getElementById("ugcPolicyOverlay");
+    var chk = document.getElementById("ugcPolicyCheck");
+    var btn = document.getElementById("ugcPolicyContinue");
+    if (chk) chk.checked = true;
+    if (btn) btn.disabled = false;
+    if (ov) ov.classList.add("is-visible");
+  };
+  try {
+    window.__asteroidLegalFirstVisitDone = legalFirstVisitDone;
+  } catch (eExpose) {}
   function ensureUgcGateDefaultCopy() {
     var t = document.getElementById("ugcPolicyTitle");
     var b = document.getElementById("ugcPolicyContinue");
@@ -3379,12 +4008,14 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     ensureUgcGateDefaultCopy();
     var ov = document.getElementById("ugcPolicyOverlay");
     var chk = document.getElementById("ugcPolicyCheck");
+    var explicitChk = document.getElementById("ugcHideExplicitCheck");
     var btn = document.getElementById("ugcPolicyContinue");
     try {
       delete window.__appleUgcPendingRunner;
     } catch (e0) {}
     restoreUgcAppleGateCopy();
     if (chk) chk.checked = false;
+    if (explicitChk) explicitChk.checked = hideExplicitContentEnabled();
     if (btn) btn.disabled = true;
     if (ov) ov.classList.add("is-visible");
   }
@@ -3403,9 +4034,11 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     restoreUgcAppleGateCopy();
     var ov = document.getElementById("ugcPolicyOverlay");
     var chk = document.getElementById("ugcPolicyCheck");
+    var explicitChk = document.getElementById("ugcHideExplicitCheck");
     var btn = document.getElementById("ugcPolicyContinue");
     if (ov) ov.classList.remove("is-visible");
     if (chk) chk.checked = false;
+    if (explicitChk) explicitChk.checked = hideExplicitContentEnabled();
     if (btn) btn.disabled = true;
   }
   window.__reportDraft = { targetType: "song", songTitle: "", artistName: "", uploaderKey: "", userDisplayName: "", fileInp: "" };
@@ -3444,6 +4077,7 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
   document.addEventListener("DOMContentLoaded", function () {
     var ov = document.getElementById("ugcPolicyOverlay");
     var chk = document.getElementById("ugcPolicyCheck");
+    var explicitChk = document.getElementById("ugcHideExplicitCheck");
     var btn = document.getElementById("ugcPolicyContinue");
     if (ov) {
       ov.addEventListener("click", function (e) {
@@ -3455,7 +4089,7 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
       if (checkRow) {
         checkRow.addEventListener("click", function (e) {
           if (e.target === chk) return;
-          if (e.target.closest && e.target.closest("a")) return;
+          if (typeof window.__ugcEventTargetIsInsideAnchor === "function" && window.__ugcEventTargetIsInsideAnchor(e.target)) return;
           e.preventDefault();
           chk.checked = !chk.checked;
           chk.dispatchEvent(new Event("change", { bubbles: true }));
@@ -3466,11 +4100,14 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
       });
       btn.addEventListener("click", function () {
         if (!chk || !chk.checked) return;
+        if (explicitChk) setHideExplicitContentEnabled(!!explicitChk.checked);
         var runner = window.__appleUgcPendingRunner;
         if (typeof runner === "function") {
           try {
             delete window.__appleUgcPendingRunner;
           } catch (e2) {}
+          localStorage.setItem(UGC_KEY, "v1");
+          localStorage.setItem(LEGAL_FIRST_KEY, "v1");
           ov.classList.remove("is-visible");
           chk.checked = false;
           btn.disabled = true;
@@ -3484,6 +4121,27 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
       });
     }
     showFirstVisitLegalGateIfNeeded();
+    var hideExplicitToggle = document.getElementById("hideExplicitToggle");
+    if (hideExplicitToggle) {
+      hideExplicitToggle.checked = hideExplicitContentEnabled();
+      hideExplicitToggle.addEventListener("change", function () {
+        setHideExplicitContentEnabled(!!hideExplicitToggle.checked);
+      });
+    }
+    var reviewLegalBtn = document.getElementById("reviewLegalBtn");
+    if (reviewLegalBtn) {
+      reviewLegalBtn.addEventListener("click", function () {
+        window.openLegalReviewOverlay();
+      });
+    }
+    window.addEventListener("asteroid-explicit-pref-changed", function () {
+      try {
+        if (typeof window.refreshLibraryAfterBlock === "function") window.refreshLibraryAfterBlock();
+        if (typeof window.refreshDiscoveryPanels === "function" && window.__asteroidSongsDataForDiscovery) {
+          window.refreshDiscoveryPanels(window.__asteroidSongsDataForDiscovery);
+        }
+      } catch (e) {}
+    });
     var ro = document.getElementById("reportContentOverlay");
     if (ro) {
       ro.addEventListener("click", function (e) {
@@ -3494,7 +4152,7 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
     if (c) c.addEventListener("click", window.closeReportContentModal);
     var s = document.getElementById("reportContentSubmit");
     if (s) {
-      s.addEventListener("click", function () {
+      s.addEventListener("click", async function () {
         var db = window.firebaseDatabase;
         var refFn = window.firebaseRef;
         var pushFn = window.firebasePush;
@@ -3532,7 +4190,7 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
           fileInp: String(d.fileInp || "").slice(0, 800)
         };
         try {
-          pushFn(refFn(db, "CONTENT_REPORTS"), payload);
+          await pushFn(refFn(db, "CONTENT_REPORTS"), payload);
           if (typeof window.applyLocalHideAfterReport === "function") window.applyLocalHideAfterReport(d);
           var rtt = String(d.targetType || "song").toLowerCase();
           if (
@@ -3647,20 +4305,25 @@ setInterval(flySanta, 10000);
       </button>
     </div>
   </div>
-  <div class="lol-queue-wrap" style="color: white;">
-    <p style="color: coral; font-weight: bold;">Music Queue</p>
-    <table><tr><td id="queuesMob"></td></tr></table>
-  </div>
 </div>
 
 <script>
+window.getMasterPlaybackAudio = function () {
+  return (
+    window.currentPlaying ||
+    (window.action && document.getElementById("gaga_" + window.action)) ||
+    null
+  );
+};
 (function () {
   function lolCurrentAudio() {
-    return window.currentPlaying ||
-      (window.action && document.getElementById("gaga_" + window.action)) ||
-      null;
+    return window.getMasterPlaybackAudio ? window.getMasterPlaybackAudio() : null;
   }
   window.pauseAllPlaybackMaster = function () {
+    try {
+      var ap0 = document.getElementById("audioPlayer");
+      if (ap0 && typeof ap0.pause === "function") ap0.pause();
+    } catch (eAP) {}
     try {
       if (window.currentPlaying && typeof window.currentPlaying.pause === "function") {
         window.currentPlaying.pause();
@@ -3672,11 +4335,6 @@ setInterval(flySanta, 10000);
       }
     } catch (e1) {}
     try {
-      document.querySelectorAll("audio").forEach(function (a) {
-        if (a && typeof a.pause === "function") a.pause();
-      });
-    } catch (e2) {}
-    try {
       var el = lolCurrentAudio();
       if (el && typeof el.pause === "function") el.pause();
     } catch (e3) {}
@@ -3687,7 +4345,14 @@ setInterval(flySanta, 10000);
     if (lp) {
       lp.addEventListener("click", function () {
         var el = lolCurrentAudio();
-        if (!el || !el.play) return;
+        if (!el || !el.play) {
+          var ap = document.getElementById("audioPlayer");
+          if (ap && ap.play && (ap.src || ap.currentSrc)) {
+            var pr0 = ap.play();
+            if (pr0 && typeof pr0.then === "function") pr0.catch(function () {});
+          }
+          return;
+        }
         var pr = el.play();
         if (pr && typeof pr.then === "function") pr.catch(function () {});
       });
@@ -3825,7 +4490,7 @@ console.log("960");
      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
   import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-  import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, OAuthProvider, signOut, onAuthStateChanged, deleteUser, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+  import { initializeAuth, getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, OAuthProvider, signOut, onAuthStateChanged, deleteUser, setPersistence, browserLocalPersistence, browserPopupRedirectResolver } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
   import { getDatabase, ref as ref2, onValue, update, get, set, remove, push, limitToFirst, startAt, orderByKey, query} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
   import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
   import { songShowsExplicitBadge } from "./js/explicit-appendix.js";
@@ -3849,9 +4514,32 @@ const firebaseConfig = {
 console.log('1067')
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
-const auth = getAuth(app);
+let auth;
+try {
+  auth = initializeAuth(app, {
+    persistence: browserLocalPersistence,
+    popupRedirectResolver: browserPopupRedirectResolver,
+  });
+} catch (e) {
+  const code = e && e.code ? String(e.code) : "";
+  const msg = e && e.message ? String(e.message) : "";
+  if (code === "auth/already-initialized" || /already.*initialized/i.test(msg)) {
+    auth = getAuth(app);
+  } else {
+    throw e;
+  }
+}
 let currentFirebaseUser = null;
 setPersistence(auth, browserLocalPersistence).catch((e) => console.warn("[auth persistence]", e && (e.message || e)));
+
+try {
+  if (typeof window.Capacitor !== "undefined" && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+    console.info(
+      "[auth] WebView origin (must be in Firebase → Authentication → Authorized domains if you use redirect/OAuth):",
+      typeof location !== "undefined" ? location.origin : "?"
+    );
+  }
+} catch (eOrig) {}
 
 // Helper: ensure DOM element exists (handles iOS WebView timing edge cases)
 function whenElementReady(id, callback, retries = 10) {
@@ -3863,6 +4551,9 @@ function whenElementReady(id, callback, retries = 10) {
 
 // Firebase REST fallback for iOS WebView (when WebSocket/onValue never fires)
 const RTDB_BASE = "https://asteroid-cdc13-default-rtdb.firebaseio.com";
+try {
+  window.__ASTER_RTDB_REST_BASE = RTDB_BASE;
+} catch (eRT) {}
 let songsReceived = false;
 let trendingReceived = false;
 function applySongSearch() {
@@ -3924,6 +4615,530 @@ window.applySongSearch = applySongSearch;
   if (si) si.addEventListener("input", applySongSearch);
 })();
 
+function songMoodFromTitle(title) {
+  const t = String(title || "").toLowerCase();
+  if (/(rage|hype|turn up|lit|fast|energy|hard)/.test(t)) return "Hype";
+  if (/(love|heart|dear|miss|cry|alone|sad|tears)/.test(t)) return "Emotional";
+  if (/(night|dream|chill|calm|moon|lofi|slow)/.test(t)) return "Chill";
+  if (/(smoke|fire|flash|run|drill|trap|heat)/.test(t)) return "Intense";
+  if (/(sun|bright|happy|smile|joy|perfect)/.test(t)) return "Uplifting";
+  return "Vibey";
+}
+
+function songGenreGuess(song) {
+  const title = String(song?.title || "").toLowerCase();
+  const artist = String(song?.artist || "").toLowerCase();
+  const album = String(song?.album || "").toLowerCase();
+  const explicit = String(song?.genre || song?.genres || song?.style || "").toLowerCase();
+  const fullText = [title, artist, album, explicit].join(" ");
+  const genreRules = {
+    "Hip-Hop": [
+      { re: /\b(hip[\s-]?hop|rap|trap|drill|boom bap|808|freestyle|cypher)\b/, w: 6 },
+      { re: /\b(flow|bars|mc|spit|lyric)\b/, w: 3 }
+    ],
+    "Rock": [
+      { re: /\b(rock|hard rock|alt rock|punk|grunge|metal|heavy metal)\b/, w: 6 },
+      { re: /\b(guitar|riff|solo|band)\b/, w: 3 }
+    ],
+    "EDM": [
+      { re: /\b(edm|electronic|house|deep house|techno|trance|dubstep|dnb|drum and bass)\b/, w: 6 },
+      { re: /\b(remix|club|festival|dj|drop)\b/, w: 3 }
+    ],
+    "R&B": [
+      { re: /\b(r&b|rnb|neo soul|soul)\b/, w: 6 },
+      { re: /\b(smooth|slow jam|groove)\b/, w: 3 }
+    ],
+    "Pop": [
+      { re: /\b(pop|synthpop|dance pop|electropop)\b/, w: 6 },
+      { re: /\b(hit|chart|radio)\b/, w: 3 }
+    ],
+    "Afrobeats": [
+      { re: /\b(afrobeats?|afrobeat|naija|amapiano)\b/, w: 6 },
+      { re: /\b(afro|lagos)\b/, w: 2 }
+    ],
+    "Reggae": [
+      { re: /\b(reggae|dancehall|dub|roots reggae)\b/, w: 6 },
+      { re: /\b(island|jah)\b/, w: 2 }
+    ],
+    "Latin": [
+      { re: /\b(latin|reggaeton|bachata|salsa|cumbia|corrido|dembow)\b/, w: 6 },
+      { re: /\b(latino|spanish)\b/, w: 2 }
+    ],
+    "Jazz": [
+      { re: /\b(jazz|bebop|swing|blues|fusion)\b/, w: 6 },
+      { re: /\b(sax|trumpet|piano trio)\b/, w: 3 }
+    ],
+    "Country": [
+      { re: /\b(country|americana|bluegrass|folk)\b/, w: 6 },
+      { re: /\b(acoustic|western)\b/, w: 2 }
+    ],
+    "Alternative": [
+      { re: /\b(alternative|indie|experimental|lo[-\s]?fi)\b/, w: 3 }
+    ]
+  };
+  let bestGenre = "Alternative";
+  let bestScore = 0;
+  for (const [genre, rules] of Object.entries(genreRules)) {
+    let score = 0;
+    for (const rule of rules) {
+      if (rule.re.test(fullText)) score += rule.w;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestGenre = genre;
+    }
+  }
+  if (bestScore < 3) {
+    const mood = songMoodFromTitle(title);
+    if (mood === "Intense") return "Hip-Hop";
+    if (mood === "Chill") return "Alternative";
+    if (mood === "Uplifting") return "Pop";
+    return "Alternative";
+  }
+  return bestGenre;
+}
+
+function flattenSongsDataForDiscovery(songsData) {
+  const out = [];
+  if (!songsData || typeof songsData !== "object") return out;
+  for (const [, albums] of Object.entries(songsData)) {
+    if (!albums || typeof albums !== "object") continue;
+    for (const [albumKey, artists] of Object.entries(albums)) {
+      if (!artists || typeof artists !== "object") continue;
+      for (const [artistKey, songData] of Object.entries(artists)) {
+        if (songData && typeof songData === "object" && songData.title && songData.fileInp) {
+          const up = (
+            songData.uploader ||
+            songData.uploaderEmail ||
+            songData.uploadedBy ||
+            songData.userEmail ||
+            songData.email ||
+            ""
+          )
+            .toString()
+            .trim();
+          const row = { ...songData, __artistKey: artistKey, __albumKey: albumKey };
+          if (up) row.uploader = up;
+          out.push(row);
+        }
+      }
+    }
+  }
+  return out;
+}
+
+function pickSongUploaderDiscovery(song) {
+  const raw = [
+    song?.uploader,
+    song?.uploaderEmail,
+    song?.ownerEmail,
+    song?.email,
+    song?.artemail,
+    song?.__artistKey
+  ].find((v) => String(v || "").trim().length > 0);
+  return String(raw || "").trim();
+}
+
+function songTransportIconsHtml(tid) {
+  const id = String(tid || "").replace(/'/g, "");
+  return (
+    '<span class="song-transport-wrap">' +
+    '<button type="button" class="song-row-transport song-row-play" onclick="playLibraryTrack(\'' +
+    id +
+    '\')" aria-label="Play"><span class="material-symbols-outlined">play_circle</span></button>' +
+    '<button type="button" class="song-row-transport song-row-pause" onclick="if(typeof pauseLibraryTrack===\'function\')pauseLibraryTrack(\'' +
+    id +
+    '\')" aria-label="Pause"><span class="material-symbols-outlined">pause_circle</span></button>' +
+    "</span>"
+  );
+}
+
+function songOverflowActionsHtml(p) {
+  var bf = String(p.blockFile == null ? "" : p.blockFile).replace(/"/g, "&quot;");
+  var bt = String(p.blockTitle == null ? "" : p.blockTitle).replace(/"/g, "&quot;");
+  var nf = String(p.notrecFile == null ? "" : p.notrecFile).replace(/"/g, "&quot;");
+  var nt = String(p.notrecTitle == null ? "" : p.notrecTitle).replace(/"/g, "&quot;");
+  var fi = String(p.reportFile == null ? "" : p.reportFile).replace(/"/g, "&quot;");
+  var st = String(p.reportTitle == null ? "" : p.reportTitle).replace(/"/g, "&quot;");
+  var sa = String(p.reportArtist == null ? "" : p.reportArtist).replace(/"/g, "&quot;");
+  var up = String(p.reportUploader == null ? "" : p.reportUploader).replace(/"/g, "&quot;");
+  var qfEnc = "";
+  var qtEnc = "";
+  try {
+    if (p.queueFileRaw != null && String(p.queueFileRaw).trim() !== "") {
+      qfEnc = encodeURIComponent(String(p.queueFileRaw));
+    }
+    if (p.queueTitleRaw != null && String(p.queueTitleRaw).trim() !== "") {
+      qtEnc = encodeURIComponent(String(p.queueTitleRaw));
+    }
+  } catch (eEnc) {}
+  var queueItem = "";
+  if (qfEnc && qtEnc) {
+    queueItem =
+      '<button type="button" class="song-overflow-item" role="menuitem" onclick="event.stopPropagation();window.__songOverflowQueueFromDataset(this)" data-queue-file="' +
+      qfEnc +
+      '" data-queue-title="' +
+      qtEnc +
+      '"><span class="material-symbols-outlined">queue_music</span><span>Add to queue</span></button>';
+  }
+  var plArtistEnc = "";
+  try {
+    if (p.playlistArtistRaw != null && String(p.playlistArtistRaw).trim() !== "") {
+      plArtistEnc = encodeURIComponent(String(p.playlistArtistRaw));
+    }
+  } catch (ePlA) {}
+  var playlistItem = "";
+  if (qfEnc && qtEnc) {
+    playlistItem =
+      '<button type="button" class="song-overflow-item" role="menuitem" onclick="event.stopPropagation();window.__saveSongToPersonalPlaylistFromDataset(this)" data-pl-file="' +
+      qfEnc +
+      '" data-pl-title="' +
+      qtEnc +
+      '" data-pl-artist="' +
+      plArtistEnc +
+      '"><span class="material-symbols-outlined">library_music</span><span>Save to My Playlist</span></button>';
+  }
+  var fsScrim =
+    '<button type="button" class="song-overflow-fs-scrim" aria-label="Close menu" onclick="event.stopPropagation();window.closeSongOverflowFullscreen()"></button>';
+  var fsBack =
+    '<button type="button" class="song-overflow-item song-overflow-fs-back" role="menuitem" onclick="event.stopPropagation();window.closeSongOverflowFullscreen()"><span class="material-symbols-outlined">arrow_back</span><span>Back</span></button>';
+  return (
+    '<div class="song-overflow-wrap">' +
+    '<button type="button" class="song-overflow-trigger" aria-label="More options" aria-haspopup="dialog" aria-expanded="false" onclick="event.stopPropagation();window.toggleSongOverflowMenu(this)"><span class="material-symbols-outlined">more_vert</span></button>' +
+    '<div class="song-overflow-menu" role="dialog" aria-modal="true" aria-label="Song actions">' +
+    fsScrim +
+    '<div class="song-overflow-fs-card">' +
+    fsBack +
+    queueItem +
+    playlistItem +
+    '<button type="button" class="song-overflow-item" role="menuitem" onclick="event.stopPropagation();window.closeSongOverflowFullscreen();window.blockSongFromDataset(this)" data-block-file="' +
+    bf +
+    '" data-block-title="' +
+    bt +
+    '"><span class="material-symbols-outlined">block</span><span>Block</span></button>' +
+    '<button type="button" class="song-overflow-item" role="menuitem" onclick="event.stopPropagation();window.closeSongOverflowFullscreen();window.dontRecommendSongFromDataset(this)" data-notrec-file="' +
+    nf +
+    '" data-notrec-title="' +
+    nt +
+    '"><span class="material-symbols-outlined">not_interested</span><span>Don\'t recommend</span></button>' +
+    '<button type="button" class="song-overflow-item" role="menuitem" onclick="event.stopPropagation();window.closeSongOverflowFullscreen();window.openReportContentModal(this)" data-target-type="song" data-file-inp="' +
+    fi +
+    '" data-song-title="' +
+    st +
+    '" data-artist-name="' +
+    sa +
+    '" data-uploader-key="' +
+    up +
+    '"><span class="material-symbols-outlined">flag</span><span>Report</span></button>' +
+    "</div></div></div>"
+  );
+}
+
+window.closeSongOverflowFullscreen = function () {
+  try {
+    document.querySelectorAll(".song-overflow-menu.is-open").forEach(function (m) {
+      m.classList.remove("is-open");
+    });
+    document.querySelectorAll(".song-overflow-trigger[aria-expanded=\"true\"]").forEach(function (b) {
+      b.setAttribute("aria-expanded", "false");
+    });
+    document.body.classList.remove("song-overflow-menu-open");
+    document.documentElement.classList.remove("song-overflow-menu-open");
+  } catch (eC) {}
+};
+
+window.__openPromoteFeatureFlow = function () {
+  try {
+    var signed = false;
+    try {
+      signed = (typeof window.isSessionValid === "function" && window.isSessionValid()) ||
+        !!(localStorage.getItem("CurrentUser") || localStorage.getItem("email") || localStorage.getItem("userEmail"));
+    } catch (eS) {}
+    if (signed) {
+      window.location.href = "studio.html";
+      return;
+    }
+    var appleBtn = document.getElementById("apple-sign-in");
+    if (appleBtn && typeof appleBtn.click === "function") {
+      appleBtn.click();
+      return;
+    }
+    localStorage.setItem("postAuthReturn", "studio.html");
+    var wantsSignup = window.confirm(
+      "Sign in is required for free song featuring.\n\nNew here? Tap OK to create an account.\nTap Cancel to go to login."
+    );
+    window.location.href = wantsSignup ? "registraition.html" : "login.html";
+  } catch (eP) {
+    window.location.href = "studio.html";
+  }
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  var btn = document.getElementById("promoteFeatureCtaBtn");
+  if (!btn) return;
+  btn.addEventListener("click", function () {
+    window.__openPromoteFeatureFlow();
+  });
+});
+
+window.toggleSongOverflowMenu = function (btn) {
+  try {
+    var wrap = btn && btn.closest ? btn.closest(".song-overflow-wrap") : null;
+    var menu = wrap && wrap.querySelector ? wrap.querySelector(".song-overflow-menu") : null;
+    if (!menu) return;
+    var willOpen = !menu.classList.contains("is-open");
+    window.closeSongOverflowFullscreen();
+    if (willOpen) {
+      menu.classList.add("is-open");
+      document.body.classList.add("song-overflow-menu-open");
+      document.documentElement.classList.add("song-overflow-menu-open");
+      if (btn && btn.setAttribute) btn.setAttribute("aria-expanded", "true");
+    }
+  } catch (e) {}
+};
+
+window.__songOverflowQueueFromDataset = function (btn) {
+  try {
+    window.closeSongOverflowFullscreen();
+    var fr = String((btn && btn.getAttribute && btn.getAttribute("data-queue-file")) || "");
+    var tr = String((btn && btn.getAttribute && btn.getAttribute("data-queue-title")) || "");
+    var f = fr;
+    var t = tr;
+    try {
+      f = decodeURIComponent(fr.replace(/\+/g, "%20"));
+    } catch (e1) {}
+    try {
+      t = decodeURIComponent(tr.replace(/\+/g, "%20"));
+    } catch (e2) {}
+    if (f && typeof window.queuemusic === "function") window.queuemusic(f, t);
+  } catch (eQ) {}
+};
+
+/** Same storage key pattern as www/pat.html + www/auth.js (authScopedKey("playlists")). */
+window.__saveSongToPersonalPlaylistFromDataset = function (btn) {
+  try {
+    window.closeSongOverflowFullscreen();
+    var uid =
+      String(
+        (localStorage.getItem("userEmail") || localStorage.getItem("email") || localStorage.getItem("CurrentUser") || "")
+          .trim()
+      ).replace(/[.#$[\]]/g, "_") || "";
+    if (!uid) {
+      var wantsSignup = window.confirm(
+        "Sign in is required to save songs.\n\nNew here? Tap OK to create an account and enter your sign-up information.\nTap Cancel to go to login."
+      );
+      localStorage.setItem("postAuthReturn", "pat.html");
+      window.location.href = wantsSignup ? "registraition.html" : "login.html";
+      return;
+    }
+    var fr = String((btn && btn.getAttribute && btn.getAttribute("data-pl-file")) || "");
+    var tr = String((btn && btn.getAttribute && btn.getAttribute("data-pl-title")) || "");
+    var ar = String((btn && btn.getAttribute && btn.getAttribute("data-pl-artist")) || "");
+    var f = fr;
+    var t = tr;
+    var a = ar;
+    try {
+      f = decodeURIComponent(fr.replace(/\+/g, "%20"));
+    } catch (e1) {}
+    try {
+      t = decodeURIComponent(tr.replace(/\+/g, "%20"));
+    } catch (e2) {}
+    try {
+      a = decodeURIComponent(ar.replace(/\+/g, "%20"));
+    } catch (e3) {}
+    if (!f || !t) return;
+    var pk = "playlists_" + uid;
+    var list = [];
+    try {
+      list = JSON.parse(localStorage.getItem(pk) || "[]");
+    } catch (eJ) {
+      list = [];
+    }
+    if (!Array.isArray(list)) list = [];
+    var dup = list.some(function (x) {
+      return x && String(x.src || "") === f;
+    });
+    if (dup) {
+      if (window.confirm('That track is already in your playlist. Open "My Playlist" (pat.html)?')) {
+        window.location.href = "pat.html";
+      }
+      return;
+    }
+    list.push({ title: t, artist: a || "Unknown artist", src: f });
+    localStorage.setItem(pk, JSON.stringify(list));
+
+    // Also persist per-user playlist in Firebase Realtime Database.
+    try {
+      var db = window.firebaseDatabase;
+      var refFn = window.firebaseRef;
+      var setFn = window.firebaseSet;
+      if (db && refFn && setFn && uid) {
+        var sid = String(f).replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 180);
+        setFn(refFn(db, "PLAYLISTS/" + uid + "/" + sid), {
+          title: t,
+          artist: a || "Unknown artist",
+          src: f,
+          addedAt: Date.now()
+        });
+      }
+    } catch (eFbPl) {
+      console.warn("[playlist-firebase]", eFbPl);
+    }
+
+    if (window.confirm('Saved to your playlist. Open "My Playlist" (pat.html) now?')) {
+      window.location.href = "pat.html";
+    }
+  } catch (ePl) {
+    console.warn("[playlist]", ePl);
+  }
+};
+if (!window.__songOverflowDocClose) {
+  window.__songOverflowDocClose = true;
+  document.addEventListener(
+    "click",
+    function (e) {
+      try {
+        var el = e.target;
+        if (el && el.closest && (el.closest(".song-overflow-menu") || el.closest(".song-overflow-trigger"))) return;
+        window.closeSongOverflowFullscreen();
+      } catch (e2) {}
+    },
+    true
+  );
+}
+if (!window.__songOverflowEscape) {
+  window.__songOverflowEscape = true;
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (!document.querySelector(".song-overflow-menu.is-open")) return;
+    window.closeSongOverflowFullscreen();
+  });
+}
+if (!window.__songOverflowMobileSafety) {
+  window.__songOverflowMobileSafety = true;
+  window.addEventListener("pageshow", function () {
+    window.closeSongOverflowFullscreen();
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") window.closeSongOverflowFullscreen();
+  });
+}
+
+function renderDiscoveryRows(list, mountId) {
+  const mount = document.getElementById(mountId);
+  if (!mount) return;
+  try {
+    mount.querySelectorAll("audio").forEach(function (a) {
+      try {
+        a.pause();
+      } catch (e0) {}
+      try {
+        a.removeAttribute("src");
+        while (a.firstChild) a.removeChild(a.firstChild);
+        a.load();
+      } catch (e1) {}
+    });
+  } catch (e2) {}
+  if (!Array.isArray(list) || list.length === 0) {
+    mount.innerHTML = '<div class="discovery-empty">No songs found in this section yet.</div>';
+    return;
+  }
+  mount.innerHTML = list.slice(0, 18).map((s, idx) => {
+    const tid =
+      "discover_" +
+      mountId +
+      "_" +
+      idx +
+      "_" +
+      Date.now() +
+      "_" +
+      (typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID().replace(/-/g, "").slice(0, 12)
+        : Math.random().toString(36).slice(2, 14));
+    const t = String(s.title || "Untitled").replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    const a = String(s.artist || "Unknown").replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    const url = String(s.fileInp || "").replace(/"/g, "&quot;");
+    const up = String(pickSongUploaderDiscovery(s) || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    const st = String(s.title || "Untitled").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    const sa = String(s.artist || "Unknown").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    const sfile = String(s.fileInp || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    const eb = songShowsExplicitBadge(s) ? '<span class="explicit-badge" title="Explicit">E</span>' : "";
+    const exDa = songShowsExplicitBadge(s) ? ' data-explicit="1"' : "";
+    const transport = songTransportIconsHtml(tid);
+    const overflow = songOverflowActionsHtml({
+      queueFileRaw: s.fileInp,
+      queueTitleRaw: s.title,
+      playlistArtistRaw: s.artist || "",
+      blockFile: sfile,
+      blockTitle: st,
+      notrecFile: sfile,
+      notrecTitle: st,
+      reportFile: sfile,
+      reportTitle: st,
+      reportArtist: sa,
+      reportUploader: up,
+    });
+    return (
+      `<div class="song-row song-row--discovery"><audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" data-uploader="${up}"${exDa} playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio><div class="song-row-num">${idx + 1}</div><div class="song-row-info"><div class="song-row-title-row">${eb}<span class="song-row-title">${t}</span></div><span class="song-row-artist">${a}</span></div><div class="song-row-actions">${transport}${overflow}</div></div>`
+    );
+  }).join("");
+}
+
+window.toggleDiscoveryCard = function (id) {
+  const card = document.getElementById(id);
+  if (card) card.classList.toggle("open");
+};
+
+window.refreshDiscoveryPanels = function (songsData) {
+  const moodWrap = document.getElementById("moodChipWrap");
+  const genreWrap = document.getElementById("genreChipWrap");
+  if (!moodWrap || !genreWrap) return;
+  if (!songsData || typeof songsData !== "object") {
+    moodWrap.innerHTML = "";
+    genreWrap.innerHTML = "";
+    renderDiscoveryRows([], "moodDiscoveryList");
+    renderDiscoveryRows([], "genreDiscoveryList");
+    return;
+  }
+  const songs = flattenSongsDataForDiscovery(songsData).filter((s) => {
+    if (window.shouldHideSongInLibrary(s)) return false;
+    if (typeof window.isSongNotRecommended === "function" && window.isSongNotRecommended(s)) return false;
+    if (typeof window.shouldHideExplicitSong === "function" && window.shouldHideExplicitSong(s)) return false;
+    return true;
+  });
+  const moods = ["Hype", "Chill", "Emotional", "Intense", "Uplifting", "Vibey"];
+  const genres = ["Hip-Hop", "Rock", "EDM", "R&B", "Pop", "Afrobeats", "Reggae", "Latin", "Jazz", "Country", "Alternative"];
+  const activeMood = window.__activeMoodDiscovery || moods[0];
+  const activeGenre = window.__activeGenreDiscovery || genres[0];
+  moodWrap.innerHTML = moods
+    .map((m) => `<button type="button" class="filter-chip ${m === activeMood ? "active" : ""}" data-mood-chip="${m}">${m}</button>`)
+    .join("");
+  genreWrap.innerHTML = genres
+    .slice(0, 9)
+    .map((g) => `<button type="button" class="filter-chip ${g === activeGenre ? "active" : ""}" data-genre-chip="${g}">${g}</button>`)
+    .join("");
+  renderDiscoveryRows(
+    songs.filter((s) => songMoodFromTitle(s.title) === activeMood),
+    "moodDiscoveryList"
+  );
+  renderDiscoveryRows(
+    songs.filter((s) => songGenreGuess(s) === activeGenre),
+    "genreDiscoveryList"
+  );
+  moodWrap.querySelectorAll("[data-mood-chip]").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      window.__activeMoodDiscovery = btn.getAttribute("data-mood-chip") || moods[0];
+      window.refreshDiscoveryPanels(songsData);
+    })
+  );
+  genreWrap.querySelectorAll("[data-genre-chip]").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      window.__activeGenreDiscovery = btn.getAttribute("data-genre-chip") || genres[0];
+      window.refreshDiscoveryPanels(songsData);
+    })
+  );
+};
+
 function renderSongsFromData(songsData) {
   if (!songsData || typeof songsData !== "object") return "<p style='text-align:center;color:#ccc;padding:20px;'>No songs yet. Upload from the studio!</p>";
 
@@ -3932,7 +5147,10 @@ function renderSongsFromData(songsData) {
   function esc(s) { return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
   function escQ(s) { return (s || "").replace(/'/g,"\\'"); }
   function explicitBadge(s) {
-    return songShowsExplicitBadge(s) ? '<span class="explicit-badge" title="Explicit language">E</span>' : "";
+    return songShowsExplicitBadge(s) ? '<span class="explicit-badge" title="Explicit">E</span>' : "";
+  }
+  function explicitDataAttr(s) {
+    return songShowsExplicitBadge(s) ? ' data-explicit="1"' : "";
   }
   function songUploaderRaw(s) {
     return (s.uploader || s.uploaderEmail || s.uploadedBy || s.userEmail || s.email || "").toString().trim();
@@ -3954,6 +5172,7 @@ function renderSongsFromData(songsData) {
   const visibleSongs = allSongs.filter((s) => {
     if (window.shouldHideSongInLibrary(s)) return false;
     if (typeof window.isSongNotRecommended === "function" && window.isSongNotRecommended(s)) return false;
+    if (typeof window.shouldHideExplicitSong === "function" && window.shouldHideExplicitSong(s)) return false;
     return true;
   });
   if (visibleSongs.length === 0) {
@@ -3985,20 +5204,30 @@ function renderSongsFromData(songsData) {
     const tid = allocTid();
     const mood = primaryMoodForSong(s);
     const up = esc(songUploaderRaw(s));
+    const transport = songTransportIconsHtml(tid);
+    const overflow = songOverflowActionsHtml({
+      queueFileRaw: s.fileInp,
+      queueTitleRaw: s.title,
+      playlistArtistRaw: s.artist || "",
+      blockFile: esc(s.fileInp),
+      blockTitle: esc(s.title),
+      notrecFile: esc(s.fileInp),
+      notrecTitle: esc(s.title),
+      reportFile: esc(s.fileInp),
+      reportTitle: esc(s.title),
+      reportArtist: esc(s.artist),
+      reportUploader: up,
+    });
     return `<div class="sssh song-row" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="${al.toLowerCase()}">
-      <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
+      <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}"${explicitDataAttr(s)} playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
       <div class="song-row-num">${idx + 1}</div>
       <div class="song-row-info">
         <div class="song-row-title-row">${explicitBadge(s)}<span class="song-row-title">${t}</span></div>
         <span class="song-row-artist">${a}</span>
       </div>
       <div class="song-row-actions">
-        <i class="fa fa-play-circle song-row-play" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play ${esc(s.title)}"></i>
-        <i class="fa fa-pause-circle-o song-row-pause" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
-        <span class="song-row-action-labeled"><button type="button" class="song-row-queue" onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button><span class="song-row-action-label">Queue</span></span>
-        <span class="song-row-action-labeled"><button type="button" class="song-row-block" aria-label="Block song" title="Hide this song" onclick="window.blockSongFromDataset(this)" data-block-file="${esc(s.fileInp)}" data-block-title="${esc(s.title)}"><span class="material-symbols-outlined">block</span></button><span class="song-row-action-label">Block</span></span>
-        <span class="song-row-action-labeled"><button type="button" class="song-row-not-rec" aria-label="Don't recommend" title="Hide from your library list" onclick="window.dontRecommendSongFromDataset(this)" data-notrec-file="${esc(s.fileInp)}" data-notrec-title="${esc(s.title)}"><span class="material-symbols-outlined">not_interested</span></button><span class="song-row-action-label">Don't recommend</span></span>
-        <span class="song-row-action-labeled"><button type="button" class="song-row-flag" aria-label="Report song" title="Report" onclick="window.openReportContentModal(this)" data-target-type="song" data-file-inp="${esc(s.fileInp)}" data-song-title="${esc(s.title)}" data-artist-name="${esc(s.artist)}" data-uploader-key="${up}"><span class="material-symbols-outlined">flag</span></button><span class="song-row-action-label">Report</span></span>
+        ${transport}
+        ${overflow}
       </div>
     </div>`;
   }
@@ -4014,8 +5243,22 @@ function renderSongsFromData(songsData) {
         const tid = allocTid();
         const mood = primaryMoodForSong(s);
         const up = esc(songUploaderRaw(s));
+        const transportSingle = songTransportIconsHtml(tid);
+        const overflowSingle = songOverflowActionsHtml({
+          queueFileRaw: s.fileInp,
+          queueTitleRaw: s.title,
+          playlistArtistRaw: s.artist || "",
+          blockFile: esc(s.fileInp),
+          blockTitle: esc(s.title),
+          notrecFile: esc(s.fileInp),
+          notrecTitle: esc(s.title),
+          reportFile: esc(s.fileInp),
+          reportTitle: esc(s.title),
+          reportArtist: esc(s.artist),
+          reportUploader: up,
+        });
         html += `<div class="sssh single-card" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="">
-          <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}" playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
+          <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}"${explicitDataAttr(s)} playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
           <div class="single-emoji">${pickEmoji(s.title)}</div>
           <div class="single-info">
             <div class="single-title-row">${explicitBadge(s)}<div class="single-title">${t}</div></div>
@@ -4023,12 +5266,8 @@ function renderSongsFromData(songsData) {
             <div class="single-badge">Single</div>
           </div>
           <div class="single-actions">
-            <i class="fa fa-play-circle" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play ${esc(s.title)}"></i>
-            <i class="fa fa-pause-circle-o" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
-            <span class="song-row-action-labeled"><button type="button" class="song-row-queue" onclick="queuemusic('${escQ(s.fileInp)}','${escQ(s.title)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button><span class="song-row-action-label">Queue</span></span>
-            <span class="song-row-action-labeled"><button type="button" class="song-row-block" aria-label="Block song" title="Hide this song" onclick="window.blockSongFromDataset(this)" data-block-file="${esc(s.fileInp)}" data-block-title="${esc(s.title)}"><span class="material-symbols-outlined">block</span></button><span class="song-row-action-label">Block</span></span>
-            <span class="song-row-action-labeled"><button type="button" class="song-row-not-rec" aria-label="Don't recommend" title="Hide from your library list" onclick="window.dontRecommendSongFromDataset(this)" data-notrec-file="${esc(s.fileInp)}" data-notrec-title="${esc(s.title)}"><span class="material-symbols-outlined">not_interested</span></button><span class="song-row-action-label">Don't recommend</span></span>
-            <span class="song-row-action-labeled"><button type="button" class="song-row-flag" aria-label="Report song" title="Report" onclick="window.openReportContentModal(this)" data-target-type="song" data-file-inp="${esc(s.fileInp)}" data-song-title="${esc(s.title)}" data-artist-name="${esc(s.artist)}" data-uploader-key="${up}"><span class="material-symbols-outlined">flag</span></button><span class="song-row-action-label">Report</span></span>
+            ${transportSingle}
+            ${overflowSingle}
           </div>
         </div>`;
       });
@@ -4067,6 +5306,7 @@ function fetchSongsViaREST() {
       const extra = document.getElementById("artists-grid-8");
       ab.innerHTML = html + (extra ? extra.innerHTML : "");
       applySongSearch();
+      if (typeof window.refreshDiscoveryPanels === "function") window.refreshDiscoveryPanels(songsData);
       if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
     });
     console.log("✅ REST fallback: SONGS loaded");
@@ -4119,6 +5359,7 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
     whenElementReady("ab", (ab) => { ab.innerHTML = "<p style='text-align:center;color:#ccc;padding:20px;'>No songs yet. Upload from the studio!</p>"; });
     globalSongsData = null;
     window.__asteroidSongsDataForDiscovery = null;
+    if (typeof window.refreshDiscoveryPanels === "function") window.refreshDiscoveryPanels(null);
     return;
   }
   globalSongsData = songsData;
@@ -4130,12 +5371,14 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
     const extra = document.getElementById("artists-grid-8");
     ab.innerHTML = html + (extra ? extra.innerHTML : "");
     applySongSearch();
+    if (typeof window.refreshDiscoveryPanels === "function") window.refreshDiscoveryPanels(songsData);
     if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
   });
 }, (error) => {
   songsReceived = true;
   console.error("❌ Firebase error loading SONGS:", error);
   whenElementReady("ab", (ab) => { ab.innerHTML = "<p style='text-align:center;color:#ff6b6b;padding:20px;'>Error loading songs. Check your connection and try again.</p>"; });
+  if (typeof window.refreshDiscoveryPanels === "function") window.refreshDiscoveryPanels(null);
 });
 console.log("✅ SONGS listener attached");
 
@@ -4148,6 +5391,7 @@ window.refreshLibraryAfterBlock = function () {
     const extra = document.getElementById("artists-grid-8");
     ab.innerHTML = html + (extra ? extra.innerHTML : "");
     applySongSearch();
+    if (typeof window.refreshDiscoveryPanels === "function") window.refreshDiscoveryPanels(globalSongsData);
     if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
   });
 };
@@ -4309,10 +5553,12 @@ window.updateBecauseYouLiked = function (seedTitle, moodRaw) {
   window.__becausePicks = picks;
   grid.innerHTML = picks
     .map(
-      (song, i) =>
-        `<div class="because-card"><div class="because-card-title">${becauseHtmlEscape(song.title)}</div><div class="because-card-artist">${becauseHtmlEscape(
-          song.artist || ""
-        )}</div><button type="button" class="because-play-btn" data-bi="${i}">Play</button></div>`
+      (song, i) => {
+        const ebB = songShowsExplicitBadge(song) ? '<span class="explicit-badge" title="Explicit">E</span>' : "";
+        return `<div class="because-card"><div class="because-card-title">${ebB}<span class="because-card-title-text">${becauseHtmlEscape(
+          song.title
+        )}</span></div><div class="because-card-artist">${becauseHtmlEscape(song.artist || "")}</div><button type="button" class="because-play-btn" data-bi="${i}">Play</button></div>`;
+      }
     )
     .join("");
   grid.onclick = function (ev) {
@@ -4335,6 +5581,7 @@ window.playRecommendedSong = function (song) {
   el.dataset.displayAlbum = song.album || "";
   el.dataset.mood = String(song.mood || song.primaryMood || (Array.isArray(song.moods) && song.moods[0] ? song.moods[0] : "") || "");
   el.dataset.uploader = String(song.uploader || "");
+  if (songShowsExplicitBadge(song)) el.dataset.explicit = "1";
   const src = document.createElement("source");
   src.src = song.fileInp;
   src.type = "audio/mpeg";
@@ -4356,11 +5603,24 @@ window.pauseAllLibraryAudioExcept = function (except) {
       a.pause();
     } catch (e) {}
   });
+  try {
+    document.querySelectorAll("#moodDiscoveryList audio, #genreDiscoveryList audio").forEach(function (a) {
+      if (except && a === except) return;
+      try {
+        a.pause();
+      } catch (e2) {}
+    });
+  } catch (e3) {}
 };
 
 window.playLibraryTrack = function (tid) {
   const el = document.getElementById("gaga_" + tid);
   if (!el) return;
+  try {
+    if (window.currentPlaying && window.currentPlaying !== el && typeof window.currentPlaying.pause === "function") {
+      window.currentPlaying.pause();
+    }
+  } catch (eCP) {}
   logListenEngagement(el);
   window.pauseAllLibraryAudioExcept(el);
   window.action = tid;
@@ -4373,7 +5633,20 @@ window.playLibraryTrack = function (tid) {
     const wrap = document.createElement("span");
     wrap.style.fontWeight = "600";
     wrap.style.color = "#ff7f50";
-    wrap.textContent = title + (artist ? " · " + artist : "") || "Playing…";
+    wrap.style.display = "inline-flex";
+    wrap.style.alignItems = "center";
+    wrap.style.gap = "6px";
+    wrap.style.flexWrap = "wrap";
+    if (el.dataset && el.dataset.explicit === "1") {
+      const badge = document.createElement("span");
+      badge.className = "explicit-badge";
+      badge.title = "Explicit";
+      badge.textContent = "E";
+      wrap.appendChild(badge);
+    }
+    const txt = document.createElement("span");
+    txt.textContent = (title + (artist ? " · " + artist : "")) || "Playing…";
+    wrap.appendChild(txt);
     tata.appendChild(wrap);
   }
   if (window.turnToCoral) window.turnToCoral();
@@ -4389,6 +5662,21 @@ window.playLibraryTrack = function (tid) {
         tata.appendChild(err);
       }
     });
+  }
+};
+
+window.pauseLibraryTrack = function (tid) {
+  var id = String(tid || "").replace(/'/g, "");
+  var el = document.getElementById("gaga_" + id);
+  if (!el || typeof el.pause !== "function") return;
+  try {
+    el.pause();
+  } catch (e) {}
+  if (window.currentPlaying === el) {
+    try {
+      var ap = document.getElementById("audioPlayer");
+      if (ap && typeof ap.pause === "function") ap.pause();
+    } catch (e3) {}
   }
 };
 
@@ -4410,7 +5698,19 @@ window.actual1 = function (audioDomId) {
     const sp = document.createElement("span");
     sp.style.color = "coral";
     sp.style.fontWeight = "600";
-    sp.textContent = "🎵 NOW PLAYING: " + displayTitle;
+    sp.style.display = "inline-flex";
+    sp.style.alignItems = "center";
+    sp.style.gap = "6px";
+    sp.style.flexWrap = "wrap";
+    sp.appendChild(document.createTextNode("🎵 NOW PLAYING: "));
+    if (el && el.dataset && el.dataset.explicit === "1") {
+      const badge = document.createElement("span");
+      badge.className = "explicit-badge";
+      badge.title = "Explicit";
+      badge.textContent = "E";
+      sp.appendChild(badge);
+    }
+    sp.appendChild(document.createTextNode(displayTitle));
     tata.appendChild(sp);
   }
 };
@@ -4651,14 +5951,92 @@ window.doDeleteAccount = async function(statusCallback) {
   setTimeout(function() { window.location.reload(); }, 1200);
 };
 
+/** True when this device still has a saved session (matches profile / follow helpers). */
+function hasRememberedAppSession() {
+  try {
+    const signedFlag =
+      localStorage.getItem("asteroidSignedInBefore") === "true" ||
+      localStorage.getItem("isLoggedIn") === "true" ||
+      localStorage.getItem("localAuthOnly") === "1";
+    if (!signedFlag) return false;
+    const ek = (localStorage.getItem("emailKey") || "").trim();
+    const cu = (localStorage.getItem("CurrentUser") || "").trim();
+    const em = (localStorage.getItem("email") || "").trim();
+    return !!(ek || cu || em);
+  } catch (e) {
+    return false;
+  }
+}
+
+function syncHeaderSignInGroupFromStorage() {
+  try {
+    const appleSignInHeader = document.getElementById("apple-sign-in");
+    const gcd = document.getElementById("gcd");
+    if (!hasRememberedAppSession()) return;
+    if (appleSignInHeader) appleSignInHeader.style.setProperty("display", "none", "important");
+    if (gcd) {
+      const nm = (localStorage.getItem("fullName") || localStorage.getItem("profileNickname") || "").trim();
+      const ac = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim();
+      const next = nm || ac;
+      if (next && (!gcd.innerText || /continue with apple/i.test(String(gcd.innerText || "")))) {
+        gcd.textContent = next;
+      }
+    }
+  } catch (e) {}
+}
+
+// Before Firebase restores the user (slow on iOS WebView), hide Apple if we already have a session.
+try {
+  syncHeaderSignInGroupFromStorage();
+} catch (eSync0) {}
+document.addEventListener("DOMContentLoaded", function () {
+  try {
+    syncHeaderSignInGroupFromStorage();
+  } catch (eSync1) {}
+});
+
 // Keep track of auth state so UI can react correctly
 onAuthStateChanged(auth, (user) => {
   currentFirebaseUser = user;
   window.currentFirebaseUser = user;
 
   const dashboardLink = document.getElementById("artist-dashboard-link");
+  const mobileDashboardLink = document.getElementById("mobile-artist-dashboard-link");
   const liveNotifier = document.getElementById("live-notifier");
   const appleSignInHeader = document.getElementById("apple-sign-in");
+
+  function localArtistProfileEnabled() {
+    const t = (localStorage.getItem("profileType") || "").toLowerCase().trim();
+    const v = (localStorage.getItem("profileVisibility") || "").toLowerCase().trim();
+    const r = (localStorage.getItem("profileRole") || localStorage.getItem("role") || "").toLowerCase().trim();
+    return t === "artist" || v === "public" || r.indexOf("artist") >= 0;
+  }
+
+  function setArtistDashboardNavVisible(enabled) {
+    const on = !!enabled;
+    if (dashboardLink) dashboardLink.style.display = on ? "block" : "none";
+    if (mobileDashboardLink) mobileDashboardLink.style.display = on ? "inline-flex" : "none";
+    if (liveNotifier) liveNotifier.style.display = on ? "none" : "block";
+  }
+
+  function isArtistProfileRecord(profileObj) {
+    if (!profileObj || typeof profileObj !== "object") return false;
+    const t = String(profileObj.profileType || "").toLowerCase().trim();
+    const v = String(profileObj.profileVisibility || "").toLowerCase().trim();
+    const r = String(profileObj.profileRole || profileObj.role || "").toLowerCase().trim();
+    return t === "artist" || v === "public" || r.indexOf("artist") >= 0;
+  }
+
+  async function resolveArtistDashboardEnabled(emailKey, fallback) {
+    var base = !!fallback;
+    if (!emailKey) return base;
+    try {
+      const profSnap = await get(ref2(database, "PROFILES/" + emailKey));
+      if (profSnap.exists() && isArtistProfileRecord(profSnap.val())) return true;
+    } catch (eProfile) {}
+    return base;
+  }
+
   // If user is signed in, update UI and check premium status
   if (user) {
     if (appleSignInHeader) appleSignInHeader.style.setProperty("display", "none", "important");
@@ -4691,26 +6069,19 @@ onAuthStateChanged(auth, (user) => {
     // Check if this user is a premium artist (PREMIUM/<emailKey>.ITG == true / "true")
     const premiumRef = ref2(database, "PREMIUM/" + emailKey);
     get(premiumRef)
-      .then((snapshot) => {
+      .then(async (snapshot) => {
         const val = snapshot.exists() ? snapshot.val() : null;
         console.log("Home PREMIUM check:", emailKey, val);
         const isPremium =
           !!val && (val.ITG === true || val.ITG === "true");
-        if (dashboardLink) {
-          if (isPremium) {
-            dashboardLink.style.display = "block";
-            liveNotifier.style.display = "none";
-          } else {
-            dashboardLink.style.display = "none";
-            liveNotifier.style.display = "block";
-          }
-        }
+        const localArtist = localArtistProfileEnabled();
+        const isArtist = await resolveArtistDashboardEnabled(emailKey, isPremium || localArtist);
+        setArtistDashboardNavVisible(isArtist);
       })
-      .catch((err) => {
+      .catch(async (err) => {
         console.error("Error checking PREMIUM status on home:", err);
-        if (dashboardLink) {
-          dashboardLink.style.display = "none";
-        }
+        const isArtist = await resolveArtistDashboardEnabled(emailKey, localArtistProfileEnabled());
+        setArtistDashboardNavVisible(isArtist);
       });
 
     const isApple = user.providerData && user.providerData.some((p) => p && p.providerId === "apple.com");
@@ -4721,24 +6092,26 @@ onAuthStateChanged(auth, (user) => {
     }
   } else {
     // If device has an existing local session, keep user logged in on this device.
-    const localAccount = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim();
-    const localName = (localStorage.getItem("fullName") || localStorage.getItem("profileNickname") || "").trim();
-    const localRemembered = localStorage.getItem("asteroidSignedInBefore") === "true";
-    if (localRemembered && localAccount) {
+    if (hasRememberedAppSession()) {
       if (appleSignInHeader) appleSignInHeader.style.setProperty("display", "none", "important");
       const gcd = document.getElementById("gcd");
-      if (gcd) gcd.textContent = localName || localAccount;
-      const localEmailKey = (localStorage.getItem("emailKey") || localAccount.replace(/[.#$[\]]/g, "_")).trim();
+      const localAccount = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim();
+      const localName = (localStorage.getItem("fullName") || localStorage.getItem("profileNickname") || "").trim();
+      if (gcd) gcd.textContent = localName || localAccount || gcd.textContent;
+      const localEmailKey = (
+        localStorage.getItem("emailKey") ||
+        localAccount.replace(/[.#$[\]]/g, "_")
+      ).trim();
       if (localEmailKey) {
         const premiumRef = ref2(database, "PREMIUM/" + localEmailKey);
-        get(premiumRef).then((snapshot) => {
+        get(premiumRef).then(async (snapshot) => {
           const val = snapshot.exists() ? snapshot.val() : null;
           const isPremium = !!val && (val.ITG === true || val.ITG === "true");
-          if (dashboardLink) dashboardLink.style.display = isPremium ? "block" : "none";
-          if (liveNotifier) liveNotifier.style.display = isPremium ? "none" : "block";
-        }).catch(() => {
-          if (dashboardLink) dashboardLink.style.display = "none";
-          if (liveNotifier) liveNotifier.style.display = "block";
+          const isArtist = await resolveArtistDashboardEnabled(localEmailKey, isPremium || localArtistProfileEnabled());
+          setArtistDashboardNavVisible(isArtist);
+        }).catch(async () => {
+          const isArtist = await resolveArtistDashboardEnabled(localEmailKey, localArtistProfileEnabled());
+          setArtistDashboardNavVisible(isArtist);
         });
       }
       console.log("[index] onAuthStateChanged: restored local device session", localAccount);
@@ -4746,7 +6119,7 @@ onAuthStateChanged(auth, (user) => {
     }
 
     // Not signed in and no local remembered session: show sign-in UI.
-    if (dashboardLink) dashboardLink.style.display = "none";
+    setArtistDashboardNavVisible(false);
     if (appleSignInHeader) appleSignInHeader.style.setProperty("display", "inline-flex", "important");
     const gcd = document.getElementById("gcd");
     if (gcd) gcd.textContent = "Continue with Apple";
@@ -5039,6 +6412,7 @@ let Cmay = document.getElementById("Cmay")
 
 function loadNotes() {
   if (!currentMusician) return;
+  if (!notesContainer) return;
 
   onValue(ref2(database, "notes/" + currentMusician), (snapshot3) => {
     notesContainer.innerHTML = "";
@@ -5142,6 +6516,21 @@ let viewportWidth = window.innerWidth;
 let viewportHeight = window.innerHeight;
 
 // Helpers for logout modal
+function setProfileUiFocus(active) {
+  try {
+    document.body.classList.toggle("profile-focus-active", !!active);
+  } catch (e0) {}
+  try {
+    const mini = document.getElementById("minivis");
+    if (mini && active) {
+      mini.hidden = true;
+      mini.setAttribute("aria-hidden", "true");
+      mini.style.setProperty("display", "none", "important");
+      const ap = document.getElementById("audioPlayer");
+      if (ap && typeof ap.pause === "function") ap.pause();
+    }
+  } catch (e1) {}
+}
 function openLogoutModal(user) {
   const modal = document.getElementById("logoutModal");
   if (!modal) return;
@@ -5156,12 +6545,14 @@ function openLogoutModal(user) {
 
   if (nameEl) nameEl.textContent = displayName;
 
+  setProfileUiFocus(true);
   modal.style.display = "flex";
 }
 
 function closeLogoutModal() {
   const modal = document.getElementById("logoutModal");
   if (modal) modal.style.display = "none";
+  setProfileUiFocus(false);
 }
 
 function showSignOutLoading() {
@@ -5263,32 +6654,6 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
   }
 });
 
-// Profile button: if signed in, show logout modal; otherwise trigger Apple sign-in
-document.getElementById("user-profile-button").addEventListener("click", () => {
-  console.log("profile_button_clicked");
-
-  const firebaseUser = window.currentFirebaseUser || auth.currentUser;
-  const hasLocalUser =
-    !!localStorage.getItem("email") || !!localStorage.getItem("CurrentUser");
-
-  if (firebaseUser || hasLocalUser) {
-    // Build a lightweight "user" object for the modal, using Firebase if possible,
-    // otherwise falling back to what we have in localStorage.
-    const modalUser =
-      firebaseUser || {
-        displayName:
-          localStorage.getItem("fullName") ||
-          localStorage.getItem("profileNickname") ||
-          "Signed-in user",
-        email: localStorage.getItem("email") || "",
-      };
-    openLogoutModal(modalUser);
-  } else {
-    const appleBtn = document.getElementById("apple-sign-in");
-    if (appleBtn) appleBtn.click();
-  }
-});
-
           // Store songs data globally for handleKKK function
           // Sign in with Apple (Firebase)
           const appleProvider = new OAuthProvider("apple.com");
@@ -5297,7 +6662,22 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
 
           const isCapacitorNative = () => typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
           const getAppPlugin = () => { try { return window.Capacitor?.Plugins?.App || null; } catch (e) { return null; } };
-          const getBrowserPlugin = () => { try { return window.Capacitor?.Plugins?.Browser || null; } catch (e) { return null; } };
+          const getBrowserPlugin = () => {
+            try {
+              const C = window.Capacitor;
+              const P = C && C.Plugins && C.Plugins.Browser;
+              if (P && typeof P.open === "function") return P;
+              if (C && typeof C.nativePromise === "function" && typeof C.getPlatform === "function" && C.getPlatform() === "ios") {
+                return {
+                  open: (opts) => C.nativePromise("Browser", "open", opts || {}),
+                  close: () => C.nativePromise("Browser", "close", {}),
+                };
+              }
+              return null;
+            } catch (e) {
+              return null;
+            }
+          };
           async function dismissInAppBrowser(reason) {
             const Browser = getBrowserPlugin();
             if (!Browser || typeof Browser.close !== "function") {
@@ -5316,6 +6696,266 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
               } catch (e) {
                 console.warn("[Cap Browser] close attempt failed", reason, "afterMs", ms, e && (e.message || e));
               }
+            }
+          }
+
+          function shouldOpenOAuthInCapBrowser(url) {
+            const s = String(url || "");
+            if (!/^https?:\/\//i.test(s)) return false;
+            return (
+              s.includes("appleid.apple.com") ||
+              s.includes("idmsa.apple.com") ||
+              s.includes("firebaseapp.com/__/auth") ||
+              s.includes("accounts.google.com") ||
+              s.includes("googleapis.com") ||
+              s.includes("google.com/")
+            );
+          }
+
+          async function signInWithRedirectCapacitorBrowser(auth, provider) {
+            if (!isCapacitorNative()) {
+              await signInWithRedirect(auth, provider);
+              return;
+            }
+            const Browser = getBrowserPlugin();
+            if (!Browser || typeof Browser.open !== "function") {
+              await signInWithRedirect(auth, provider);
+              return;
+            }
+
+            const locProto = window.Location.prototype;
+            const origReplace = locProto.replace;
+            const origAssign = locProto.assign;
+            let patchesActive = false;
+            let oauthOpened = false;
+            let hrefDesc = null;
+
+            const openOAuthBrowser = (url) => {
+              if (oauthOpened) return false;
+              if (!shouldOpenOAuthInCapBrowser(url)) return false;
+              oauthOpened = true;
+              try {
+                sessionStorage.setItem("capAuthBrowserOpened", String(Date.now()));
+              } catch (e0) {}
+              console.log("[auth] OAuth navigation → Capacitor Browser.open", String(url).slice(0, 200));
+              void Browser.open({ url: String(url), presentationStyle: "fullscreen" });
+              return true;
+            };
+
+            const restorePatches = () => {
+              if (!patchesActive) return;
+              patchesActive = false;
+              try {
+                locProto.replace = origReplace;
+                locProto.assign = origAssign;
+                if (hrefDesc) Object.defineProperty(locProto, "href", hrefDesc);
+              } catch (e1) {}
+            };
+
+            locProto.replace = function (url) {
+              if (openOAuthBrowser(url)) return;
+              return origReplace.call(this, url);
+            };
+            locProto.assign = function (url) {
+              if (openOAuthBrowser(url)) return;
+              return origAssign.call(this, url);
+            };
+            patchesActive = true;
+
+            try {
+              hrefDesc = Object.getOwnPropertyDescriptor(locProto, "href");
+              if (hrefDesc && typeof hrefDesc.set === "function") {
+                const origHrefSet = hrefDesc.set;
+                Object.defineProperty(locProto, "href", {
+                  configurable: true,
+                  enumerable: !!hrefDesc.enumerable,
+                  get: hrefDesc.get,
+                  set: function (v) {
+                    if (openOAuthBrowser(v)) return;
+                    return origHrefSet.call(this, v);
+                  },
+                });
+              }
+            } catch (eHref) {
+              console.warn("[auth] href interceptor not applied", eHref && (eHref.message || eHref));
+            }
+
+            try {
+              await Promise.race([
+                signInWithRedirect(auth, provider),
+                new Promise((_, rej) =>
+                  setTimeout(() => rej(Object.assign(new Error("cap-redirect-timeout"), { code: "cap/redirect-timeout" })), 15000)
+                ),
+              ]);
+            } catch (e) {
+              const code = e && e.code ? String(e.code) : "";
+              if (code !== "cap/redirect-timeout") console.warn("[auth] signInWithRedirect:", e);
+              if (code === "auth/unauthorized-domain" && isCapacitorNative()) {
+                try {
+                  if (!sessionStorage.getItem("asteroidFirebaseDomainHintShown")) {
+                    sessionStorage.setItem("asteroidFirebaseDomainHintShown", "1");
+                    const o = typeof location !== "undefined" ? location.origin : "";
+                    const host = typeof location !== "undefined" ? location.hostname : "";
+                    alert(
+                      "Firebase: auth/unauthorized-domain\n\n" +
+                        "This WebView origin is not allowed for OAuth. Add it in Firebase Console:\n" +
+                        "Authentication → Settings → Authorized domains → Add domain\n\n" +
+                        "Use the hostname only (no path), e.g.:\n• " +
+                        (host || "(unknown host)") +
+                        "\n• localhost\n• www.asteroid8.net and asteroid8.net\n• your Xcode live-reload host (LAN IP) if you use one\n\n" +
+                        "Current origin: " +
+                        (o || "(unknown)") +
+                        "\n\nNative Sign in with Apple does not need this once it works."
+                    );
+                  }
+                } catch (a0) {}
+              }
+            } finally {
+              setTimeout(restorePatches, oauthOpened ? 400 : 8000);
+            }
+          }
+
+          function getAppleNativeSignInPlugin() {
+            try {
+              const C = window.Capacitor;
+              if (!C) return null;
+              if (typeof C.registerPlugin === "function") {
+                if (!C.Plugins) C.Plugins = {};
+                if (!C.Plugins.SignInWithApple) {
+                  C.registerPlugin("SignInWithApple", {
+                    web: () => ({
+                      authorize: async () => {
+                        const E = C.Exception || Error;
+                        const unimpl = C.ExceptionCode && C.ExceptionCode.Unimplemented;
+                        if (unimpl) throw new E("Sign in with Apple requires the Asteroid iOS app.", unimpl);
+                        throw new E("Sign in with Apple requires the iOS app.");
+                      },
+                    }),
+                  });
+                }
+                const reg = C.Plugins.SignInWithApple;
+                if (reg && typeof reg.authorize === "function") return reg;
+              }
+              if (typeof C.nativePromise === "function" && typeof C.getPlatform === "function") {
+                const plat = String(C.getPlatform() || "").toLowerCase();
+                if (plat === "ios") {
+                  return {
+                    authorize: (options) => C.nativePromise("SignInWithApple", "authorize", options || {}),
+                  };
+                }
+              }
+              return null;
+            } catch (e) {
+              console.warn("[auth] getAppleNativeSignInPlugin:", e);
+              return null;
+            }
+          }
+
+          function buildAppleAuthRawNonce() {
+            try {
+              const arr = new Uint8Array(32);
+              crypto.getRandomValues(arr);
+              return Array.from(arr, (b) => ("0" + b.toString(16)).slice(-2)).join("");
+            } catch (e) {
+              return "n_" + Math.random().toString(36).slice(2) + "_" + Math.random().toString(36).slice(2);
+            }
+          }
+
+          async function sha256HexUtf8(plain) {
+            const enc = new TextEncoder();
+            const buf = await crypto.subtle.digest("SHA-256", enc.encode(String(plain)));
+            return Array.from(new Uint8Array(buf), (b) => ("0" + b.toString(16)).slice(-2)).join("");
+          }
+
+          async function tryNativeAppleSignInThenFirebase(hadPreviousUser) {
+            try {
+              if (!isCapacitorNative()) return false;
+              const plat =
+                typeof window.Capacitor.getPlatform === "function"
+                  ? String(window.Capacitor.getPlatform() || "").toLowerCase()
+                  : "";
+              if (plat !== "ios") return false;
+              const P = getAppleNativeSignInPlugin();
+              if (!P || typeof P.authorize !== "function") {
+                console.log("[auth] Native SignInWithApple plugin unavailable — using redirect/Browser flow");
+                return false;
+              }
+              const rawNonce = buildAppleAuthRawNonce();
+              const nonceForAppleRequest = await sha256HexUtf8(rawNonce);
+              console.log("[auth] Invoking native Sign in with Apple (system sheet)…");
+              const res = await P.authorize({
+                clientId: "com.asteroid.asteroidinc8",
+                redirectURI: "https://asteroid-cdc13.firebaseapp.com/__/auth/handler",
+                scopes: "email name",
+                nonce: nonceForAppleRequest,
+              });
+              const resp = res && res.response ? res.response : res;
+              const idToken = resp && (resp.identityToken || resp.identity_token);
+              const nativeUserId = String((resp && resp.user) || "").trim();
+              const nativeEmail = String((resp && resp.email) || "").trim();
+              const nativeGiven = String((resp && (resp.givenName || resp.given_name)) || "").trim();
+              const nativeFamily = String((resp && (resp.familyName || resp.family_name)) || "").trim();
+              const nativeName = [nativeGiven, nativeFamily].filter(Boolean).join(" ").trim();
+              const nativeAccountId = nativeUserId || nativeEmail;
+              if (nativeAccountId) {
+                localStorage.setItem("asteroidSignedInBefore", "true");
+                localStorage.setItem("CurrentUser", nativeAccountId);
+                localStorage.setItem("email", nativeEmail || nativeAccountId);
+                localStorage.setItem("emailKey", nativeAccountId.replace(/[.#$[\]]/g, "_"));
+                if (nativeName) {
+                  localStorage.setItem("fullName", nativeName);
+                  localStorage.setItem("name", nativeName);
+                }
+                const gcdNative = document.getElementById("gcd");
+                if (gcdNative && nativeName) {
+                  gcdNative.innerText = nativeName;
+                  gcdNative.textContent = nativeName;
+                }
+                const appleBtnNative = document.getElementById("apple-sign-in");
+                if (appleBtnNative) appleBtnNative.style.setProperty("display", "none", "important");
+              }
+              if (!idToken) {
+                console.warn("[auth] Native Apple authorize returned no identityToken", res);
+                if (nativeAccountId) {
+                  localStorage.setItem("localAuthOnly", "1");
+                  return true;
+                }
+                return false;
+              }
+              const appleCred = appleProvider.credential({ idToken: String(idToken), rawNonce: rawNonce });
+              try {
+                const result = await signInWithCredential(auth, appleCred);
+                await handleSignInSuccess(result, hadPreviousUser);
+                console.log("[auth] Native Sign in with Apple + Firebase signInWithCredential OK");
+                return true;
+              } catch (fe) {
+                const c = fe && fe.code ? String(fe.code) : "";
+                console.error("[auth] Firebase signInWithCredential (Apple) failed:", c, fe && (fe.message || fe));
+                if (nativeAccountId) {
+                  localStorage.setItem("localAuthOnly", "1");
+                  return true;
+                }
+                return false;
+              }
+            } catch (err) {
+              const msg = err && (err.message || err.localizedDescription || String(err));
+              console.warn("[auth] Native Apple sign-in failed, falling back:", msg);
+              if (isCapacitorNative() && /1000|AuthorizationError/i.test(String(msg))) {
+                try {
+                  if (!sessionStorage.getItem("asteroidApple1000HintShown")) {
+                    sessionStorage.setItem("asteroidApple1000HintShown", "1");
+                    alert(
+                      "Sign in with Apple returned Apple error 1000 (often “unknown” / not available).\n\n" +
+                        "Checklist:\n" +
+                        "• Xcode → target App → Signing & Capabilities → Sign in with Apple is ON\n" +
+                        "• Simulator: Settings app → sign in with an Apple ID\n" +
+                        "• Prefer a real device for Apple testing\n\n" +
+                        "The app will try browser sign-in next; that needs Firebase authorized domains (see separate alert if it fails)."
+                    );
+                  }
+                } catch (x0) {}
+              }
+              return false;
             }
           }
 
@@ -5564,6 +7204,11 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             localStorage.setItem("CurrentUser", accountId);
             localStorage.setItem("fullName", user["displayName"] || "");
             localStorage.setItem("pfp", user.photoURL || user.imageUrl || "");
+            try {
+              window.currentFirebaseUser = user;
+            } catch (eCFU) {}
+            const appleSignInHeader = document.getElementById("apple-sign-in");
+            if (appleSignInHeader) appleSignInHeader.style.setProperty("display", "none", "important");
             var fullName = user.displayName || localStorage.getItem("fullName") || "";
             const gcd = document.getElementById("gcd");
             if (gcd) { gcd.innerHTML = fullName; gcd.innerText = fullName; }
@@ -5675,6 +7320,18 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
               if (appleBtn) appleBtn.style.setProperty("display", "none", "important");
 
               void maybeShowAppleOnboarding();
+            } else {
+              const fallbackUser = auth.currentUser;
+              if (fallbackUser) {
+                const fallbackId = getStableAccountId(fallbackUser) || fallbackUser.uid || "";
+                if (fallbackId) {
+                  localStorage.setItem("CurrentUser", fallbackId);
+                  localStorage.setItem("email", fallbackUser.email || fallbackId);
+                  localStorage.setItem("asteroidSignedInBefore", "true");
+                  localStorage.setItem("emailKey", fallbackId.replace(/[.#$[\]]/g, "_"));
+                  window.currentFirebaseUser = fallbackUser;
+                }
+              }
             }
           }
           (async function setupCapacitorAuth() {
@@ -5695,16 +7352,23 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
             }
           })();
 
-          const appleSignInBtn = document.getElementById("apple-sign-in");
-          if (appleSignInBtn && !appleSignInBtn.hasAttribute('data-listener-added')) {
-            appleSignInBtn.setAttribute('data-listener-added', 'true');
-            appleSignInBtn.addEventListener("click", async () => {
+          function bindAppleSignInButton(appleSignInBtn) {
+            if (!appleSignInBtn || appleSignInBtn.hasAttribute("data-listener-added")) return;
+            appleSignInBtn.setAttribute("data-listener-added", "true");
+            let __appleSignInLast = 0;
+            let __appleLastTouchEnd = 0;
+            const appleSignInHandler = async () => {
+              const now = Date.now();
+              if (now - __appleSignInLast < 1500) return;
+              __appleSignInLast = now;
               console.log("apple-sign-in-clicked");
               var ovU = document.getElementById("ugcPolicyOverlay");
               var chkU = document.getElementById("ugcPolicyCheck");
               var btnU = document.getElementById("ugcPolicyContinue");
               var titleU = document.getElementById("ugcPolicyTitle");
-              if (ovU && chkU && btnU) {
+              var legalAlready =
+                typeof window.__asteroidLegalFirstVisitDone === "function" && window.__asteroidLegalFirstVisitDone();
+              if (ovU && chkU && btnU && !legalAlready) {
                 if (!window.__ugcAppleGateDefaults && titleU && btnU) {
                   window.__ugcAppleGateDefaults = { title: titleU.textContent, btn: btnU.textContent };
                 }
@@ -5716,7 +7380,8 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
                   const hadPreviousUser = localStorage.getItem("asteroidSignedInBefore") === "true";
                   if (isCapacitorNative()) {
                     try {
-                      await signInWithRedirect(auth, appleProvider);
+                      if (await tryNativeAppleSignInThenFirebase(hadPreviousUser)) return;
+                      await signInWithRedirectCapacitorBrowser(auth, appleProvider);
                     } catch (redirectErr) {
                       console.error("Apple redirect sign-in (native):", redirectErr);
                       alert(
@@ -5765,7 +7430,8 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
               const hadPreviousUser = localStorage.getItem("asteroidSignedInBefore") === "true";
               if (isCapacitorNative()) {
                 try {
-                  await signInWithRedirect(auth, appleProvider);
+                  if (await tryNativeAppleSignInThenFirebase(hadPreviousUser)) return;
+                  await signInWithRedirectCapacitorBrowser(auth, appleProvider);
                 } catch (redirectErr) {
                   console.error("Apple redirect sign-in (native):", redirectErr);
                   alert(
@@ -5807,8 +7473,45 @@ document.getElementById("user-profile-button").addEventListener("click", () => {
                     );
                   }
                 });
-            });
+            };
+            const routeAppleActivation = (ev) => {
+              if (ev.type === "click" && Date.now() - __appleLastTouchEnd < 500) return;
+              if (ev.type === "touchend") __appleLastTouchEnd = Date.now();
+              void appleSignInHandler();
+            };
+            appleSignInBtn.addEventListener("touchend", routeAppleActivation, { capture: true, passive: true });
+            appleSignInBtn.addEventListener("click", routeAppleActivation, { capture: true });
           }
+          bindAppleSignInButton(document.getElementById("apple-sign-in"));
+          whenElementReady("apple-sign-in", bindAppleSignInButton, 120);
+          setTimeout(() => bindAppleSignInButton(document.getElementById("apple-sign-in")), 4000);
+
+// Profile button: if signed in, show logout modal; otherwise trigger Apple sign-in (after Apple wiring so a missing node never blocks auth)
+document.getElementById("user-profile-button")?.addEventListener("click", () => {
+  console.log("profile_button_clicked");
+  setProfileUiFocus(true);
+
+  const firebaseUser = window.currentFirebaseUser || auth.currentUser;
+  const hasLocalUser =
+    !!localStorage.getItem("email") || !!localStorage.getItem("CurrentUser");
+  const hasLocalOnlyAuth = localStorage.getItem("localAuthOnly") === "1" && localStorage.getItem("asteroidSignedInBefore") === "true";
+
+  if (firebaseUser || hasLocalUser || hasLocalOnlyAuth) {
+    const modalUser =
+      firebaseUser || {
+        displayName:
+          localStorage.getItem("fullName") ||
+          localStorage.getItem("profileNickname") ||
+          "Signed-in user",
+        email: localStorage.getItem("email") || "",
+      };
+    openLogoutModal(modalUser);
+  } else {
+    setProfileUiFocus(false);
+    const appleBtn = document.getElementById("apple-sign-in");
+    if (appleBtn) appleBtn.click();
+  }
+});
 
           void (async function consumeFirebaseRedirectSignIn() {
             try {
@@ -5948,7 +7651,6 @@ console.log('1171')
 
 
 
-    var audio = document.getElementById("audioPlayer");
     var songTitleElement = document.getElementById("songTitle");
     var artistNameElement = document.getElementById("artistName");
     if (songTitleElement) songTitleElement.textContent = typeof songTitle !== "undefined" ? songTitle : "—";
@@ -5958,6 +7660,21 @@ console.log('1171')
 
     // Function to play or pause the audio
     function playPause() {
+      var master =
+        (typeof window.getMasterPlaybackAudio === "function" && window.getMasterPlaybackAudio()) ||
+        window.currentPlaying ||
+        (window.action && document.getElementById("gaga_" + window.action)) ||
+        null;
+      if (master && typeof master.play === "function" && typeof master.pause === "function") {
+        if (master.paused) {
+          var pr = master.play();
+          if (pr && typeof pr.then === "function") pr.catch(function () {});
+        } else {
+          master.pause();
+        }
+        return;
+      }
+      var audio = document.getElementById("audioPlayer");
       if (!audio) return;
       if (audio.paused) {
         var mv = document.getElementById("minivis");
@@ -6140,6 +7857,7 @@ console.log('1171')
 
       function openArtistModal(profile, artistId) {
         if (!profile) return;
+        if (typeof window.closeSongOverflowFullscreen === "function") window.closeSongOverflowFullscreen();
         overlay.dataset.featuredArtistId = artistId != null ? String(artistId) : "";
         avatar.src = profile.image || "";
         nameEl.textContent = profile.name || "Artist";
@@ -6161,37 +7879,21 @@ console.log('1171')
       overlay.addEventListener("click", (e) => { if (e.target === overlay) closeArtistModal(); });
 
       if (followBtn) {
+        function kickOffFollowSignIn() {
+          var appleBtn = document.getElementById("apple-sign-in");
+          if (appleBtn && typeof appleBtn.click === "function") {
+            appleBtn.click();
+            return;
+          }
+          localStorage.setItem("postAuthReturn", "index.html");
+          var wantsSignup = window.confirm(
+            "Sign in is required to follow artists.\n\nNew here? Tap OK to create an account.\nTap Cancel to go to login."
+          );
+          window.location.href = wantsSignup ? "registraition.html" : "login.html";
+        }
+        window.__kickOffFollowSignIn = kickOffFollowSignIn;
         followBtn.addEventListener("click", async function () {
-          if (followBtn.disabled) return;
-          if (followBtn.dataset.mode === "signin") {
-            document.getElementById("apple-sign-in")?.click();
-            return;
-          }
-          const artistKey = followBtn.dataset.artistKey || overlay.dataset.followArtistKey;
-          if (!artistKey) return;
-          if (typeof window.isSignedInForFollow === "function" && !window.isSignedInForFollow()) {
-            document.getElementById("apple-sign-in")?.click();
-            return;
-          }
-          const db = window.firebaseDatabase;
-          const refFn = window.firebaseRef;
-          const setFn = window.firebaseSet;
-          const gv = window.getViewerFollowKeyForFollow;
-          if (!db || !refFn || !setFn || typeof gv !== "function") {
-            alert("Connection not ready. Try again in a moment.");
-            return;
-          }
-          const viewerKey = gv();
-          try {
-            await setFn(refFn(db, "FOLLOWS/" + artistKey + "/" + viewerKey), true);
-            await setFn(refFn(db, "FOLLOWING/" + viewerKey + "/" + artistKey), true);
-            followBtn.textContent = "Following";
-            followBtn.disabled = true;
-            followBtn.dataset.mode = "follow";
-          } catch (e) {
-            console.error(e);
-            alert("Could not follow right now.");
-          }
+          await window.__runFollowFromButtonById("artistProfileFollowBtn");
         });
       }
 
@@ -6241,7 +7943,7 @@ console.log('1171')
         <div class="profile-modal-name-large" id="profileModalName">User Name</div>
         <div class="profile-modal-bio" id="profileModalBio">No bio available</div>
         <div id="profileModalFollowWrap" class="profile-modal-follow-wrap" style="display: none;">
-          <button type="button" class="profile-follow-btn" id="profileFollowBtn">Follow artist</button>
+          <button type="button" class="profile-follow-btn" id="profileFollowBtn" onclick="window.__runFollowFromButtonById('profileFollowBtn'); return false;">Follow artist</button>
           <p class="profile-follow-hint" id="profileFollowHint"></p>
         </div>
         <div id="profileModalSafetyWrap" class="profile-modal-safety-wrap" style="display: none;">
@@ -6492,102 +8194,250 @@ console.log('1171')
       return null;
     }
 
+    async function loadAllUsersFromProfilesObject(profiles, db) {
+      const usersGrid = document.getElementById("usersGrid");
+      if (!usersGrid) return;
+
+      if (!profiles || typeof profiles !== "object") {
+        usersGrid.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
+        return;
+      }
+
+      const profilesArray = Object.entries(profiles).map(([key, value]) => ({
+        emailKey: key,
+        profile: value,
+      }));
+
+      if (profilesArray.length === 0) {
+        usersGrid.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
+        return;
+      }
+
+      let concertByEmailKey = new Map();
+      if (db) {
+        try {
+          const concertUsersSnapshot = await Promise.race([
+            get(ref2(db, "CONCERTUSERS/")),
+            new Promise(function (_, rej) {
+              setTimeout(function () {
+                rej(new Error("concertusers-timeout"));
+              }, 10000);
+            }),
+          ]).catch(function () {
+            return { exists: function () { return false; } };
+          });
+          if (concertUsersSnapshot.exists()) {
+            const concertUsers = concertUsersSnapshot.val();
+            Object.values(concertUsers || {}).forEach((u) => {
+              if (!u || !u.email) return;
+              const k = sanitizeEmail(String(u.email));
+              if (k) concertByEmailKey.set(k, u);
+            });
+          }
+        } catch (eCu) {
+          console.warn("[users] CONCERTUSERS read:", eCu);
+        }
+      }
+
+      let usersWithProfiles;
+      try {
+        usersWithProfiles = await Promise.race([
+          Promise.all(
+            profilesArray.map(async (item) => {
+              const emailKey = item.emailKey;
+              const userEntry = concertByEmailKey.get(emailKey) || null;
+              const userEmail = userEntry ? userEntry.email : null;
+              const userRole = userEntry ? userEntry.role : null;
+              const userFullName = null;
+
+              let isPremium = false;
+              if (db) {
+                try {
+                  const premiumRef = ref2(db, "PREMIUM/" + emailKey);
+                  const premiumSnapshot = await Promise.race([
+                    get(premiumRef),
+                    new Promise(function (_, rej) {
+                      setTimeout(function () {
+                        rej(new Error("premium-timeout"));
+                      }, 4000);
+                    }),
+                  ]).catch(function () {
+                    return { exists: function () { return false; } };
+                  });
+                  const premium = premiumSnapshot.exists() ? premiumSnapshot.val() : null;
+                  isPremium = !!(premium && (premium.ITG === true || premium.ITG === "true"));
+                } catch (ePr) {
+                  console.warn("[users] PREMIUM read", emailKey, ePr);
+                }
+              }
+
+              return {
+                emailKey: emailKey,
+                email: userEmail || emailKey.replace(/_/g, "."),
+                role: userRole || "User",
+                fullName: userFullName,
+                profile: item.profile,
+                isPremium: isPremium,
+              };
+            })
+          ),
+          new Promise(function (_, rej) {
+            setTimeout(function () {
+              rej(new Error("users-map-timeout"));
+            }, 20000);
+          }),
+        ]);
+      } catch (eMap) {
+        console.warn("[users] profile enrich timeout, basic list", eMap);
+        usersWithProfiles = profilesArray.map(function (item) {
+          return {
+            emailKey: item.emailKey,
+            email: item.emailKey.replace(/_/g, "."),
+            role: "User",
+            fullName: null,
+            profile: item.profile,
+            isPremium: false,
+          };
+        });
+      }
+
+      allUsersDataGlobal = usersWithProfiles;
+      renderUsers(usersWithProfiles);
+    }
+
+    async function loadAllUsersViaRestFallback() {
+      const base =
+        (typeof window !== "undefined" && window.__ASTER_RTDB_REST_BASE) ||
+        (typeof RTDB_BASE !== "undefined" ? RTDB_BASE : "") ||
+        "";
+      if (!base) return false;
+      const usersGrid = document.getElementById("usersGrid");
+      try {
+        const r = await fetch(base + "/PROFILES.json", { cache: "no-store" });
+        if (!r.ok) return false;
+        const profiles = await r.json();
+        await loadAllUsersFromProfilesObject(profiles, getDb());
+        return true;
+      } catch (e) {
+        console.warn("[users] REST fallback failed:", e);
+        if (usersGrid) {
+          usersGrid.innerHTML = `<div class="empty-state" style="color: rgba(255,255,255,0.6); padding: 2rem;">
+            <p>Could not load users (network).</p>
+            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Pull to refresh or try again.</p>
+          </div>`;
+        }
+        return false;
+      }
+    }
+
     async function loadAllUsers() {
+      const usersGrid = document.getElementById("usersGrid");
       try {
         const db = getDb();
         if (!db) {
-          console.error('Database not available');
+          console.warn("[users] Database handle not ready — trying REST");
+          if (usersGrid) {
+            usersGrid.innerHTML = `<div class="empty-state" style="color: rgba(255,255,255,0.55); padding: 2rem;">
+              <p>Loading users…</p>
+            </div>`;
+          }
+          const okRest = await loadAllUsersViaRestFallback();
+          if (!okRest && usersGrid) {
+            usersGrid.innerHTML = `<div class="empty-state" style="color: rgba(255,255,255,0.6); padding: 2rem;">
+              <p>Could not connect yet.</p>
+              <p style="font-size: 0.85rem; margin-top: 0.5rem;">Open the app again or check your network.</p>
+            </div>`;
+          }
           return;
         }
-        
-        const profilesRef = ref2(db, 'PROFILES/');
-        const snapshot = await get(profilesRef);
-        
-        const usersGrid = document.getElementById('usersGrid');
+
+        const profilesRef = ref2(db, "PROFILES/");
+        const snapshot = await Promise.race([
+          get(profilesRef),
+          new Promise(function (_, rej) {
+            setTimeout(function () {
+              rej(new Error("profiles-get-timeout"));
+            }, 12000);
+          }),
+        ]).catch(function () {
+          return null;
+        });
+
         if (!usersGrid) {
-          console.error('usersGrid element not found');
+          console.error("usersGrid element not found");
           return;
         }
-        
+
+        if (!snapshot) {
+          if (usersGrid) {
+            usersGrid.innerHTML = `<div class="empty-state" style="color: rgba(255,255,255,0.6); padding: 2rem;">
+              <p>Users took too long over the live link.</p>
+              <p style="font-size: 0.85rem; margin-top: 0.5rem;">Trying a direct connection…</p>
+            </div>`;
+          }
+          const ok = await loadAllUsersViaRestFallback();
+          if (!ok && usersGrid) {
+            usersGrid.innerHTML = `<div class="empty-state" style="color: rgba(255,255,255,0.6); padding: 2rem;">
+              <p>Could not load users.</p>
+              <p style="font-size: 0.85rem; margin-top: 0.5rem;">Check your network and pull to refresh.</p>
+            </div>`;
+          }
+          return;
+        }
+
         if (!snapshot.exists()) {
           usersGrid.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
           return;
         }
 
-        const profiles = snapshot.val();
-        const profilesArray = Object.entries(profiles).map(([key, value]) => ({
-          emailKey: key,
-          profile: value
-        }));
-
-        if (profilesArray.length === 0) {
-          usersGrid.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
-          return;
-        }
-
-        // Get additional user data (email, role) and premium status for each profile
-        const usersWithProfiles = await Promise.all(profilesArray.map(async (item) => {
-          const emailKey = item.emailKey;
-          
-          // Try to get user data from CONCERTUSERS or other sources
-          let userEmail = null;
-          let userRole = null;
-          let userFullName = null;
-          
-          // Check CONCERTUSERS for email/role
-          const concertUsersRef = ref2(db, 'CONCERTUSERS/');
-          const concertUsersSnapshot = await get(concertUsersRef);
-          if (concertUsersSnapshot.exists()) {
-            const concertUsers = concertUsersSnapshot.val();
-            const userEntry = Object.values(concertUsers).find(u => {
-              const uEmailKey = sanitizeEmail(u.email || '');
-              return uEmailKey === emailKey;
-            });
-            if (userEntry) {
-              userEmail = userEntry.email;
-              userRole = userEntry.role;
-            }
-          }
-          
-          // Check if premium
-          const premiumRef = ref2(db, 'PREMIUM/' + emailKey);
-          const premiumSnapshot = await get(premiumRef);
-          const premium = premiumSnapshot.exists() ? premiumSnapshot.val() : null;
-          const isPremium = premium && (premium.ITG === true || premium.ITG === "true");
-
-          return {
-            emailKey: emailKey,
-            email: userEmail || emailKey.replace(/_/g, '.'),
-            role: userRole || 'User',
-            fullName: userFullName,
-            profile: item.profile,
-            isPremium: isPremium
-          };
-        }));
-
-        // Store users data globally for modal access
-        allUsersDataGlobal = usersWithProfiles;
-
-        // Render users (will be filtered by search if needed)
-        renderUsers(usersWithProfiles);
-
+        await loadAllUsersFromProfilesObject(snapshot.val(), db);
       } catch (error) {
-        console.error('Error loading users:', error);
-        console.error('Error details:', {
+        console.error("Error loading users:", error);
+        console.error("Error details:", {
           message: error.message,
           stack: error.stack,
           db: !!getDb(),
-          usersGrid: !!document.getElementById('usersGrid')
+          usersGrid: !!document.getElementById("usersGrid"),
         });
-        const usersGrid = document.getElementById('usersGrid');
-        if (usersGrid) {
+        const ok = await loadAllUsersViaRestFallback();
+        if (!ok && usersGrid) {
           usersGrid.innerHTML = `<div class="empty-state" style="color: rgba(255,255,255,0.6); padding: 2rem;">
             <i class="fas fa-exclamation-triangle"></i>
             <p>Error loading users</p>
-            <p style="font-size: 0.85rem; margin-top: 0.5rem;">${error.message || 'Unknown error'}</p>
+            <p style="font-size: 0.85rem; margin-top: 0.5rem;">${(error && error.message) || "Unknown error"}</p>
           </div>`;
         }
       }
+    }
+
+    window.__openUserProfileFromCard = function (card, ev) {
+      try {
+        if (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        }
+      } catch (e0) {}
+      const idx = parseInt((card && card.getAttribute && card.getAttribute('data-user-index')) || '', 10);
+      if (!Number.isFinite(idx)) return false;
+      if (typeof window.showUserProfileModal === 'function') {
+        window.showUserProfileModal(idx);
+      }
+      return false;
+    };
+
+    if (!window.__globalUserProfileCardTapBound) {
+      window.__globalUserProfileCardTapBound = true;
+      const openFromEvent = function (e) {
+        try {
+          const card = e.target && e.target.closest ? e.target.closest('.user-profile-card[data-user-index]') : null;
+          if (!card) return;
+          if (typeof window.__openUserProfileFromCard === 'function') {
+            window.__openUserProfileFromCard(card, e);
+          }
+        } catch (eTap) {}
+      };
+      document.addEventListener('pointerup', openFromEvent, true);
+      document.addEventListener('click', openFromEvent, true);
     }
 
     // Render users function (with search filtering)
@@ -6654,7 +8504,7 @@ console.log('1171')
           : null;
 
         return `
-          <div class="user-profile-card" onclick="showUserProfileModal(${modalIndex})">
+          <div class="user-profile-card" data-user-index="${modalIndex}" role="button" tabindex="0" onclick="window.__openUserProfileFromCard(this, event)">
             <div class="user-profile-avatar">
               ${profilePicture 
                 ? `<img src="${profilePicture}" alt="${displayName}">` 
@@ -6666,11 +8516,44 @@ console.log('1171')
           </div>
         `;
       }).join('');
+
+      usersGrid.querySelectorAll('.user-profile-card[data-user-index]').forEach((card) => {
+        if (card.dataset.boundProfileTap === '1') return;
+        card.dataset.boundProfileTap = '1';
+        const openNow = function (e) {
+          if (typeof window.__openUserProfileFromCard === 'function') {
+            window.__openUserProfileFromCard(card, e);
+          }
+        };
+        card.addEventListener('click', openNow);
+        card.addEventListener('touchend', openNow, { passive: false });
+        card.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') openNow(e);
+        });
+      });
     }
 
     window.__refreshUsersGridAfterHide = function () {
       renderUsers(allUsersDataGlobal);
     };
+
+    if (!window.__usersGridProfileTapBound) {
+      window.__usersGridProfileTapBound = true;
+      const bindUsersGridTap = function () {
+        const grid = document.getElementById('usersGrid');
+        if (!grid || grid.__tapBound) return;
+        grid.__tapBound = true;
+        grid.addEventListener('click', function (e) {
+          const card = e.target && e.target.closest ? e.target.closest('.user-profile-card') : null;
+          if (!card) return;
+          const idx = parseInt(card.getAttribute('data-user-index') || '', 10);
+          if (!Number.isFinite(idx)) return;
+          if (typeof window.showUserProfileModal === 'function') window.showUserProfileModal(idx);
+        }, true);
+      };
+      document.addEventListener('DOMContentLoaded', bindUsersGridTap);
+      bindUsersGridTap();
+    }
 
     // Clear search function
     window.clearUserSearch = function() {
@@ -6719,6 +8602,7 @@ console.log('1171')
 
     // Show user profile modal and track profile view
     window.showUserProfileModal = async function(userIndex) {
+      if (typeof window.closeSongOverflowFullscreen === "function") window.closeSongOverflowFullscreen();
       const userData = allUsersDataGlobal[userIndex];
       if (!userData) return;
 
@@ -6842,18 +8726,31 @@ console.log('1171')
             const urlAttr = escProfileSongAttr(s.fileInp || "");
             const up = escProfileSongAttr(s.uploader || "");
             const m = escProfileSongAttr(moodFor(s));
+            const transportPm = songTransportIconsHtml(tid);
+            const ebPm = songShowsExplicitBadge(s) ? '<span class="explicit-badge" title="Explicit">E</span>' : "";
+            const exPm = songShowsExplicitBadge(s) ? ' data-explicit="1"' : "";
+            const overflowPm = songOverflowActionsHtml({
+              queueFileRaw: s.fileInp || "",
+              queueTitleRaw: titlePlain,
+              playlistArtistRaw: artistPlain || "",
+              blockFile: escProfileSongAttr(s.fileInp || ""),
+              blockTitle: escProfileSongAttr(titlePlain),
+              notrecFile: escProfileSongAttr(s.fileInp || ""),
+              notrecTitle: escProfileSongAttr(titlePlain),
+              reportFile: urlAttr,
+              reportTitle: t,
+              reportArtist: a,
+              reportUploader: up,
+            });
             html += `<div class="profile-modal-song-row">
-  <audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" data-display-album="${al}" data-mood="${m}" data-uploader="${up}" playsinline preload="metadata"><source src="${urlAttr}" type="audio/mpeg"></audio>
+  <audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" data-display-album="${al}" data-mood="${m}" data-uploader="${up}"${exPm} playsinline preload="metadata"><source src="${urlAttr}" type="audio/mpeg"></audio>
   <div class="profile-modal-song-info">
-    <span class="profile-modal-song-title">${t}</span>
+    <span class="profile-modal-song-title">${ebPm}<span class="profile-modal-song-title-text">${t}</span></span>
     <span class="profile-modal-song-meta">${a}${albumPlain ? " · " + al : ""}</span>
   </div>
   <div class="profile-modal-song-actions">
-    <i class="fa fa-play-circle" onclick="playLibraryTrack('${tid}')" role="button" tabindex="0" aria-label="Play"></i>
-    <i class="fa fa-pause-circle-o" onclick="document.getElementById('gaga_${tid}').pause()" role="button" tabindex="0" aria-label="Pause"></i>
-    <span class="song-row-action-labeled"><button type="button" class="song-row-queue" onclick="queuemusic('${escProfileSongQ(s.fileInp)}','${escProfileSongQ(titlePlain)}')" aria-label="Add to queue"><span class="material-symbols-outlined">queue_music</span></button><span class="song-row-action-label">Queue</span></span>
-    <span class="song-row-action-labeled"><button type="button" class="song-row-block" aria-label="Block song" title="Hide this song" onclick="window.blockSongFromDataset(this)" data-block-file="${escProfileSongAttr(s.fileInp || "")}" data-block-title="${escProfileSongAttr(titlePlain)}"><span class="material-symbols-outlined">block</span></button><span class="song-row-action-label">Block</span></span>
-    <span class="song-row-action-labeled"><button type="button" class="song-row-flag" aria-label="Report song" title="Report" onclick="window.openReportContentModal(this)" data-target-type="song" data-file-inp="${urlAttr}" data-song-title="${t}" data-artist-name="${a}" data-uploader-key="${up}"><span class="material-symbols-outlined">flag</span></button><span class="song-row-action-label">Report</span></span>
+    ${transportPm}
+    ${overflowPm}
   </div>
 </div>`;
           });
@@ -6991,28 +8888,55 @@ console.log('1171')
       }
     });
 
-    document.getElementById('profileFollowBtn')?.addEventListener('click', async () => {
-      const btn = document.getElementById('profileFollowBtn');
+    function triggerFollowSignInFlow() {
+      const appleBtn = document.getElementById('apple-sign-in');
+      if (appleBtn && typeof appleBtn.click === 'function') {
+        appleBtn.click();
+        return;
+      }
+      localStorage.setItem('postAuthReturn', 'index.html');
+      const wantsSignup = window.confirm(
+        'Sign in is required to follow artists.\n\nNew here? Tap OK to create an account.\nTap Cancel to go to login.'
+      );
+      window.location.href = wantsSignup ? 'registraition.html' : 'login.html';
+    }
+    window.__triggerFollowSignInFlow = triggerFollowSignInFlow;
+
+    window.__runFollowFromButtonById = async function (btnId) {
+      const btn = document.getElementById(btnId);
       if (!btn || btn.disabled) return;
+      const signInFn =
+        typeof window.__kickOffFollowSignIn === 'function'
+          ? window.__kickOffFollowSignIn
+          : window.__triggerFollowSignInFlow;
       if (btn.dataset.mode === 'signin') {
-        document.getElementById('apple-sign-in')?.click();
+        signInFn();
         return;
       }
-      const artistKey = btn && btn.dataset ? btn.dataset.artistKey : '';
-      if (!artistKey) return;
-      if (!isSignedInForFollow()) {
-        document.getElementById('apple-sign-in')?.click();
+      const artistKey = (btn.dataset && btn.dataset.artistKey ? btn.dataset.artistKey : '').trim();
+      if (!artistKey) {
+        alert('Could not find this artist to follow. Please close and reopen the profile.');
         return;
       }
-      const db = getDb();
-      if (!db) {
+      if (typeof isSignedInForFollow === 'function' && !isSignedInForFollow()) {
+        signInFn();
+        return;
+      }
+      const db = typeof getDb === 'function' ? getDb() : window.firebaseDatabase;
+      const refFn = typeof ref2 === 'function' ? ref2 : window.firebaseRef;
+      const setFn = typeof set === 'function' ? set : window.firebaseSet;
+      const viewerKey = typeof getViewerFollowKeyForFollow === 'function' ? getViewerFollowKeyForFollow() : '';
+      if (!db || !refFn || !setFn) {
         alert('Connection not ready. Try again in a moment.');
         return;
       }
-      const viewerKey = getViewerFollowKeyForFollow();
+      if (!viewerKey) {
+        signInFn();
+        return;
+      }
       try {
-        await set(ref2(db, 'FOLLOWS/' + artistKey + '/' + viewerKey), true);
-        await set(ref2(db, 'FOLLOWING/' + viewerKey + '/' + artistKey), true);
+        await setFn(refFn(db, 'FOLLOWS/' + artistKey + '/' + viewerKey), true);
+        await setFn(refFn(db, 'FOLLOWING/' + viewerKey + '/' + artistKey), true);
         btn.textContent = 'Following';
         btn.disabled = true;
         btn.dataset.mode = 'follow';
@@ -7020,37 +8944,79 @@ console.log('1171')
         console.error(e);
         alert('Could not follow right now.');
       }
+    };
+
+    if (!window.__followButtonsTapFix) {
+      window.__followButtonsTapFix = true;
+      document.addEventListener('touchend', function (e) {
+        const t = e.target;
+        const btn = t && t.closest ? t.closest('#artistProfileFollowBtn, #profileFollowBtn') : null;
+        if (!btn) return;
+        try {
+          e.preventDefault();
+          e.stopPropagation();
+        } catch (e0) {}
+        if (btn.disabled) return;
+        const now = Date.now();
+        const last = parseInt(btn.dataset.tapLockTs || '0', 10) || 0;
+        if (now - last < 450) return;
+        btn.dataset.tapLockTs = String(now);
+        if (typeof btn.click === 'function') btn.click();
+      }, true);
+    }
+
+    document.getElementById('profileFollowBtn')?.addEventListener('click', async () => {
+      await window.__runFollowFromButtonById('profileFollowBtn');
     });
 
-    // Load users when page loads (copied from ArtistDashboard pattern)
-    window.addEventListener('DOMContentLoaded', () => {
-      // Wait for Firebase to be ready
-      setTimeout(() => {
+    // Load users when page loads (wait for Firebase, then live PROFILES)
+    window.addEventListener("DOMContentLoaded", () => {
+      let liveUnsub = null;
+      const tryWireLive = () => {
         const db = getDb();
-        if (db) {
-          loadAllUsers();
-          
-          // Set up real-time listener
-          const profilesRef = ref2(db, 'PROFILES/');
-          onValue(profilesRef, () => loadAllUsers());
-        } else {
-          // Keep trying until database is ready
-          const checkInterval = setInterval(() => {
-            const db = getDb();
-            if (db) {
-              clearInterval(checkInterval);
-              loadAllUsers();
-              
-              // Set up real-time listener
-              const profilesRef = ref2(db, 'PROFILES/');
-              onValue(profilesRef, () => loadAllUsers());
-            }
-          }, 500);
-          
-          // Stop trying after 10 seconds
-          setTimeout(() => clearInterval(checkInterval), 10000);
+        if (!db) return false;
+        if (typeof liveUnsub === "function") {
+          try {
+            liveUnsub();
+          } catch (eU) {}
+          liveUnsub = null;
         }
-      }, 1000);
+        void loadAllUsers();
+        try {
+          const profilesRef = ref2(db, "PROFILES/");
+          liveUnsub = onValue(profilesRef, () => {
+            void loadAllUsers();
+          });
+        } catch (eOv) {
+          console.warn("[users] onValue PROFILES:", eOv);
+        }
+        return true;
+      };
+
+      setTimeout(() => {
+        if (tryWireLive()) return;
+
+        let attempts = 0;
+        const maxAttempts = 80;
+        const checkInterval = setInterval(() => {
+          attempts += 1;
+          if (tryWireLive()) {
+            clearInterval(checkInterval);
+            return;
+          }
+          if (attempts >= maxAttempts) {
+            clearInterval(checkInterval);
+            const ug = document.getElementById("usersGrid");
+            if (ug) {
+              ug.innerHTML = `<div class="empty-state" style="color: rgba(255,255,255,0.6); padding: 2rem;">
+                <p>Firebase did not initialize in time.</p>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem;">Trying a direct connection…</p>
+              </div>`;
+            }
+            void loadAllUsersViaRestFallback();
+          }
+        }, 250);
+      }, 400);
     });
   </script>
 
@@ -7080,6 +9046,10 @@ console.log('1171')
   <a href="pat.html" class="mobile-nav-item">
     <span class="material-symbols-outlined">queue_music</span>
     <span>Playlist</span>
+  </a>
+  <a href="ArtistDashboard.html" class="mobile-nav-item" id="mobile-artist-dashboard-link" style="display:none;">
+    <span class="material-symbols-outlined">dashboard</span>
+    <span>Dashboard</span>
   </a>
 </nav>
 <style>
@@ -7159,15 +9129,25 @@ console.log('1171')
   background: rgba(255,127,80,0.1);
 }
 @media screen and (max-width: 3840px) {
-  body { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+  body { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
   .mobile-nav { display: flex !important; }
-  .lol { bottom: 116px !important; }
+  .lol { bottom: 96px !important; }
 }
 </style>
 <script type="module">
   import { initHomePolls } from "./js/home-polls.js";
   import { initFollowedArtistNotices } from "./js/followed-notices.js";
+  let __homePollsBootAttempts = 0;
   function bootHomePolls() {
+    __homePollsBootAttempts += 1;
+    if (__homePollsBootAttempts > 200) {
+      const pm = document.getElementById("homePollsMount");
+      if (pm && /loading/i.test(pm.textContent || "")) {
+        pm.innerHTML =
+          '<p class="home-polls-empty">Could not connect to polls. Reopen the app or check your network.</p>';
+      }
+      return;
+    }
     if (window.firebaseDatabase && window.firebaseRef && window.firebaseGet && window.firebaseSet && window.firebaseOnValue) {
       initHomePolls();
       initFollowedArtistNotices();

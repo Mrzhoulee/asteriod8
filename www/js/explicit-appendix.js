@@ -111,9 +111,44 @@ export function songMetadataExplicit(song) {
   return textContainsAppendixExplicit(blob);
 }
 
+function truthyExplicitValue(v) {
+  if (v === true || v === 1) return true;
+  const s = String(v == null ? "" : v).trim().toLowerCase();
+  if (!s) return false;
+  return s === "true" || s === "1" || s === "yes" || s === "y" || s === "explicit" || s === "e";
+}
+
+function songExplicitMetadataFlags(song) {
+  if (!song || typeof song !== "object") return false;
+  const keys = ["isExplicit", "explicit", "explicitLanguage", "explicitTrack", "parentalAdvisory"];
+  for (const k of keys) {
+    if (truthyExplicitValue(song[k])) return true;
+  }
+  const cr = String(song.contentRating || song.rating || "").trim().toLowerCase();
+  if (cr === "explicit" || cr === "mature") return true;
+  const tags = song.tags;
+  if (Array.isArray(tags) && tags.some((t) => String(t).toLowerCase() === "explicit")) return true;
+  if (typeof tags === "string" && tags.toLowerCase().includes("explicit")) return true;
+  return false;
+}
+
+function catalogExplicitFromStrings(song) {
+  if (!song || typeof song !== "object") return false;
+  const blob = [song.title, song.artist, song.album, song.version, song.subtitle, song.originalTitle]
+    .filter(Boolean)
+    .map(String)
+    .join("\n");
+  if (!blob.trim()) return false;
+  return (
+    /\(\s*explicit\s*\)|\[\s*explicit\s*\]|\bexplicit\s+version\b|\bexplicit\s+content\b/i.test(blob) ||
+    /\(\s*e\s*\)\s*$/i.test(blob.trim()) ||
+    /\s-\s*e\s*$/i.test(blob.trim())
+  );
+}
+
 export function songShowsExplicitBadge(song) {
   if (!song || typeof song !== "object") return false;
-  const flag = song.isExplicit;
-  if (flag === true || flag === 1 || flag === "1" || String(flag).toLowerCase() === "true") return true;
+  if (songExplicitMetadataFlags(song)) return true;
+  if (catalogExplicitFromStrings(song)) return true;
   return songMetadataExplicit(song);
 }

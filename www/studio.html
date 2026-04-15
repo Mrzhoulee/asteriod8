@@ -4,7 +4,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Asteroid Teams Media Studio</title>
   <style>
     body { background-color: antiquewhite; font-family: "Montserrat", sans-serif; margin: 0; padding: 20px; text-align: center; }
@@ -96,7 +96,43 @@
     .apple-onboarding-save { background: linear-gradient(135deg, #ff7f50, #e85d2c); color: #fff; }
     .apple-onboarding-skip { background: transparent; color: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.2) !important; }
     #studioSignInRow.studio-signin-row--hidden { display: none !important; }
-    #studioTopBar.studio-topbar--visible { display: block !important; }
+    #studioTopBar.studio-topbar--visible {
+      display: block !important;
+      padding-top: max(8px, env(safe-area-inset-top, 0px));
+      padding-right: max(8px, env(safe-area-inset-right, 0px));
+      box-sizing: border-box;
+    }
+    .studio-explicit-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 14px auto 16px;
+      max-width: 400px;
+      padding: 12px 14px;
+      text-align: left;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .studio-explicit-option input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: #ff7f50;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .studio-explicit-option .studio-explicit-copy {
+      font-family: "Poppins", sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+      color: #1a1a1a;
+      font-weight: 500;
+    }
+    .studio-explicit-option .studio-explicit-copy strong {
+      color: #c44a1a;
+    }
     
     /* CAMPAIGN UI */
     #campaignContainer { display: none; margin-bottom: 30px; border-bottom: 2px dashed #ccc; padding-bottom: 20px; }
@@ -109,6 +145,11 @@
     .alertBox { background-color: lightcoral; padding: 15px; visibility: hidden; border-radius: 10px; margin: 10px auto; width: 80%; }
     input { margin: 8px; padding: 12px; width: 80%; max-width: 400px; border-radius: 8px; border: 1px solid #ccc; }
     #unlockMsg { color: #008044; font-weight: bold; display: none; margin-top: 10px; }
+    .referral-code-panel { margin-top: 16px; padding-top: 14px; border-top: 1px dashed rgba(0,0,0,0.2); }
+    .referral-code-title { margin: 0 0 8px; font-weight: 700; color: #1f2937; }
+    .referral-code-status { min-height: 20px; font-size: 12px; font-weight: 600; color: #374151; margin-top: 6px; }
+    .referral-code-status.error { color: #b91c1c; }
+    .referral-code-status.ok { color: #0f766e; }
 
     /* SUCCESS MODAL */
     #vipSuccessBox { display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid #00ff88; padding: 30px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.5); z-index: 1000; max-width: 400px; }
@@ -230,7 +271,17 @@
       line-height: 1.5;
     }
     .ugc-policy-card h2 { margin: 0 0 12px; font-size: 18px; color: #fff; font-family: 'Montserrat', sans-serif; text-align: center; }
-    .ugc-policy-card a { color: #ff9a6e; text-decoration: underline; text-underline-offset: 2px; position: relative; z-index: 2; cursor: pointer; }
+    .ugc-policy-card a {
+      color: #ff9a6e;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      position: relative;
+      z-index: 3;
+      cursor: pointer;
+      pointer-events: auto;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: rgba(255, 127, 80, 0.25);
+    }
     .ugc-policy-actions { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
     .ugc-policy-check-row {
       display: flex;
@@ -287,11 +338,11 @@
   <div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
     <div class="ugc-policy-card">
       <h2 id="ugcPolicyTitle">Before you continue</h2>
-      <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;line-height:1.45;text-align:center;">You must accept our policies before using Studio. Sign in with Apple will ask you to confirm again at each sign-in.</p>
+      <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;line-height:1.45;text-align:center;">You must accept our policies before using Studio. This is saved once on this device (browser storage); you will not need to accept again on return visits. <strong>App Store age rating:</strong> Apple lists Asteroid as <strong>16+</strong> in most countries and regions, and <strong>15+</strong> in Australia, Brazil, and the Republic of Korea—the badge on your local App Store applies to you. By continuing you confirm you meet that minimum age.</p>
       <div class="ugc-policy-actions">
         <div class="ugc-policy-check-row" id="ugcPolicyCheckRow" role="group" aria-label="Legal acceptance">
           <input type="checkbox" id="ugcPolicyCheck" autocomplete="off" aria-describedby="ugcPolicyLegalText">
-          <span class="ugc-policy-check-text" id="ugcPolicyLegalText">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span>
+          <span class="ugc-policy-check-text" id="ugcPolicyLegalText">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer" onclick="return window.openAsteroidLegalPageFromClick(event, 'Asteroid%20Terms.html');">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer" onclick="return window.openAsteroidLegalPageFromClick(event, 'policy.html');">Privacy Policy</a>.</span>
         </div>
         <button type="button" class="ugc-policy-continue" id="ugcPolicyContinue" disabled>Continue to Studio</button>
       </div>
@@ -299,11 +350,83 @@
   </div>
   <script>
   (function () {
+    window.openAsteroidLegalPageFromClick = function (ev, path) {
+      try {
+        if (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        }
+      } catch (e0) {}
+      var rel = String(path || "").trim();
+      if (!rel) return false;
+      var url = "";
+      try {
+        url = new URL(rel, window.location.href).href;
+      } catch (e1) {
+        url = rel;
+      }
+      var isCap =
+        window.Capacitor &&
+        typeof window.Capacitor.isNativePlatform === "function" &&
+        window.Capacitor.isNativePlatform();
+      if (isCap) {
+        var pubBase = "https://www.asteroid8.net/";
+        try {
+          var pu = new URL(url);
+          var needRewrite =
+            pu.protocol === "ionic:" ||
+            pu.protocol === "capacitor:" ||
+            pu.protocol === "file:";
+          if (needRewrite) {
+            url = pubBase + rel.replace(/^\/+/, "");
+          }
+        } catch (eRew) {
+          try {
+            url = pubBase + rel.replace(/^\/+/, "");
+          } catch (eFb) {}
+        }
+      }
+      try {
+        if (isCap) {
+          var C = window.Capacitor;
+          var P = C.Plugins || {};
+          var Br = P.Browser;
+          if (Br && typeof Br.open === "function") {
+            void Br.open({ url: url, presentationStyle: "fullscreen" });
+            return false;
+          }
+          if (typeof C.nativePromise === "function") {
+            void C.nativePromise("Browser", "open", { url: url, presentationStyle: "fullscreen" });
+            return false;
+          }
+        }
+      } catch (e2) {}
+      try {
+        window.open(url, "_blank", "noopener,noreferrer");
+      } catch (e3) {
+        try {
+          window.location.href = url;
+        } catch (e4) {}
+      }
+      return false;
+    };
+    function ugcEventTargetIsInsideAnchor(target) {
+      var n = target;
+      while (n) {
+        if (n.nodeType === 1 && n.tagName && String(n.tagName).toLowerCase() === "a") return true;
+        n = n.parentNode;
+      }
+      return false;
+    }
+    window.__ugcEventTargetIsInsideAnchor = ugcEventTargetIsInsideAnchor;
     var UGC_KEY = "asteroidUgcPolicyAccepted";
     var LEGAL_FIRST_KEY = "asteroidTermsPrivacyAccepted";
     function legalFirstVisitDone() {
       return localStorage.getItem(LEGAL_FIRST_KEY) === "v1";
     }
+    try {
+      window.__asteroidLegalFirstVisitDone = legalFirstVisitDone;
+    } catch (eExpose) {}
     function ensureUgcGateDefaultCopy() {
       var t = document.getElementById("ugcPolicyTitle");
       var b = document.getElementById("ugcPolicyContinue");
@@ -357,7 +480,7 @@
         if (checkRow) {
           checkRow.addEventListener("click", function (e) {
             if (e.target === chk) return;
-            if (e.target.closest && e.target.closest("a")) return;
+            if (typeof window.__ugcEventTargetIsInsideAnchor === "function" && window.__ugcEventTargetIsInsideAnchor(e.target)) return;
             e.preventDefault();
             chk.checked = !chk.checked;
             chk.dispatchEvent(new Event("change", { bubbles: true }));
@@ -371,6 +494,8 @@
           var runner = window.__appleUgcPendingRunner;
           if (typeof runner === "function") {
             try { delete window.__appleUgcPendingRunner; } catch (e2) {}
+            localStorage.setItem(UGC_KEY, "v1");
+            localStorage.setItem(LEGAL_FIRST_KEY, "v1");
             ov.classList.remove("is-visible");
             chk.checked = false;
             btn.disabled = true;
@@ -432,6 +557,15 @@
       <p style="font-size: 0.9em;">Your Share Link:</p>
       <input type="text" id="shareLinkInput" readonly placeholder="Sign in to generate link...">
       <button id="copyBtn" class="upload-btn" style="width: 80px; height: 35px; font-size: 12px;">COPY</button>
+
+      <div class="referral-code-panel">
+        <p class="referral-code-title">Referral code (signed-in artists only)</p>
+        <input type="text" id="referralCodeDisplay" readonly placeholder="Sign in to generate your code">
+        <button id="copyCodeBtn" class="upload-btn" style="width: 110px; height: 35px; font-size: 12px;">COPY CODE</button>
+        <input type="text" id="referralCodeEntry" placeholder="Enter another artist's code to request feature" autocomplete="off">
+        <button id="submitReferralCodeBtn" class="upload-btn" style="width: 180px; height: 35px; font-size: 12px;">SUBMIT FOR FEATURE</button>
+        <div id="referralCodeStatus" class="referral-code-status"></div>
+      </div>
     </div>
   </div>
 
@@ -599,6 +733,10 @@
     <input type="text" id="title" placeholder="Song Title" required><br>
     <input type="text" id="artist" placeholder="Artist Name" required><br>
     <input type="text" id="album" placeholder="Album Name" required><br>
+    <label for="studioMarkExplicit" class="studio-explicit-option">
+      <input type="checkbox" id="studioMarkExplicit" autocomplete="off">
+      <span class="studio-explicit-copy"><strong>Explicit content</strong> — check this if the track has strong language or adult themes. Listeners will see an <strong>E</strong> badge next to the title (and can hide explicit songs in settings).</span>
+    </label>
     <style>
       .upload-wrapper {
         width: 320px;
@@ -872,7 +1010,7 @@
 <script type="module">
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
   import { getDatabase, goOnline, ref as ref2, update, get, set, onValue, increment, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-  import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInAnonymously, OAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { initializeAuth, getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInAnonymously, OAuthProvider, onAuthStateChanged, browserLocalPersistence, browserPopupRedirectResolver } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
   import { processReferralURL, createOrUpdateUserOnSignup, getReferralFromURL, onSongUploaded } from "./js/referral-system.js";
   import { songMetadataExplicit } from "./js/explicit-appendix.js";
@@ -890,11 +1028,33 @@
 
   const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  const auth = getAuth(app);
+  let auth;
+  try {
+    auth = initializeAuth(app, {
+      persistence: browserLocalPersistence,
+      popupRedirectResolver: browserPopupRedirectResolver,
+    });
+  } catch (e) {
+    const code = e && e.code ? String(e.code) : "";
+    const msg = e && e.message ? String(e.message) : "";
+    if (code === "auth/already-initialized" || /already.*initialized/i.test(msg)) {
+      auth = getAuth(app);
+    } else {
+      throw e;
+    }
+  }
   const storage = getStorage(app);
   const appleProvider = new OAuthProvider("apple.com");
   appleProvider.addScope("email");
   appleProvider.addScope("name");
+  try {
+    if (typeof window.Capacitor !== "undefined" && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+      console.info(
+        "[studio][auth] WebView origin (must be in Firebase Authorized domains for redirect OAuth):",
+        typeof location !== "undefined" ? location.origin : "?"
+      );
+    }
+  } catch (eOrig) {}
   const jsConfetti = new JSConfetti();
 
   function isAppleAuthUser(user) {
@@ -1294,7 +1454,22 @@
 
   let _studioCapResumeCloserDone = false;
   const isCapacitorNative = () => typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
-  const getBrowserPlugin = () => { try { return window.Capacitor?.Plugins?.Browser || null; } catch (e) { return null; } };
+  const getBrowserPlugin = () => {
+    try {
+      const C = window.Capacitor;
+      const P = C && C.Plugins && C.Plugins.Browser;
+      if (P && typeof P.open === "function") return P;
+      if (C && typeof C.nativePromise === "function" && typeof C.getPlatform === "function" && C.getPlatform() === "ios") {
+        return {
+          open: (opts) => C.nativePromise("Browser", "open", opts || {}),
+          close: () => C.nativePromise("Browser", "close", {}),
+        };
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  };
   const getAppPlugin = () => { try { return window.Capacitor?.Plugins?.App || null; } catch (e) { return null; } };
 
   async function dismissInAppBrowser(reason) {
@@ -1315,6 +1490,238 @@
       } catch (e) {
         console.warn("[studio][Cap Browser] close attempt failed", reason, "afterMs", ms, e && (e.message || e));
       }
+    }
+  }
+
+  function shouldOpenOAuthInCapBrowser(url) {
+    const s = String(url || "");
+    if (!/^https?:\/\//i.test(s)) return false;
+    return (
+      s.includes("appleid.apple.com") ||
+      s.includes("idmsa.apple.com") ||
+      s.includes("firebaseapp.com/__/auth") ||
+      s.includes("accounts.google.com") ||
+      s.includes("googleapis.com") ||
+      s.includes("google.com/")
+    );
+  }
+
+  async function signInWithRedirectCapacitorBrowser(auth, provider) {
+    if (!isCapacitorNative()) {
+      await signInWithRedirect(auth, provider);
+      return;
+    }
+    const Browser = getBrowserPlugin();
+    if (!Browser || typeof Browser.open !== "function") {
+      await signInWithRedirect(auth, provider);
+      return;
+    }
+
+    const locProto = window.Location.prototype;
+    const origReplace = locProto.replace;
+    const origAssign = locProto.assign;
+    let patchesActive = false;
+    let oauthOpened = false;
+    let hrefDesc = null;
+
+    const openOAuthBrowser = (url) => {
+      if (oauthOpened) return false;
+      if (!shouldOpenOAuthInCapBrowser(url)) return false;
+      oauthOpened = true;
+      try {
+        sessionStorage.setItem("capAuthBrowserOpened", String(Date.now()));
+      } catch (e0) {}
+      console.log("[studio][auth] OAuth navigation → Capacitor Browser.open", String(url).slice(0, 200));
+      void Browser.open({ url: String(url), presentationStyle: "fullscreen" });
+      return true;
+    };
+
+    const restorePatches = () => {
+      if (!patchesActive) return;
+      patchesActive = false;
+      try {
+        locProto.replace = origReplace;
+        locProto.assign = origAssign;
+        if (hrefDesc) Object.defineProperty(locProto, "href", hrefDesc);
+      } catch (e1) {}
+    };
+
+    locProto.replace = function (url) {
+      if (openOAuthBrowser(url)) return;
+      return origReplace.call(this, url);
+    };
+    locProto.assign = function (url) {
+      if (openOAuthBrowser(url)) return;
+      return origAssign.call(this, url);
+    };
+    patchesActive = true;
+
+    try {
+      hrefDesc = Object.getOwnPropertyDescriptor(locProto, "href");
+      if (hrefDesc && typeof hrefDesc.set === "function") {
+        const origHrefSet = hrefDesc.set;
+        Object.defineProperty(locProto, "href", {
+          configurable: true,
+          enumerable: !!hrefDesc.enumerable,
+          get: hrefDesc.get,
+          set: function (v) {
+            if (openOAuthBrowser(v)) return;
+            return origHrefSet.call(this, v);
+          },
+        });
+      }
+    } catch (eHref) {
+      console.warn("[studio][auth] href interceptor not applied", eHref && (eHref.message || eHref));
+    }
+
+    try {
+      await Promise.race([
+        signInWithRedirect(auth, provider),
+        new Promise((_, rej) =>
+          setTimeout(() => rej(Object.assign(new Error("cap-redirect-timeout"), { code: "cap/redirect-timeout" })), 15000)
+        ),
+      ]);
+    } catch (e) {
+      const code = e && e.code ? String(e.code) : "";
+      if (code !== "cap/redirect-timeout") console.warn("[studio][auth] signInWithRedirect:", e);
+      if (code === "auth/unauthorized-domain" && isCapacitorNative()) {
+        try {
+          if (!sessionStorage.getItem("asteroidFirebaseDomainHintShown")) {
+            sessionStorage.setItem("asteroidFirebaseDomainHintShown", "1");
+            const o = typeof location !== "undefined" ? location.origin : "";
+            const host = typeof location !== "undefined" ? location.hostname : "";
+            alert(
+              "Firebase: auth/unauthorized-domain\n\n" +
+                "Add this WebView’s hostname in Firebase Console:\n" +
+                "Authentication → Settings → Authorized domains\n\n" +
+                "Hostname: " +
+                (host || "(unknown)") +
+                "\nOrigin: " +
+                (o || "(unknown)") +
+                "\n\nAlso add localhost, www.asteroid8.net, asteroid8.net, and any Xcode live-reload IP you use."
+            );
+          }
+        } catch (a0) {}
+      }
+    } finally {
+      setTimeout(restorePatches, oauthOpened ? 400 : 8000);
+    }
+  }
+
+  function getAppleNativeSignInPlugin() {
+    try {
+      const C = window.Capacitor;
+      if (!C) return null;
+      if (typeof C.registerPlugin === "function") {
+        if (!C.Plugins) C.Plugins = {};
+        if (!C.Plugins.SignInWithApple) {
+          C.registerPlugin("SignInWithApple", {
+            web: () => ({
+              authorize: async () => {
+                const E = C.Exception || Error;
+                const unimpl = C.ExceptionCode && C.ExceptionCode.Unimplemented;
+                if (unimpl) throw new E("Sign in with Apple requires the Asteroid iOS app.", unimpl);
+                throw new E("Sign in with Apple requires the iOS app.");
+              },
+            }),
+          });
+        }
+        const reg = C.Plugins.SignInWithApple;
+        if (reg && typeof reg.authorize === "function") return reg;
+      }
+      if (typeof C.nativePromise === "function" && typeof C.getPlatform === "function") {
+        const plat = String(C.getPlatform() || "").toLowerCase();
+        if (plat === "ios") {
+          return {
+            authorize: (options) => C.nativePromise("SignInWithApple", "authorize", options || {}),
+          };
+        }
+      }
+      return null;
+    } catch (e) {
+      console.warn("[studio][auth] getAppleNativeSignInPlugin:", e);
+      return null;
+    }
+  }
+
+  function buildAppleAuthRawNonce() {
+    try {
+      const arr = new Uint8Array(32);
+      crypto.getRandomValues(arr);
+      return Array.from(arr, (b) => ("0" + b.toString(16)).slice(-2)).join("");
+    } catch (e) {
+      return "n_" + Math.random().toString(36).slice(2) + "_" + Math.random().toString(36).slice(2);
+    }
+  }
+
+  async function sha256HexUtf8(plain) {
+    const enc = new TextEncoder();
+    const buf = await crypto.subtle.digest("SHA-256", enc.encode(String(plain)));
+    return Array.from(new Uint8Array(buf), (b) => ("0" + b.toString(16)).slice(-2)).join("");
+  }
+
+  async function tryNativeAppleStudioSignIn() {
+    try {
+      if (!isCapacitorNative()) return false;
+      const plat =
+        typeof window.Capacitor.getPlatform === "function"
+          ? String(window.Capacitor.getPlatform() || "").toLowerCase()
+          : "";
+      if (plat !== "ios") return false;
+      const P = getAppleNativeSignInPlugin();
+      if (!P || typeof P.authorize !== "function") {
+        console.log("[studio][auth] Native SignInWithApple plugin unavailable — using redirect/Browser flow");
+        return false;
+      }
+      const rawNonce = buildAppleAuthRawNonce();
+      const nonceForAppleRequest = await sha256HexUtf8(rawNonce);
+      console.log("[studio][auth] Invoking native Sign in with Apple (system sheet)…");
+      const res = await Promise.race([
+        P.authorize({
+          clientId: "com.asteroid.asteroidinc8",
+          redirectURI: "https://asteroid-cdc13.firebaseapp.com/__/auth/handler",
+          scopes: "email name",
+          nonce: nonceForAppleRequest,
+        }),
+        new Promise((_, rej) =>
+          setTimeout(
+            () => rej(Object.assign(new Error("Apple authorize timed out (no response from native)."), { code: "apple/timeout" })),
+            120000
+          )
+        ),
+      ]);
+      const resp = res && res.response ? res.response : res;
+      const idToken = resp && (resp.identityToken || resp.identity_token);
+      if (!idToken) {
+        console.warn("[studio][auth] Native Apple authorize returned no identityToken", res);
+        return false;
+      }
+      const appleCred = appleProvider.credential({ idToken: String(idToken), rawNonce: rawNonce });
+      try {
+        const result = await signInWithCredential(auth, appleCred);
+        await completeStudioSignIn(result);
+        console.log("[studio][auth] Native Sign in with Apple + Firebase signInWithCredential OK");
+        return true;
+      } catch (fe) {
+        const c = fe && fe.code ? String(fe.code) : "";
+        console.error("[studio][auth] Firebase signInWithCredential (Apple) failed:", c, fe && (fe.message || fe));
+        return false;
+      }
+    } catch (err) {
+      const msg = err && (err.message || err.localizedDescription || String(err));
+      console.warn("[studio][auth] Native Apple sign-in failed, falling back:", msg);
+      if (isCapacitorNative() && /1000|AuthorizationError/i.test(String(msg))) {
+        try {
+          if (!sessionStorage.getItem("asteroidApple1000HintShown")) {
+            sessionStorage.setItem("asteroidApple1000HintShown", "1");
+            alert(
+              "Sign in with Apple returned Apple error 1000.\n\n" +
+                "Enable Sign in with Apple in Xcode capabilities, sign into an Apple ID in the Simulator Settings app, or test on a real device."
+            );
+          }
+        } catch (x0) {}
+      }
+      return false;
     }
   }
 
@@ -1450,6 +1857,8 @@
         topBar.style.display = "none";
       }
     }
+    void refreshStudioReferralUi();
+    updateCampaignVisibility();
   }
   window.applyStudioAuthUI = applyStudioAuthUI;
 
@@ -1459,6 +1868,26 @@
       requestAnimationFrame(() => applyStudioAuthUI());
     } catch (e) {}
     setTimeout(() => applyStudioAuthUI(), 50);
+  }
+
+  function studioSessionSignedIn() {
+    if (auth.currentUser) return true;
+    try {
+      if (typeof window.isSessionValid === 'function' && window.isSessionValid()) return true;
+    } catch (e) {}
+    const signedFlag =
+      localStorage.getItem('asteroidSignedInBefore') === 'true' ||
+      localStorage.getItem('isLoggedIn') === 'true' ||
+      localStorage.getItem('localAuthOnly') === '1';
+    if (!signedFlag) return false;
+    const id = (localStorage.getItem('emailKey') || localStorage.getItem('CurrentUser') || localStorage.getItem('email') || '').trim();
+    return !!id;
+  }
+
+  function updateCampaignVisibility() {
+    const box = document.getElementById('campaignContainer');
+    if (!box) return;
+    box.style.display = studioSessionSignedIn() ? 'block' : 'none';
   }
 
   onAuthStateChanged(auth, (user) => {
@@ -1492,10 +1921,6 @@
 
   // --- 1. DETECTION ---
   const params = new URLSearchParams(window.location.search);
-  if (params.get('ref') === "ARTISTSOFFEB26" || localStorage.getItem('ref_active') === 'true') {
-      localStorage.setItem('ref_active', 'true');
-      document.getElementById('campaignContainer').style.display = 'block';
-  }
   if (params.get('by')) localStorage.setItem('pending_inviter', params.get('by'));
 
   // --- 2. AUTH & PROGRESS ---
@@ -1558,7 +1983,12 @@
       var chkU = document.getElementById("ugcPolicyCheck");
       var btnU = document.getElementById("ugcPolicyContinue");
       var titleU = document.getElementById("ugcPolicyTitle");
-      if (ovU && chkU && btnU) {
+      var legalAlready =
+        typeof window.__asteroidLegalFirstVisitDone === "function" && window.__asteroidLegalFirstVisitDone();
+      if (legalAlready) {
+        console.log("[studio][auth] Terms/Privacy already accepted (skipping legal overlay). Clear localStorage asteroidTermsPrivacyAccepted / asteroidUgcPolicyAccepted to see it again.");
+      }
+      if (ovU && chkU && btnU && !legalAlready) {
         if (!window.__ugcAppleGateDefaults && titleU && btnU) {
           window.__ugcAppleGateDefaults = { title: titleU.textContent, btn: btnU.textContent };
         }
@@ -1568,8 +1998,9 @@
         btnU.textContent = "Continue with Apple";
         window.__appleUgcPendingRunner = async function () {
           if (isCapacitorNative()) {
+            if (await tryNativeAppleStudioSignIn()) return;
             try {
-              await signInWithRedirect(auth, appleProvider);
+              await signInWithRedirectCapacitorBrowser(auth, appleProvider);
             } catch (redirectErr) {
               console.error("[studio] Apple redirect sign-in (native):", redirectErr);
               alert(
@@ -1615,8 +2046,9 @@
         return;
       }
       if (isCapacitorNative()) {
+        if (await tryNativeAppleStudioSignIn()) return;
         try {
-          await signInWithRedirect(auth, appleProvider);
+          await signInWithRedirectCapacitorBrowser(auth, appleProvider);
         } catch (redirectErr) {
           console.error("[studio] Apple redirect sign-in (native):", redirectErr);
           alert(
@@ -1699,6 +2131,148 @@
     });
   }
 
+  function studioReferralUserKey() {
+    const raw = (localStorage.getItem('emailKey') || localStorage.getItem('CurrentUser') || localStorage.getItem('email') || '').trim();
+    return raw.replace(/[.#$[\]]/g, '_');
+  }
+
+  function studioReferralDisplayName() {
+    const fromProfile = (localStorage.getItem('profileNickname') || localStorage.getItem('fullName') || '').trim();
+    if (fromProfile) return fromProfile;
+    const idRaw = (localStorage.getItem('CurrentUser') || localStorage.getItem('email') || '').trim();
+    if (!idRaw) return 'artist';
+    return String(idRaw).split('@')[0] || 'artist';
+  }
+
+  function setReferralStatus(message, cls) {
+    const el = document.getElementById('referralCodeStatus');
+    if (!el) return;
+    el.textContent = message || '';
+    el.className = 'referral-code-status' + (cls ? ' ' + cls : '');
+  }
+
+  function generateUsernameReferralCode(displayName) {
+    const base = String(displayName || 'artist').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'ARTIST';
+    const shift = Math.floor(Math.random() * 25) + 1;
+    const randLetter = () => String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    const randDigits = () => Math.floor(Math.random() * 100).toString().padStart(2, '0');
+    let encrypted = '';
+    for (const ch of base) {
+      if (ch >= 'A' && ch <= 'Z') {
+        const next = ((ch.charCodeAt(0) - 65 + shift) % 26) + 65;
+        encrypted += String.fromCharCode(next);
+      } else if (ch >= '0' && ch <= '9') {
+        encrypted += String((Number(ch) + shift) % 10);
+      }
+    }
+    let mixed = '';
+    for (const ch of encrypted) mixed += ch + randLetter();
+    const core = (randLetter() + randLetter() + mixed + randDigits()).slice(0, 16);
+    return 'AST-' + core;
+  }
+
+  async function ensureStudioReferralCode() {
+    const key = studioReferralUserKey();
+    const out = document.getElementById('referralCodeDisplay');
+    if (!out) return '';
+    if (!key) {
+      out.value = '';
+      return '';
+    }
+    const userRef = ref2(db, 'REFERRAL_CODES_BY_USER/' + key);
+    const snap = await get(userRef);
+    let code = snap.exists() && snap.val() && snap.val().code ? String(snap.val().code).trim().toUpperCase() : '';
+    if (!code) {
+      const name = studioReferralDisplayName();
+      for (let i = 0; i < 8; i++) {
+        const candidate = generateUsernameReferralCode(name);
+        const idxSnap = await get(ref2(db, 'REFERRAL_CODE_INDEX/' + candidate));
+        if (!idxSnap.exists() || String(idxSnap.val() || '').trim() === key) {
+          code = candidate;
+          break;
+        }
+      }
+      if (!code) code = generateUsernameReferralCode(studioReferralDisplayName());
+      await set(userRef, { code: code, ownerKey: key, createdAt: Date.now(), codeSource: 'username-encrypted' });
+    }
+    await set(ref2(db, 'REFERRAL_CODE_INDEX/' + code), key);
+    out.value = code;
+    return code;
+  }
+
+  async function refreshStudioReferralUi() {
+    const signedIn = studioSessionSignedIn();
+    const display = document.getElementById('referralCodeDisplay');
+    const entry = document.getElementById('referralCodeEntry');
+    const submit = document.getElementById('submitReferralCodeBtn');
+    const copy = document.getElementById('copyCodeBtn');
+    if (display) display.disabled = !signedIn;
+    if (entry) entry.disabled = !signedIn;
+    if (submit) submit.disabled = !signedIn;
+    if (copy) copy.disabled = !signedIn;
+    if (!signedIn) {
+      if (display) display.value = '';
+      setReferralStatus('Sign in to use referral featuring.', '');
+      return;
+    }
+    try {
+      const code = await ensureStudioReferralCode();
+      setReferralStatus(code ? 'Share your encrypted username code, or enter another artist code below.' : 'Could not prepare code yet.', code ? '' : 'error');
+    } catch (e) {
+      console.warn('[referral-code]', e);
+      setReferralStatus('Could not load referral code right now.', 'error');
+    }
+  }
+
+  async function submitStudioReferralCode() {
+    const key = studioReferralUserKey();
+    if (!key) {
+      setReferralStatus('Sign in first.', 'error');
+      return;
+    }
+    const input = document.getElementById('referralCodeEntry');
+    const rawCode = String((input && input.value) || '').trim().toUpperCase();
+    if (!rawCode) {
+      setReferralStatus('Enter a referral code first.', 'error');
+      return;
+    }
+    try {
+      const ownerSnap = await get(ref2(db, 'REFERRAL_CODE_INDEX/' + rawCode));
+      const ownerKey = ownerSnap.exists() ? String(ownerSnap.val() || '').trim() : '';
+      if (!ownerKey) {
+        setReferralStatus('Code not found. Ask the artist to share a valid code.', 'error');
+        return;
+      }
+      if (ownerKey === key) {
+        setReferralStatus('You cannot enter your own code.', 'error');
+        return;
+      }
+      const reqPath = 'FEATURE_REFERRAL_REQUESTS/' + ownerKey + '/' + key;
+      const existing = await get(ref2(db, reqPath));
+      if (existing.exists()) {
+        setReferralStatus('Already sent to this artist. Wait for review.', 'ok');
+        return;
+      }
+      await set(ref2(db, reqPath), {
+        fromKey: key,
+        ownerKey: ownerKey,
+        referralCode: rawCode,
+        status: 'pending_feature_review',
+        requestedAt: Date.now()
+      });
+      await set(ref2(db, 'FEATURE_REFERRAL_OUTBOX/' + key + '/' + ownerKey), {
+        ownerKey: ownerKey,
+        referralCode: rawCode,
+        requestedAt: Date.now()
+      });
+      if (input) input.value = '';
+      setReferralStatus('Submitted. This was sent to the referred artist account for feature review.', 'ok');
+    } catch (e) {
+      console.error(e);
+      setReferralStatus('Could not submit code right now. Check connection and try again.', 'error');
+    }
+  }
+
   // --- 3. UPLOAD ---
   document.getElementById("btn").onclick = async () => {
     clearUploadStatus();
@@ -1756,6 +2330,8 @@
         console.warn("[studio] goOnline", e);
       }
       const fullName = localStorage.getItem("fullName") || "";
+      const markExplicitEl = document.getElementById("studioMarkExplicit");
+      const markExplicitChecked = !!(markExplicitEl && markExplicitEl.checked);
       const songData = {
         album: album,
         artist: artist,
@@ -1765,7 +2341,7 @@
         uploaderName: fullName,
         campaign: "ARTISTSOFFEB26",
         createdAt: Date.now(),
-        isExplicit: songMetadataExplicit({ title, artist, album }),
+        isExplicit: markExplicitChecked || songMetadataExplicit({ title, artist, album }),
       };
       const dbPath = `SONGS/${safeTitle}/${safeAlbum}/${safeArtist}`;
       const rtdbTimeoutMs = 45000;
@@ -1837,6 +2413,25 @@
     navigator.clipboard.writeText(copyText.value);
     alert("Copied! Share it with 1 person.");
   };
+
+  document.getElementById("copyCodeBtn")?.addEventListener("click", async () => {
+    const codeInput = document.getElementById("referralCodeDisplay");
+    const code = (codeInput && codeInput.value ? codeInput.value : "").trim();
+    if (!code) {
+      setReferralStatus("No code yet. Sign in to generate one.", "error");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(code);
+      setReferralStatus("Referral code copied.", "ok");
+    } catch (e) {
+      setReferralStatus("Could not copy code automatically. Copy it manually.", "error");
+    }
+  });
+
+  document.getElementById("submitReferralCodeBtn")?.addEventListener("click", async () => {
+    await submitStudioReferralCode();
+  });
 
   if(localStorage.getItem("fullName") || localStorage.getItem("email")) {
       const savedName = localStorage.getItem("fullName") || localStorage.getItem("email") || "";

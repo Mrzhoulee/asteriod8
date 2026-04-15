@@ -1,0 +1,131 @@
+diff --git a/node_modules/@capacitor-community/apple-sign-in/Package.swift b/node_modules/@capacitor-community/apple-sign-in/Package.swift
+index 94246df..7d9d007 100644
+--- a/node_modules/@capacitor-community/apple-sign-in/Package.swift
++++ b/node_modules/@capacitor-community/apple-sign-in/Package.swift
+@@ -10,7 +10,7 @@ let package = Package(
+             targets: ["SignInWithApple"])
+     ],
+     dependencies: [
+-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "7.0.0")
++        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "8.0.0")
+     ],
+     targets: [
+         .target(
+diff --git a/node_modules/@capacitor-community/apple-sign-in/ios/Sources/SignInWithApple/Plugin.swift b/node_modules/@capacitor-community/apple-sign-in/ios/Sources/SignInWithApple/Plugin.swift
+index f53087c..93a134b 100755
+--- a/node_modules/@capacitor-community/apple-sign-in/ios/Sources/SignInWithApple/Plugin.swift
++++ b/node_modules/@capacitor-community/apple-sign-in/ios/Sources/SignInWithApple/Plugin.swift
+@@ -1,4 +1,5 @@
+ import Foundation
++import UIKit
+ import Capacitor
+ import AuthenticationServices
+ 
+@@ -10,6 +11,10 @@ public class SignInWithApple: CAPPlugin, CAPBridgedPlugin {
+         CAPPluginMethod(name: "authorize", returnType: CAPPluginReturnPromise),
+     ]
+ 
++    /// Must be retained for the lifetime of the Sign in with Apple UI session (Apple sample pattern).
++    /// A local variable + async was released after `performRequests()` returned, so the sheet never appeared.
++    private var currentAuthorizationController: ASAuthorizationController?
++
+     @objc func authorize(_ call: CAPPluginCall) {
+         let appleIDProvider = ASAuthorizationAppleIDProvider()
+         let request = appleIDProvider.createRequest()
+@@ -22,9 +27,15 @@ public class SignInWithApple: CAPPlugin, CAPBridgedPlugin {
+ 
+         self.bridge?.saveCall(call)
+ 
+-        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+-        authorizationController.delegate = self
+-        authorizationController.performRequests()
++        let controller = ASAuthorizationController(authorizationRequests: [request])
++        controller.delegate = self
++        controller.presentationContextProvider = self
++        self.currentAuthorizationController = controller
++
++        DispatchQueue.main.async { [weak self] in
++            guard let self = self else { return }
++            self.currentAuthorizationController?.performRequests()
++        }
+     }
+ 
+     func getRequestedScopes(from call: CAPPluginCall) -> [ASAuthorization.Scope]? {
+@@ -48,24 +59,65 @@ public class SignInWithApple: CAPPlugin, CAPBridgedPlugin {
+     }
+ }
+ 
++extension SignInWithApple: ASAuthorizationControllerPresentationContextProviding {
++    public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
++        if let window = self.bridge?.viewController?.view.window {
++            return window
++        }
++        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
++        for scene in scenes {
++            if let key = scene.windows.first(where: { $0.isKeyWindow }) {
++                return key
++            }
++        }
++        for scene in scenes {
++            if let first = scene.windows.first {
++                return first
++            }
++        }
++        let flat = scenes.flatMap(\.windows)
++        if let w = flat.first {
++            return w
++        }
++        return UIWindow(frame: UIScreen.main.bounds)
++    }
++}
++
+ extension SignInWithApple: ASAuthorizationControllerDelegate {
+     public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+-        guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else { return }
+-
++        defer { self.currentAuthorizationController = nil }
+         let defaults = UserDefaults()
+         let id = defaults.string(forKey: "callbackId") ?? ""
++
++        guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
++            if let call = self.bridge?.savedCall(withID: id) {
++                call.reject("Unexpected Apple authorization credential type")
++                self.bridge?.releaseCall(call)
++            }
++            return
++        }
++
+         guard let call = self.bridge?.savedCall(withID: id) else {
+             return
+         }
+ 
++        guard let idTokenData = appleIDCredential.identityToken,
++              let idToken = String(data: idTokenData, encoding: .utf8),
++              let authCodeData = appleIDCredential.authorizationCode,
++              let authCode = String(data: authCodeData, encoding: .utf8) else {
++            call.reject("Missing identity token or authorization code from Apple")
++            self.bridge?.releaseCall(call)
++            return
++        }
++
+         let result = [
+             "response": [
+                 "user": appleIDCredential.user,
+                 "email": appleIDCredential.email,
+                 "givenName": appleIDCredential.fullName?.givenName,
+                 "familyName": appleIDCredential.fullName?.familyName,
+-                "identityToken": String(data: appleIDCredential.identityToken!, encoding: .utf8),
+-                "authorizationCode": String(data: appleIDCredential.authorizationCode!, encoding: .utf8)
++                "identityToken": idToken,
++                "authorizationCode": authCode
+             ]
+         ]
+ 
+@@ -74,6 +126,7 @@ extension SignInWithApple: ASAuthorizationControllerDelegate {
+     }
+ 
+     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
++        defer { self.currentAuthorizationController = nil }
+         let defaults = UserDefaults()
+         let id = defaults.string(forKey: "callbackId") ?? ""
+         guard let call = self.bridge?.savedCall(withID: id) else {

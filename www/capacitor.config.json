@@ -1,5 +1,24 @@
 {
   "appId": "com.asteroid.asteroidinc8",
   "appName": "Asteroid",
-  "webDir": "www"
+  "webDir": "www",
+  "ios": {
+    "webContentsDebuggingEnabled": true
+  },
+  "server": {
+    "iosScheme": "ionic",
+    "allowNavigation": [
+      "https://appleid.apple.com",
+      "https://www.apple.com",
+      "https://apple.com",
+      "https://idmsa.apple.com",
+      "https://*.apple.com",
+      "https://asteroid-cdc13.firebaseapp.com",
+      "https://*.firebaseapp.com",
+      "https://accounts.google.com",
+      "https://*.google.com",
+      "https://*.googleapis.com",
+      "https://securetoken.googleapis.com"
+    ]
+  }
 }
