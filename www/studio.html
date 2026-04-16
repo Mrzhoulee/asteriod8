@@ -1906,6 +1906,11 @@
   window.addEventListener("pageshow", () => {
     try { applyStudioAuthUI(); } catch (e) {}
   });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      try { void refreshStudioReferralUi(); } catch (e) {}
+    }
+  });
   if (typeof auth.authStateReady === "function") {
     auth.authStateReady().then(() => {
       try {
@@ -2303,9 +2308,10 @@
   }
 
   async function submitStudioReferralCode() {
+    try { if (typeof auth.authStateReady === 'function') await auth.authStateReady(); } catch (e) {}
     const key = studioReferralUserKey();
     if (!key) {
-      setReferralStatus('Sign in first.', 'error');
+      setReferralStatus('Sign in to submit a referral code.', 'error');
       return;
     }
     const input = document.getElementById('referralCodeEntry');
