@@ -2018,7 +2018,14 @@
     const row = document.getElementById("studioSignInRow");
     const topBar = document.getElementById("studioTopBar");
     const sessionOk = typeof window.isSessionValid === "function" && window.isSessionValid();
-    const signedIn = !!auth.currentUser || sessionOk;
+    const hasLocalIdentity = !!(
+      localStorage.getItem("emailKey") ||
+      localStorage.getItem("CurrentUser") ||
+      localStorage.getItem("email") ||
+      localStorage.getItem("userEmail") ||
+      localStorage.getItem("artemail")
+    );
+    const signedIn = !!auth.currentUser || sessionOk || hasLocalIdentity;
     if (row) {
       if (signedIn) {
         row.classList.add("studio-signin-row--hidden");
@@ -2159,6 +2166,8 @@
     loadUserProgress(user.displayName || rawEmail || accountId || "Artist");
     applyStudioAuthUI();
     void maybeShowAppleOnboarding();
+    try { sessionStorage.setItem("_studioJustSignedIn", "1"); } catch (e) {}
+    setTimeout(() => { try { location.reload(); } catch (e) {} }, 200);
   }
 
   const appleBtn = document.getElementById("apple-sign-in");
