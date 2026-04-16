@@ -2131,15 +2131,48 @@
   }
 
   function studioReferralUserKey() {
-    const raw = (localStorage.getItem('emailKey') || localStorage.getItem('CurrentUser') || localStorage.getItem('email') || '').trim();
+    const candidates = [
+      localStorage.getItem('emailKey'),
+      localStorage.getItem('CurrentUser'),
+      localStorage.getItem('email'),
+      localStorage.getItem('userEmail'),
+      localStorage.getItem('artemail'),
+      (auth && auth.currentUser) ? (auth.currentUser.email || auth.currentUser.uid) : null,
+    ];
+    console.log('[referral] studioReferralUserKey candidates:', candidates);
+    const raw = (candidates.find(v => v && String(v).trim() && String(v).trim() !== 'null' && String(v).trim() !== 'undefined') || '').trim();
+    if (!raw) {
+      // Fallback: if any sign-in flag exists, use or create a stable anonymous key
+      const signedFlag = localStorage.getItem('asteroidSignedInBefore') === 'true' ||
+        localStorage.getItem('isLoggedIn') === 'true' ||
+        localStorage.getItem('localAuthOnly') === '1';
+      if (signedFlag) {
+        let anonKey = localStorage.getItem('_referralAnonKey');
+        if (!anonKey) {
+          anonKey = 'anon_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+          localStorage.setItem('_referralAnonKey', anonKey);
+        }
+        console.log('[referral] using anonKey fallback:', anonKey);
+        return anonKey;
+      }
+      console.log('[referral] no identity found, not signed in');
+      return '';
+    }
     return raw.replace(/[.#$[\]]/g, '_');
   }
 
   function studioReferralDisplayName() {
     const fromProfile = (localStorage.getItem('profileNickname') || localStorage.getItem('fullName') || '').trim();
     if (fromProfile) return fromProfile;
-    const idRaw = (localStorage.getItem('CurrentUser') || localStorage.getItem('email') || '').trim();
-    if (!idRaw) return 'artist';
+    const idRaw = (
+      localStorage.getItem('CurrentUser') ||
+      localStorage.getItem('email') ||
+      localStorage.getItem('userEmail') ||
+      localStorage.getItem('artemail') ||
+      (auth.currentUser && (auth.currentUser.displayName || auth.currentUser.email || auth.currentUser.uid)) ||
+      ''
+    ).trim();
+    if (!idRaw || idRaw === 'null' || idRaw === 'undefined') return 'artist';
     return String(idRaw).split('@')[0] || 'artist';
   }
 
@@ -2193,7 +2226,7 @@
     async function codeIsValid(c) {
       if (!c) return false;
       const idxSnap = await get(ref2(db, 'REFERRAL_CODE_INDEX/' + c));
-      if (!idxSnap.exists()) return true;
+      if (!idxSnap.exists()) return true; // unclaimed slot, ok
       const v = idxSnap.val();
       const owner = typeof v === 'string' ? v : (v?.ownerKey || '');
       const used = typeof v === 'object' && v?.used === true;
@@ -2240,23 +2273,17 @@
       if (copyMain) copyMain.disabled = !on;
     };
 
-    // Wait for Firebase auth to resolve — email users have auth.currentUser null
-    // briefly on page load while the SDK restores the persisted session.
-    let firebaseUser = auth.currentUser;
-    if (!firebaseUser) {
-      firebaseUser = await new Promise(resolve => {
-        const unsub = onAuthStateChanged(auth, u => { unsub(); resolve(u); });
-      });
-    }
+    // Wait for Firebase auth to settle, then fall back to localStorage-based identity
+    // so email-only (non-Firebase) users are correctly recognised as signed in.
+    try { if (typeof auth.authStateReady === 'function') await auth.authStateReady(); } catch (e) {}
+    const key = studioReferralUserKey();
 
-    const signedIn = !!firebaseUser || studioSessionSignedIn();
-
-    if (!signedIn) {
+    if (!key) {
       setEnabled(false);
       if (display) display.value = '';
       const shareInput = document.getElementById('shareLinkInput');
       if (shareInput) shareInput.value = '';
-      setReferralStatus('Sign in to use referral featuring.', '');
+      setReferralStatus('Sign in to generate your referral code.', '');
       return;
     }
 
