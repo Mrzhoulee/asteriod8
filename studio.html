@@ -2108,7 +2108,7 @@
   })();
 
   function loadUserProgress(name) {
-    const cleanName = name.replace(/\s+/g, '_');
+    const cleanName = name.replace(/[.#$[\]\s]/g, '_');
     const emailRaw = localStorage.getItem("email") || "";
     const safeEmail = emailRaw.replace(/\./g, ',');
     const rewardKey = (typeof authScopedKey === "function") ? authScopedKey("rewardNotified") : "rewardNotified";

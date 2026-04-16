@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "asteroid-cdc13",
     "public": "www",
     "ignore": [
       "firebase.json",
