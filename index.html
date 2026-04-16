@@ -2113,9 +2113,6 @@ body.create-profile-active {
           </div>
           </a>
 
-          <div id="live-notifier" class="live-notifier">
-           Artist Dashboard is only for VIP
-          </div>
 
 
           <div id="tour-live-concerts" class="tour-live-concerts-wrap">
@@ -2634,7 +2631,7 @@ body.create-profile-active {
           <h2 id="artistProfileName" class="artist-profile-name">Artist</h2>
           <div id="artistProfileTag" class="artist-profile-tag">Featured artist</div>
           <div id="artistProfileFollowWrap" class="profile-modal-follow-wrap artist-profile-follow-wrap" style="display: none;">
-            <button type="button" class="profile-follow-btn" id="artistProfileFollowBtn" onclick="window.__runFollowFromButtonById('artistProfileFollowBtn'); return false;">Follow artist</button>
+            <button type="button" class="profile-follow-btn" id="artistProfileFollowBtn" onclick="if(window.__runFollowFromButtonById){window.__runFollowFromButtonById('artistProfileFollowBtn'); return false;}">Follow artist</button>
             <p class="profile-follow-hint" id="artistProfileFollowHint"></p>
           </div>
           <div id="artistProfileFeaturedBlockWrap" style="margin-top:12px;width:100%;max-width:280px;">
@@ -6005,36 +6002,11 @@ onAuthStateChanged(auth, (user) => {
   const liveNotifier = document.getElementById("live-notifier");
   const appleSignInHeader = document.getElementById("apple-sign-in");
 
-  function localArtistProfileEnabled() {
-    const t = (localStorage.getItem("profileType") || "").toLowerCase().trim();
-    const v = (localStorage.getItem("profileVisibility") || "").toLowerCase().trim();
-    const r = (localStorage.getItem("profileRole") || localStorage.getItem("role") || "").toLowerCase().trim();
-    return t === "artist" || v === "public" || r.indexOf("artist") >= 0;
-  }
-
   function setArtistDashboardNavVisible(enabled) {
     const on = !!enabled;
     if (dashboardLink) dashboardLink.style.display = on ? "block" : "none";
     if (mobileDashboardLink) mobileDashboardLink.style.display = on ? "inline-flex" : "none";
-    if (liveNotifier) liveNotifier.style.display = on ? "none" : "block";
-  }
-
-  function isArtistProfileRecord(profileObj) {
-    if (!profileObj || typeof profileObj !== "object") return false;
-    const t = String(profileObj.profileType || "").toLowerCase().trim();
-    const v = String(profileObj.profileVisibility || "").toLowerCase().trim();
-    const r = String(profileObj.profileRole || profileObj.role || "").toLowerCase().trim();
-    return t === "artist" || v === "public" || r.indexOf("artist") >= 0;
-  }
-
-  async function resolveArtistDashboardEnabled(emailKey, fallback) {
-    var base = !!fallback;
-    if (!emailKey) return base;
-    try {
-      const profSnap = await get(ref2(database, "PROFILES/" + emailKey));
-      if (profSnap.exists() && isArtistProfileRecord(profSnap.val())) return true;
-    } catch (eProfile) {}
-    return base;
+    if (liveNotifier) liveNotifier.style.display = "none";
   }
 
   // If user is signed in, update UI and check premium status
@@ -6066,23 +6038,7 @@ onAuthStateChanged(auth, (user) => {
     localStorage.removeItem("userName");
     console.log("[index] onAuthStateChanged: signed in as", accountId, "provider:", user.providerData[0]?.providerId);
 
-    // Check if this user is a premium artist (PREMIUM/<emailKey>.ITG == true / "true")
-    const premiumRef = ref2(database, "PREMIUM/" + emailKey);
-    get(premiumRef)
-      .then(async (snapshot) => {
-        const val = snapshot.exists() ? snapshot.val() : null;
-        console.log("Home PREMIUM check:", emailKey, val);
-        const isPremium =
-          !!val && (val.ITG === true || val.ITG === "true");
-        const localArtist = localArtistProfileEnabled();
-        const isArtist = await resolveArtistDashboardEnabled(emailKey, isPremium || localArtist);
-        setArtistDashboardNavVisible(isArtist);
-      })
-      .catch(async (err) => {
-        console.error("Error checking PREMIUM status on home:", err);
-        const isArtist = await resolveArtistDashboardEnabled(emailKey, localArtistProfileEnabled());
-        setArtistDashboardNavVisible(isArtist);
-      });
+    setArtistDashboardNavVisible(true);
 
     const isApple = user.providerData && user.providerData.some((p) => p && p.providerId === "apple.com");
     if (isApple) {
@@ -6102,18 +6058,7 @@ onAuthStateChanged(auth, (user) => {
         localStorage.getItem("emailKey") ||
         localAccount.replace(/[.#$[\]]/g, "_")
       ).trim();
-      if (localEmailKey) {
-        const premiumRef = ref2(database, "PREMIUM/" + localEmailKey);
-        get(premiumRef).then(async (snapshot) => {
-          const val = snapshot.exists() ? snapshot.val() : null;
-          const isPremium = !!val && (val.ITG === true || val.ITG === "true");
-          const isArtist = await resolveArtistDashboardEnabled(localEmailKey, isPremium || localArtistProfileEnabled());
-          setArtistDashboardNavVisible(isArtist);
-        }).catch(async () => {
-          const isArtist = await resolveArtistDashboardEnabled(localEmailKey, localArtistProfileEnabled());
-          setArtistDashboardNavVisible(isArtist);
-        });
-      }
+      setArtistDashboardNavVisible(true);
       console.log("[index] onAuthStateChanged: restored local device session", localAccount);
       return;
     }
@@ -7943,7 +7888,7 @@ console.log('1171')
         <div class="profile-modal-name-large" id="profileModalName">User Name</div>
         <div class="profile-modal-bio" id="profileModalBio">No bio available</div>
         <div id="profileModalFollowWrap" class="profile-modal-follow-wrap" style="display: none;">
-          <button type="button" class="profile-follow-btn" id="profileFollowBtn" onclick="window.__runFollowFromButtonById('profileFollowBtn'); return false;">Follow artist</button>
+          <button type="button" class="profile-follow-btn" id="profileFollowBtn" onclick="if(window.__runFollowFromButtonById){window.__runFollowFromButtonById('profileFollowBtn'); return false;}">Follow artist</button>
           <p class="profile-follow-hint" id="profileFollowHint"></p>
         </div>
         <div id="profileModalSafetyWrap" class="profile-modal-safety-wrap" style="display: none;">
@@ -8504,7 +8449,7 @@ console.log('1171')
           : null;
 
         return `
-          <div class="user-profile-card" data-user-index="${modalIndex}" role="button" tabindex="0" onclick="window.__openUserProfileFromCard(this, event)">
+          <div class="user-profile-card" data-user-index="${modalIndex}" role="button" tabindex="0" onclick="if(window.showUserProfileModal)window.showUserProfileModal(${modalIndex}); return false;">
             <div class="user-profile-avatar">
               ${profilePicture 
                 ? `<img src="${profilePicture}" alt="${displayName}">` 

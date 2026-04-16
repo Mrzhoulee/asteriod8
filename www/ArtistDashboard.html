@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artist Dashboard - Asteroid</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
     <style>
         * {
             margin: 0;
@@ -884,12 +885,6 @@
                                         <i class="fas fa-upload"></i> Upload Picture
                                     </button>
                                 </div>
-                                <div id="premiumBadge" class="premium-badge" style="display: none;">
-                                    <i class="fas fa-crown"></i> Premium Feature
-                                </div>
-                                <div id="defaultIconNotice" class="default-icon-notice" style="display: none;">
-                                    <i class="fas fa-info-circle"></i> Default icon shown (Premium required for custom picture)
-                                </div>
                                 <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
                                     Click the preview or button to upload a new profile picture
                                 </p>
@@ -947,15 +942,6 @@ Donation Box Embed Code
 type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 <h3>ⓘ Paste your full DonorBox iframe embed code, or just enter the donation page URL and it will be displayed in an iframe</h3>
 
-                    <div class="form-group">
-                        <label class="form-label">Social Media Links</label>
-                        <input type="text" id="profileInstagram" class="form-input" placeholder="Instagram URL">
-                        <input type="text" id="profileYoutube" class="form-input" placeholder="YouTube URL" style="margin-top: 0.5rem;">
-                        <input type="text" id="profileSpotify" class="form-input" placeholder="Spotify URL" style="margin-top: 0.5rem;">
-                        <input type="text" id="profileSoundcloud" class="form-input" placeholder="SoundCloud URL" style="margin-top: 0.5rem;">
-                        <input type="text" id="profileAppleMusic" class="form-input" placeholder="Apple Music URL" style="margin-top: 0.5rem;">
-                    </div>
-
                     <button type="button" class="btn btn-primary" onclick="saveProfile()">
                         <i class="fas fa-save"></i> Save Profile
                     </button>
@@ -972,7 +958,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                         <div class="preview-name" id="previewName">Your Artist Name</div>
                         <div class="preview-bio" id="previewBio">Your bio will appear here...</div>
                         <div class="preview-socials" id="prevTin">Your donation box wil appear here...</div> 
-                        <div class="preview-socials" id="previewSocials">Your socials will appear here...</div>
                     </div>
                 </div>
             </div>
@@ -1098,16 +1083,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             <div class="profile-modal-body">
                 <div class="profile-modal-section">
                     <div class="profile-modal-section-title">
-                        <i class="fas fa-link"></i> Social Media
-                    </div>
-                    <div class="profile-modal-socials" id="profileModalSocials">
-                        <div class="empty-state" style="padding: 1rem;">
-                            <p>No social media links</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="profile-modal-section">
-                    <div class="profile-modal-section-title">
                         <i class="fas fa-info-circle"></i> Profile Information
                     </div>
                     <div class="profile-modal-info" id="profileModalInfo">
@@ -1186,24 +1161,10 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             return [...set].filter(Boolean);
         }
 
-        const TRIAL_DAYS = 30;
-        const MS_PER_DAY = 24 * 60 * 60 * 1000;
-        const isWithinTrial = (trialStart) => {
-            if (!trialStart) return false;
-            const start = typeof trialStart === 'number' ? trialStart : (trialStart?.seconds ? trialStart.seconds * 1000 : 0);
-            return (Date.now() - start) < TRIAL_DAYS * MS_PER_DAY;
-        };
-        const getTrialDaysRemaining = (trialStart) => {
-            if (!trialStart) return 0;
-            const start = typeof trialStart === 'number' ? trialStart : (trialStart?.seconds ? trialStart.seconds * 1000 : 0);
-            const elapsed = (Date.now() - start) / MS_PER_DAY;
-            return Math.max(0, Math.ceil(TRIAL_DAYS - elapsed));
-        };
-
         let currentUserEmail = null;
         let currentEmailKey = null;
         let selectedTheme = 'coral';
-        let isPremiumUser = false;
+        let isPremiumUser = true;
         let allUsersData = []; // Store all users data for modal access
 
         // Tab switching
@@ -1574,11 +1535,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
         // Handle profile picture upload
         document.getElementById('profilePictureInput').addEventListener('change', async function(e) {
-            if (!isPremiumUser) {
-                alert('Profile picture upload is a premium feature. Please upgrade to premium to use custom profile pictures.');
-                return;
-            }
-
             const file = e.target.files[0];
             if (!file) return;
 
@@ -1629,7 +1585,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
         // Update profile picture preview
         function updateProfilePicturePreview(imageUrl) {
             const preview = document.getElementById('profilePicturePreview');
-            if (imageUrl && isPremiumUser) {
+            if (imageUrl) {
                 preview.innerHTML = `<img src="${imageUrl}" alt="Profile Picture">`;
             } else {
                 preview.innerHTML = '<i class="fas fa-user"></i>';
@@ -1647,9 +1603,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             
             const displayName = userData.profile?.nickname || userData.fullName || userData.email || userData.id || 'User';
             const role = userData.role || 'User';
-            const profilePicture = (userData.isPremium && userData.profile?.profilePicture) 
-                ? userData.profile.profilePicture 
-                : null;
+            const profilePicture = userData.profile?.profilePicture || null;
             
             // Set profile picture
             const avatar = document.getElementById('profileModalAvatar');
@@ -1667,37 +1621,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             document.getElementById('profileModalBio').textContent = bio;
 
             document.getElementById('profileModalRole').textContent = role;
-
-            // Set social links
-            const socialsContainer = document.getElementById('profileModalSocials');
-            const socials = [];
-            
-            if (userData.profile?.instagram) {
-                socials.push({ name: 'Instagram', url: userData.profile.instagram, icon: 'fab fa-instagram' });
-            }
-            if (userData.profile?.youtube) {
-                socials.push({ name: 'YouTube', url: userData.profile.youtube, icon: 'fab fa-youtube' });
-            }
-            if (userData.profile?.spotify) {
-                socials.push({ name: 'Spotify', url: userData.profile.spotify, icon: 'fab fa-spotify' });
-            }
-            if (userData.profile?.soundcloud) {
-                socials.push({ name: 'SoundCloud', url: userData.profile.soundcloud, icon: 'fab fa-soundcloud' });
-            }
-            if (userData.profile?.applemusic) {
-                socials.push({ name: 'Apple Music', url: userData.profile.applemusic, icon: 'fab fa-apple' });
-            }
-
-            if (socials.length > 0) {
-                socialsContainer.innerHTML = socials.map(social => `
-                    <a href="${social.url}" target="_blank" rel="noopener noreferrer" class="profile-modal-social-link">
-                        <i class="${social.icon}"></i>
-                        <span>${social.name}</span>
-                    </a>
-                `).join('');
-            } else {
-                socialsContainer.innerHTML = '<div class="empty-state" style="padding: 1rem;"><p>No social media links</p></div>';
-            }
 
             // Apply theme color
             const themes = {
@@ -1742,11 +1665,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 bio: document.getElementById('profileBio').value || null,
                 theme: selectedTheme,
                 donorbox: tino || null,
-                instagram: document.getElementById('profileInstagram').value || null,
-                youtube: document.getElementById('profileYoutube').value || null,
-                spotify: document.getElementById('profileSpotify').value || null,
-                soundcloud: document.getElementById('profileSoundcloud').value || null,
-                applemusic: document.getElementById('profileAppleMusic').value || null,
                 updatedAt: new Date().toISOString()
             };
 
@@ -1951,11 +1869,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                         pu.disabled = !!profile.publicUsername;
                     }
                     document.getElementById('profileBio').value = profile.bio || '';
-                    document.getElementById('profileInstagram').value = profile.instagram || '';
-                    document.getElementById('profileYoutube').value = profile.youtube || '';
-                    document.getElementById('profileSpotify').value = profile.spotify || '';
-                    document.getElementById('profileSoundcloud').value = profile.soundcloud || '';
-                    document.getElementById('profileAppleMusic').value = profile.applemusic || '';
                     document.getElementById("tinp").value = profile.donorbox || '';
                     
                     if (profile.theme) {
@@ -1963,10 +1876,9 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                         selectTheme(profile.theme);
                     }
 
-                    // Load profile picture if premium
-                    if (isPremiumUser && profile.profilePicture) {
+                    // Load profile picture
+                    if (profile.profilePicture) {
                         updateProfilePicturePreview(profile.profilePicture);
-                        // Update preview avatar too
                         const previewAvatar = document.getElementById('previewAvatar');
                         if (previewAvatar) {
                             previewAvatar.innerHTML = `<img src="${profile.profilePicture}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
@@ -2120,65 +2032,18 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 currentUserEmail = emailToUse;
                 currentEmailKey = sanitizeEmail(emailToUse);
 
-                const premiumRef = ref(database, 'PREMIUM/' + currentEmailKey);
-            const snapshot = await get(premiumRef);
-            let val = snapshot.exists() ? snapshot.val() : null;
+                localStorage.setItem("artemail", emailToUse);
 
-            // 30-day free trial: create trial on first access
-            if (!val) {
-                await update(premiumRef, { trialStartDate: Date.now() });
-                val = { trialStartDate: Date.now() };
-            } else if (!val.trialStartDate) {
-                await update(premiumRef, { trialStartDate: Date.now() });
-                val = { ...val, trialStartDate: Date.now() };
-            }
+                await loadAnalytics();
+                await loadProfile();
+                await loadAllUsers();
 
-            const isPaidPremium = val && (val.ITG === true || val.ITG === "true");
-            const isTrialActive = val?.trialStartDate && isWithinTrial(val.trialStartDate);
-            isPremiumUser = isPaidPremium || isTrialActive;
+                // Set up real-time listeners
+                const songplaysRef = ref(database, 'songplayed');
+                onValue(songplaysRef, () => loadAnalytics());
 
-            localStorage.setItem("artemail", emailToUse);
-
-            if (isTrialActive && !isPaidPremium) {
-                const daysLeft = getTrialDaysRemaining(val.trialStartDate);
-                document.getElementById('premiumBadge').innerHTML = `<i class="fas fa-gift"></i> Free Trial • ${daysLeft} day${daysLeft !== 1 ? 's' : ''} left`;
-            } else {
-                document.getElementById('premiumBadge').innerHTML = '<i class="fas fa-crown"></i> Premium Feature';
-            }
-
-            if (isPremiumUser) {
-                    document.getElementById('premiumBadge').style.display = 'inline-flex';
-                    document.getElementById('defaultIconNotice').style.display = 'none';
-                    
-                    await loadAnalytics();
-                    await loadProfile();
-                    await loadAllUsers();
-                    
-                    // Set up real-time listeners
-                    const songplaysRef = ref(database, 'songplayed');
-                    onValue(songplaysRef, () => loadAnalytics());
-                    
-                    const profilesRef = ref(database, 'PROFILES/');
-                    onValue(profilesRef, () => loadAllUsers());
-            } else {
-                    // Trial expired, not premium
-                    isPremiumUser = false;
-                    document.getElementById('premiumBadge').style.display = 'none';
-                    document.getElementById('defaultIconNotice').style.display = 'block';
-                    updateProfilePicturePreview(null);
-                    
-                    localStorage.setItem("artemail", emailToUse);
-                    await loadAnalytics();
-                    await loadProfile();
-                    await loadAllUsers();
-                    
-                    // Set up real-time listeners
-                    const songplaysRef = ref(database, 'songplayed');
-                    onValue(songplaysRef, () => loadAnalytics());
-                    
-                    const profilesRef = ref(database, 'PROFILES/');
-                    onValue(profilesRef, () => loadAllUsers());
-            }
+                const profilesRef = ref(database, 'PROFILES/');
+                onValue(profilesRef, () => loadAllUsers());
           } catch (error) {
             console.error("Error checking premium status:", error);
                 window.location.href = "index.html";
@@ -2349,5 +2214,75 @@ Object.keys(data).forEach(sub => {
 });
 
     </script>
+
+<nav class="mobile-nav">
+  <a href="index.html" class="mobile-nav-item">
+    <span class="material-symbols-outlined">home</span>
+    <span>Home</span>
+  </a>
+  <a href="lively.html" class="mobile-nav-item">
+    <span class="material-symbols-outlined">mic</span>
+    <span>Concerts</span>
+  </a>
+  <a href="studio.html" class="mobile-nav-item">
+    <span class="material-symbols-outlined">upload</span>
+    <span>Upload</span>
+  </a>
+  <a href="pat.html" class="mobile-nav-item">
+    <span class="material-symbols-outlined">queue_music</span>
+    <span>Playlist</span>
+  </a>
+  <a href="ArtistDashboard.html" class="mobile-nav-item mobile-nav-active">
+    <span class="material-symbols-outlined">dashboard</span>
+    <span>Dashboard</span>
+  </a>
+</nav>
+
+<style>
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  z-index: 99999;
+  background: #0a0a0a;
+  border-top: 1px solid rgba(255,127,80,0.25);
+  padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+  justify-content: space-around;
+  align-items: center;
+}
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  color: rgba(255,255,255,0.5);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 10px;
+  transition: color 0.2s, background 0.2s;
+}
+.mobile-nav-item .material-symbols-outlined {
+  font-size: 24px;
+}
+.mobile-nav-item:hover,
+.mobile-nav-item.mobile-nav-active {
+  color: #ff7f50;
+}
+.mobile-nav-item.mobile-nav-active {
+  background: rgba(255,127,80,0.1);
+}
+@media screen and (max-width: 3840px) {
+  body { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+  .mobile-nav { display: flex !important; }
+}
+</style>
 </body>
 </html>

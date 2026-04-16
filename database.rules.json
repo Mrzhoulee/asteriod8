@@ -128,6 +128,10 @@
         ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40"
       }
     },
+    "REFERRAL_CODES_BY_USER": { ".read": true, ".write": true },
+    "REFERRAL_CODE_INDEX": { ".read": true, ".write": true },
+    "FEATURE_REFERRAL_REQUESTS": { ".read": true, ".write": true },
+    "FEATURE_REFERRAL_OUTBOX": { ".read": true, ".write": true },
     "CONTENT_REPORTS": {
       "$reportId": {
         ".read": false,
