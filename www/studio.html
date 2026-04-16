@@ -472,9 +472,60 @@
       .step-desc { font-size: 12px; }
       .step-badge { font-size: 10px; padding: 3px 8px; }
     }
+
+    /* ---- Referral success popup ---- */
+    .referral-success-overlay {
+      position: fixed; inset: 0; z-index: 99999;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.55);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .referral-success-overlay.visible {
+      opacity: 1; pointer-events: auto;
+    }
+    .referral-success-card {
+      background: #fff; border-radius: 20px;
+      padding: 36px 28px 28px; text-align: center;
+      max-width: 340px; width: 90%;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+      transform: scale(0.85); transition: transform 0.3s ease;
+    }
+    .referral-success-overlay.visible .referral-success-card {
+      transform: scale(1);
+    }
+    .referral-success-icon {
+      font-size: 48px; margin-bottom: 12px;
+    }
+    .referral-success-title {
+      font-size: 20px; font-weight: 800; color: #008044; margin: 0 0 8px;
+    }
+    .referral-success-msg {
+      font-size: 14px; color: #555; line-height: 1.5; margin: 0 0 20px;
+    }
+    .referral-success-close {
+      display: inline-block; padding: 10px 32px;
+      border: none; border-radius: 30px; cursor: pointer;
+      font-weight: 700; font-size: 14px; color: #fff;
+      background: linear-gradient(135deg, #00c853, #008044);
+      transition: transform 0.2s;
+    }
+    .referral-success-close:hover { transform: scale(1.05); }
+
+    .bar-bg.bar-success #progressBarStatus {
+      background: linear-gradient(90deg, #00e676, #00c853, #008044) !important;
+    }
   </style>
 </head>
 <body>
+  <div id="referralSuccessOverlay" class="referral-success-overlay" role="dialog" aria-modal="true" aria-label="Referral submitted">
+    <div class="referral-success-card">
+      <div class="referral-success-icon">&#127881;</div>
+      <h2 class="referral-success-title">Feature Request Sent!</h2>
+      <p class="referral-success-msg">Your referral code was submitted successfully. The referred artist will review your feature request within <strong>48 hours</strong>.</p>
+      <button type="button" class="referral-success-close" id="referralSuccessCloseBtn">Got it</button>
+    </div>
+  </div>
   <div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
     <div class="ugc-policy-card">
       <h2 id="ugcPolicyTitle">Before you continue</h2>
@@ -682,6 +733,45 @@
 
   <div id="campaignContainer">
 
+    <section id="studioTutorial" class="studio-tutorial" aria-label="How feature requests work">
+      <h2 class="studio-tutorial-title"><span>✨</span> How to get featured</h2>
+      <p class="studio-tutorial-sub">Follow these 4 steps to request a feature spot on Asteroid.</p>
+      <div class="studio-tutorial-steps">
+        <div class="studio-tutorial-step" data-step="1" data-status="active">
+          <div class="step-bullet"><span class="step-bullet-num">1</span></div>
+          <div class="step-body">
+            <div class="step-title">Sign in</div>
+            <div class="step-desc">Sign in with Apple or email so we can link your referral code to your artist profile.</div>
+          </div>
+          <div class="step-badge">Start here</div>
+        </div>
+        <div class="studio-tutorial-step" data-step="2" data-status="pending">
+          <div class="step-bullet"><span class="step-bullet-num">2</span></div>
+          <div class="step-body">
+            <div class="step-title">Upload a song</div>
+            <div class="step-desc">Fill in song details and upload your track using the form below.</div>
+          </div>
+          <div class="step-badge">Pending</div>
+        </div>
+        <div class="studio-tutorial-step" data-step="3" data-status="pending">
+          <div class="step-bullet"><span class="step-bullet-num">3</span></div>
+          <div class="step-body">
+            <div class="step-title">Share your referral code</div>
+            <div class="step-desc">Copy your unique 18-character code and share it with 1 artist friend to request feature.</div>
+          </div>
+          <div class="step-badge">Pending</div>
+        </div>
+        <div class="studio-tutorial-step" data-step="4" data-status="pending">
+          <div class="step-bullet"><span class="step-bullet-num">4</span></div>
+          <div class="step-body">
+            <div class="step-title">Wait 48 hours</div>
+            <div class="step-desc">Your feature request goes under review. You'll be notified within 48 hours.</div>
+          </div>
+          <div class="step-badge">Pending</div>
+        </div>
+      </div>
+    </section>
+
     <div class="progress-box">
       <h3 style="margin: 0; color: coral;">Reward Progress</h3>
       <p id="countText" style="font-weight: bold;">0 / 1 Artist Joined</p>
@@ -836,44 +926,6 @@
       </div>
     </div>
   </div>
-  <section id="studioTutorial" class="studio-tutorial" aria-label="How feature requests work">
-    <h2 class="studio-tutorial-title"><span>✨</span> How to get featured</h2>
-    <p class="studio-tutorial-sub">Follow these 4 steps to request a feature spot on Asteroid.</p>
-    <div class="studio-tutorial-steps">
-      <div class="studio-tutorial-step" data-step="1" data-status="active">
-        <div class="step-bullet"><span class="step-bullet-num">1</span></div>
-        <div class="step-body">
-          <div class="step-title">Sign in</div>
-          <div class="step-desc">Sign in with Apple or email so we can link your referral code to your artist profile.</div>
-        </div>
-        <div class="step-badge">Start here</div>
-      </div>
-      <div class="studio-tutorial-step" data-step="2" data-status="pending">
-        <div class="step-bullet"><span class="step-bullet-num">2</span></div>
-        <div class="step-body">
-          <div class="step-title">Upload a song</div>
-          <div class="step-desc">Fill in song details and upload your track using the form below.</div>
-        </div>
-        <div class="step-badge">Pending</div>
-      </div>
-      <div class="studio-tutorial-step" data-step="3" data-status="pending">
-        <div class="step-bullet"><span class="step-bullet-num">3</span></div>
-        <div class="step-body">
-          <div class="step-title">Share your referral code</div>
-          <div class="step-desc">Copy your unique 18-character code and share it with 1 artist friend to request feature.</div>
-        </div>
-        <div class="step-badge">Pending</div>
-      </div>
-      <div class="studio-tutorial-step" data-step="4" data-status="pending">
-        <div class="step-bullet"><span class="step-bullet-num">4</span></div>
-        <div class="step-body">
-          <div class="step-title">Wait 48 hours</div>
-          <div class="step-desc">Your feature request goes under review. You'll be notified within 48 hours.</div>
-        </div>
-        <div class="step-badge">Pending</div>
-      </div>
-    </div>
-  </section>
   <script>
     (function studioAuthPaintSync() {
       function uid() {
@@ -2591,6 +2643,20 @@
       setReferralStatus('Submitted. This was sent to the referred artist account for feature review.', 'ok');
       localStorage.setItem('_studioTutorialSubmittedAt', String(Date.now()));
       updateStudioTutorial();
+      try {
+        var barBg = document.querySelector('.bar-bg');
+        var bar = document.getElementById('progressBarStatus');
+        if (barBg) barBg.classList.add('bar-success');
+        if (bar) { bar.style.width = '100%'; bar.style.transition = 'width 0.8s ease'; }
+        var overlay = document.getElementById('referralSuccessOverlay');
+        if (overlay) {
+          overlay.classList.add('visible');
+          var closeBtn = document.getElementById('referralSuccessCloseBtn');
+          var closeFn = function () { overlay.classList.remove('visible'); };
+          if (closeBtn) closeBtn.onclick = closeFn;
+          overlay.addEventListener('click', function (ev) { if (ev.target === overlay) closeFn(); });
+        }
+      } catch (e2) {}
     } catch (e) {
       console.error(e);
       setReferralStatus('Could not submit code right now. Check connection and try again.', 'error');
