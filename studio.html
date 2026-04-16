@@ -332,6 +332,146 @@
       color: #e5e7eb;
       border-color: #374151;
     }
+
+    /* ---- Studio tutorial guide ---- */
+    .studio-tutorial {
+      max-width: 640px;
+      margin: 0 auto 24px;
+      padding: 22px 20px 18px;
+      background: linear-gradient(135deg, #fff1e3 0%, #ffe0c2 100%);
+      border-radius: 18px;
+      border: 2px solid #ff6b35;
+      box-shadow: 0 6px 24px rgba(255, 107, 53, 0.18);
+      text-align: left;
+      font-family: "Poppins", sans-serif;
+    }
+    .studio-tutorial-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      font-family: "Montserrat", sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      color: #ff5722;
+      margin: 0 0 6px;
+      letter-spacing: 0.3px;
+    }
+    .studio-tutorial-sub {
+      text-align: center;
+      font-size: 13px;
+      color: #7a4a2a;
+      margin: 0 0 18px;
+      font-weight: 500;
+    }
+    .studio-tutorial-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .studio-tutorial-step {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 14px;
+      border: 2px solid rgba(255, 107, 53, 0.12);
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .studio-tutorial-step[data-status="done"] {
+      background: linear-gradient(135deg, #e4f8e6 0%, #c8efca 100%);
+      border-color: #4caf50;
+      opacity: 0.95;
+    }
+    .studio-tutorial-step[data-status="active"] {
+      background: linear-gradient(135deg, #fff6e5 0%, #ffe3a6 100%);
+      border-color: #ff9800;
+      box-shadow: 0 4px 14px rgba(255, 152, 0, 0.2);
+      transform: translateY(-1px);
+    }
+    .studio-tutorial-step[data-status="active"]::before {
+      content: "";
+      position: absolute;
+      left: -2px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 70%;
+      background: #ff9800;
+      border-radius: 4px;
+    }
+    .step-bullet {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #ff6b35;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 15px;
+      font-family: "Montserrat", sans-serif;
+      box-shadow: 0 2px 6px rgba(255, 107, 53, 0.3);
+    }
+    .studio-tutorial-step[data-status="done"] .step-bullet {
+      background: #4caf50;
+      box-shadow: 0 2px 6px rgba(76, 175, 80, 0.35);
+    }
+    .studio-tutorial-step[data-status="done"] .step-bullet::after {
+      content: "✓";
+      font-size: 18px;
+    }
+    .studio-tutorial-step[data-status="done"] .step-bullet-num { display: none; }
+    .step-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .step-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2b2b2b;
+      line-height: 1.2;
+    }
+    .step-desc {
+      font-size: 12.5px;
+      color: #6b6b6b;
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+    .step-badge {
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .studio-tutorial-step[data-status="active"] .step-badge {
+      background: #ff9800;
+      color: #fff;
+    }
+    .studio-tutorial-step[data-status="done"] .step-badge {
+      background: #4caf50;
+      color: #fff;
+    }
+    .studio-tutorial-step[data-status="pending"] .step-badge {
+      background: rgba(0, 0, 0, 0.08);
+      color: #888;
+    }
+    @media (max-width: 520px) {
+      .studio-tutorial { padding: 18px 14px 14px; }
+      .studio-tutorial-title { font-size: 17px; }
+      .studio-tutorial-step { padding: 12px 12px; gap: 10px; }
+      .step-bullet { width: 30px; height: 30px; font-size: 13px; }
+      .step-title { font-size: 14px; }
+      .step-desc { font-size: 12px; }
+      .step-badge { font-size: 10px; padding: 3px 8px; }
+    }
   </style>
 </head>
 <body>
@@ -702,6 +842,44 @@
       </div>
     </div>
   </div>
+  <section id="studioTutorial" class="studio-tutorial" aria-label="How feature requests work">
+    <h2 class="studio-tutorial-title"><span>✨</span> How to get featured</h2>
+    <p class="studio-tutorial-sub">Follow these 4 steps to request a feature spot on Asteroid.</p>
+    <div class="studio-tutorial-steps">
+      <div class="studio-tutorial-step" data-step="1" data-status="active">
+        <div class="step-bullet"><span class="step-bullet-num">1</span></div>
+        <div class="step-body">
+          <div class="step-title">Sign in</div>
+          <div class="step-desc">Sign in with Apple or email so we can link your referral code to your artist profile.</div>
+        </div>
+        <div class="step-badge">Start here</div>
+      </div>
+      <div class="studio-tutorial-step" data-step="2" data-status="pending">
+        <div class="step-bullet"><span class="step-bullet-num">2</span></div>
+        <div class="step-body">
+          <div class="step-title">Upload a song</div>
+          <div class="step-desc">Fill in song details and upload your track using the form below.</div>
+        </div>
+        <div class="step-badge">Pending</div>
+      </div>
+      <div class="studio-tutorial-step" data-step="3" data-status="pending">
+        <div class="step-bullet"><span class="step-bullet-num">3</span></div>
+        <div class="step-body">
+          <div class="step-title">Share your referral code</div>
+          <div class="step-desc">Copy your unique 18-character code and share it with 1 artist friend to request feature.</div>
+        </div>
+        <div class="step-badge">Pending</div>
+      </div>
+      <div class="studio-tutorial-step" data-step="4" data-status="pending">
+        <div class="step-bullet"><span class="step-bullet-num">4</span></div>
+        <div class="step-body">
+          <div class="step-title">Wait 48 hours</div>
+          <div class="step-desc">Your feature request goes under review. You'll be notified within 48 hours.</div>
+        </div>
+        <div class="step-badge">Pending</div>
+      </div>
+    </div>
+  </section>
   <script>
     (function studioAuthPaintSync() {
       function uid() {
@@ -1392,6 +1570,10 @@
       const closeBtn = document.getElementById("uploadSuccessCloseBtn");
       if (closeBtn && typeof closeBtn.focus === "function") closeBtn.focus();
     } catch (e2) {}
+    try {
+      localStorage.setItem("_studioTutorialUploadedOnce", "1");
+      if (typeof window.updateStudioTutorial === "function") window.updateStudioTutorial();
+    } catch (e3) {}
   }
 
   function studioUploadLocalIdentity() {
@@ -1909,8 +2091,10 @@
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
       try { void refreshStudioReferralUi(); } catch (e) {}
+      try { updateStudioTutorial(); } catch (e) {}
     }
   });
+  try { updateStudioTutorial(); } catch (e) {}
   if (typeof auth.authStateReady === "function") {
     auth.authStateReady().then(() => {
       try {
@@ -2305,7 +2489,48 @@
       console.warn('[referral-code]', e);
       setReferralStatus('Could not load referral code right now.', 'error');
     }
+    updateStudioTutorial();
   }
+
+  function updateStudioTutorial() {
+    const steps = document.querySelectorAll('.studio-tutorial-step');
+    if (!steps.length) return;
+    const signedIn = !!studioReferralUserKey();
+    const uploaded = localStorage.getItem('_studioTutorialUploadedOnce') === '1';
+    const codeField = document.getElementById('referralCodeDisplay');
+    const hasCode = !!(codeField && codeField.value && codeField.value.trim().length >= 10);
+    const submittedAt = Number(localStorage.getItem('_studioTutorialSubmittedAt') || 0);
+    const submitted = submittedAt > 0;
+    const doneFlags = [signedIn, uploaded, hasCode, submitted];
+    let firstPending = -1;
+    for (let i = 0; i < doneFlags.length; i++) {
+      if (!doneFlags[i]) { firstPending = i; break; }
+    }
+    steps.forEach((el, idx) => {
+      const badge = el.querySelector('.step-badge');
+      if (doneFlags[idx]) {
+        el.setAttribute('data-status', 'done');
+        if (badge) badge.textContent = 'Done';
+      } else if (idx === firstPending) {
+        el.setAttribute('data-status', 'active');
+        if (badge) badge.textContent = idx === 0 ? 'Start here' : 'Next step';
+      } else {
+        el.setAttribute('data-status', 'pending');
+        if (badge) badge.textContent = 'Pending';
+      }
+    });
+    if (submitted) {
+      const hoursLeft = Math.max(0, 48 - Math.floor((Date.now() - submittedAt) / 3600000));
+      const step4 = steps[3];
+      const desc = step4 && step4.querySelector('.step-desc');
+      if (desc) {
+        desc.textContent = hoursLeft > 0
+          ? `Your feature request is under review. ~${hoursLeft} hour(s) left of the 48-hour window.`
+          : 'Review window complete — check the Asteroid app for your feature status.';
+      }
+    }
+  }
+  window.updateStudioTutorial = updateStudioTutorial;
 
   async function submitStudioReferralCode() {
     try { if (typeof auth.authStateReady === 'function') await auth.authStateReady(); } catch (e) {}
@@ -2361,6 +2586,8 @@
       });
       if (input) input.value = '';
       setReferralStatus('Submitted. This was sent to the referred artist account for feature review.', 'ok');
+      localStorage.setItem('_studioTutorialSubmittedAt', String(Date.now()));
+      updateStudioTutorial();
     } catch (e) {
       console.error(e);
       setReferralStatus('Could not submit code right now. Check connection and try again.', 'error');
