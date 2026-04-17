@@ -1689,6 +1689,13 @@
   }
 
   async function ensureFirebaseAuthForUpload() {
+    // Wait for any pending redirect result first (blocks signInAnonymously if not consumed)
+    try {
+      if (window._redirectResultReady) {
+        await Promise.race([window._redirectResultReady, new Promise(r => setTimeout(r, 5000))]);
+      }
+    } catch (e) {}
+
     if (typeof auth.authStateReady === "function") {
       try {
         await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 3000))]);
@@ -1699,20 +1706,19 @@
     syncAuthUserToLocalStorage(auth.currentUser);
     if (auth.currentUser) return true;
 
-    // Email-only users: try anonymous sign-in for Storage, but don't block upload
+    // Email-only users: try anonymous sign-in for Storage
     if (localStorage.getItem('localAuthOnly') === '1' && localStorage.getItem('emailKey')) {
       try {
-        const anonResult = await Promise.race([
-          signInAnonymously(auth).then(() => 'ok'),
-          new Promise(r => setTimeout(() => r('timeout'), 4000))
+        await Promise.race([
+          signInAnonymously(auth),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('anonymous auth timeout')), 8000))
         ]);
-        if (anonResult === 'timeout') {
-          console.warn("[studio] anonymous auth timed out, proceeding with upload anyway");
-        }
+        return true;
       } catch (e) {
-        console.warn("[studio] anonymous auth failed, proceeding anyway:", e.code || e.message);
+        console.warn("[studio] anonymous auth for email upload:", e.code || e.message || e);
+        // Proceed anyway — Storage rules may allow it
+        return true;
       }
-      return true;
     }
 
     if (shouldAttemptAnonymousFirebaseForUpload()) {
@@ -2397,7 +2403,7 @@
     });
   }
 
-  void (async function consumeStudioFirebaseRedirectSignIn() {
+  window._redirectResultReady = (async function consumeStudioFirebaseRedirectSignIn() {
     try {
       const result = await getRedirectResult(auth);
       if (result && result.user) {
@@ -3118,4 +3124,4 @@ boostBtn.addEventListener("click", async (e) => {
 @media screen and (max-width:3840px){body{padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}.mobile-nav{display:flex !important}}
 </style>
 </body>
-</html>
+</html>          
