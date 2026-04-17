@@ -1699,25 +1699,20 @@
     syncAuthUserToLocalStorage(auth.currentUser);
     if (auth.currentUser) return true;
 
-    // Email-only users: need Firebase Auth for Storage — try anonymous sign-in (no timeout, must succeed)
+    // Email-only users: try anonymous sign-in for Storage, but don't block upload
     if (localStorage.getItem('localAuthOnly') === '1' && localStorage.getItem('emailKey')) {
       try {
-        appendUploadStatus("Setting up storage access…");
-        await signInAnonymously(auth);
-        appendUploadStatus("Storage access ready.");
-        return true;
-      } catch (e) {
-        console.error("[studio] anonymous auth for email-only upload:", e);
-        const code = e && e.code ? String(e.code) : "";
-        if (code === "auth/operation-not-allowed") {
-          appendUploadStatus("Upload requires Anonymous sign-in enabled in Firebase Console → Authentication → Sign-in method → Anonymous → Enable.");
-          alert("Anonymous sign-in is not enabled in Firebase. Enable it in Firebase Console → Authentication → Sign-in method → Anonymous → Enable, then try again.");
-        } else {
-          appendUploadStatus("Could not authenticate for upload: " + (e.message || code));
-          alert("Could not authenticate for upload. Check your connection and try again.");
+        const anonResult = await Promise.race([
+          signInAnonymously(auth).then(() => 'ok'),
+          new Promise(r => setTimeout(() => r('timeout'), 4000))
+        ]);
+        if (anonResult === 'timeout') {
+          console.warn("[studio] anonymous auth timed out, proceeding with upload anyway");
         }
-        return false;
+      } catch (e) {
+        console.warn("[studio] anonymous auth failed, proceeding anyway:", e.code || e.message);
       }
+      return true;
     }
 
     if (shouldAttemptAnonymousFirebaseForUpload()) {
@@ -2825,8 +2820,8 @@
       const safeArtist = sanitizeRtdbPathSegment(artist);
       const path = `${safeAlbum}/${safeTitle}/${safeArtist}/${file.name}`;
       appendUploadStatus("Sending file to storage…");
-      const snap = await uploadBytes(ref(storage, path), file);
-      const url = await getDownloadURL(snap.ref);
+      const snap = await withTimeout(uploadBytes(ref(storage, path), file), 60000, "Uploading file to storage");
+      const url = await withTimeout(getDownloadURL(snap.ref), 15000, "Getting download URL");
       console.log("File uploaded to:", url);
 
       appendUploadStatus("Saving song info to the database…");
