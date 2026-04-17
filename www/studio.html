@@ -1699,6 +1699,18 @@
     syncAuthUserToLocalStorage(auth.currentUser);
     if (auth.currentUser) return true;
 
+    // Email-only users: accept localStorage session, attempt anonymous Firebase for Storage
+    if (localStorage.getItem('localAuthOnly') === '1' && localStorage.getItem('emailKey')) {
+      if (shouldAttemptAnonymousFirebaseForUpload()) {
+        try {
+          await signInAnonymously(auth);
+        } catch (e) {
+          console.warn("[studio] anonymous auth for email-only upload:", e);
+        }
+      }
+      return true;
+    }
+
     if (shouldAttemptAnonymousFirebaseForUpload()) {
       try {
         await signInAnonymously(auth);
