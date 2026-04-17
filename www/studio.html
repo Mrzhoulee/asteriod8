@@ -2641,6 +2641,9 @@
       } else if (idx === firstPending) {
         el.setAttribute('data-status', 'active');
         if (badge) badge.textContent = idx === 0 ? 'Start here' : 'Next step';
+      } else if (idx === 3 && uploaded && codeUsedByAnother) {
+        el.setAttribute('data-status', 'active');
+        if (badge) badge.textContent = 'Submit a code';
       } else {
         el.setAttribute('data-status', 'pending');
         if (badge) badge.textContent = 'Pending';
