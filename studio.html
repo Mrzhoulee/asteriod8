@@ -987,12 +987,14 @@
         var signedIn = sessionQuick();
         var row = document.getElementById("studioSignInRow");
         var bar = document.getElementById("studioTopBar");
+        var campaign = document.getElementById("campaignContainer");
         if (signedIn) {
           if (row) {
             row.classList.add("studio-signin-row--hidden");
             row.setAttribute("aria-hidden", "true");
           }
           if (bar) bar.classList.add("studio-topbar--visible");
+          if (campaign) campaign.style.display = "block";
         }
       } catch (e) {}
     })();
@@ -2560,9 +2562,12 @@
       if (copyMain) copyMain.disabled = !on;
     };
 
-    // Wait for Firebase auth to settle, then fall back to localStorage-based identity
-    // so email-only (non-Firebase) users are correctly recognised as signed in.
-    try { if (typeof auth.authStateReady === 'function') await auth.authStateReady(); } catch (e) {}
+    // Wait for Firebase auth to settle (with 2s timeout so email-only users aren't blocked)
+    try {
+      if (typeof auth.authStateReady === 'function') {
+        await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 2000))]);
+      }
+    } catch (e) {}
     const key = studioReferralUserKey();
 
     if (!key) {
@@ -2631,7 +2636,11 @@
   window.updateStudioTutorial = updateStudioTutorial;
 
   async function submitStudioReferralCode() {
-    try { if (typeof auth.authStateReady === 'function') await auth.authStateReady(); } catch (e) {}
+    try {
+      if (typeof auth.authStateReady === 'function') {
+        await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 2000))]);
+      }
+    } catch (e) {}
     const key = studioReferralUserKey();
     if (!key) {
       setReferralStatus('Sign in to submit a referral code.', 'error');
