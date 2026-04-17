@@ -1699,17 +1699,25 @@
     syncAuthUserToLocalStorage(auth.currentUser);
     if (auth.currentUser) return true;
 
-    // Email-only users: accept localStorage session, try anonymous Firebase for Storage (with timeout)
+    // Email-only users: need Firebase Auth for Storage — try anonymous sign-in (no timeout, must succeed)
     if (localStorage.getItem('localAuthOnly') === '1' && localStorage.getItem('emailKey')) {
       try {
-        await Promise.race([
-          signInAnonymously(auth),
-          new Promise((_, rej) => setTimeout(() => rej(new Error('anonymous auth timeout')), 5000))
-        ]);
+        appendUploadStatus("Setting up storage access…");
+        await signInAnonymously(auth);
+        appendUploadStatus("Storage access ready.");
+        return true;
       } catch (e) {
-        console.warn("[studio] anonymous auth for email-only upload (continuing anyway):", e);
+        console.error("[studio] anonymous auth for email-only upload:", e);
+        const code = e && e.code ? String(e.code) : "";
+        if (code === "auth/operation-not-allowed") {
+          appendUploadStatus("Upload requires Anonymous sign-in enabled in Firebase Console → Authentication → Sign-in method → Anonymous → Enable.");
+          alert("Anonymous sign-in is not enabled in Firebase. Enable it in Firebase Console → Authentication → Sign-in method → Anonymous → Enable, then try again.");
+        } else {
+          appendUploadStatus("Could not authenticate for upload: " + (e.message || code));
+          alert("Could not authenticate for upload. Check your connection and try again.");
+        }
+        return false;
       }
-      return true;
     }
 
     if (shouldAttemptAnonymousFirebaseForUpload()) {
