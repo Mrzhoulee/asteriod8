@@ -2580,6 +2580,18 @@
     }
 
     setEnabled(true);
+
+    // Email-only users: skip Firebase RTDB, use static code
+    if (!auth.currentUser && localStorage.getItem('localAuthOnly') === '1') {
+      const staticCode = 'B3Z9LKY2Q7PANFR1XM';
+      if (display) display.value = staticCode;
+      const shareInput = document.getElementById('shareLinkInput');
+      if (shareInput) shareInput.value = staticCode;
+      setReferralStatus('Share your code with another artist — one use only.', '');
+      updateStudioTutorial();
+      return;
+    }
+
     try {
       const code = await ensureStudioReferralCode();
       if (!code) {
