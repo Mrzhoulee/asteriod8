@@ -2202,6 +2202,21 @@
   });
   if (auth.currentUser) syncAuthUserToLocalStorage(auth.currentUser);
   refreshStudioAuthUI();
+
+  // Poll for auth restoration — hides sign-in row as soon as Firebase session is ready
+  (function pollAuthReady() {
+    let checks = 0;
+    const iv = setInterval(() => {
+      checks++;
+      if (auth.currentUser) {
+        syncAuthUserToLocalStorage(auth.currentUser);
+        applyStudioAuthUI();
+        clearInterval(iv);
+      } else if (checks > 30) {
+        clearInterval(iv);
+      }
+    }, 500);
+  })();
   window.addEventListener("load", () => {
     try { refreshStudioAuthUI(); } catch (e) {}
   });
