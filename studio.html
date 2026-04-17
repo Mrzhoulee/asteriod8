@@ -2254,7 +2254,7 @@
       provider: user.providerData[0]?.providerId || "unknown",
       lastLogin: Date.now()
     });
-    loadUserProgress(user.displayName || rawEmail || accountId || "Artist");
+    try { loadUserProgress(user.displayName || rawEmail || accountId || "Artist"); } catch (e) { console.warn("[studio] loadUserProgress:", e); }
     applyStudioAuthUI();
     void maybeShowAppleOnboarding();
     try { sessionStorage.setItem("_studioJustSignedIn", "1"); } catch (e) {}
@@ -2397,7 +2397,7 @@
   })();
 
   function loadUserProgress(name) {
-    const cleanName = name.replace(/\s+/g, '_');
+    const cleanName = name.replace(/[.#$[\]\s]/g, '_');
     const emailRaw = localStorage.getItem("email") || "";
     const safeEmail = emailRaw.replace(/\./g, ',');
     const rewardKey = (typeof authScopedKey === "function") ? authScopedKey("rewardNotified") : "rewardNotified";
@@ -2428,7 +2428,6 @@
       localStorage.getItem('artemail'),
       (auth && auth.currentUser) ? (auth.currentUser.email || auth.currentUser.uid) : null,
     ];
-    console.log('[referral] studioReferralUserKey candidates:', candidates);
     const raw = (candidates.find(v => v && String(v).trim() && String(v).trim() !== 'null' && String(v).trim() !== 'undefined') || '').trim();
     if (!raw) {
       // Fallback: if any sign-in flag exists, use or create a stable anonymous key
@@ -2441,10 +2440,8 @@
           anonKey = 'anon_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
           localStorage.setItem('_referralAnonKey', anonKey);
         }
-        console.log('[referral] using anonKey fallback:', anonKey);
         return anonKey;
       }
-      console.log('[referral] no identity found, not signed in');
       return '';
     }
     return raw.replace(/[.#$[\]]/g, '_');
@@ -2745,6 +2742,23 @@
   // --- 3. UPLOAD ---
   document.getElementById("btn").onclick = async () => {
     clearUploadStatus();
+
+    const _title = document.getElementById("title").value.trim();
+    const _artist = document.getElementById("artist").value.trim();
+    const _album = document.getElementById("album").value.trim();
+    const _file = document.getElementById("fileInp").files[0];
+    const _agree = document.getElementById("agreement").checked;
+    if (!_title || !_artist || !_album || !_file || !_agree) {
+      var missing = [];
+      if (!_title) missing.push("Song Title");
+      if (!_artist) missing.push("Artist Name");
+      if (!_album) missing.push("Album Name");
+      if (!_file) missing.push("Audio file");
+      if (!_agree) missing.push("Agreement checkbox");
+      appendUploadStatus("Please fill in: " + missing.join(", "));
+      return;
+    }
+
     appendUploadStatus("Preparing upload…");
 
     const okAuth = await ensureFirebaseAuthForUpload();
@@ -2908,7 +2922,7 @@
       if (gcmEl) gcmEl.innerHTML = savedName;
       const gcdEl = document.getElementById("gcd");
       if (gcdEl) gcdEl.textContent = savedName;
-      if (savedName) loadUserProgress(savedName);
+      if (savedName) try { loadUserProgress(savedName); } catch (e) { console.warn("[studio] loadUserProgress:", e); }
   }
   refreshStudioAuthUI();
 
