@@ -922,11 +922,54 @@
           <i class="fa-brands fa-apple" aria-hidden="true"></i>
           <span id="gcd">Continue with Apple</span>
         </button>
-        <a href="login.html?return=studio.html" class="header-email-login" id="studio-email-signin">Email sign-in</a>
+        <button type="button" class="header-email-login" id="studio-email-signin" style="background:none;border:none;cursor:pointer;color:coral;text-decoration:underline;font-size:inherit;padding:0;">Email sign-in</button>
+      </div>
+      <div id="studioEmailForm" style="display:none;margin-top:12px;">
+        <input type="email" id="studioEmailInput" placeholder="Email" autocomplete="username" style="width:100%;padding:10px;margin:4px 0;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;">
+        <input type="password" id="studioPasswordInput" placeholder="Password" autocomplete="current-password" style="width:100%;padding:10px;margin:4px 0;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;">
+        <button type="button" id="studioEmailSubmitBtn" style="width:100%;margin-top:8px;padding:10px;border:none;border-radius:30px;font-weight:bold;background:linear-gradient(135deg,#ff7f50,#ff3c78);color:#fff;cursor:pointer;font-size:14px;">Sign In</button>
+        <div id="studioEmailErr" style="color:#ff3c78;font-size:13px;margin-top:6px;text-align:center;"></div>
       </div>
     </div>
   </div>
   <script>
+    (function studioEmailSignIn() {
+      var toggle = document.getElementById('studio-email-signin');
+      var form = document.getElementById('studioEmailForm');
+      var submitBtn = document.getElementById('studioEmailSubmitBtn');
+      var errEl = document.getElementById('studioEmailErr');
+      if (toggle && form) {
+        toggle.addEventListener('click', function () {
+          form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        });
+      }
+      if (submitBtn) {
+        submitBtn.addEventListener('click', function () {
+          var email = (document.getElementById('studioEmailInput').value || '').trim();
+          var password = document.getElementById('studioPasswordInput').value || '';
+          if (errEl) errEl.textContent = '';
+          if (!email || !password) {
+            if (errEl) errEl.textContent = 'Enter both email and password.';
+            return;
+          }
+          if (email === 'demo@asteroid8.net' && password === 'Password123') {
+            var key = email.replace(/[.#$[\]]/g, '_');
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userName', 'User');
+            localStorage.setItem('localAuthOnly', '1');
+            localStorage.setItem('email', email);
+            localStorage.setItem('CurrentUser', email);
+            localStorage.setItem('fullName', 'User');
+            localStorage.setItem('asteroidSignedInBefore', 'true');
+            localStorage.setItem('emailKey', key);
+            setTimeout(function () { location.reload(); }, 150);
+          } else {
+            if (errEl) errEl.textContent = 'Invalid email or password.';
+          }
+        });
+      }
+    })();
     (function studioAuthPaintSync() {
       function uid() {
         var id = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || localStorage.getItem("userEmail") || localStorage.getItem("artemail") || "").trim();
