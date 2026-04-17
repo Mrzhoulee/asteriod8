@@ -1127,7 +1127,7 @@
         <span id="agreementLabel">I confirm that I own <strong id="agreementSongTitle">this song</strong> and I accept the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer" style="color: coral;">Terms of Service</a> and <a href="policy.html" target="_blank" rel="noopener noreferrer" style="color: coral;">Privacy Policy</a> of Asteroid.</span>
         </div>
     </div>
-    <button type="button" id="btn" class="upload-btn">UPLOAD NOW</button>
+    <button type="button" id="btn" class="upload-btn" onclick="if(!window._uploadHandlerReady){console.log('[upload] module not loaded yet — form inputs:',{title:document.getElementById('title').value,artist:document.getElementById('artist').value,album:document.getElementById('album').value,file:document.getElementById('fileInp').files[0]?.name||null,agreement:document.getElementById('agreement').checked});alert('Upload is still loading. Please wait a moment and try again, or hard-refresh (Cmd+Shift+R).');}">UPLOAD NOW</button>
     <label for="uploadStatusArea" style="display:block;margin:16px auto 6px;max-width:400px;text-align:left;font-size:12px;font-weight:700;color:#333;font-family:Montserrat,sans-serif;">Upload status</label>
     <textarea id="uploadStatusArea" readonly rows="5" aria-live="polite" placeholder="Progress will show here when you upload." style="display:block;width:min(400px,92vw);max-width:400px;margin:0 auto 20px;padding:12px;font-size:13px;line-height:1.45;font-family:Montserrat,sans-serif;border-radius:12px;border:1px solid #bbb;box-sizing:border-box;background:#f8f8f8;color:#111;resize:vertical;"></textarea>
     <style>
@@ -2752,6 +2752,7 @@
   }
 
   // --- 3. UPLOAD ---
+  window._uploadHandlerReady = true;
   document.getElementById("btn").onclick = async () => {
     clearUploadStatus();
 
