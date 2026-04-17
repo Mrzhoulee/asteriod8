@@ -1691,7 +1691,7 @@
   async function ensureFirebaseAuthForUpload() {
     if (typeof auth.authStateReady === "function") {
       try {
-        await auth.authStateReady();
+        await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 3000))]);
       } catch (e) {
         console.warn("[studio] auth.authStateReady", e);
       }
@@ -1699,14 +1699,15 @@
     syncAuthUserToLocalStorage(auth.currentUser);
     if (auth.currentUser) return true;
 
-    // Email-only users: accept localStorage session, attempt anonymous Firebase for Storage
+    // Email-only users: accept localStorage session, try anonymous Firebase for Storage (with timeout)
     if (localStorage.getItem('localAuthOnly') === '1' && localStorage.getItem('emailKey')) {
-      if (shouldAttemptAnonymousFirebaseForUpload()) {
-        try {
-          await signInAnonymously(auth);
-        } catch (e) {
-          console.warn("[studio] anonymous auth for email-only upload:", e);
-        }
+      try {
+        await Promise.race([
+          signInAnonymously(auth),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('anonymous auth timeout')), 5000))
+        ]);
+      } catch (e) {
+        console.warn("[studio] anonymous auth for email-only upload (continuing anyway):", e);
       }
       return true;
     }
