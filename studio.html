@@ -529,13 +529,18 @@
   <div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
     <div class="ugc-policy-card">
       <h2 id="ugcPolicyTitle">Before you continue</h2>
-      <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;line-height:1.45;text-align:center;">You must accept our policies before using Studio. This is saved once on this device (browser storage); you will not need to accept again on return visits. <strong>App Store age rating:</strong> Apple lists Asteroid as <strong>16+</strong> in most countries and regions, and <strong>15+</strong> in Australia, Brazil, and the Republic of Korea—the badge on your local App Store applies to you. By continuing you confirm you meet that minimum age.</p>
+      <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;">Check the box and tap Continue to accept the Terms of Service and Privacy Policy before using Asteroid. You only need to do this once on this device (saved in browser storage). Asteroid includes user-uploaded music and profiles; you can report content, block users, and reach our team at any time. <strong>App Store age rating:</strong> Apple lists Asteroid as <strong>16+</strong> in most countries and regions, and <strong>15+</strong> in Australia, Brazil, and the Republic of Korea—the badge shown on your local App Store is the one that applies to you. By continuing you confirm you meet that minimum age.</p>
       <div class="ugc-policy-actions">
         <div class="ugc-policy-check-row" id="ugcPolicyCheckRow" role="group" aria-label="Legal acceptance">
           <input type="checkbox" id="ugcPolicyCheck" autocomplete="off" aria-describedby="ugcPolicyLegalText">
           <span class="ugc-policy-check-text" id="ugcPolicyLegalText">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer" onclick="return window.openAsteroidLegalPageFromClick(event, 'Asteroid%20Terms.html');">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer" onclick="return window.openAsteroidLegalPageFromClick(event, 'policy.html');">Privacy Policy</a>.</span>
         </div>
-        <button type="button" class="ugc-policy-continue" id="ugcPolicyContinue" disabled>Continue to Studio</button>
+        <div class="ugc-policy-check-row" id="ugcExplicitCheckRow" role="group" aria-label="Content preference">
+          <input type="checkbox" id="ugcHideExplicitCheck" autocomplete="off" aria-describedby="ugcHideExplicitText">
+          <span class="ugc-policy-check-text" id="ugcHideExplicitText">Hide explicit content (recommended for younger listeners).</span>
+        </div>
+        <button type="button" class="ugc-policy-continue" id="ugcPolicyContinue" disabled>Continue to Asteroid</button>
+        <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.5);text-align:center;">Questions: <a href="mailto:asteroidcontactbussiness@gmail.com?subject=Asteroid%20app%20-%20moderation">asteroidcontactbussiness@gmail.com</a></p>
       </div>
     </div>
   </div>
@@ -938,36 +943,58 @@
       var form = document.getElementById('studioEmailForm');
       var submitBtn = document.getElementById('studioEmailSubmitBtn');
       var errEl = document.getElementById('studioEmailErr');
+
+      function doEmailSignIn() {
+        var email = (document.getElementById('studioEmailInput').value || '').trim();
+        var password = document.getElementById('studioPasswordInput').value || '';
+        if (errEl) errEl.textContent = '';
+        if (!email || !password) {
+          if (errEl) errEl.textContent = 'Enter both email and password.';
+          return;
+        }
+        if (email === 'demo@asteroid8.net' && password === 'Password123') {
+          var key = email.replace(/[.#$[\]]/g, '_');
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userEmail', email);
+          localStorage.setItem('userName', 'User');
+          localStorage.setItem('localAuthOnly', '1');
+          localStorage.setItem('email', email);
+          localStorage.setItem('CurrentUser', email);
+          localStorage.setItem('fullName', 'User');
+          localStorage.setItem('asteroidSignedInBefore', 'true');
+          localStorage.setItem('emailKey', key);
+          setTimeout(function () { location.reload(); }, 150);
+        } else {
+          if (errEl) errEl.textContent = 'Invalid email or password.';
+        }
+      }
+
       if (toggle && form) {
         toggle.addEventListener('click', function () {
+          // Show legal overlay first if not yet accepted
+          var legalDone = typeof window.__asteroidLegalFirstVisitDone === 'function' && window.__asteroidLegalFirstVisitDone();
+          if (!legalDone) {
+            var ov = document.getElementById('ugcPolicyOverlay');
+            var chk = document.getElementById('ugcPolicyCheck');
+            var btn = document.getElementById('ugcPolicyContinue');
+            var titleEl = document.getElementById('ugcPolicyTitle');
+            if (ov && chk && btn) {
+              if (chk) chk.checked = false;
+              if (btn) btn.disabled = true;
+              if (titleEl) titleEl.textContent = 'Before you continue';
+              btn.textContent = 'Continue to sign in';
+              window.__appleUgcPendingRunner = function () {
+                form.style.display = 'block';
+              };
+              ov.classList.add('is-visible');
+              return;
+            }
+          }
           form.style.display = form.style.display === 'none' ? 'block' : 'none';
         });
       }
       if (submitBtn) {
-        submitBtn.addEventListener('click', function () {
-          var email = (document.getElementById('studioEmailInput').value || '').trim();
-          var password = document.getElementById('studioPasswordInput').value || '';
-          if (errEl) errEl.textContent = '';
-          if (!email || !password) {
-            if (errEl) errEl.textContent = 'Enter both email and password.';
-            return;
-          }
-          if (email === 'demo@asteroid8.net' && password === 'Password123') {
-            var key = email.replace(/[.#$[\]]/g, '_');
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userEmail', email);
-            localStorage.setItem('userName', 'User');
-            localStorage.setItem('localAuthOnly', '1');
-            localStorage.setItem('email', email);
-            localStorage.setItem('CurrentUser', email);
-            localStorage.setItem('fullName', 'User');
-            localStorage.setItem('asteroidSignedInBefore', 'true');
-            localStorage.setItem('emailKey', key);
-            setTimeout(function () { location.reload(); }, 150);
-          } else {
-            if (errEl) errEl.textContent = 'Invalid email or password.';
-          }
-        });
+        submitBtn.addEventListener('click', doEmailSignIn);
       }
     })();
     (function studioAuthPaintSync() {
