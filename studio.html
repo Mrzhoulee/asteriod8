@@ -2523,6 +2523,9 @@
     }
 
     const stillValid = await codeIsValid(code);
+    if (code && !stillValid) {
+      localStorage.setItem('_studioReferralCodeUsed', '1');
+    }
     if (!code || !stillValid) {
       const oldCode = code;
       const name = studioReferralDisplayName();
@@ -2581,12 +2584,22 @@
 
     setEnabled(true);
 
-    // Email-only users: skip Firebase RTDB, use static code
+    // Email-only users: skip Firebase RTDB for code generation, use static code
     if (!auth.currentUser && localStorage.getItem('localAuthOnly') === '1') {
       const staticCode = 'B3Z9LKY2Q7PANFR1XM';
       if (display) display.value = staticCode;
       const shareInput = document.getElementById('shareLinkInput');
       if (shareInput) shareInput.value = staticCode;
+      // Check if another user has used this code
+      try {
+        const idxSnap = await get(ref2(db, 'REFERRAL_CODE_INDEX/' + staticCode));
+        if (idxSnap.exists()) {
+          const v = idxSnap.val();
+          if (typeof v === 'object' && v.used === true) {
+            localStorage.setItem('_studioReferralCodeUsed', '1');
+          }
+        }
+      } catch (e) {}
       setReferralStatus('Share your code with another artist — one use only.', '');
       updateStudioTutorial();
       return;
@@ -2612,11 +2625,10 @@
     if (!steps.length) return;
     const signedIn = !!studioReferralUserKey();
     const uploaded = localStorage.getItem('_studioTutorialUploadedOnce') === '1';
-    const codeField = document.getElementById('referralCodeDisplay');
-    const hasCode = !!(codeField && codeField.value && codeField.value.trim().length >= 10);
+    const codeUsedByAnother = localStorage.getItem('_studioReferralCodeUsed') === '1';
     const submittedAt = Number(localStorage.getItem('_studioTutorialSubmittedAt') || 0);
     const submitted = submittedAt > 0;
-    const doneFlags = [signedIn, uploaded, hasCode, submitted];
+    const doneFlags = [signedIn, uploaded, codeUsedByAnother, submitted];
     let firstPending = -1;
     for (let i = 0; i < doneFlags.length; i++) {
       if (!doneFlags[i]) { firstPending = i; break; }
