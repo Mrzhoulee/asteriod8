@@ -991,6 +991,7 @@
         if (signedIn) {
           if (row) {
             row.classList.add("studio-signin-row--hidden");
+            row.style.display = "none";
             row.setAttribute("aria-hidden", "true");
           }
           if (bar) bar.classList.add("studio-topbar--visible");
