@@ -2760,6 +2760,7 @@
     const _album = document.getElementById("album").value.trim();
     const _file = document.getElementById("fileInp").files[0];
     const _agree = document.getElementById("agreement").checked;
+    console.log("[upload] form inputs:", { title: _title, artist: _artist, album: _album, file: _file ? _file.name : null, agreement: _agree });
     if (!_title || !_artist || !_album || !_file || !_agree) {
       var missing = [];
       if (!_title) missing.push("Song Title");
