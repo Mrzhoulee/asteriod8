@@ -2345,26 +2345,11 @@
               console.error("Apple sign-in:", err?.code || err);
               const code = err && err.code ? String(err.code) : "";
               if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
-                try {
-                  await signInWithRedirect(auth, appleProvider);
-                  return;
-                } catch (redirectErr) {
-                  console.error("[studio] Apple redirect sign-in:", redirectErr);
-                }
-              }
-              if (err && err.code === "auth/operation-not-allowed") {
-                alert(
-                  "Sign in with Apple is not enabled for this app in Firebase yet.\n\n" +
-                    "Firebase Console → Authentication → Sign-in method → Apple → Enable."
-                );
+                alert("Your browser blocked the Apple sign-in popup. Please allow popups for this site and try again.");
+              } else if (code === "auth/operation-not-allowed") {
+                alert("Sign in with Apple is not enabled in Firebase yet.\n\nFirebase Console → Authentication → Sign-in method → Apple → Enable.");
               } else if (err) {
-                alert(
-                  "Could not start Apple sign-in.\n\n" +
-                    "If you see 403 on Apple’s page, open Apple Developer → your Services ID → " +
-                    "Sign in with Apple → Return URLs must include exactly:\n" +
-                    "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
-                    "Domains must list the site you use (e.g. asteroid8.net and www.asteroid8.net)."
-                );
+                alert("Apple sign-in failed: " + (err.message || code) + "\n\nMake sure popups are allowed for this site.");
               }
             });
         };
@@ -2393,26 +2378,11 @@
           console.error("Apple sign-in:", err?.code || err);
           const code = err && err.code ? String(err.code) : "";
           if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
-            try {
-              await signInWithRedirect(auth, appleProvider);
-              return;
-            } catch (redirectErr) {
-              console.error("[studio] Apple redirect sign-in:", redirectErr);
-            }
-          }
-          if (err && err.code === "auth/operation-not-allowed") {
-            alert(
-              "Sign in with Apple is not enabled for this app in Firebase yet.\n\n" +
-                "Firebase Console → Authentication → Sign-in method → Apple → Enable."
-            );
+            alert("Your browser blocked the Apple sign-in popup. Please allow popups for this site and try again.");
+          } else if (code === "auth/operation-not-allowed") {
+            alert("Sign in with Apple is not enabled in Firebase yet.\n\nFirebase Console → Authentication → Sign-in method → Apple → Enable.");
           } else if (err) {
-            alert(
-              "Could not start Apple sign-in.\n\n" +
-                "If you see 403 on Apple’s page, open Apple Developer → your Services ID → " +
-                "Sign in with Apple → Return URLs must include exactly:\n" +
-                "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
-                "Domains must list the site you use (e.g. asteroid8.net and www.asteroid8.net)."
-            );
+            alert("Apple sign-in failed: " + (err.message || code) + "\n\nMake sure popups are allowed for this site.");
           }
         });
     });
