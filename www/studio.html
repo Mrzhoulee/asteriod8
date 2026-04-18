@@ -521,8 +521,8 @@
   <div id="referralSuccessOverlay" class="referral-success-overlay" role="dialog" aria-modal="true" aria-label="Referral submitted">
     <div class="referral-success-card">
       <div class="referral-success-icon">&#127881;</div>
-      <h2 class="referral-success-title">Feature Request Sent!</h2>
-      <p class="referral-success-msg">Your referral code was submitted successfully. The referred artist will review your feature request within <strong>48 hours</strong>.</p>
+      <h2 class="referral-success-title">Referral Submitted!</h2>
+      <p class="referral-success-msg">You entered the code successfully. The artist who shared it will now be featured for <strong>3 months</strong>.</p>
       <button type="button" class="referral-success-close" id="referralSuccessCloseBtn">Got it</button>
     </div>
   </div>
@@ -791,8 +791,8 @@
         <p class="referral-code-title">Share your code — one use only</p>
         <input type="text" id="referralCodeDisplay" readonly placeholder="Sign in to generate your code">
         <button id="copyCodeBtn" class="upload-btn" style="width: 110px; height: 35px; font-size: 12px;">COPY CODE</button>
-        <input type="text" id="referralCodeEntry" placeholder="Enter another artist's code to request feature" autocomplete="off">
-        <button id="submitReferralCodeBtn" class="upload-btn" style="width: 180px; height: 35px; font-size: 12px;">SUBMIT FOR FEATURE</button>
+        <input type="text" id="referralCodeEntry" placeholder="Enter another artist's referral code" autocomplete="off">
+        <button id="submitReferralCodeBtn" class="upload-btn" style="width: 180px; height: 35px; font-size: 12px;">SUBMIT CODE</button>
         <div id="referralCodeStatus" class="referral-code-status"></div>
       </div>
     </div>
@@ -2446,12 +2446,12 @@
   })();
 
   function loadUserProgress(name) {
-    const cleanName = name.replace(/[.#$[\]\s]/g, '_');
+    const userKey = studioReferralUserKey() || name.replace(/[.#$[\]\s]/g, '_');
     const emailRaw = localStorage.getItem("email") || "";
     const safeEmail = emailRaw.replace(/\./g, ',');
     const rewardKey = (typeof authScopedKey === "function") ? authScopedKey("rewardNotified") : "rewardNotified";
 
-    onValue(ref2(db, 'referralCounts/' + cleanName), async (snap) => {
+    onValue(ref2(db, 'referralCounts/' + userKey), async (snap) => {
       const count = snap.val()?.count || 0;
       document.getElementById('countText').innerText = `${count} / 1 Artist Joined`;
       document.getElementById('progressBarStatus').style.width = (count >= 1 ? 100 : 0) + "%";
@@ -2745,18 +2745,20 @@
       const reqPath = 'FEATURE_REFERRAL_REQUESTS/' + ownerKey + '/' + key;
       const existing = await get(ref2(db, reqPath));
       if (existing.exists()) {
-        setReferralStatus('Already sent to this artist. Wait for review.', 'ok');
+        setReferralStatus('You already submitted this artist\'s code.', 'ok');
         return;
       }
       // Mark code as used (one-time only)
       await set(ref2(db, 'REFERRAL_CODE_INDEX/' + rawCode), { ownerKey, used: true });
       // Clear owner's stored code so they get a fresh one next visit
       await remove(ref2(db, 'REFERRAL_CODES_BY_USER/' + ownerKey));
+      // Increment the code owner's referral count so their progress bar updates in real-time
+      await update(ref2(db, 'referralCounts/' + ownerKey), { count: increment(1) });
       await set(ref2(db, reqPath), {
         fromKey: key,
         ownerKey: ownerKey,
         referralCode: rawCode,
-        status: 'pending_feature_review',
+        status: 'featured',
         requestedAt: Date.now()
       });
       await set(ref2(db, 'FEATURE_REFERRAL_OUTBOX/' + key + '/' + ownerKey), {
@@ -2765,14 +2767,18 @@
         requestedAt: Date.now()
       });
       if (input) input.value = '';
-      setReferralStatus('Submitted. This was sent to the referred artist account for feature review.', 'ok');
+      setReferralStatus('Code accepted! The artist who shared it will be featured.', 'ok');
       localStorage.setItem('_studioTutorialSubmittedAt', String(Date.now()));
       updateStudioTutorial();
       try {
+        var countEl = document.getElementById('countText');
+        if (countEl) countEl.innerText = '1 / 1 Artist Joined';
         var barBg = document.querySelector('.bar-bg');
         var bar = document.getElementById('progressBarStatus');
         if (barBg) barBg.classList.add('bar-success');
         if (bar) { bar.style.width = '100%'; bar.style.transition = 'width 0.8s ease'; }
+        var unlockEl = document.getElementById('unlockMsg');
+        if (unlockEl) unlockEl.style.display = 'block';
         var overlay = document.getElementById('referralSuccessOverlay');
         if (overlay) {
           overlay.classList.add('visible');
