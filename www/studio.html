@@ -2371,20 +2371,13 @@
             }
             return;
           }
-          signInWithPopup(auth, appleProvider)
-            .then((res) => completeStudioSignIn(res))
-            .catch(async (err) => {
-              console.error("Apple sign-in:", err?.code || err);
-              const code = err && err.code ? String(err.code) : "";
-              if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
-                console.log("[studio] Popup blocked, falling back to redirect");
-                try { await signInWithRedirect(auth, appleProvider); } catch (e) { console.error("[studio] redirect fallback:", e); }
-              } else if (code === "auth/operation-not-allowed") {
-                alert("Sign in with Apple is not enabled in Firebase yet.\n\nFirebase Console → Authentication → Sign-in method → Apple → Enable.");
-              } else if (err) {
-                alert("Apple sign-in failed: " + (err.message || code));
-              }
-            });
+          try {
+            console.log("[studio] Attempting signInWithRedirect (Apple)");
+            await signInWithRedirect(auth, appleProvider);
+          } catch (e) {
+            console.error("[studio] signInWithRedirect failed:", e);
+            alert("Apple sign-in failed: " + (e.message || e.code || e));
+          }
         };
         ovU.classList.add("is-visible");
         return;
@@ -2405,20 +2398,13 @@
         }
         return;
       }
-      signInWithPopup(auth, appleProvider)
-        .then((res) => completeStudioSignIn(res))
-        .catch(async (err) => {
-          console.error("Apple sign-in:", err?.code || err);
-          const code = err && err.code ? String(err.code) : "";
-          if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
-            console.log("[studio] Popup blocked, falling back to redirect");
-            try { await signInWithRedirect(auth, appleProvider); } catch (e) { console.error("[studio] redirect fallback:", e); }
-          } else if (code === "auth/operation-not-allowed") {
-            alert("Sign in with Apple is not enabled in Firebase yet.\n\nFirebase Console → Authentication → Sign-in method → Apple → Enable.");
-          } else if (err) {
-            alert("Apple sign-in failed: " + (err.message || code));
-          }
-        });
+      try {
+        console.log("[studio] Attempting signInWithRedirect (Apple)");
+        await signInWithRedirect(auth, appleProvider);
+      } catch (e) {
+        console.error("[studio] signInWithRedirect failed:", e);
+        alert("Apple sign-in failed: " + (e.message || e.code || e));
+      }
     });
   }
 
