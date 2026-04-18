@@ -2225,6 +2225,7 @@
   }
 
   let _authStateKnown = false;
+  let _referralCodeLoaded = false;
   onAuthStateChanged(auth, (user) => {
     _authStateKnown = true;
     syncAuthUserToLocalStorage(user);
@@ -2598,7 +2599,6 @@
     return code;
   }
 
-  let _referralCodeLoaded = false;
   async function refreshStudioReferralUi() {
     const display = document.getElementById('referralCodeDisplay');
     const entry = document.getElementById('referralCodeEntry');
