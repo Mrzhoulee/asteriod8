@@ -1331,19 +1331,29 @@
   const db = getDatabase(app);
   let auth;
   try {
+    console.log('[studio][init] Calling initializeAuth…');
     auth = initializeAuth(app, {
       persistence: browserLocalPersistence,
       popupRedirectResolver: browserPopupRedirectResolver,
     });
+    console.log('[studio][init] initializeAuth OK — auth.currentUser:', auth.currentUser);
   } catch (e) {
     const code = e && e.code ? String(e.code) : "";
     const msg = e && e.message ? String(e.message) : "";
+    console.warn('[studio][init] initializeAuth threw:', code, msg);
     if (code === "auth/already-initialized" || /already.*initialized/i.test(msg)) {
       auth = getAuth(app);
+      console.log('[studio][init] Fell back to getAuth — auth.currentUser:', auth.currentUser);
     } else {
       throw e;
     }
   }
+  // Diagnostic: check if Firebase has stored auth tokens
+  try {
+    const fbKey = 'firebase:authUser:' + firebaseConfig.apiKey + ':[DEFAULT]';
+    const fbToken = localStorage.getItem(fbKey);
+    console.log('[studio][init] Firebase auth token in localStorage (' + fbKey + '):', fbToken ? 'EXISTS (' + fbToken.length + ' chars)' : 'MISSING');
+  } catch (e) {}
   const storage = getStorage(app);
   const appleProvider = new OAuthProvider("apple.com");
   appleProvider.addScope("email");
@@ -2220,6 +2230,7 @@
   let _authStateKnown = false;
   let _referralLoadVersion = 0;   // version counter — newer calls invalidate older ones
 
+  console.log('[studio][init] Registering onAuthStateChanged listener — auth object:', typeof auth, '| auth.currentUser:', auth && auth.currentUser);
   onAuthStateChanged(auth, (user) => {
     console.log('[studio] onAuthStateChanged fired — user:', user ? (user.email || user.uid) : 'NULL (signed out)');
     _authStateKnown = true;
@@ -2704,15 +2715,28 @@
     } catch (e) {
       if (stale()) return;
       console.warn('[referral-code] RTDB failed or timed out:', e.message || e);
+      // If no Firebase session, try anonymous sign-in to get RTDB access, then retry
       if (!auth.currentUser) {
-        // Firebase session expired — show sign-in prompt
-        console.warn('[referral-code] No Firebase auth session — user needs to re-sign in');
-        if (display) { display.value = ''; display.placeholder = 'Sign in again to get your code'; }
-        if (shareInput) { shareInput.value = ''; shareInput.placeholder = 'Sign in again to get your code'; }
-        setReferralStatus('Session expired — please sign in again below.', 'error');
-        // Show the sign-in row
-        var row = document.getElementById('studioSignInRow');
-        if (row) { row.classList.remove('studio-signin-row--hidden'); row.style.display = ''; row.removeAttribute('aria-hidden'); }
+        console.log('[referral-code] No auth session — attempting anonymous sign-in for RTDB access…');
+        setReferralStatus('Connecting…', '');
+        try {
+          await signInAnonymously(auth);
+          console.log('[referral-code] Anonymous sign-in OK — retrying RTDB load');
+          // Retry once with the new anonymous session
+          const code = await Promise.race([ensureStudioReferralCode(), new Promise((_, rej) => setTimeout(() => rej(new Error('retry timeout')), 8000))]);
+          if (stale()) return;
+          setAllDisabled(false);
+          if (code) {
+            console.log('[referral-code] Code loaded after anonymous sign-in:', code);
+            setReferralStatus('Share your code with another artist — one use only.', '');
+          } else {
+            setReferralStatus('Could not prepare code yet.', 'error');
+          }
+        } catch (anonErr) {
+          if (stale()) return;
+          console.error('[referral-code] Anonymous sign-in or retry also failed:', anonErr.message || anonErr);
+          setReferralStatus('Could not load referral code right now.', 'error');
+        }
       } else {
         setReferralStatus('Could not load referral code right now.', 'error');
       }
@@ -2873,11 +2897,19 @@
     } catch (e) {
       console.error('[referral-submit] ERROR:', e);
       if (!auth.currentUser) {
-        console.warn('[referral-submit] No Firebase auth session — user needs to re-sign in');
-        setReferralStatus('Session expired — please sign in again to submit a code.', 'error');
-        // Show the sign-in row so user can re-authenticate
-        var row = document.getElementById('studioSignInRow');
-        if (row) { row.classList.remove('studio-signin-row--hidden'); row.style.display = ''; row.removeAttribute('aria-hidden'); }
+        // Try anonymous sign-in then retry the submit once
+        console.log('[referral-submit] No auth session — attempting anonymous sign-in then retry…');
+        setReferralStatus('Connecting… please wait.', '');
+        try {
+          await signInAnonymously(auth);
+          console.log('[referral-submit] Anonymous sign-in OK — retrying submit');
+          // Re-run the submit logic (recursive call, but only once since auth.currentUser is now set)
+          await submitStudioReferralCode();
+          return;
+        } catch (anonErr) {
+          console.error('[referral-submit] Anonymous sign-in failed:', anonErr.message || anonErr);
+          setReferralStatus('Could not submit code right now. Check connection and try again.', 'error');
+        }
       } else {
         setReferralStatus('Could not submit code right now. Check connection and try again.', 'error');
       }
