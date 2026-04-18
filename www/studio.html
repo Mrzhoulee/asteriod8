@@ -2682,12 +2682,13 @@
       return;
     }
 
-    // Load/generate code from RTDB (works with or without auth.currentUser)
+    // Load/generate code — try RTDB with a 6s timeout, fall back to local code
     console.log('[referral-code] Loading code from RTDB — auth.currentUser:', !!auth.currentUser, '| key:', key);
     try {
-      const code = await ensureStudioReferralCode();
+      const rtdbTimeout = new Promise((_, rej) => setTimeout(() => rej(new Error('RTDB timeout (6s)')), 6000));
+      const code = await Promise.race([ensureStudioReferralCode(), rtdbTimeout]);
       if (stale()) { console.log('[referral-code] Version', myVersion, 'is stale after ensureStudioReferralCode — aborting'); return; }
-      setAllDisabled(false);                   // re-assert after async gap
+      setAllDisabled(false);
       if (!code) {
         console.warn('[referral-code] ensureStudioReferralCode returned empty — no code generated');
         if (display) display.disabled = true;
@@ -2699,8 +2700,21 @@
       setReferralStatus(code ? 'Share your code with another artist — one use only.' : 'Could not prepare code yet.', code ? '' : 'error');
     } catch (e) {
       if (stale()) return;
-      console.error('[referral-code] ERROR loading referral code:', e);
-      setReferralStatus('Could not load referral code right now.', 'error');
+      console.warn('[referral-code] RTDB failed or timed out:', e.message || e, '— using local fallback');
+      // Fallback: generate a code locally and persist in localStorage
+      let localCode = localStorage.getItem('_localReferralCode');
+      if (!localCode) {
+        localCode = generateUsernameReferralCode(studioReferralDisplayName());
+        localStorage.setItem('_localReferralCode', localCode);
+        console.log('[referral-code] Generated local fallback code:', localCode);
+      } else {
+        console.log('[referral-code] Using cached local fallback code:', localCode);
+      }
+      if (display) { display.value = localCode; display.disabled = false; }
+      if (shareInput) shareInput.value = localCode;
+      if (copyCode) copyCode.disabled = false;
+      if (copyMain) copyMain.disabled = false;
+      setReferralStatus('Share your code with another artist — one use only.', '');
     }
     updateStudioTutorial();
   }
