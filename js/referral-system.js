@@ -23,7 +23,7 @@ import {
   serverTimestamp,
   writeBatch
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { initializeAuth, getAuth, onAuthStateChanged, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
 // Must match the main app (index.html / studio.html) so Storage/Auth use one project.
 const FIREBASE_CONFIG = {
@@ -39,7 +39,14 @@ const FIREBASE_CONFIG = {
 
 const app = getApps().length ? getApp() : initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
-const auth = getAuth(app);
+// Use initializeAuth with browserLocalPersistence so the stored Apple token
+// in localStorage is found. getAuth() defaults to indexedDB which misses it.
+let auth;
+try {
+  auth = initializeAuth(app, { persistence: browserLocalPersistence });
+} catch (e) {
+  auth = getAuth(app);
+}
 
 // --- Constants ---
 const VIP_TRIAL_DAYS = 30;
