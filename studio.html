@@ -2373,7 +2373,7 @@
           }
           try {
             console.log("[studio] Attempting signInWithRedirect (Apple)");
-            await signInWithRedirect(auth, appleProvider);
+            await signInWithRedirect(auth, appleProvider, browserPopupRedirectResolver);
           } catch (e) {
             console.error("[studio] signInWithRedirect failed:", e);
             alert("Apple sign-in failed: " + (e.message || e.code || e));
@@ -2400,7 +2400,7 @@
       }
       try {
         console.log("[studio] Attempting signInWithRedirect (Apple)");
-        await signInWithRedirect(auth, appleProvider);
+        await signInWithRedirect(auth, appleProvider, browserPopupRedirectResolver);
       } catch (e) {
         console.error("[studio] signInWithRedirect failed:", e);
         alert("Apple sign-in failed: " + (e.message || e.code || e));
