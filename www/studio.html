@@ -2372,11 +2372,22 @@
             return;
           }
           try {
-            console.log("[studio] Attempting signInWithRedirect (Apple)");
-            await signInWithRedirect(auth, appleProvider, browserPopupRedirectResolver);
-          } catch (e) {
-            console.error("[studio] signInWithRedirect failed:", e);
-            alert("Apple sign-in failed: " + (e.message || e.code || e));
+            console.log("[studio] Attempting signInWithPopup (Apple)");
+            const result = await signInWithPopup(auth, appleProvider);
+            await completeStudioSignIn(result);
+          } catch (popupErr) {
+            const code = popupErr && popupErr.code ? String(popupErr.code) : "";
+            console.warn("[studio] popup failed:", code, popupErr && (popupErr.message || popupErr));
+            if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+              try {
+                await signInWithRedirect(auth, appleProvider, browserPopupRedirectResolver);
+              } catch (e2) {
+                console.error("[studio] redirect fallback failed:", e2);
+                alert("Apple sign-in failed. Please allow popups for this site and try again.");
+              }
+            } else if (code !== "auth/user-cancelled") {
+              alert("Apple sign-in failed: " + (popupErr.message || code || popupErr));
+            }
           }
         };
         ovU.classList.add("is-visible");
@@ -2399,11 +2410,22 @@
         return;
       }
       try {
-        console.log("[studio] Attempting signInWithRedirect (Apple)");
-        await signInWithRedirect(auth, appleProvider, browserPopupRedirectResolver);
-      } catch (e) {
-        console.error("[studio] signInWithRedirect failed:", e);
-        alert("Apple sign-in failed: " + (e.message || e.code || e));
+        console.log("[studio] Attempting signInWithPopup (Apple)");
+        const result = await signInWithPopup(auth, appleProvider);
+        await completeStudioSignIn(result);
+      } catch (popupErr) {
+        const code = popupErr && popupErr.code ? String(popupErr.code) : "";
+        console.warn("[studio] popup failed:", code, popupErr && (popupErr.message || popupErr));
+        if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+          try {
+            await signInWithRedirect(auth, appleProvider, browserPopupRedirectResolver);
+          } catch (e2) {
+            console.error("[studio] redirect fallback failed:", e2);
+            alert("Apple sign-in failed. Please allow popups for this site and try again.");
+          }
+        } else if (code !== "auth/user-cancelled") {
+          alert("Apple sign-in failed: " + (popupErr.message || code || popupErr));
+        }
       }
     });
   }
