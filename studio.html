@@ -2221,10 +2221,13 @@
   let _referralLoadVersion = 0;   // version counter — newer calls invalidate older ones
 
   onAuthStateChanged(auth, (user) => {
+    console.log('[studio] onAuthStateChanged fired — user:', user ? (user.email || user.uid) : 'NULL (signed out)');
     _authStateKnown = true;
     syncAuthUserToLocalStorage(user);
     if (user) {
-      console.log("[studio] onAuthStateChanged: signed in as", user.email || user.uid);
+      // Clear any stale local fallback code so RTDB code takes priority
+      const userKey = studioReferralUserKey();
+      if (userKey) localStorage.removeItem('_localReferralCode_' + userKey);
       void maybeShowAppleOnboarding();
     }
     applyStudioAuthUI();
@@ -2682,10 +2685,10 @@
       return;
     }
 
-    // Load/generate code — try RTDB with a 6s timeout, fall back to local code
+    // Load/generate code — try RTDB with a 5s timeout, fall back to local code
     console.log('[referral-code] Loading code from RTDB — auth.currentUser:', !!auth.currentUser, '| key:', key);
     try {
-      const rtdbTimeout = new Promise((_, rej) => setTimeout(() => rej(new Error('RTDB timeout (6s)')), 6000));
+      const rtdbTimeout = new Promise((_, rej) => setTimeout(() => rej(new Error('RTDB timeout (5s)')), 5000));
       const code = await Promise.race([ensureStudioReferralCode(), rtdbTimeout]);
       if (stale()) { console.log('[referral-code] Version', myVersion, 'is stale after ensureStudioReferralCode — aborting'); return; }
       setAllDisabled(false);
@@ -2701,20 +2704,35 @@
     } catch (e) {
       if (stale()) return;
       console.warn('[referral-code] RTDB failed or timed out:', e.message || e, '— using local fallback');
-      // Fallback: generate a code locally and persist in localStorage
-      let localCode = localStorage.getItem('_localReferralCode');
+      // Fallback: per-user local code keyed by identity
+      const localKey = '_localReferralCode_' + key;
+      let localCode = localStorage.getItem(localKey);
       if (!localCode) {
         localCode = generateUsernameReferralCode(studioReferralDisplayName());
-        localStorage.setItem('_localReferralCode', localCode);
-        console.log('[referral-code] Generated local fallback code:', localCode);
+        localStorage.setItem(localKey, localCode);
+        console.log('[referral-code] Generated local fallback code for', key, ':', localCode);
       } else {
-        console.log('[referral-code] Using cached local fallback code:', localCode);
+        console.log('[referral-code] Using cached local fallback code for', key, ':', localCode);
       }
       if (display) { display.value = localCode; display.disabled = false; }
       if (shareInput) shareInput.value = localCode;
       if (copyCode) copyCode.disabled = false;
       if (copyMain) copyMain.disabled = false;
       setReferralStatus('Share your code with another artist — one use only.', '');
+      // Try to register the local code in RTDB in the background so others can submit it
+      try {
+        const regTimeout = new Promise((_, rej) => setTimeout(() => rej(new Error('register timeout')), 5000));
+        await Promise.race([
+          Promise.all([
+            set(ref2(db, 'REFERRAL_CODES_BY_USER/' + key), { code: localCode, ownerKey: key, createdAt: Date.now(), codeSource: 'local-fallback' }),
+            set(ref2(db, 'REFERRAL_CODE_INDEX/' + localCode), { ownerKey: key, used: false }),
+          ]),
+          regTimeout,
+        ]);
+        console.log('[referral-code] Local fallback code registered in RTDB');
+      } catch (regErr) {
+        console.warn('[referral-code] Could not register local code in RTDB:', regErr.message || regErr);
+      }
     }
     updateStudioTutorial();
   }
@@ -2761,7 +2779,25 @@
   }
   window.updateStudioTutorial = updateStudioTutorial;
 
+  // Helper: RTDB get with a timeout so it never hangs
+  function rtdbGet(dbRef, ms) {
+    ms = ms || 6000;
+    return Promise.race([
+      get(dbRef),
+      new Promise(function (_, rej) { setTimeout(function () { rej(new Error('RTDB get timeout (' + ms + 'ms)')); }, ms); }),
+    ]);
+  }
+  // Helper: RTDB set with a timeout
+  function rtdbSet(dbRef, val, ms) {
+    ms = ms || 6000;
+    return Promise.race([
+      set(dbRef, val),
+      new Promise(function (_, rej) { setTimeout(function () { rej(new Error('RTDB set timeout (' + ms + 'ms)')); }, ms); }),
+    ]);
+  }
+
   async function submitStudioReferralCode() {
+    console.log('[referral-submit] submitStudioReferralCode() called');
     try {
       if (typeof auth.authStateReady === 'function') {
         await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 4000))]);
@@ -2774,6 +2810,7 @@
       key = studioReferralUserKey();
     }
     if (!key) {
+      console.log('[referral-submit] No user key — not signed in');
       setReferralStatus('Sign in to submit a referral code.', 'error');
       return;
     }
@@ -2783,11 +2820,14 @@
       setReferralStatus('Enter a referral code first.', 'error');
       return;
     }
+    console.log('[referral-submit] Submitting code:', rawCode, '| user key:', key);
+    setReferralStatus('Submitting…', '');
     try {
-      const ownerSnap = await get(ref2(db, 'REFERRAL_CODE_INDEX/' + rawCode));
+      const ownerSnap = await rtdbGet(ref2(db, 'REFERRAL_CODE_INDEX/' + rawCode));
       const idxVal = ownerSnap.exists() ? ownerSnap.val() : null;
       const ownerKey = typeof idxVal === 'string' ? idxVal : (idxVal?.ownerKey || '');
       const isUsed = typeof idxVal === 'object' && idxVal?.used === true;
+      console.log('[referral-submit] Lookup result — ownerKey:', ownerKey, '| used:', isUsed);
       if (!ownerKey) {
         setReferralStatus('Code not found. Ask the artist to share a valid code.', 'error');
         return;
@@ -2801,30 +2841,31 @@
         return;
       }
       const reqPath = 'FEATURE_REFERRAL_REQUESTS/' + ownerKey + '/' + key;
-      const existing = await get(ref2(db, reqPath));
+      const existing = await rtdbGet(ref2(db, reqPath));
       if (existing.exists()) {
         setReferralStatus('You already submitted this artist\'s code.', 'ok');
         return;
       }
       // Mark code as used (one-time only)
-      await set(ref2(db, 'REFERRAL_CODE_INDEX/' + rawCode), { ownerKey, used: true });
+      await rtdbSet(ref2(db, 'REFERRAL_CODE_INDEX/' + rawCode), { ownerKey, used: true });
       // Clear owner's stored code so they get a fresh one next visit
-      await remove(ref2(db, 'REFERRAL_CODES_BY_USER/' + ownerKey));
+      await Promise.race([remove(ref2(db, 'REFERRAL_CODES_BY_USER/' + ownerKey)), new Promise(r => setTimeout(r, 6000))]);
       // Increment the code owner's referral count so their progress bar updates in real-time
-      await update(ref2(db, 'referralCounts/' + ownerKey), { count: increment(1) });
-      await set(ref2(db, reqPath), {
+      await Promise.race([update(ref2(db, 'referralCounts/' + ownerKey), { count: increment(1) }), new Promise(r => setTimeout(r, 6000))]);
+      await rtdbSet(ref2(db, reqPath), {
         fromKey: key,
         ownerKey: ownerKey,
         referralCode: rawCode,
         status: 'featured',
         requestedAt: Date.now()
       });
-      await set(ref2(db, 'FEATURE_REFERRAL_OUTBOX/' + key + '/' + ownerKey), {
+      await rtdbSet(ref2(db, 'FEATURE_REFERRAL_OUTBOX/' + key + '/' + ownerKey), {
         ownerKey: ownerKey,
         referralCode: rawCode,
         requestedAt: Date.now()
       });
       if (input) input.value = '';
+      console.log('[referral-submit] Code submitted successfully');
       setReferralStatus('Code accepted! The artist who shared it will be featured.', 'ok');
       localStorage.setItem('_studioTutorialSubmittedAt', String(Date.now()));
       updateStudioTutorial();
@@ -2847,7 +2888,7 @@
         }
       } catch (e2) {}
     } catch (e) {
-      console.error(e);
+      console.error('[referral-submit] ERROR:', e);
       setReferralStatus('Could not submit code right now. Check connection and try again.', 'error');
     }
   }
