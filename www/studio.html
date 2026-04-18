@@ -2603,24 +2603,33 @@
     const copyCode = document.getElementById('copyCodeBtn');
     const copyMain = document.getElementById('copyBtn');
 
-    const setEnabled = (on) => {
+    const setCodeEnabled = (on) => {
       if (display) display.disabled = !on;
-      if (entry) entry.disabled = !on;
-      if (submit) submit.disabled = !on;
       if (copyCode) copyCode.disabled = !on;
       if (copyMain) copyMain.disabled = !on;
     };
+    const setEntryEnabled = (on) => {
+      if (entry) entry.disabled = !on;
+      if (submit) submit.disabled = !on;
+    };
 
-    // Wait for Firebase auth to settle (with 2s timeout so email-only users aren't blocked)
+    // Wait for Firebase auth to settle (with 4s timeout so slow restores aren't missed)
     try {
       if (typeof auth.authStateReady === 'function') {
-        await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 2000))]);
+        await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 4000))]);
       }
     } catch (e) {}
-    const key = studioReferralUserKey();
+    let key = studioReferralUserKey();
+
+    // Fallback: if auth.currentUser exists but localStorage wasn't synced yet, sync now
+    if (!key && auth.currentUser) {
+      syncAuthUserToLocalStorage(auth.currentUser);
+      key = studioReferralUserKey();
+    }
 
     if (!key) {
-      setEnabled(false);
+      setCodeEnabled(false);
+      setEntryEnabled(false);
       if (display) display.value = '';
       const shareInput = document.getElementById('shareLinkInput');
       if (shareInput) shareInput.value = '';
@@ -2628,7 +2637,9 @@
       return;
     }
 
-    setEnabled(true);
+    // User is signed in — always enable the entry/submit for entering another artist's code
+    setEntryEnabled(true);
+    setCodeEnabled(true);
 
     // Email-only users: skip Firebase RTDB for code generation, use static code
     if (!auth.currentUser && localStorage.getItem('localAuthOnly') === '1') {
@@ -2654,13 +2665,12 @@
     try {
       const code = await ensureStudioReferralCode();
       if (!code) {
-        if (display) display.disabled = true;
-        if (copyCode) copyCode.disabled = true;
-        if (copyMain) copyMain.disabled = true;
+        setCodeEnabled(false);
       }
       setReferralStatus(code ? 'Share your code with another artist — one use only.' : 'Could not prepare code yet.', code ? '' : 'error');
     } catch (e) {
       console.warn('[referral-code]', e);
+      setCodeEnabled(false);
       setReferralStatus('Could not load referral code right now.', 'error');
     }
     updateStudioTutorial();
@@ -2711,10 +2721,15 @@
   async function submitStudioReferralCode() {
     try {
       if (typeof auth.authStateReady === 'function') {
-        await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 2000))]);
+        await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 4000))]);
       }
     } catch (e) {}
-    const key = studioReferralUserKey();
+    let key = studioReferralUserKey();
+    // Fallback: if auth.currentUser exists but localStorage wasn't synced yet
+    if (!key && auth.currentUser) {
+      syncAuthUserToLocalStorage(auth.currentUser);
+      key = studioReferralUserKey();
+    }
     if (!key) {
       setReferralStatus('Sign in to submit a referral code.', 'error');
       return;
