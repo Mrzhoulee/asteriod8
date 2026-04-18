@@ -2191,18 +2191,11 @@
         topBar.style.display = "none";
       }
     }
-    void refreshStudioReferralUi();
+    // NOTE: referral UI is loaded separately via loadReferralCode(), not here.
+    // This function is sync-only — safe to call from anywhere without races.
     updateCampaignVisibility();
   }
   window.applyStudioAuthUI = applyStudioAuthUI;
-
-  function refreshStudioAuthUI() {
-    applyStudioAuthUI();
-    try {
-      requestAnimationFrame(() => applyStudioAuthUI());
-    } catch (e) {}
-    setTimeout(() => applyStudioAuthUI(), 50);
-  }
 
   function studioSessionSignedIn() {
     if (auth.currentUser) return true;
@@ -2225,21 +2218,21 @@
   }
 
   let _authStateKnown = false;
-  let _referralCodeLoaded = false;
-  let _refreshReferralLock = false;
-  let _refreshReferralPending = false;
+  let _referralLoadVersion = 0;   // version counter — newer calls invalidate older ones
+
   onAuthStateChanged(auth, (user) => {
     _authStateKnown = true;
-    _referralCodeLoaded = false; // force re-fetch on auth state change
     syncAuthUserToLocalStorage(user);
     if (user) {
       console.log("[studio] onAuthStateChanged: signed in as", user.email || user.uid);
       void maybeShowAppleOnboarding();
     }
     applyStudioAuthUI();
+    // This is the ONE place that triggers referral code loading.
+    void loadReferralCode();
   });
   if (auth.currentUser) syncAuthUserToLocalStorage(auth.currentUser);
-  refreshStudioAuthUI();
+  applyStudioAuthUI();
 
   // Poll for auth restoration — hides sign-in row as soon as Firebase session is ready
   (function pollAuthReady() {
@@ -2255,15 +2248,12 @@
       }
     }, 500);
   })();
-  window.addEventListener("load", () => {
-    try { refreshStudioAuthUI(); } catch (e) {}
-  });
   window.addEventListener("pageshow", () => {
     try { applyStudioAuthUI(); } catch (e) {}
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
-      try { void refreshStudioReferralUi(); } catch (e) {}
+      try { applyStudioAuthUI(); } catch (e) {}
       try { updateStudioTutorial(); } catch (e) {}
     }
   });
@@ -2602,15 +2592,16 @@
     return code;
   }
 
-  async function refreshStudioReferralUi() {
-    // Prevent concurrent executions — queue a retry if already running
-    if (_refreshReferralLock) {
-      _refreshReferralPending = true;
-      return;
-    }
-    _refreshReferralLock = true;
+  /**
+   * loadReferralCode — the ONLY function that loads/displays the referral code.
+   * Called exclusively from onAuthStateChanged.  Uses a version counter so that
+   * if a newer call starts while an older one is awaiting RTDB, the older one
+   * silently abandons its DOM writes.  No locks needed.
+   */
+  async function loadReferralCode() {
+    const myVersion = ++_referralLoadVersion;
+    const stale = () => myVersion !== _referralLoadVersion;
 
-    try {
     const display = document.getElementById('referralCodeDisplay');
     const entry = document.getElementById('referralCodeEntry');
     const submit = document.getElementById('submitReferralCodeBtn');
@@ -2618,12 +2609,12 @@
     const copyMain = document.getElementById('copyBtn');
     const shareInput = document.getElementById('shareLinkInput');
 
-    function enableAllControls() {
-      if (entry) entry.disabled = false;
-      if (submit) submit.disabled = false;
-      if (copyCode) copyCode.disabled = false;
-      if (copyMain) copyMain.disabled = false;
-      if (display) display.disabled = false;
+    function setAllDisabled(off) {
+      if (display) display.disabled = off;
+      if (entry) entry.disabled = off;
+      if (submit) submit.disabled = off;
+      if (copyCode) copyCode.disabled = off;
+      if (copyMain) copyMain.disabled = off;
     }
 
     // Determine auth key from localStorage OR live auth
@@ -2634,37 +2625,25 @@
     }
 
     if (!key) {
-      // Don't show "sign in" until Firebase has actually determined auth state.
-      // onAuthStateChanged will call applyStudioAuthUI which retriggers this.
-      if (!_authStateKnown) {
-        return;
-      }
-      if (display) { display.disabled = true; display.value = ''; }
-      if (entry) entry.disabled = true;
-      if (submit) submit.disabled = true;
-      if (copyCode) copyCode.disabled = true;
-      if (copyMain) copyMain.disabled = true;
+      if (!_authStateKnown) return;            // auth hasn't resolved yet — wait
+      setAllDisabled(true);
+      if (display) display.value = '';
       if (shareInput) shareInput.value = '';
       setReferralStatus('Sign in to generate your referral code.', '');
       return;
     }
 
-    // User is signed in — enable controls
-    enableAllControls();
+    // User is signed in — enable controls immediately
+    setAllDisabled(false);
 
-    // Skip code generation if already loaded (prevents redundant RTDB calls)
-    if (_referralCodeLoaded && display && display.value) {
-      setReferralStatus('Share your code with another artist — one use only.', '');
-      return;
-    }
-
-    // Email-only users: use static code
+    // Email-only users: use static code (no RTDB write needed)
     if (!auth.currentUser && localStorage.getItem('localAuthOnly') === '1') {
       const staticCode = 'B3Z9LKY2Q7PANFR1XM';
       if (display) display.value = staticCode;
       if (shareInput) shareInput.value = staticCode;
       try {
         const idxSnap = await get(ref2(db, 'REFERRAL_CODE_INDEX/' + staticCode));
+        if (stale()) return;
         if (idxSnap.exists()) {
           const v = idxSnap.val();
           if (typeof v === 'object' && v.used === true) {
@@ -2672,17 +2651,17 @@
           }
         }
       } catch (e) {}
-      _referralCodeLoaded = true;
+      if (stale()) return;
       setReferralStatus('Share your code with another artist — one use only.', '');
       updateStudioTutorial();
       return;
     }
 
+    // Firebase-authenticated user — load/generate code from RTDB
     try {
       const code = await ensureStudioReferralCode();
-      _referralCodeLoaded = !!code;
-      // Re-enable controls after async load to prevent race condition overrides
-      enableAllControls();
+      if (stale()) return;                     // a newer auth event superseded us
+      setAllDisabled(false);                   // re-assert after async gap
       if (!code) {
         if (display) display.disabled = true;
         if (copyCode) copyCode.disabled = true;
@@ -2690,19 +2669,11 @@
       }
       setReferralStatus(code ? 'Share your code with another artist — one use only.' : 'Could not prepare code yet.', code ? '' : 'error');
     } catch (e) {
+      if (stale()) return;
       console.warn('[referral-code]', e);
       setReferralStatus('Could not load referral code right now.', 'error');
     }
     updateStudioTutorial();
-
-    } finally {
-      _refreshReferralLock = false;
-      // If a call was queued while we were running, retry
-      if (_refreshReferralPending) {
-        _refreshReferralPending = false;
-        setTimeout(() => void refreshStudioReferralUi(), 200);
-      }
-    }
   }
 
   function updateStudioTutorial() {
@@ -3030,7 +3001,7 @@
       if (gcdEl) gcdEl.textContent = savedName;
       if (savedName) try { loadUserProgress(savedName); } catch (e) { console.warn("[studio] loadUserProgress:", e); }
   }
-  refreshStudioAuthUI();
+  applyStudioAuthUI();
 
 
   document.addEventListener("DOMContentLoaded", () => {
