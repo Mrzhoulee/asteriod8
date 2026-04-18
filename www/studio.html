@@ -2224,7 +2224,9 @@
     box.style.display = studioSessionSignedIn() ? 'block' : 'none';
   }
 
+  let _authStateKnown = false;
   onAuthStateChanged(auth, (user) => {
+    _authStateKnown = true;
     syncAuthUserToLocalStorage(user);
     if (user) {
       console.log("[studio] onAuthStateChanged: signed in as", user.email || user.uid);
@@ -2596,21 +2598,8 @@
     return code;
   }
 
-  let _referralUiTimer = null;
-  let _referralUiRunning = false;
-  function refreshStudioReferralUi() {
-    // Debounce: wait 300ms after the last call, then run once
-    clearTimeout(_referralUiTimer);
-    _referralUiTimer = setTimeout(() => {
-      if (!_referralUiRunning) _doRefreshReferralUi();
-    }, 300);
-  }
-  async function _doRefreshReferralUi() {
-    _referralUiRunning = true;
-    try { await _refreshReferralUiInner(); } catch (e) { console.warn('[referral-ui]', e); }
-    _referralUiRunning = false;
-  }
-  async function _refreshReferralUiInner() {
+  let _referralCodeLoaded = false;
+  async function refreshStudioReferralUi() {
     const display = document.getElementById('referralCodeDisplay');
     const entry = document.getElementById('referralCodeEntry');
     const submit = document.getElementById('submitReferralCodeBtn');
@@ -2618,23 +2607,19 @@
     const copyMain = document.getElementById('copyBtn');
     const shareInput = document.getElementById('shareLinkInput');
 
-    // Check localStorage first (set by index.html sign-in)
+    // Determine auth key from localStorage OR live auth
     let key = studioReferralUserKey();
-
-    // If no key from localStorage, wait for Firebase auth to finish restoring
-    if (!key) {
-      try {
-        if (typeof auth.authStateReady === 'function') {
-          await auth.authStateReady();
-        }
-      } catch (e) {}
-      if (auth.currentUser) {
-        syncAuthUserToLocalStorage(auth.currentUser);
-      }
+    if (!key && auth.currentUser) {
+      syncAuthUserToLocalStorage(auth.currentUser);
       key = studioReferralUserKey();
     }
 
     if (!key) {
+      // Don't show "sign in" until Firebase has actually determined auth state.
+      // onAuthStateChanged will call applyStudioAuthUI which retriggers this.
+      if (!_authStateKnown) {
+        return;
+      }
       if (display) { display.disabled = true; display.value = ''; }
       if (entry) entry.disabled = true;
       if (submit) submit.disabled = true;
@@ -2645,14 +2630,19 @@
       return;
     }
 
-    // User is signed in — enable all controls immediately
+    // User is signed in — enable controls
     if (entry) entry.disabled = false;
     if (submit) submit.disabled = false;
     if (copyCode) copyCode.disabled = false;
     if (copyMain) copyMain.disabled = false;
     if (display) display.disabled = false;
 
-    // Email-only users: skip Firebase RTDB for code generation, use static code
+    // Skip code generation if already loaded (prevents redundant RTDB calls)
+    if (_referralCodeLoaded && display && display.value) {
+      return;
+    }
+
+    // Email-only users: use static code
     if (!auth.currentUser && localStorage.getItem('localAuthOnly') === '1') {
       const staticCode = 'B3Z9LKY2Q7PANFR1XM';
       if (display) display.value = staticCode;
@@ -2666,6 +2656,7 @@
           }
         }
       } catch (e) {}
+      _referralCodeLoaded = true;
       setReferralStatus('Share your code with another artist — one use only.', '');
       updateStudioTutorial();
       return;
@@ -2673,6 +2664,7 @@
 
     try {
       const code = await ensureStudioReferralCode();
+      _referralCodeLoaded = !!code;
       if (!code) {
         if (display) display.disabled = true;
         if (copyCode) copyCode.disabled = true;
