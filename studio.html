@@ -2596,58 +2596,67 @@
     return code;
   }
 
-  async function refreshStudioReferralUi() {
+  let _referralUiTimer = null;
+  let _referralUiRunning = false;
+  function refreshStudioReferralUi() {
+    // Debounce: wait 300ms after the last call, then run once
+    clearTimeout(_referralUiTimer);
+    _referralUiTimer = setTimeout(() => {
+      if (!_referralUiRunning) _doRefreshReferralUi();
+    }, 300);
+  }
+  async function _doRefreshReferralUi() {
+    _referralUiRunning = true;
+    try { await _refreshReferralUiInner(); } catch (e) { console.warn('[referral-ui]', e); }
+    _referralUiRunning = false;
+  }
+  async function _refreshReferralUiInner() {
     const display = document.getElementById('referralCodeDisplay');
     const entry = document.getElementById('referralCodeEntry');
     const submit = document.getElementById('submitReferralCodeBtn');
     const copyCode = document.getElementById('copyCodeBtn');
     const copyMain = document.getElementById('copyBtn');
+    const shareInput = document.getElementById('shareLinkInput');
 
-    const setCodeEnabled = (on) => {
-      if (display) display.disabled = !on;
-      if (copyCode) copyCode.disabled = !on;
-      if (copyMain) copyMain.disabled = !on;
-    };
-    const setEntryEnabled = (on) => {
-      if (entry) entry.disabled = !on;
-      if (submit) submit.disabled = !on;
-    };
-
-    // Wait for Firebase auth to settle (with 4s timeout so slow restores aren't missed)
-    try {
-      if (typeof auth.authStateReady === 'function') {
-        await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 4000))]);
-      }
-    } catch (e) {}
+    // Check localStorage first (set by index.html sign-in)
     let key = studioReferralUserKey();
 
-    // Fallback: if auth.currentUser exists but localStorage wasn't synced yet, sync now
-    if (!key && auth.currentUser) {
-      syncAuthUserToLocalStorage(auth.currentUser);
+    // If no key from localStorage, wait for Firebase auth to finish restoring
+    if (!key) {
+      try {
+        if (typeof auth.authStateReady === 'function') {
+          await auth.authStateReady();
+        }
+      } catch (e) {}
+      if (auth.currentUser) {
+        syncAuthUserToLocalStorage(auth.currentUser);
+      }
       key = studioReferralUserKey();
     }
 
     if (!key) {
-      setCodeEnabled(false);
-      setEntryEnabled(false);
-      if (display) display.value = '';
-      const shareInput = document.getElementById('shareLinkInput');
+      if (display) { display.disabled = true; display.value = ''; }
+      if (entry) entry.disabled = true;
+      if (submit) submit.disabled = true;
+      if (copyCode) copyCode.disabled = true;
+      if (copyMain) copyMain.disabled = true;
       if (shareInput) shareInput.value = '';
       setReferralStatus('Sign in to generate your referral code.', '');
       return;
     }
 
-    // User is signed in — always enable the entry/submit for entering another artist's code
-    setEntryEnabled(true);
-    setCodeEnabled(true);
+    // User is signed in — enable all controls immediately
+    if (entry) entry.disabled = false;
+    if (submit) submit.disabled = false;
+    if (copyCode) copyCode.disabled = false;
+    if (copyMain) copyMain.disabled = false;
+    if (display) display.disabled = false;
 
     // Email-only users: skip Firebase RTDB for code generation, use static code
     if (!auth.currentUser && localStorage.getItem('localAuthOnly') === '1') {
       const staticCode = 'B3Z9LKY2Q7PANFR1XM';
       if (display) display.value = staticCode;
-      const shareInput = document.getElementById('shareLinkInput');
       if (shareInput) shareInput.value = staticCode;
-      // Check if another user has used this code
       try {
         const idxSnap = await get(ref2(db, 'REFERRAL_CODE_INDEX/' + staticCode));
         if (idxSnap.exists()) {
@@ -2665,12 +2674,16 @@
     try {
       const code = await ensureStudioReferralCode();
       if (!code) {
-        setCodeEnabled(false);
+        if (display) display.disabled = true;
+        if (copyCode) copyCode.disabled = true;
+        if (copyMain) copyMain.disabled = true;
       }
       setReferralStatus(code ? 'Share your code with another artist — one use only.' : 'Could not prepare code yet.', code ? '' : 'error');
     } catch (e) {
       console.warn('[referral-code]', e);
-      setCodeEnabled(false);
+      if (display) display.disabled = true;
+      if (copyCode) copyCode.disabled = true;
+      if (copyMain) copyMain.disabled = true;
       setReferralStatus('Could not load referral code right now.', 'error');
     }
     updateStudioTutorial();
