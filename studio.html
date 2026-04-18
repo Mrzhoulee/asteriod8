@@ -2703,35 +2703,18 @@
       setReferralStatus(code ? 'Share your code with another artist — one use only.' : 'Could not prepare code yet.', code ? '' : 'error');
     } catch (e) {
       if (stale()) return;
-      console.warn('[referral-code] RTDB failed or timed out:', e.message || e, '— using local fallback');
-      // Fallback: per-user local code keyed by identity
-      const localKey = '_localReferralCode_' + key;
-      let localCode = localStorage.getItem(localKey);
-      if (!localCode) {
-        localCode = generateUsernameReferralCode(studioReferralDisplayName());
-        localStorage.setItem(localKey, localCode);
-        console.log('[referral-code] Generated local fallback code for', key, ':', localCode);
+      console.warn('[referral-code] RTDB failed or timed out:', e.message || e);
+      if (!auth.currentUser) {
+        // Firebase session expired — show sign-in prompt
+        console.warn('[referral-code] No Firebase auth session — user needs to re-sign in');
+        if (display) { display.value = ''; display.placeholder = 'Sign in again to get your code'; }
+        if (shareInput) { shareInput.value = ''; shareInput.placeholder = 'Sign in again to get your code'; }
+        setReferralStatus('Session expired — please sign in again below.', 'error');
+        // Show the sign-in row
+        var row = document.getElementById('studioSignInRow');
+        if (row) { row.classList.remove('studio-signin-row--hidden'); row.style.display = ''; row.removeAttribute('aria-hidden'); }
       } else {
-        console.log('[referral-code] Using cached local fallback code for', key, ':', localCode);
-      }
-      if (display) { display.value = localCode; display.disabled = false; }
-      if (shareInput) shareInput.value = localCode;
-      if (copyCode) copyCode.disabled = false;
-      if (copyMain) copyMain.disabled = false;
-      setReferralStatus('Share your code with another artist — one use only.', '');
-      // Try to register the local code in RTDB in the background so others can submit it
-      try {
-        const regTimeout = new Promise((_, rej) => setTimeout(() => rej(new Error('register timeout')), 5000));
-        await Promise.race([
-          Promise.all([
-            set(ref2(db, 'REFERRAL_CODES_BY_USER/' + key), { code: localCode, ownerKey: key, createdAt: Date.now(), codeSource: 'local-fallback' }),
-            set(ref2(db, 'REFERRAL_CODE_INDEX/' + localCode), { ownerKey: key, used: false }),
-          ]),
-          regTimeout,
-        ]);
-        console.log('[referral-code] Local fallback code registered in RTDB');
-      } catch (regErr) {
-        console.warn('[referral-code] Could not register local code in RTDB:', regErr.message || regErr);
+        setReferralStatus('Could not load referral code right now.', 'error');
       }
     }
     updateStudioTutorial();
@@ -2889,7 +2872,15 @@
       } catch (e2) {}
     } catch (e) {
       console.error('[referral-submit] ERROR:', e);
-      setReferralStatus('Could not submit code right now. Check connection and try again.', 'error');
+      if (!auth.currentUser) {
+        console.warn('[referral-submit] No Firebase auth session — user needs to re-sign in');
+        setReferralStatus('Session expired — please sign in again to submit a code.', 'error');
+        // Show the sign-in row so user can re-authenticate
+        var row = document.getElementById('studioSignInRow');
+        if (row) { row.classList.remove('studio-signin-row--hidden'); row.style.display = ''; row.removeAttribute('aria-hidden'); }
+      } else {
+        setReferralStatus('Could not submit code right now. Check connection and try again.', 'error');
+      }
     }
   }
 
