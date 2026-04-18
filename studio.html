@@ -784,12 +784,12 @@
       <div id="unlockMsg">✅ UNLOCKED: 3-Month Feature Active!</div>
       
       <p style="font-size: 0.9em;">Your Referral Code:</p>
-      <input type="text" id="shareLinkInput" readonly placeholder="Sign in to generate code...">
+      <input type="text" id="shareLinkInput" readonly placeholder="Loading your code...">
       <button id="copyBtn" class="upload-btn" style="width: 80px; height: 35px; font-size: 12px;">COPY</button>
 
       <div class="referral-code-panel">
         <p class="referral-code-title">Share your code — one use only</p>
-        <input type="text" id="referralCodeDisplay" readonly placeholder="Sign in to generate your code">
+        <input type="text" id="referralCodeDisplay" readonly placeholder="Loading your code...">
         <button id="copyCodeBtn" class="upload-btn" style="width: 110px; height: 35px; font-size: 12px;">COPY CODE</button>
         <input type="text" id="referralCodeEntry" placeholder="Enter another artist's referral code" autocomplete="off">
         <button id="submitReferralCodeBtn" class="upload-btn" style="width: 180px; height: 35px; font-size: 12px;">SUBMIT CODE</button>
@@ -2228,7 +2228,7 @@
       void maybeShowAppleOnboarding();
     }
     applyStudioAuthUI();
-    // This is the ONE place that triggers referral code loading.
+    // Primary trigger for referral code loading (also retried by pollAuthReady/authStateReady).
     void loadReferralCode();
   });
   if (auth.currentUser) syncAuthUserToLocalStorage(auth.currentUser);
@@ -2242,6 +2242,7 @@
       if (auth.currentUser) {
         syncAuthUserToLocalStorage(auth.currentUser);
         applyStudioAuthUI();
+        void loadReferralCode();
         clearInterval(iv);
       } else if (checks > 30) {
         clearInterval(iv);
@@ -2250,10 +2251,12 @@
   })();
   window.addEventListener("pageshow", () => {
     try { applyStudioAuthUI(); } catch (e) {}
+    try { void loadReferralCode(); } catch (e) {}
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
       try { applyStudioAuthUI(); } catch (e) {}
+      try { void loadReferralCode(); } catch (e) {}
       try { updateStudioTutorial(); } catch (e) {}
     }
   });
@@ -2264,6 +2267,7 @@
         syncAuthUserToLocalStorage(auth.currentUser);
         if (auth.currentUser) void maybeShowAppleOnboarding();
         applyStudioAuthUI();
+        void loadReferralCode();
       } catch (e) {}
     });
   }
@@ -2594,13 +2598,25 @@
 
   /**
    * loadReferralCode — the ONLY function that loads/displays the referral code.
-   * Called exclusively from onAuthStateChanged.  Uses a version counter so that
-   * if a newer call starts while an older one is awaiting RTDB, the older one
-   * silently abandons its DOM writes.  No locks needed.
+   * Called from onAuthStateChanged, authStateReady, pollAuthReady, pageshow,
+   * and visibilitychange.  Uses a version counter so that if a newer call starts
+   * while an older one is awaiting RTDB, the older one silently abandons its
+   * DOM writes.  No locks needed.
    */
   async function loadReferralCode() {
     const myVersion = ++_referralLoadVersion;
     const stale = () => myVersion !== _referralLoadVersion;
+
+    console.log('[referral-code] loadReferralCode() called — version', myVersion,
+      '| auth.currentUser:', !!auth.currentUser,
+      '| _authStateKnown:', _authStateKnown,
+      '| localStorage keys:', {
+        emailKey: localStorage.getItem('emailKey'),
+        CurrentUser: localStorage.getItem('CurrentUser'),
+        email: localStorage.getItem('email'),
+        localAuthOnly: localStorage.getItem('localAuthOnly'),
+        asteroidSignedInBefore: localStorage.getItem('asteroidSignedInBefore'),
+      });
 
     const display = document.getElementById('referralCodeDisplay');
     const entry = document.getElementById('referralCodeEntry');
@@ -2625,19 +2641,28 @@
     }
 
     if (!key) {
-      if (!_authStateKnown) return;            // auth hasn't resolved yet — wait
+      if (!_authStateKnown) {
+        console.log('[referral-code] No key and auth not yet known — waiting');
+        return;
+      }
+      console.log('[referral-code] No key found — user is NOT signed in');
       setAllDisabled(true);
-      if (display) display.value = '';
-      if (shareInput) shareInput.value = '';
+      if (display) { display.value = ''; display.placeholder = 'Sign in to generate your code'; }
+      if (shareInput) { shareInput.value = ''; shareInput.placeholder = 'Sign in to generate code...'; }
       setReferralStatus('Sign in to generate your referral code.', '');
       return;
     }
 
-    // User is signed in — enable controls immediately
+    console.log('[referral-code] User key resolved:', key);
+
+    // User is signed in — update placeholders & enable controls immediately
+    if (display) display.placeholder = 'Loading your code...';
+    if (shareInput) shareInput.placeholder = 'Loading your code...';
     setAllDisabled(false);
 
     // Email-only users: use static code (no RTDB write needed)
     if (!auth.currentUser && localStorage.getItem('localAuthOnly') === '1') {
+      console.log('[referral-code] localAuthOnly path — using static code');
       const staticCode = 'B3Z9LKY2Q7PANFR1XM';
       if (display) display.value = staticCode;
       if (shareInput) shareInput.value = staticCode;
@@ -2657,20 +2682,31 @@
       return;
     }
 
+    // If auth.currentUser is not yet available, wait for Firebase to restore session
+    if (!auth.currentUser) {
+      console.log('[referral-code] Have localStorage key but auth.currentUser is null — waiting for session restore');
+      setReferralStatus('Restoring session…', '');
+      return;  // will be retried by authStateReady / pollAuthReady
+    }
+
     // Firebase-authenticated user — load/generate code from RTDB
+    console.log('[referral-code] Firebase user confirmed — loading code from RTDB for', auth.currentUser.email || auth.currentUser.uid);
     try {
       const code = await ensureStudioReferralCode();
-      if (stale()) return;                     // a newer auth event superseded us
+      if (stale()) { console.log('[referral-code] Version', myVersion, 'is stale after ensureStudioReferralCode — aborting'); return; }
       setAllDisabled(false);                   // re-assert after async gap
       if (!code) {
+        console.warn('[referral-code] ensureStudioReferralCode returned empty — no code generated');
         if (display) display.disabled = true;
         if (copyCode) copyCode.disabled = true;
         if (copyMain) copyMain.disabled = true;
+      } else {
+        console.log('[referral-code] Code loaded successfully:', code);
       }
       setReferralStatus(code ? 'Share your code with another artist — one use only.' : 'Could not prepare code yet.', code ? '' : 'error');
     } catch (e) {
       if (stale()) return;
-      console.warn('[referral-code]', e);
+      console.error('[referral-code] ERROR loading referral code:', e);
       setReferralStatus('Could not load referral code right now.', 'error');
     }
     updateStudioTutorial();
