@@ -2682,15 +2682,8 @@
       return;
     }
 
-    // If auth.currentUser is not yet available, wait for Firebase to restore session
-    if (!auth.currentUser) {
-      console.log('[referral-code] Have localStorage key but auth.currentUser is null — waiting for session restore');
-      setReferralStatus('Restoring session…', '');
-      return;  // will be retried by authStateReady / pollAuthReady
-    }
-
-    // Firebase-authenticated user — load/generate code from RTDB
-    console.log('[referral-code] Firebase user confirmed — loading code from RTDB for', auth.currentUser.email || auth.currentUser.uid);
+    // Load/generate code from RTDB (works with or without auth.currentUser)
+    console.log('[referral-code] Loading code from RTDB — auth.currentUser:', !!auth.currentUser, '| key:', key);
     try {
       const code = await ensureStudioReferralCode();
       if (stale()) { console.log('[referral-code] Version', myVersion, 'is stale after ensureStudioReferralCode — aborting'); return; }
