@@ -919,7 +919,7 @@
 
   <form id="uploadForm">
     <h2>Upload Your Media</h2>
-  <div id="studioSignInRow" class="sign-in-row studio-account-wrap" style="margin-top: 6px; margin-bottom: 12px;">
+  <div id="studioSignInRow" class="sign-in-row studio-account-wrap" style="margin-top: 6px; margin-bottom: 12px; display: none;">
     <div class="studio-account-card">
       <p class="studio-account-lead">Sign in with the same account as the home page. After Apple or email login, you can finish your profile here — same form as on Asteroid Music home.</p>
       <div class="header-sign-in-group" aria-label="Sign in options">
@@ -1018,11 +1018,15 @@
         if (signedIn) {
           if (row) {
             row.classList.add("studio-signin-row--hidden");
-            row.style.display = "none";
             row.setAttribute("aria-hidden", "true");
           }
           if (bar) bar.classList.add("studio-topbar--visible");
           if (campaign) campaign.style.display = "block";
+        } else {
+          if (row) {
+            row.style.display = "";
+            row.classList.remove("studio-signin-row--hidden");
+          }
         }
       } catch (e) {}
     })();
