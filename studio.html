@@ -2377,11 +2377,12 @@
               console.error("Apple sign-in:", err?.code || err);
               const code = err && err.code ? String(err.code) : "";
               if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
-                alert("Your browser blocked the Apple sign-in popup. Please allow popups for this site and try again.");
+                console.log("[studio] Popup blocked, falling back to redirect");
+                try { await signInWithRedirect(auth, appleProvider); } catch (e) { console.error("[studio] redirect fallback:", e); }
               } else if (code === "auth/operation-not-allowed") {
                 alert("Sign in with Apple is not enabled in Firebase yet.\n\nFirebase Console → Authentication → Sign-in method → Apple → Enable.");
               } else if (err) {
-                alert("Apple sign-in failed: " + (err.message || code) + "\n\nMake sure popups are allowed for this site.");
+                alert("Apple sign-in failed: " + (err.message || code));
               }
             });
         };
@@ -2410,11 +2411,12 @@
           console.error("Apple sign-in:", err?.code || err);
           const code = err && err.code ? String(err.code) : "";
           if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
-            alert("Your browser blocked the Apple sign-in popup. Please allow popups for this site and try again.");
+            console.log("[studio] Popup blocked, falling back to redirect");
+            try { await signInWithRedirect(auth, appleProvider); } catch (e) { console.error("[studio] redirect fallback:", e); }
           } else if (code === "auth/operation-not-allowed") {
             alert("Sign in with Apple is not enabled in Firebase yet.\n\nFirebase Console → Authentication → Sign-in method → Apple → Enable.");
           } else if (err) {
-            alert("Apple sign-in failed: " + (err.message || code) + "\n\nMake sure popups are allowed for this site.");
+            alert("Apple sign-in failed: " + (err.message || code));
           }
         });
     });
