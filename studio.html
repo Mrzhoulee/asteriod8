@@ -2226,8 +2226,11 @@
 
   let _authStateKnown = false;
   let _referralCodeLoaded = false;
+  let _refreshReferralLock = false;
+  let _refreshReferralPending = false;
   onAuthStateChanged(auth, (user) => {
     _authStateKnown = true;
+    _referralCodeLoaded = false; // force re-fetch on auth state change
     syncAuthUserToLocalStorage(user);
     if (user) {
       console.log("[studio] onAuthStateChanged: signed in as", user.email || user.uid);
@@ -2600,12 +2603,28 @@
   }
 
   async function refreshStudioReferralUi() {
+    // Prevent concurrent executions — queue a retry if already running
+    if (_refreshReferralLock) {
+      _refreshReferralPending = true;
+      return;
+    }
+    _refreshReferralLock = true;
+
+    try {
     const display = document.getElementById('referralCodeDisplay');
     const entry = document.getElementById('referralCodeEntry');
     const submit = document.getElementById('submitReferralCodeBtn');
     const copyCode = document.getElementById('copyCodeBtn');
     const copyMain = document.getElementById('copyBtn');
     const shareInput = document.getElementById('shareLinkInput');
+
+    function enableAllControls() {
+      if (entry) entry.disabled = false;
+      if (submit) submit.disabled = false;
+      if (copyCode) copyCode.disabled = false;
+      if (copyMain) copyMain.disabled = false;
+      if (display) display.disabled = false;
+    }
 
     // Determine auth key from localStorage OR live auth
     let key = studioReferralUserKey();
@@ -2631,14 +2650,11 @@
     }
 
     // User is signed in — enable controls
-    if (entry) entry.disabled = false;
-    if (submit) submit.disabled = false;
-    if (copyCode) copyCode.disabled = false;
-    if (copyMain) copyMain.disabled = false;
-    if (display) display.disabled = false;
+    enableAllControls();
 
     // Skip code generation if already loaded (prevents redundant RTDB calls)
     if (_referralCodeLoaded && display && display.value) {
+      setReferralStatus('Share your code with another artist — one use only.', '');
       return;
     }
 
@@ -2665,6 +2681,8 @@
     try {
       const code = await ensureStudioReferralCode();
       _referralCodeLoaded = !!code;
+      // Re-enable controls after async load to prevent race condition overrides
+      enableAllControls();
       if (!code) {
         if (display) display.disabled = true;
         if (copyCode) copyCode.disabled = true;
@@ -2673,12 +2691,18 @@
       setReferralStatus(code ? 'Share your code with another artist — one use only.' : 'Could not prepare code yet.', code ? '' : 'error');
     } catch (e) {
       console.warn('[referral-code]', e);
-      if (display) display.disabled = true;
-      if (copyCode) copyCode.disabled = true;
-      if (copyMain) copyMain.disabled = true;
       setReferralStatus('Could not load referral code right now.', 'error');
     }
     updateStudioTutorial();
+
+    } finally {
+      _refreshReferralLock = false;
+      // If a call was queued while we were running, retry
+      if (_refreshReferralPending) {
+        _refreshReferralPending = false;
+        setTimeout(() => void refreshStudioReferralUi(), 200);
+      }
+    }
   }
 
   function updateStudioTutorial() {
@@ -2990,7 +3014,12 @@
   });
 
   document.getElementById("submitReferralCodeBtn")?.addEventListener("click", async () => {
-    await submitStudioReferralCode();
+    try {
+      await submitStudioReferralCode();
+    } catch (e) {
+      console.error('[referral-submit]', e);
+      setReferralStatus('Could not submit code right now. Check connection and try again.', 'error');
+    }
   });
 
   if(localStorage.getItem("fullName") || localStorage.getItem("email")) {
