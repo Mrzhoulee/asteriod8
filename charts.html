@@ -1,161 +1,482 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asteroid Charts – Top VIP Artists</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Charts · Asteroid</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <style>
-    :root {
-      --coral: #ff7f50;
-      --coral-dark: #ff6347;
-      --bg-dark: #0a0a0f;
-      --card-bg: #1a1a22;
-      --text: #ffffff;
-      --text-muted: rgba(255,255,255,0.7);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --coral: #ff7f50; --coral-dark: #e66a3a; --bg: #060606; --card: #101010; }
+    * { box-sizing: border-box; }
     body {
-      font-family: 'Montserrat', sans-serif;
-      background: var(--bg-dark);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 1.5rem;
+      margin: 0;
+      background: var(--bg);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      padding: 0 0 calc(100px + env(safe-area-inset-bottom, 0px));
     }
-    .container {
-      max-width: 640px;
-      margin: 0 auto;
+    .page-head {
+      padding: 28px 20px 18px;
+      position: sticky; top: 0; z-index: 10;
+      background: linear-gradient(180deg, rgba(6,6,6,0.95), rgba(6,6,6,0.85));
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,127,80,0.15);
+      display: flex; align-items: center; gap: 14px;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 1.5rem;
+    .page-head a.back {
+      color: #fff; text-decoration: none; display: flex; align-items: center;
+      gap: 4px; font-size: 13px; padding: 6px 10px; border-radius: 10px;
+      background: rgba(255,255,255,0.05); transition: background 0.2s;
+    }
+    .page-head a.back:hover { background: rgba(255,255,255,0.1); }
+    .page-head h1 {
+      margin: 0; font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 800;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .page-head h1 .material-symbols-outlined { color: var(--coral); font-size: 30px; }
+    .tabs {
+      display: flex; gap: 8px; padding: 14px 20px; overflow-x: auto;
+      scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      white-space: nowrap; padding: 9px 18px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.12);
+      background: transparent; color: rgba(255,255,255,0.75); font-weight: 600; font-size: 13px;
+      cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s;
+    }
+    .tab-btn:hover { border-color: rgba(255,127,80,0.45); color: #fff; }
+    .tab-btn.active {
       background: linear-gradient(135deg, var(--coral), var(--coral-dark));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-size: 1.75rem;
+      border-color: transparent; color: #fff;
     }
-    .subtitle {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 2rem;
+    section.panel { padding: 8px 20px 24px; display: none; }
+    section.panel.active { display: block; }
+    .section-title {
+      font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 700;
+      margin: 18px 0 4px; display: flex; align-items: center; gap: 8px;
     }
-    .chart-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+    .section-subtitle {
+      font-size: 12px; color: rgba(255,255,255,0.55); margin: 0 0 16px;
     }
-    .chart-item {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
-      border: 1px solid rgba(255,255,255,0.08);
+    .trending-list { display: flex; flex-direction: column; gap: 10px; }
+    .trending-row {
+      display: grid; grid-template-columns: 32px 44px 1fr auto; gap: 12px; align-items: center;
+      background: var(--card); border-radius: 14px; padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,0.04); transition: border-color 0.2s, transform 0.2s;
     }
-    .chart-rank {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+    .trending-row:hover { border-color: rgba(255,127,80,0.3); transform: translateX(2px); }
+    .trending-rank {
+      font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 18px;
+      color: var(--coral); text-align: center;
+    }
+    .trending-rank.top3 { color: #fff; background: linear-gradient(135deg, var(--coral), var(--coral-dark)); border-radius: 8px; padding: 4px 0; }
+    .trending-art {
+      width: 44px; height: 44px; border-radius: 10px; background: #1a1a1a;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Montserrat', sans-serif; font-weight: 800; color: var(--coral);
+      overflow: hidden; flex-shrink: 0;
+    }
+    .trending-art img { width: 100%; height: 100%; object-fit: cover; }
+    .trending-meta { min-width: 0; }
+    .trending-title {
+      font-weight: 600; font-size: 14px; color: #fff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .trending-artist {
+      font-size: 12px; color: rgba(255,255,255,0.6);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .trending-plays {
+      font-size: 11px; color: rgba(255,127,80,0.85); font-weight: 600;
+      padding: 4px 10px; border-radius: 999px; background: rgba(255,127,80,0.08);
+    }
+    .play-btn {
+      background: transparent; border: none; color: var(--coral); cursor: pointer;
+      padding: 6px; border-radius: 999px; transition: background 0.2s;
+    }
+    .play-btn:hover { background: rgba(255,127,80,0.15); }
+    .play-btn .material-symbols-outlined { font-size: 28px; }
+    .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .chip {
+      padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.12);
+      background: transparent; color: rgba(255,255,255,0.75); font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; font-family: 'Poppins', sans-serif;
+    }
+    .chip:hover { border-color: rgba(255,127,80,0.4); color: #fff; }
+    .chip.active {
       background: linear-gradient(135deg, var(--coral), var(--coral-dark));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1rem;
+      border-color: transparent; color: #fff;
     }
-    .chart-rank.gold { background: linear-gradient(135deg, #ffd700, #ffb700); }
-    .chart-rank.silver { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); }
-    .chart-rank.bronze { background: linear-gradient(135deg, #cd7f32, #b87333); }
-    .chart-info {
-      flex: 1;
+    .discover-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;
     }
-    .chart-name {
-      font-weight: 600;
-      font-size: 1.05rem;
+    .discover-card {
+      background: var(--card); border-radius: 14px; padding: 14px;
+      border: 1px solid rgba(255,255,255,0.04);
+      display: flex; gap: 12px; align-items: center;
     }
-    .chart-refs {
-      font-size: 0.85rem;
-      color: var(--coral);
+    .discover-card .title { font-weight: 600; font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .discover-card .sub { font-size: 12px; color: rgba(255,255,255,0.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .state-msg {
+      padding: 34px 20px; text-align: center; color: rgba(255,255,255,0.55);
+      font-size: 13px;
     }
-    .empty-state {
-      text-align: center;
-      padding: 3rem;
-      color: var(--text-muted);
+    .vip-rank {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--coral), var(--coral-dark));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 15px; flex-shrink: 0;
     }
-    .empty-state i {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      opacity: 0.5;
+    .vip-rank.gold { background: linear-gradient(135deg, #ffd700, #ffb700); color: #222; }
+    .vip-rank.silver { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #222; }
+    .vip-rank.bronze { background: linear-gradient(135deg, #cd7f32, #b87333); }
+    .vip-row {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--card); border-radius: 14px; padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,0.04); margin-bottom: 10px;
     }
-    .link-row {
-      margin-top: 1.5rem;
-      text-align: center;
+    .mobile-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; width: 100%;
+      z-index: 99999; background: #0a0a0a;
+      border-top: 1px solid rgba(255,127,80,0.25);
+      padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+      display: flex; justify-content: space-around; align-items: center;
     }
-    .link-row a {
-      color: var(--coral);
-      text-decoration: none;
+    .mobile-nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      text-decoration: none; color: rgba(255,255,255,0.5);
+      font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 500;
+      padding: 4px 12px; border-radius: 10px; transition: color 0.2s, background 0.2s;
     }
+    .mobile-nav-item .material-symbols-outlined { font-size: 24px; }
+    .mobile-nav-item.mobile-nav-active,
+    .mobile-nav-item:hover { color: var(--coral); }
+    .mobile-nav-item.mobile-nav-active { background: rgba(255,127,80,0.1); }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1><i class="fas fa-trophy"></i> Asteroid Charts</h1>
-    <p class="subtitle">Top VIP artists by referrals</p>
+  <header class="page-head">
+    <a href="index.html" class="back" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+    <h1><span class="material-symbols-outlined">leaderboard</span> Charts</h1>
+  </header>
 
-    <div id="chartList" class="chart-list"></div>
-    <div id="emptyState" class="empty-state" style="display:none;">
-      <i class="fas fa-music"></i>
-      <p>No VIP artists yet. Be the first to climb the charts!</p>
-    </div>
-
-    <div class="link-row">
-      <a href="vip-dashboard.html"><i class="fas fa-crown"></i> VIP Dashboard</a> &nbsp;|&nbsp;
-      <a href="index.html"><i class="fas fa-home"></i> Home</a>
-    </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="trending">Trending</button>
+    <button class="tab-btn" data-tab="mood">Mood</button>
+    <button class="tab-btn" data-tab="genre">Genre</button>
+    <button class="tab-btn" data-tab="vip">Top VIP</button>
   </div>
 
+  <section id="panel-trending" class="panel active">
+    <h2 class="section-title"><span class="material-symbols-outlined" style="color:var(--coral);">trending_up</span>Trending Songs of the Month</h2>
+    <p class="section-subtitle">Top songs by plays this month</p>
+    <div id="trendingList" class="trending-list">
+      <div class="state-msg">Loading trending…</div>
+    </div>
+  </section>
+
+  <section id="panel-mood" class="panel">
+    <h2 class="section-title"><span class="material-symbols-outlined" style="color:var(--coral);">mood</span>Discover by Mood</h2>
+    <p class="section-subtitle">Mapped from title energy cues</p>
+    <div id="moodChips" class="chip-wrap"></div>
+    <div id="moodList" class="discover-grid">
+      <div class="state-msg">Loading songs…</div>
+    </div>
+  </section>
+
+  <section id="panel-genre" class="panel">
+    <h2 class="section-title"><span class="material-symbols-outlined" style="color:var(--coral);">library_music</span>Discover by Genre</h2>
+    <p class="section-subtitle">Grouped from title, album and artist text</p>
+    <div id="genreChips" class="chip-wrap"></div>
+    <div id="genreList" class="discover-grid">
+      <div class="state-msg">Loading songs…</div>
+    </div>
+  </section>
+
+  <section id="panel-vip" class="panel">
+    <h2 class="section-title"><span class="material-symbols-outlined" style="color:var(--coral);">military_tech</span>Top VIP Artists</h2>
+    <p class="section-subtitle">Ranked by referrals</p>
+    <div id="vipList"><div class="state-msg">Loading VIP artists…</div></div>
+  </section>
+
+  <nav class="mobile-nav">
+    <a href="index.html" class="mobile-nav-item"><span class="material-symbols-outlined">home</span><span>Home</span></a>
+    <a href="lively.html" class="mobile-nav-item"><span class="material-symbols-outlined">mic</span><span>Concerts</span></a>
+    <a href="studio.html" class="mobile-nav-item"><span class="material-symbols-outlined">upload</span><span>Upload</span></a>
+    <a href="pat.html" class="mobile-nav-item"><span class="material-symbols-outlined">queue_music</span><span>Playlist</span></a>
+    <a href="charts.html" class="mobile-nav-item mobile-nav-active"><span class="material-symbols-outlined">leaderboard</span><span>Charts</span></a>
+  </nav>
+
   <script type="module">
-    import { subscribeToTopVipArtists } from "./js/referral-system.js";
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
-    const chartList = document.getElementById("chartList");
-    const emptyState = document.getElementById("emptyState");
+    const firebaseConfig = {
+      apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+      authDomain: "asteroid-cdc13.firebaseapp.com",
+      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+      projectId: "asteroid-cdc13",
+      storageBucket: "asteroid-cdc13.appspot.com",
+      messagingSenderId: "793353824502",
+      appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+      measurementId: "G-GV72TMNNGR"
+    };
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    subscribeToTopVipArtists(50, (artists) => {
-      if (!artists || artists.length === 0) {
-        chartList.innerHTML = "";
-        emptyState.style.display = "block";
-        return;
-      }
-
-      emptyState.style.display = "none";
-      chartList.innerHTML = artists.map((a, i) => {
-        const rank = i + 1;
-        let rankClass = "";
-        if (rank === 1) rankClass = "gold";
-        else if (rank === 2) rankClass = "silver";
-        else if (rank === 3) rankClass = "bronze";
-
-        return `
-          <div class="chart-item">
-            <div class="chart-rank ${rankClass}">${rank}</div>
-            <div class="chart-info">
-              <div class="chart-name">${escapeHtml(a.username || "Artist")}</div>
-              <div class="chart-refs">${a.referralCount || 0} referral${(a.referralCount || 0) !== 1 ? "s" : ""}</div>
-            </div>
-          </div>
-        `;
-      }).join("");
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const panel = document.getElementById('panel-' + btn.dataset.tab);
+        if (panel) panel.classList.add('active');
+        if (btn.dataset.tab === 'vip' && !vipLoaded) loadVip();
+      });
     });
 
-    function escapeHtml(text) {
-      const div = document.createElement("div");
-      div.textContent = text;
-      return div.innerHTML;
+    function songMoodFromTitle(title) {
+      const t = String(title || '').toLowerCase();
+      if (/love|romance|heart|kiss|baby/.test(t)) return 'Romantic';
+      if (/sad|cry|alone|miss|lost|pain|hurt|tears/.test(t)) return 'Sad';
+      if (/party|dance|club|hype|vibe|fire|lit/.test(t)) return 'Hype';
+      if (/chill|slow|night|moon|dream|soft|calm|quiet/.test(t)) return 'Chill';
+      if (/hope|rise|shine|bright|sun|free|fly/.test(t)) return 'Uplifting';
+      return 'Everyday';
     }
+    function songGenreGuess(song) {
+      const combined = [song.title, song.album, song.artist, song.genre, song.genres, song.style]
+        .filter(Boolean).join(' ').toLowerCase();
+      const rules = {
+        'Hip-Hop': /hip.?hop|rap|trap|drill/,
+        'R&B / Soul': /r&b|rnb|soul|neo.?soul/,
+        'Pop': /\bpop\b/,
+        'EDM': /edm|house|techno|dubstep|drum.?bass|dnb|electro/,
+        'Rock': /rock|metal|punk|indie.rock|alt.rock/,
+        'Lo-Fi': /lo.?fi|lofi|chillhop/,
+        'Jazz': /jazz|blues/,
+        'Country': /country|folk|americana/,
+        'Afro / Latin': /afro|latin|reggaeton|reggae|dancehall|amapiano/
+      };
+      for (const name in rules) if (rules[name].test(combined)) return name;
+      return 'Alternative';
+    }
+
+    function escHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s == null ? '' : String(s);
+      return d.innerHTML;
+    }
+
+    let currentAudio = null;
+    let currentBtn = null;
+    function playTrack(url, btn) {
+      if (!url) return;
+      if (currentAudio) {
+        try { currentAudio.pause(); } catch (e) {}
+        if (currentBtn) {
+          const oi = currentBtn.querySelector('.material-symbols-outlined');
+          if (oi) oi.textContent = 'play_circle';
+        }
+      }
+      const a = new Audio(url);
+      a.play().catch(() => {});
+      currentAudio = a;
+      currentBtn = btn;
+      if (btn) {
+        const icon = btn.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = 'pause_circle';
+        a.onended = () => { if (icon) icon.textContent = 'play_circle'; };
+      }
+    }
+
+    let allSongs = [];
+    function collectSongs(tree) {
+      const out = [];
+      if (!tree) return out;
+      for (const titleKey in tree) {
+        const byAlbum = tree[titleKey];
+        if (!byAlbum || typeof byAlbum !== 'object') continue;
+        for (const albumKey in byAlbum) {
+          const byArtist = byAlbum[albumKey];
+          if (!byArtist || typeof byArtist !== 'object') continue;
+          for (const artistKey in byArtist) {
+            const s = byArtist[artistKey];
+            if (s && (s.fileInp || s.file)) {
+              out.push({
+                title: s.title || titleKey,
+                album: s.album || albumKey,
+                artist: s.artist || s.uploaderName || artistKey,
+                fileInp: s.fileInp || s.file,
+                genre: s.genre || s.genres || s.style || '',
+                imageUrl: s.imageUrl || s.thumbnail || s.cover || ''
+              });
+            }
+          }
+        }
+      }
+      return out;
+    }
+
+    function renderTrending(playsMap) {
+      const list = document.getElementById('trendingList');
+      const entries = Object.entries(playsMap || {}).map(([key, val]) => {
+        const count = (val && typeof val === 'object') ? (val.count || val.plays || val.playCount || 0) : Number(val) || 0;
+        const meta = (val && typeof val === 'object') ? val : {};
+        return {
+          key,
+          count,
+          title: meta.title || '',
+          album: meta.album || '',
+          artist: meta.artist || '',
+          fileInp: meta.fileInp || meta.file || '',
+          imageUrl: meta.imageUrl || meta.cover || ''
+        };
+      });
+      entries.sort((a, b) => b.count - a.count);
+      const byTitle = new Map();
+      allSongs.forEach(s => { if (s.title) byTitle.set(s.title.toLowerCase(), s); });
+      entries.forEach(e => {
+        if ((!e.fileInp || !e.artist) && (e.title || e.key)) {
+          const m = byTitle.get((e.title || e.key).toLowerCase());
+          if (m) {
+            e.artist = e.artist || m.artist;
+            e.album = e.album || m.album;
+            e.fileInp = e.fileInp || m.fileInp;
+            e.imageUrl = e.imageUrl || m.imageUrl;
+            e.title = e.title || m.title;
+          }
+        }
+        if (!e.title) e.title = e.key;
+      });
+      const top = entries.filter(e => e.count > 0).slice(0, 50);
+      if (!top.length) {
+        list.innerHTML = '<div class="state-msg">No trending songs yet — start playing songs in the app to see the charts.</div>';
+        return;
+      }
+      list.innerHTML = top.map((e, i) => {
+        const rank = i + 1;
+        const art = e.imageUrl
+          ? `<img src="${escHtml(e.imageUrl)}" alt="">`
+          : escHtml((e.title || '?').charAt(0).toUpperCase());
+        return `
+          <div class="trending-row">
+            <div class="trending-rank ${rank <= 3 ? 'top3' : ''}">${rank}</div>
+            <div class="trending-art">${art}</div>
+            <div class="trending-meta">
+              <div class="trending-title">${escHtml(e.title)}</div>
+              <div class="trending-artist">${escHtml(e.artist || 'Unknown')}${e.album ? ' · ' + escHtml(e.album) : ''}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="trending-plays">${e.count} plays</span>
+              ${e.fileInp ? `<button class="play-btn" data-url="${escHtml(e.fileInp)}" aria-label="Play"><span class="material-symbols-outlined">play_circle</span></button>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+      list.querySelectorAll('.play-btn').forEach(btn => {
+        btn.addEventListener('click', () => playTrack(btn.dataset.url, btn));
+      });
+    }
+
+    let activeMood = 'All';
+    let activeGenre = 'All';
+    function renderChips(container, values, active, onPick) {
+      container.innerHTML = ['All', ...values].map(v =>
+        `<button class="chip ${v === active ? 'active' : ''}" data-v="${escHtml(v)}">${escHtml(v)}</button>`
+      ).join('');
+      container.querySelectorAll('.chip').forEach(c => {
+        c.addEventListener('click', () => onPick(c.dataset.v));
+      });
+    }
+    function renderDiscoverList(listEl, songs) {
+      if (!songs.length) {
+        listEl.innerHTML = '<div class="state-msg">No songs in this bucket yet.</div>';
+        return;
+      }
+      listEl.innerHTML = songs.slice(0, 80).map(s => {
+        const art = s.imageUrl
+          ? `<div class="trending-art"><img src="${escHtml(s.imageUrl)}" alt=""></div>`
+          : `<div class="trending-art">${escHtml((s.title || '?').charAt(0).toUpperCase())}</div>`;
+        return `
+          <div class="discover-card">
+            ${art}
+            <div style="flex:1;min-width:0;">
+              <div class="title">${escHtml(s.title)}</div>
+              <div class="sub">${escHtml(s.artist || 'Unknown')}</div>
+            </div>
+            ${s.fileInp ? `<button class="play-btn" data-url="${escHtml(s.fileInp)}" aria-label="Play"><span class="material-symbols-outlined">play_circle</span></button>` : ''}
+          </div>`;
+      }).join('');
+      listEl.querySelectorAll('.play-btn').forEach(btn => {
+        btn.addEventListener('click', () => playTrack(btn.dataset.url, btn));
+      });
+    }
+    function refreshMood() {
+      const moods = Array.from(new Set(allSongs.map(s => songMoodFromTitle(s.title)))).sort();
+      renderChips(document.getElementById('moodChips'), moods, activeMood, (v) => { activeMood = v; refreshMood(); });
+      const filtered = activeMood === 'All' ? allSongs : allSongs.filter(s => songMoodFromTitle(s.title) === activeMood);
+      renderDiscoverList(document.getElementById('moodList'), filtered);
+    }
+    function refreshGenre() {
+      const genres = Array.from(new Set(allSongs.map(s => songGenreGuess(s)))).sort();
+      renderChips(document.getElementById('genreChips'), genres, activeGenre, (v) => { activeGenre = v; refreshGenre(); });
+      const filtered = activeGenre === 'All' ? allSongs : allSongs.filter(s => songGenreGuess(s) === activeGenre);
+      renderDiscoverList(document.getElementById('genreList'), filtered);
+    }
+
+    let vipLoaded = false;
+    async function loadVip() {
+      vipLoaded = true;
+      const el = document.getElementById('vipList');
+      try {
+        const mod = await import('./js/referral-system.js');
+        if (typeof mod.subscribeToTopVipArtists !== 'function') {
+          el.innerHTML = '<div class="state-msg">VIP rankings unavailable.</div>';
+          return;
+        }
+        mod.subscribeToTopVipArtists(50, (artists) => {
+          if (!artists || !artists.length) {
+            el.innerHTML = '<div class="state-msg">No VIP artists yet. Be the first to climb the charts!</div>';
+            return;
+          }
+          el.innerHTML = artists.map((a, i) => {
+            const rank = i + 1;
+            const cls = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+            return `
+              <div class="vip-row">
+                <div class="vip-rank ${cls}">${rank}</div>
+                <div style="flex:1;min-width:0;">
+                  <div class="trending-title">${escHtml(a.username || 'Artist')}</div>
+                  <div class="trending-artist">${a.referralCount || 0} referral${(a.referralCount || 0) !== 1 ? 's' : ''}</div>
+                </div>
+              </div>`;
+          }).join('');
+        });
+      } catch (e) {
+        console.warn('VIP load', e);
+        el.innerHTML = '<div class="state-msg">Could not load VIP rankings.</div>';
+      }
+    }
+
+    (async () => {
+      try {
+        const songsSnap = await get(ref(db, 'SONGS'));
+        allSongs = collectSongs(songsSnap.exists() ? songsSnap.val() : {});
+      } catch (e) { console.warn('SONGS load', e); }
+      refreshMood();
+      refreshGenre();
+      onValue(ref(db, 'songplayed'), (snap) => {
+        renderTrending(snap.exists() ? snap.val() : {});
+      }, (err) => {
+        console.warn('songplayed', err);
+        document.getElementById('trendingList').innerHTML =
+          '<div class="state-msg">Could not load trending. Check your connection.</div>';
+      });
+    })();
   </script>
 </body>
 </html>
