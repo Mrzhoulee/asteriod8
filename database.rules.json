@@ -132,6 +132,7 @@
     "REFERRAL_CODE_INDEX": { ".read": true, ".write": true },
     "FEATURE_REFERRAL_REQUESTS": { ".read": true, ".write": true },
     "FEATURE_REFERRAL_OUTBOX": { ".read": true, ".write": true },
+    "FEATURED_SOCIAL_LINKS": { ".read": true, ".write": true },
     "CONTENT_REPORTS": {
       "$reportId": {
         ".read": false,
