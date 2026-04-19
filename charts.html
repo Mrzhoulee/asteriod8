@@ -509,8 +509,15 @@
           </div>`;
       }).join('');
     }
+    function isProfilePrivate(p) {
+      if (!p) return true; // no profile → treat as private
+      if (String(p.profileVisibility || '').toLowerCase() === 'private') return true;
+      if (p.publicProfile === false) return true;
+      return false;
+    }
     async function loadVipFromRtdb() {
       // Fallback: aggregate RTDB referralCounts + PROFILES/nicknames.
+      // Hide users whose profile is private.
       const [countsSnap, profilesSnap] = await Promise.all([
         get(ref(db, 'referralCounts')).catch(() => null),
         get(ref(db, 'PROFILES')).catch(() => null)
@@ -524,55 +531,48 @@
         return {
           uid: key,
           username: p.username || p.nickname || key.split('@')[0] || 'Artist',
-          referralCount: count
+          referralCount: count,
+          _profile: p
         };
-      }).filter(a => a.referralCount > 0);
+      }).filter(a => a.referralCount > 0 && !isProfilePrivate(a._profile));
       artists.sort((a, b) => b.referralCount - a.referralCount);
-      return artists.slice(0, 50);
+      return artists.slice(0, 50).map(({ _profile, ...rest }) => rest);
     }
     async function loadVip() {
       vipLoaded = true;
       const el = document.getElementById('vipList');
-      let firestoreCallbackFired = false;
+      // Prefer RTDB (source of truth for referralCounts + PROFILES, includes
+      // the public/private visibility flag so we can hide private users).
+      try {
+        const rtdbArtists = await loadVipFromRtdb();
+        if (rtdbArtists.length) {
+          renderVipList(rtdbArtists);
+          return;
+        }
+      } catch (e) {
+        console.warn('VIP RTDB load', e);
+      }
+      // RTDB empty — optionally try Firestore, but still filter private users
+      // by cross-checking their email against RTDB PROFILES.
       try {
         const mod = await import('./js/referral-system.js');
         if (typeof mod.subscribeToTopVipArtists === 'function') {
-          mod.subscribeToTopVipArtists(50, async (artists) => {
-            firestoreCallbackFired = true;
-            if (artists && artists.length) {
-              renderVipList(artists);
-            } else {
-              // Firestore empty — try RTDB fallback.
-              try {
-                const rtdbArtists = await loadVipFromRtdb();
-                renderVipList(rtdbArtists);
-              } catch (e2) {
-                renderVipList([]);
-              }
-            }
+          const profilesSnap = await get(ref(db, 'PROFILES')).catch(() => null);
+          const profiles = (profilesSnap && profilesSnap.exists()) ? profilesSnap.val() : {};
+          mod.subscribeToTopVipArtists(50, (artists) => {
+            const visible = (artists || []).filter(a => {
+              const emailKey = (a.email || '').replace(/[.#$[\]]/g, '_');
+              const p = emailKey ? profiles[emailKey] : null;
+              return !isProfilePrivate(p);
+            });
+            renderVipList(visible);
           });
-          // If Firestore callback hasn't fired within 4s, trigger RTDB fallback.
-          setTimeout(async () => {
-            if (firestoreCallbackFired) return;
-            try {
-              const rtdbArtists = await loadVipFromRtdb();
-              renderVipList(rtdbArtists);
-            } catch (e2) {
-              el.innerHTML = '<div class="state-msg">Could not load VIP rankings.</div>';
-            }
-          }, 4000);
           return;
         }
       } catch (e) {
         console.warn('VIP firestore load', e);
       }
-      // Firestore unavailable — RTDB fallback.
-      try {
-        const rtdbArtists = await loadVipFromRtdb();
-        renderVipList(rtdbArtists);
-      } catch (e2) {
-        el.innerHTML = '<div class="state-msg">Could not load VIP rankings.</div>';
-      }
+      renderVipList([]);
     }
 
     (async () => {
