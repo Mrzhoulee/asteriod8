@@ -522,7 +522,7 @@
     <div class="referral-success-card">
       <div class="referral-success-icon">&#127881;</div>
       <h2 class="referral-success-title">Referral Submitted!</h2>
-      <p class="referral-success-msg">You entered the code successfully. The artist who shared it will now be featured for <strong>3 months</strong>.</p>
+      <p class="referral-success-msg">You entered the code successfully. The artist who shared it will have their song added to <strong>Featured Songs</strong> on Asteroid.</p>
       <button type="button" class="referral-success-close" id="referralSuccessCloseBtn">Got it</button>
     </div>
   </div>
@@ -769,8 +769,8 @@
         <div class="studio-tutorial-step" data-step="4" data-status="pending">
           <div class="step-bullet"><span class="step-bullet-num">4</span></div>
           <div class="step-body">
-            <div class="step-title">Wait 48 hours</div>
-            <div class="step-desc">Your feature request goes under review. You'll be notified within 48 hours.</div>
+            <div class="step-title">Get featured</div>
+            <div class="step-desc">Once a friend enters your code, your uploaded song will appear in Featured Songs on Asteroid.</div>
           </div>
           <div class="step-badge">Pending</div>
         </div>
@@ -2758,14 +2758,11 @@
       if (desc3) desc3.textContent = 'Your code was used by another artist. Nice work!';
     }
     if (submitted) {
-      const hoursLeft = Math.max(0, 48 - Math.floor((Date.now() - submittedAt) / 3600000));
       const step4 = steps[3];
-      const desc = step4 && step4.querySelector('.step-desc');
-      if (desc) {
-        desc.textContent = hoursLeft > 0
-          ? `Your feature request is under review. ~${hoursLeft} hour(s) left of the 48-hour window.`
-          : 'Review window complete — check the Asteroid app for your feature status.';
-      }
+      const title4 = step4 && step4.querySelector('.step-title');
+      const desc4 = step4 && step4.querySelector('.step-desc');
+      if (title4) title4.textContent = 'Featured!';
+      if (desc4) desc4.textContent = 'Your song is now in Featured Songs on Asteroid.';
     }
   }
   window.updateStudioTutorial = updateStudioTutorial;
