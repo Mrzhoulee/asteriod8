@@ -775,14 +775,6 @@
           </div>
           <div class="step-badge">Pending</div>
         </div>
-        <div class="studio-tutorial-step" data-step="4" data-status="pending">
-          <div class="step-bullet"><span class="step-bullet-num">4</span></div>
-          <div class="step-body">
-            <div class="step-title">Get featured</div>
-            <div class="step-desc">Once a friend enters your code, your uploaded song will appear in Featured Songs on Asteroid.</div>
-          </div>
-          <div class="step-badge">Pending</div>
-        </div>
       </div>
     </section>
 
@@ -2751,9 +2743,7 @@
     const signedIn = !!studioReferralUserKey();
     const uploaded = localStorage.getItem('_studioTutorialUploadedOnce') === '1';
     const codeUsedByAnother = localStorage.getItem('_studioReferralCodeUsed') === '1';
-    const submittedAt = Number(localStorage.getItem('_studioTutorialSubmittedAt') || 0);
-    const submitted = submittedAt > 0;
-    const doneFlags = [signedIn, uploaded, codeUsedByAnother, submitted];
+    const doneFlags = [signedIn, uploaded, codeUsedByAnother];
     let firstPending = -1;
     for (let i = 0; i < doneFlags.length; i++) {
       if (!doneFlags[i]) { firstPending = i; break; }
@@ -2766,9 +2756,6 @@
       } else if (idx === firstPending) {
         el.setAttribute('data-status', 'active');
         if (badge) badge.textContent = idx === 0 ? 'Start here' : 'Next step';
-      } else if (idx === 3 && uploaded && codeUsedByAnother) {
-        el.setAttribute('data-status', 'active');
-        if (badge) badge.textContent = 'Submit a code';
       } else {
         el.setAttribute('data-status', 'pending');
         if (badge) badge.textContent = 'Pending';
@@ -2782,13 +2769,6 @@
       if (title3) title3.textContent = 'Referral code shared';
       if (desc3) desc3.textContent = 'Your code was used by another artist. Nice work!';
     }
-    if (submitted) {
-      const step4 = steps[3];
-      const title4 = step4 && step4.querySelector('.step-title');
-      const desc4 = step4 && step4.querySelector('.step-desc');
-      if (title4) title4.textContent = 'Featured!';
-      if (desc4) desc4.textContent = 'Your song is now in Featured Songs on Asteroid.';
-    }
     // Always check completion state after tutorial update
     try { checkReferralCompletion(); } catch (e) {}
     // Start watching for code usage if signed in
@@ -2801,8 +2781,7 @@
     const signedIn = !!studioReferralUserKey();
     const uploaded = localStorage.getItem('_studioTutorialUploadedOnce') === '1';
     const codeUsed = localStorage.getItem('_studioReferralCodeUsed') === '1';
-    const submitted = Number(localStorage.getItem('_studioTutorialSubmittedAt') || 0) > 0;
-    const allDone = signedIn && uploaded && codeUsed && submitted;
+    const allDone = signedIn && uploaded && codeUsed;
     const panel = document.getElementById('referralComplete');
     const codePanel = document.querySelector('.referral-code-panel');
     const shareLinkRow = document.getElementById('shareLinkInput');
