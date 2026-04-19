@@ -1252,7 +1252,7 @@
     </style>
   <br>
   <br>
-    <button id="boost" type="button" disabled aria-disabled="true">Currently Disabled</button>
+    <button id="boost" type="button" >Currently Disabled</button>
     <br>
     <br>
     <font face="Montserrat">Click Activate to get your song featured on the top page</font>
@@ -1263,6 +1263,12 @@
   </form>
 
   <script>
+
+    import { store, ProductType, Platform } from 'capacitor-plugin-cdv-purchase';
+
+    // The CdvPurchase namespace is available globally after plugin install
+    const store = CdvPurchase.store;
+    console.log("hello")
     function openBoostUpload(event) {
       if (event) event.preventDefault();
       const boostBtn = document.getElementById("boost");
@@ -3336,6 +3342,64 @@ boostBtn.addEventListener("click", async (e) => {
     <button type="button" class="upload-success-btn" id="uploadSuccessCloseBtn" onclick="if (window.closeUploadSuccessModal) window.closeUploadSuccessModal();">Great!</button>
   </div>
 </div>
+<!-- Dynamic Featured Songs (artist profile + social links + player) -->
+<style>
+  #studioFeaturedSection { max-width: 900px; margin: 24px auto 40px; padding: 0 16px; text-align: left; color: #fff; }
+  #studioFeaturedSection h2 {
+    font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; color: #ff7f50;
+    margin: 0 0 4px; display: flex; align-items: center; gap: 8px;
+  }
+  #studioFeaturedSection .studio-featured-sub { margin: 0 0 14px; font-size: 12px; color: rgba(0,0,0,0.55); font-weight: 500; }
+  #studioFeaturedContainer { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .studioFeaturedCard {
+    background: #0a0a0a; color: #fff;
+    border: 1px solid rgba(255,127,80,0.35);
+    border-radius: 14px; padding: 14px;
+    display: flex; flex-direction: column; gap: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  }
+  .studioFeaturedCard h3 { margin: 0; font-size: 15px; font-weight: 700; color: #fff; }
+  .studioFeaturedCard p { margin: 0; font-size: 12px; color: rgba(255,255,255,0.6); }
+  .studioFeaturedCard .studio-artist-block {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px; border-radius: 10px;
+    background: rgba(255,127,80,0.08); border: 1px solid rgba(255,127,80,0.2);
+  }
+  .studioFeaturedCard .studio-artist-avatar {
+    width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
+    background: linear-gradient(135deg, #ff7f50, #e66a3a);
+    display: flex; align-items: center; justify-content: center;
+    color: #000; font-weight: 800; font-size: 16px; flex-shrink: 0;
+  }
+  .studioFeaturedCard .studio-artist-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .studioFeaturedCard .studio-artist-meta { display: flex; flex-direction: column; min-width: 0; }
+  .studioFeaturedCard .studio-artist-name { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .studioFeaturedCard .studio-artist-tag { font-size: 10px; color: #ff7f50; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+  .studioFeaturedCard .studio-social-links { display: flex; flex-wrap: wrap; gap: 6px; }
+  .studioFeaturedCard .studio-social-links a {
+    font-size: 11px; padding: 5px 10px; border-radius: 999px;
+    color: #ff7f50; text-decoration: none;
+    border: 1px solid rgba(255,127,80,0.4); background: rgba(255,127,80,0.08);
+  }
+  .studioFeaturedCard .studio-social-links a:hover { background: #ff7f50; color: #000; }
+  .studioFeaturedCard .studio-card-actions { display: flex; gap: 8px; margin-top: 2px; }
+  .studioFeaturedCard .studio-card-actions button {
+    flex: 1; padding: 8px 10px; border-radius: 8px;
+    font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700;
+    cursor: pointer; border: 1px solid rgba(255,127,80,0.45);
+  }
+  .studioFeaturedCard .studio-card-actions .studio-play-btn { background: linear-gradient(135deg, #ff7f50, #e66a3a); color: #000; border-color: transparent; }
+  .studioFeaturedCard .studio-card-actions .studio-queue-btn { background: transparent; color: #ff7f50; }
+  .studioFeaturedCard .studio-card-actions .studio-queue-btn:hover { background: rgba(255,127,80,0.14); }
+  #studioFeaturedEmpty { text-align: center; padding: 24px; color: rgba(0,0,0,0.55); font-size: 13px; }
+</style>
+<section id="studioFeaturedSection">
+  <h2><span class="material-symbols-outlined">star</span>Featured Songs</h2>
+  <p class="studio-featured-sub">Artists featured via the referral program — with links straight to their music and socials.</p>
+  <div id="studioFeaturedContainer"></div>
+  <div id="studioFeaturedEmpty">Loading featured artists…</div>
+</section>
+
 <!-- Mobile bottom nav -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 <nav class="mobile-nav">
@@ -3352,5 +3416,140 @@ boostBtn.addEventListener("click", async (e) => {
 .mobile-nav-item.mobile-nav-active{background:rgba(255,127,80,0.1)}
 @media screen and (max-width:3840px){body{padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}.mobile-nav{display:flex !important}}
 </style>
+
+<script src="js/miniplayer.js" defer></script>
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getDatabase, ref as ref2, get, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+  const studioFeaturedConfig = {
+    apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+    authDomain: "asteroid-cdc13.firebaseapp.com",
+    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+    projectId: "asteroid-cdc13",
+    storageBucket: "asteroid-cdc13.appspot.com",
+    messagingSenderId: "793353824502",
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+    measurementId: "G-GV72TMNNGR"
+  };
+  const _app = getApps().length ? getApp() : initializeApp(studioFeaturedConfig);
+  const _db = getDatabase(_app);
+
+  function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+  function prettifyUrl(url) {
+    try {
+      const h = new URL(url).hostname.replace('www.', '').replace('open.', '');
+      if (/instagram/i.test(h)) return 'Instagram';
+      if (/spotify/i.test(h)) return 'Spotify';
+      if (/soundcloud/i.test(h)) return 'SoundCloud';
+      if (/youtube|youtu\.be/i.test(h)) return 'YouTube';
+      if (/tiktok/i.test(h)) return 'TikTok';
+      if (/twitter|x\.com/i.test(h)) return 'X / Twitter';
+      if (/apple/i.test(h)) return 'Apple Music';
+      return h.split('.')[0].charAt(0).toUpperCase() + h.split('.')[0].slice(1);
+    } catch (e) { return 'Link'; }
+  }
+
+  const container = document.getElementById('studioFeaturedContainer');
+  const emptyEl = document.getElementById('studioFeaturedEmpty');
+  if (container && emptyEl) {
+    onValue(ref2(_db, 'FEATURE_REFERRAL_REQUESTS'), (snap) => {
+      container.innerHTML = '';
+      if (!snap.exists()) {
+        emptyEl.style.display = '';
+        emptyEl.textContent = 'No featured artists yet. Be the first!';
+        return;
+      }
+      const requests = snap.val();
+      const ownerKeys = new Set();
+      for (const ownerKey in requests) {
+        for (const fromKey in requests[ownerKey]) {
+          const req = requests[ownerKey][fromKey];
+          if (req && req.status === 'featured') ownerKeys.add(ownerKey);
+        }
+      }
+      if (!ownerKeys.size) {
+        emptyEl.style.display = '';
+        emptyEl.textContent = 'No featured artists yet. Be the first!';
+        return;
+      }
+      emptyEl.style.display = 'none';
+      ownerKeys.forEach((ownerKey) => {
+        Promise.all([
+          get(ref2(_db, 'FEATURED_SOCIAL_LINKS/' + ownerKey)).catch(() => null),
+          get(ref2(_db, 'PROFILES/' + ownerKey)).catch(() => null),
+          get(ref2(_db, 'SONGS')).catch(() => null)
+        ]).then(([linkSnap, profileSnap, songsSnap]) => {
+          if (!songsSnap || !songsSnap.exists()) return;
+          const socialData = (linkSnap && linkSnap.exists()) ? linkSnap.val() : {};
+          const savedLinks = (socialData.links || []).filter(Boolean);
+          const profile = (profileSnap && profileSnap.exists()) ? profileSnap.val() : {};
+          const allSongs = songsSnap.val();
+          let song = null;
+          for (const titleKey in allSongs) {
+            for (const albumKey in allSongs[titleKey]) {
+              for (const artistKey in allSongs[titleKey][albumKey]) {
+                const s = allSongs[titleKey][albumKey][artistKey];
+                if (s && s.uploader) {
+                  const uploaderKey = s.uploader.replace(/[.#$[\]]/g, '_');
+                  if (uploaderKey === ownerKey || s.uploader === ownerKey) { song = s; break; }
+                }
+              }
+              if (song) break;
+            }
+            if (song) break;
+          }
+          if (!song || !song.fileInp) return;
+          const profileSocialLinks = [
+            profile.instagram, profile.youtube, profile.soundcloud,
+            profile.spotify, profile.applemusic, profile.website, profile.tiktok
+          ].filter(u => u && /^https?:\/\//.test(u));
+          const allSocialLinks = Array.from(new Set([...savedLinks, ...profileSocialLinks]));
+          const artistName = profile.nickname || song.artist || song.uploaderName || 'Artist';
+          const avatarImg = profile.profileImage || profile.photoURL || '';
+          const initial = String(artistName).trim().charAt(0).toUpperCase() || 'A';
+          const avatarHtml = avatarImg
+            ? '<div class="studio-artist-avatar"><img src="' + esc(avatarImg) + '" alt="' + esc(artistName) + '"></div>'
+            : '<div class="studio-artist-avatar">' + esc(initial) + '</div>';
+          const profileBlockHtml =
+            '<div class="studio-artist-block">' +
+              avatarHtml +
+              '<div class="studio-artist-meta">' +
+                '<span class="studio-artist-name">' + esc(artistName) + '</span>' +
+                '<span class="studio-artist-tag">Featured artist</span>' +
+              '</div>' +
+            '</div>';
+          const linksHtml = allSocialLinks.length
+            ? '<div class="studio-social-links">' +
+                allSocialLinks.map(u => '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(prettifyUrl(u)) + '</a>').join('') +
+              '</div>'
+            : '';
+          const card = document.createElement('div');
+          card.className = 'studioFeaturedCard';
+          card.innerHTML =
+            profileBlockHtml +
+            '<h3>' + esc(song.title || 'Untitled') + '</h3>' +
+            '<p>Album: ' + esc(song.album || '') + '</p>' +
+            linksHtml +
+            '<div class="studio-card-actions">' +
+              '<button class="studio-play-btn">Play</button>' +
+              '<button class="studio-queue-btn">Queue</button>' +
+            '</div>';
+          const meta = { url: song.fileInp, title: song.title || 'Untitled', artist: artistName, imageUrl: avatarImg || '' };
+          card.querySelector('.studio-play-btn').addEventListener('click', () => {
+            if (window.AsteroidPlayer) window.AsteroidPlayer.play(meta);
+          });
+          card.querySelector('.studio-queue-btn').addEventListener('click', () => {
+            if (window.AsteroidPlayer) window.AsteroidPlayer.enqueue(meta);
+          });
+          container.appendChild(card);
+        }).catch(() => {});
+      });
+    }, () => {
+      emptyEl.style.display = '';
+      emptyEl.textContent = 'Could not load featured artists.';
+    });
+  }
+</script>
 </body>
 </html>          

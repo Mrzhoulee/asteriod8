@@ -260,6 +260,7 @@
     <a href="charts.html" class="mobile-nav-item mobile-nav-active"><span class="material-symbols-outlined">leaderboard</span><span>Charts</span></a>
   </nav>
 
+  <script src="js/miniplayer.js" defer></script>
   <script type="module">
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
     import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
@@ -321,26 +322,23 @@
       return d.innerHTML;
     }
 
-    let currentAudio = null;
-    let currentBtn = null;
     function playTrack(url, btn) {
-      if (!url) return;
-      if (currentAudio) {
-        try { currentAudio.pause(); } catch (e) {}
-        if (currentBtn) {
-          const oi = currentBtn.querySelector('.material-symbols-outlined');
-          if (oi) oi.textContent = 'play_circle';
-        }
-      }
-      const a = new Audio(url);
-      a.play().catch(() => {});
-      currentAudio = a;
-      currentBtn = btn;
-      if (btn) {
-        const icon = btn.querySelector('.material-symbols-outlined');
-        if (icon) icon.textContent = 'pause_circle';
-        a.onended = () => { if (icon) icon.textContent = 'play_circle'; };
-      }
+      if (!url || !window.AsteroidPlayer) return;
+      const meta = btn ? {
+        title: btn.dataset.title || '',
+        artist: btn.dataset.artist || '',
+        imageUrl: btn.dataset.img || ''
+      } : {};
+      window.AsteroidPlayer.play({ url, ...meta });
+    }
+    function queueTrack(url, btn) {
+      if (!url || !window.AsteroidPlayer) return;
+      const meta = btn ? {
+        title: btn.dataset.title || '',
+        artist: btn.dataset.artist || '',
+        imageUrl: btn.dataset.img || ''
+      } : {};
+      window.AsteroidPlayer.enqueue({ url, ...meta });
     }
 
     let allSongs = [];
@@ -373,35 +371,35 @@
 
     function renderTrending(playsMap) {
       const list = document.getElementById('trendingList');
-      const entries = Object.entries(playsMap || {}).map(([key, val]) => {
-        const count = (val && typeof val === 'object') ? (val.count || val.plays || val.playCount || 0) : Number(val) || 0;
-        const meta = (val && typeof val === 'object') ? val : {};
+      // `songplayed` is a push-id keyed log: { <pushId>: { title2, ofctime } }.
+      // Aggregate by title2, filtering to the current month.
+      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const currentMonth = monthNames[new Date().getMonth()].toLowerCase();
+      const countsByTitle = {};
+      for (const k in (playsMap || {})) {
+        const v = playsMap[k];
+        if (!v || typeof v !== 'object') continue;
+        const t = (v.title2 || v.title || '').toString().trim();
+        if (!t) continue;
+        const m = (v.ofctime || '').toString().trim().toLowerCase();
+        if (m && m !== currentMonth) continue;
+        countsByTitle[t] = (countsByTitle[t] || 0) + 1;
+      }
+      const byTitle = new Map();
+      allSongs.forEach(s => { if (s.title) byTitle.set(s.title.toLowerCase(), s); });
+      const entries = Object.entries(countsByTitle).map(([title, count]) => {
+        const m = byTitle.get(title.toLowerCase()) || {};
         return {
-          key,
+          key: title,
           count,
-          title: meta.title || '',
-          album: meta.album || '',
-          artist: meta.artist || '',
-          fileInp: meta.fileInp || meta.file || '',
-          imageUrl: meta.imageUrl || meta.cover || ''
+          title,
+          album: m.album || '',
+          artist: m.artist || '',
+          fileInp: m.fileInp || '',
+          imageUrl: m.imageUrl || ''
         };
       });
       entries.sort((a, b) => b.count - a.count);
-      const byTitle = new Map();
-      allSongs.forEach(s => { if (s.title) byTitle.set(s.title.toLowerCase(), s); });
-      entries.forEach(e => {
-        if ((!e.fileInp || !e.artist) && (e.title || e.key)) {
-          const m = byTitle.get((e.title || e.key).toLowerCase());
-          if (m) {
-            e.artist = e.artist || m.artist;
-            e.album = e.album || m.album;
-            e.fileInp = e.fileInp || m.fileInp;
-            e.imageUrl = e.imageUrl || m.imageUrl;
-            e.title = e.title || m.title;
-          }
-        }
-        if (!e.title) e.title = e.key;
-      });
       const top = entries.filter(e => e.count > 0).slice(0, 50);
       if (!top.length) {
         list.innerHTML = '<div class="state-msg">No trending songs yet — start playing songs in the app to see the charts.</div>';
@@ -412,6 +410,9 @@
         const art = e.imageUrl
           ? `<img src="${escHtml(e.imageUrl)}" alt="">`
           : escHtml((e.title || '?').charAt(0).toUpperCase());
+        const dataAttrs = e.fileInp
+          ? `data-url="${escHtml(e.fileInp)}" data-title="${escHtml(e.title)}" data-artist="${escHtml(e.artist || '')}" data-img="${escHtml(e.imageUrl || '')}"`
+          : '';
         return `
           <div class="trending-row">
             <div class="trending-rank ${rank <= 3 ? 'top3' : ''}">${rank}</div>
@@ -420,14 +421,18 @@
               <div class="trending-title">${escHtml(e.title)}</div>
               <div class="trending-artist">${escHtml(e.artist || 'Unknown')}${e.album ? ' · ' + escHtml(e.album) : ''}</div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;">
+            <div style="display:flex;align-items:center;gap:6px;">
               <span class="trending-plays">${e.count} plays</span>
-              ${e.fileInp ? `<button class="play-btn" data-url="${escHtml(e.fileInp)}" aria-label="Play"><span class="material-symbols-outlined">play_circle</span></button>` : ''}
+              ${e.fileInp ? `<button class="play-btn" ${dataAttrs} aria-label="Play"><span class="material-symbols-outlined">play_circle</span></button>` : ''}
+              ${e.fileInp ? `<button class="play-btn queue-btn" ${dataAttrs} aria-label="Add to queue"><span class="material-symbols-outlined">playlist_add</span></button>` : ''}
             </div>
           </div>`;
       }).join('');
       list.querySelectorAll('.play-btn').forEach(btn => {
-        btn.addEventListener('click', () => playTrack(btn.dataset.url, btn));
+        btn.addEventListener('click', () => {
+          if (btn.classList.contains('queue-btn')) queueTrack(btn.dataset.url, btn);
+          else playTrack(btn.dataset.url, btn);
+        });
       });
     }
 
@@ -450,6 +455,9 @@
         const art = s.imageUrl
           ? `<div class="trending-art"><img src="${escHtml(s.imageUrl)}" alt=""></div>`
           : `<div class="trending-art">${escHtml((s.title || '?').charAt(0).toUpperCase())}</div>`;
+        const dataAttrs = s.fileInp
+          ? `data-url="${escHtml(s.fileInp)}" data-title="${escHtml(s.title)}" data-artist="${escHtml(s.artist || '')}" data-img="${escHtml(s.imageUrl || '')}"`
+          : '';
         return `
           <div class="discover-card">
             ${art}
@@ -457,11 +465,15 @@
               <div class="title">${escHtml(s.title)}</div>
               <div class="sub">${escHtml(s.artist || 'Unknown')}</div>
             </div>
-            ${s.fileInp ? `<button class="play-btn" data-url="${escHtml(s.fileInp)}" aria-label="Play"><span class="material-symbols-outlined">play_circle</span></button>` : ''}
+            ${s.fileInp ? `<button class="play-btn" ${dataAttrs} aria-label="Play"><span class="material-symbols-outlined">play_circle</span></button>` : ''}
+            ${s.fileInp ? `<button class="play-btn queue-btn" ${dataAttrs} aria-label="Add to queue"><span class="material-symbols-outlined">playlist_add</span></button>` : ''}
           </div>`;
       }).join('');
       listEl.querySelectorAll('.play-btn').forEach(btn => {
-        btn.addEventListener('click', () => playTrack(btn.dataset.url, btn));
+        btn.addEventListener('click', () => {
+          if (btn.classList.contains('queue-btn')) queueTrack(btn.dataset.url, btn);
+          else playTrack(btn.dataset.url, btn);
+        });
       });
     }
     function refreshMood() {
@@ -478,35 +490,87 @@
     }
 
     let vipLoaded = false;
+    function renderVipList(artists) {
+      const el = document.getElementById('vipList');
+      if (!artists || !artists.length) {
+        el.innerHTML = '<div class="state-msg">No VIP artists yet. Be the first to climb the charts!</div>';
+        return;
+      }
+      el.innerHTML = artists.map((a, i) => {
+        const rank = i + 1;
+        const cls = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+        return `
+          <div class="vip-row">
+            <div class="vip-rank ${cls}">${rank}</div>
+            <div style="flex:1;min-width:0;">
+              <div class="trending-title">${escHtml(a.username || a.nickname || 'Artist')}</div>
+              <div class="trending-artist">${a.referralCount || 0} referral${(a.referralCount || 0) !== 1 ? 's' : ''}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+    async function loadVipFromRtdb() {
+      // Fallback: aggregate RTDB referralCounts + PROFILES/nicknames.
+      const [countsSnap, profilesSnap] = await Promise.all([
+        get(ref(db, 'referralCounts')).catch(() => null),
+        get(ref(db, 'PROFILES')).catch(() => null)
+      ]);
+      const counts = (countsSnap && countsSnap.exists()) ? countsSnap.val() : {};
+      const profiles = (profilesSnap && profilesSnap.exists()) ? profilesSnap.val() : {};
+      const artists = Object.keys(counts).map((key) => {
+        const c = counts[key] || {};
+        const p = profiles[key] || {};
+        const count = Number(c.count || c.referralCount || 0);
+        return {
+          uid: key,
+          username: p.username || p.nickname || key.split('@')[0] || 'Artist',
+          referralCount: count
+        };
+      }).filter(a => a.referralCount > 0);
+      artists.sort((a, b) => b.referralCount - a.referralCount);
+      return artists.slice(0, 50);
+    }
     async function loadVip() {
       vipLoaded = true;
       const el = document.getElementById('vipList');
+      let firestoreCallbackFired = false;
       try {
         const mod = await import('./js/referral-system.js');
-        if (typeof mod.subscribeToTopVipArtists !== 'function') {
-          el.innerHTML = '<div class="state-msg">VIP rankings unavailable.</div>';
+        if (typeof mod.subscribeToTopVipArtists === 'function') {
+          mod.subscribeToTopVipArtists(50, async (artists) => {
+            firestoreCallbackFired = true;
+            if (artists && artists.length) {
+              renderVipList(artists);
+            } else {
+              // Firestore empty — try RTDB fallback.
+              try {
+                const rtdbArtists = await loadVipFromRtdb();
+                renderVipList(rtdbArtists);
+              } catch (e2) {
+                renderVipList([]);
+              }
+            }
+          });
+          // If Firestore callback hasn't fired within 4s, trigger RTDB fallback.
+          setTimeout(async () => {
+            if (firestoreCallbackFired) return;
+            try {
+              const rtdbArtists = await loadVipFromRtdb();
+              renderVipList(rtdbArtists);
+            } catch (e2) {
+              el.innerHTML = '<div class="state-msg">Could not load VIP rankings.</div>';
+            }
+          }, 4000);
           return;
         }
-        mod.subscribeToTopVipArtists(50, (artists) => {
-          if (!artists || !artists.length) {
-            el.innerHTML = '<div class="state-msg">No VIP artists yet. Be the first to climb the charts!</div>';
-            return;
-          }
-          el.innerHTML = artists.map((a, i) => {
-            const rank = i + 1;
-            const cls = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
-            return `
-              <div class="vip-row">
-                <div class="vip-rank ${cls}">${rank}</div>
-                <div style="flex:1;min-width:0;">
-                  <div class="trending-title">${escHtml(a.username || 'Artist')}</div>
-                  <div class="trending-artist">${a.referralCount || 0} referral${(a.referralCount || 0) !== 1 ? 's' : ''}</div>
-                </div>
-              </div>`;
-          }).join('');
-        });
       } catch (e) {
-        console.warn('VIP load', e);
+        console.warn('VIP firestore load', e);
+      }
+      // Firestore unavailable — RTDB fallback.
+      try {
+        const rtdbArtists = await loadVipFromRtdb();
+        renderVipList(rtdbArtists);
+      } catch (e2) {
         el.innerHTML = '<div class="state-msg">Could not load VIP rankings.</div>';
       }
     }

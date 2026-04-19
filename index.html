@@ -4591,7 +4591,6 @@ function whenElementReady(id, callback, retries = 10) {
             '</div>'
           : '';
 
-        const audioId = 'dynAudio_' + (++_audioCounter);
         const card = document.createElement('div');
         card.className = 'featuredCard';
         card.setAttribute('data-dynamic', '1');
@@ -4600,9 +4599,22 @@ function whenElementReady(id, callback, retries = 10) {
           '<h3>' + esc(song.title || 'Untitled') + '</h3>' +
           '<p>Album: ' + esc(song.album || '') + '</p>' +
           linksHtml +
-          '<audio id="' + audioId + '" src="' + esc(song.fileInp) + '" preload="none"></audio>' +
-          '<button onclick="document.getElementById(\'' + audioId + '\').play()">PLAY</button>' +
-          '<button onclick="document.getElementById(\'' + audioId + '\').pause()">PAUSE</button>';
+          '<button class="dyn-play">PLAY</button>' +
+          '<button class="dyn-queue">Queue</button>';
+        const playBtn = card.querySelector('.dyn-play');
+        const queueBtn = card.querySelector('.dyn-queue');
+        const songMeta = {
+          url: song.fileInp,
+          title: song.title || 'Untitled',
+          artist: artistName,
+          imageUrl: avatarImg || ''
+        };
+        playBtn.addEventListener('click', () => {
+          if (window.AsteroidPlayer) window.AsteroidPlayer.play(songMeta);
+        });
+        queueBtn.addEventListener('click', () => {
+          if (window.AsteroidPlayer) window.AsteroidPlayer.enqueue(songMeta);
+        });
         container.appendChild(card);
       }).catch(() => {});
     });
@@ -9169,5 +9181,6 @@ console.log('1171')
   }
   bootHomePolls();
 </script>
+<script src="js/miniplayer.js" defer></script>
 </body>
 </html>
