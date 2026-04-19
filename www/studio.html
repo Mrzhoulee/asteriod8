@@ -2494,6 +2494,9 @@
 
       if(count >= 1) {
           document.getElementById('unlockMsg').style.display = 'block';
+          // Mark step 3 as done — someone used our referral code
+          localStorage.setItem('_studioReferralCodeUsed', '1');
+          updateStudioTutorial();
           if (localStorage.getItem(rewardKey) !== 'true') {
               document.getElementById('vipSuccessBox').style.display = 'block';
               await update(ref2(db, 'users/' + safeEmail), { eligibility: "3_MONTH_FEATURE" });
