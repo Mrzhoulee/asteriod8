@@ -38,6 +38,42 @@
       display: flex; align-items: center; gap: 10px;
     }
     .page-head h1 .material-symbols-outlined { color: var(--coral); font-size: 30px; }
+    .page-head h1 { flex: 1; }
+    .head-action {
+      display: flex; align-items: center; gap: 6px;
+      color: #fff; text-decoration: none;
+      padding: 8px 14px; border-radius: 10px;
+      background: rgba(255,127,80,0.12);
+      border: 1px solid rgba(255,127,80,0.25);
+      font-size: 12px; font-weight: 600; transition: all 0.2s;
+    }
+    .head-action .material-symbols-outlined { font-size: 20px; color: var(--coral); }
+    .head-action:hover { background: rgba(255,127,80,0.22); border-color: var(--coral); }
+    @media (max-width: 420px) { .head-action-label { display: none; } }
+
+    .users-cta {
+      display: flex; align-items: center; gap: 14px;
+      margin: 8px 20px 0; padding: 14px 18px;
+      border-radius: 16px; text-decoration: none;
+      background: linear-gradient(135deg, rgba(255,127,80,0.14), rgba(255,127,80,0.04));
+      border: 1px solid rgba(255,127,80,0.28);
+      color: #fff; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .users-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(255,127,80,0.18);
+      border-color: rgba(255,127,80,0.55);
+    }
+    .users-cta-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--coral), var(--coral-dark));
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .users-cta-icon .material-symbols-outlined { color: #fff; font-size: 24px; }
+    .users-cta-body { flex: 1; min-width: 0; }
+    .users-cta-title { font-weight: 700; font-size: 14px; font-family: 'Montserrat', sans-serif; }
+    .users-cta-sub { font-size: 11px; color: rgba(255,255,255,0.65); }
+    .users-cta-arrow { color: var(--coral); font-size: 24px; flex-shrink: 0; }
     .tabs {
       display: flex; gap: 8px; padding: 14px 20px; overflow-x: auto;
       scrollbar-width: none; -ms-overflow-style: none;
@@ -162,6 +198,10 @@
   <header class="page-head">
     <a href="index.html" class="back" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
     <h1><span class="material-symbols-outlined">leaderboard</span> Charts</h1>
+    <a href="users.html" class="head-action" aria-label="Browse users">
+      <span class="material-symbols-outlined">group</span>
+      <span class="head-action-label">Users</span>
+    </a>
   </header>
 
   <div class="tabs">
@@ -170,6 +210,15 @@
     <button class="tab-btn" data-tab="genre">Genre</button>
     <button class="tab-btn" data-tab="vip">Top VIP</button>
   </div>
+
+  <a href="users.html" class="users-cta" aria-label="Browse all users">
+    <div class="users-cta-icon"><span class="material-symbols-outlined">group</span></div>
+    <div class="users-cta-body">
+      <div class="users-cta-title">Browse &amp; search users</div>
+      <div class="users-cta-sub">Find artists, listeners and their social links</div>
+    </div>
+    <span class="material-symbols-outlined users-cta-arrow">chevron_right</span>
+  </a>
 
   <section id="panel-trending" class="panel active">
     <h2 class="section-title"><span class="material-symbols-outlined" style="color:var(--coral);">trending_up</span>Trending Songs of the Month</h2>

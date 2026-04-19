@@ -2813,71 +2813,9 @@ body.create-profile-active {
     
 
     <!-- Users Section -->
-    <section id="users-section" class="content-section">
-      <h2 class="section-title">All Users</h2>
-      
-      <!-- User Search Bar -->
-      <div style="margin-bottom: 2rem;">
-        <div style="position: relative; max-width: 500px; margin: 0 auto;">
-          <input 
-            type="text" 
-            id="userSearchInput" 
-            placeholder="Search users by name or role..." 
-            style="
-              width: 100%;
-              padding: 0.75rem 1rem 0.75rem 3rem;
-              background: rgba(255, 255, 255, 0.1);
-              border: 1px solid rgba(255, 255, 255, 0.2);
-              border-radius: 12px;
-              color: #ffffff;
-              font-size: 1rem;
-              outline: none;
-              transition: all 0.3s ease;
-            "
-            onfocus="this.style.background='rgba(255,255,255,0.15)'; this.style.borderColor='#ff7f50';"
-            onblur="this.style.background='rgba(255,255,255,0.1)'; this.style.borderColor='rgba(255,255,255,0.2)';"
-          />
-          <i class="fas fa-search" style="
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255,255,255,0.5);
-            font-size: 1rem;
-          "></i>
-          <button 
-            id="clearSearchBtn" 
-            onclick="clearUserSearch()" 
-            style="
-              position: absolute;
-              right: 0.5rem;
-              top: 50%;
-              transform: translateY(-50%);
-              background: transparent;
-              border: none;
-              color: rgba(255,255,255,0.5);
-              cursor: pointer;
-              padding: 0.5rem;
-              display: none;
-              font-size: 1rem;
-            "
-            onmouseover="this.style.color='#ff7f50'"
-            onmouseout="this.style.color='rgba(255,255,255,0.5)'"
-          >
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      </div>
-      
-      <div id="usersGrid" class="users-grid-container" style="
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 1.5rem;
-        padding: 1rem 0;
-      ">
-        <div class="loading" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.7);">Loading users...</div>
-      </div>
-    </section>
+    <!-- All Users + search moved to users.html (link from charts.html) -->
+    <div id="usersGrid" style="display:none;"></div>
+    <input type="text" id="userSearchInput" style="display:none;" />
 
 <section class="promote-cta-wrap" aria-label="Get featured for free">
   <div class="promote-cta-card">
