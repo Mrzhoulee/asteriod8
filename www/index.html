@@ -2728,6 +2728,13 @@ body.create-profile-active {
   background: #e66a3a;
   transform: scale(1.02);
 }
+.featuredCard .social-links { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+.featuredCard .social-links a {
+  display: inline-block; padding: 5px 12px; font-size: 12px; font-weight: 600;
+  color: #ff7f50; border: 1px solid rgba(255,127,80,0.3); border-radius: 6px;
+  text-decoration: none; transition: background 0.2s, color 0.2s;
+}
+.featuredCard .social-links a:hover { background: #ff7f50; color: #fff; }
     </style>
     <section id="featuredSection">
       <h2>🔥 Featured Songs</h2>
@@ -4546,6 +4553,89 @@ function whenElementReady(id, callback, retries = 10) {
   requestAnimationFrame(() => whenElementReady(id, callback, retries - 1));
 }
 
+// --- Load dynamic featured songs from RTDB ---
+(function loadDynamicFeaturedSongs() {
+  let _audioCounter = 100;
+  function prettifyUrl(url) {
+    try {
+      const h = new URL(url).hostname.replace('www.', '').replace('open.', '');
+      if (/instagram/i.test(h)) return 'Instagram';
+      if (/spotify/i.test(h)) return 'Spotify';
+      if (/soundcloud/i.test(h)) return 'SoundCloud';
+      if (/youtube|youtu\.be/i.test(h)) return 'YouTube';
+      if (/tiktok/i.test(h)) return 'TikTok';
+      if (/twitter|x\.com/i.test(h)) return 'X / Twitter';
+      if (/apple/i.test(h)) return 'Apple Music';
+      return h.split('.')[0].charAt(0).toUpperCase() + h.split('.')[0].slice(1);
+    } catch (e) { return 'Link'; }
+  }
+  onValue(ref2(database, 'FEATURE_REFERRAL_REQUESTS'), (snap) => {
+    const container = document.getElementById('featuredContainer');
+    if (!container || !snap.exists()) return;
+    // Remove previously injected dynamic cards
+    container.querySelectorAll('.featuredCard[data-dynamic]').forEach(el => el.remove());
+    const requests = snap.val();
+    const ownerKeys = new Set();
+    // Collect unique owner keys with status 'featured'
+    for (const ownerKey in requests) {
+      for (const fromKey in requests[ownerKey]) {
+        const req = requests[ownerKey][fromKey];
+        if (req && req.status === 'featured') ownerKeys.add(ownerKey);
+      }
+    }
+    ownerKeys.forEach((ownerKey) => {
+      // Load the owner's song from SONGS/ (find any song uploaded by this user)
+      get(ref2(database, 'FEATURED_SOCIAL_LINKS/' + ownerKey)).then((linkSnap) => {
+        const socialData = linkSnap.exists() ? linkSnap.val() : {};
+        const socialLinks = (socialData.links || []).filter(Boolean);
+        // Find a song by this user — search SONGS tree
+        get(ref2(database, 'SONGS')).then((songsSnap) => {
+          if (!songsSnap.exists()) return;
+          const allSongs = songsSnap.val();
+          let song = null;
+          // Walk the SONGS/<title>/<album>/<artist> tree
+          for (const titleKey in allSongs) {
+            for (const albumKey in allSongs[titleKey]) {
+              for (const artistKey in allSongs[titleKey][albumKey]) {
+                const s = allSongs[titleKey][albumKey][artistKey];
+                if (s && s.uploader) {
+                  const uploaderKey = s.uploader.replace(/[.#$[\]]/g, '_');
+                  if (uploaderKey === ownerKey || s.uploader === ownerKey) {
+                    song = s;
+                    break;
+                  }
+                }
+              }
+              if (song) break;
+            }
+            if (song) break;
+          }
+          if (!song || !song.fileInp) return;
+          const audioId = 'dynAudio_' + (++_audioCounter);
+          const card = document.createElement('div');
+          card.className = 'featuredCard';
+          card.setAttribute('data-dynamic', '1');
+          let linksHtml = '';
+          if (socialLinks.length) {
+            linksHtml = '<div class="social-links">' +
+              socialLinks.map(u => '<a href="' + u.replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">' + prettifyUrl(u) + '</a>').join('') +
+              '</div>';
+          }
+          card.innerHTML =
+            '<h3>' + (song.title || 'Untitled').replace(/</g, '&lt;') + '</h3>' +
+            '<p>Album: ' + (song.album || '').replace(/</g, '&lt;') + '</p>' +
+            '<p>Artist: ' + (song.artist || song.uploaderName || '').replace(/</g, '&lt;') + '</p>' +
+            linksHtml +
+            '<audio id="' + audioId + '" src="' + song.fileInp + '" preload="none"></audio>' +
+            '<button onclick="document.getElementById(\'' + audioId + '\').play()">PLAY</button>' +
+            '<button onclick="document.getElementById(\'' + audioId + '\').pause()">PAUSE</button>';
+          container.appendChild(card);
+        }).catch(() => {});
+      }).catch(() => {});
+    });
+  });
+})();
+
 // Firebase REST fallback for iOS WebView (when WebSocket/onValue never fires)
 const RTDB_BASE = "https://asteroid-cdc13-default-rtdb.firebaseio.com";
 try {
@@ -4795,7 +4885,7 @@ function songOverflowActionsHtml(p) {
       plArtistEnc +
       '"><span class="material-symbols-outlined">library_music</span><span>Save to My Playlist</span></button>';
   }
-  var fsScrim =
+   var fsScrim =
     '<button type="button" class="song-overflow-fs-scrim" aria-label="Close menu" onclick="event.stopPropagation();window.closeSongOverflowFullscreen()"></button>';
   var fsBack =
     '<button type="button" class="song-overflow-item song-overflow-fs-back" role="menuitem" onclick="event.stopPropagation();window.closeSongOverflowFullscreen()"><span class="material-symbols-outlined">arrow_back</span><span>Back</span></button>';

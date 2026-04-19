@@ -150,6 +150,15 @@
     .referral-code-status { min-height: 20px; font-size: 12px; font-weight: 600; color: #374151; margin-top: 6px; }
     .referral-code-status.error { color: #b91c1c; }
     .referral-code-status.ok { color: #0f766e; }
+    #referralComplete { display: none; margin-top: 16px; padding: 18px; border-radius: 12px; background: linear-gradient(135deg, #e6fff0, #f0fdf4); border: 2px solid #22c55e; text-align: center; }
+    #referralComplete h3 { margin: 0 0 6px; color: #15803d; font-size: 16px; }
+    #referralComplete p { margin: 0 0 14px; color: #166534; font-size: 13px; }
+    .social-links-form { text-align: left; }
+    .social-links-form label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 4px; margin-top: 10px; }
+    .social-links-form input { width: 100%; max-width: 100%; margin: 0; padding: 10px; font-size: 13px; box-sizing: border-box; }
+    .social-links-form button { margin-top: 12px; padding: 10px 20px; background: #22c55e; color: #fff; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
+    .social-links-form button:hover { background: #16a34a; }
+    #socialLinksSaved { display: none; margin-top: 8px; font-size: 12px; font-weight: 600; color: #15803d; }
 
     /* SUCCESS MODAL */
     #vipSuccessBox { display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid #00ff88; padding: 30px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.5); z-index: 1000; max-width: 400px; }
@@ -794,6 +803,19 @@
         <input type="text" id="referralCodeEntry" placeholder="Enter another artist's referral code" autocomplete="off">
         <button id="submitReferralCodeBtn" class="upload-btn" style="width: 180px; height: 35px; font-size: 12px;">SUBMIT CODE</button>
         <div id="referralCodeStatus" class="referral-code-status"></div>
+      </div>
+
+      <div id="referralComplete">
+        <h3>Your song is featured!</h3>
+        <p>You have already been granted feature for this song.</p>
+        <div class="social-links-form">
+          <label>Add up to 3 links (social media, streaming, website)</label>
+          <input type="url" id="socialLink1" placeholder="https://instagram.com/..." autocomplete="off">
+          <input type="url" id="socialLink2" placeholder="https://open.spotify.com/..." autocomplete="off">
+          <input type="url" id="socialLink3" placeholder="https://soundcloud.com/..." autocomplete="off">
+          <button type="button" id="saveSocialLinksBtn">Save Links</button>
+          <div id="socialLinksSaved">Links saved! They will appear with your featured song.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -2764,8 +2786,108 @@
       if (title4) title4.textContent = 'Featured!';
       if (desc4) desc4.textContent = 'Your song is now in Featured Songs on Asteroid.';
     }
+    // Always check completion state after tutorial update
+    try { checkReferralCompletion(); } catch (e) {}
+    // Start watching for code usage if signed in
+    try { watchReferralCodeUsage(); } catch (e) {}
   }
   window.updateStudioTutorial = updateStudioTutorial;
+
+  // Check if all steps are done and show/hide the completion panel
+  function checkReferralCompletion() {
+    const signedIn = !!studioReferralUserKey();
+    const uploaded = localStorage.getItem('_studioTutorialUploadedOnce') === '1';
+    const codeUsed = localStorage.getItem('_studioReferralCodeUsed') === '1';
+    const submitted = Number(localStorage.getItem('_studioTutorialSubmittedAt') || 0) > 0;
+    const allDone = signedIn && uploaded && codeUsed && submitted;
+    const panel = document.getElementById('referralComplete');
+    const codePanel = document.querySelector('.referral-code-panel');
+    const shareLinkRow = document.getElementById('shareLinkInput');
+    const copyBtn = document.getElementById('copyBtn');
+    const shareLabel = shareLinkRow && shareLinkRow.previousElementSibling; // the <p> "Your Referral Code:"
+    if (allDone) {
+      if (panel) panel.style.display = 'block';
+      if (codePanel) codePanel.style.display = 'none';
+      if (shareLinkRow) shareLinkRow.style.display = 'none';
+      if (copyBtn) copyBtn.style.display = 'none';
+      if (shareLabel) shareLabel.style.display = 'none';
+      // Load saved social links
+      loadSocialLinks();
+    } else {
+      if (panel) panel.style.display = 'none';
+      if (codePanel) codePanel.style.display = '';
+      if (shareLinkRow) shareLinkRow.style.display = '';
+      if (copyBtn) copyBtn.style.display = '';
+      if (shareLabel) shareLabel.style.display = '';
+    }
+  }
+
+  // Load saved social links from RTDB
+  async function loadSocialLinks() {
+    const key = studioReferralUserKey();
+    if (!key) return;
+    try {
+      const snap = await rtdbGet(ref2(db, 'FEATURED_SOCIAL_LINKS/' + key));
+      if (snap.exists()) {
+        const data = snap.val();
+        const links = data.links || [];
+        if (links[0]) document.getElementById('socialLink1').value = links[0];
+        if (links[1]) document.getElementById('socialLink2').value = links[1];
+        if (links[2]) document.getElementById('socialLink3').value = links[2];
+      }
+    } catch (e) {
+      console.warn('[social-links] Could not load:', e.message || e);
+    }
+  }
+
+  // Save social links to RTDB
+  document.getElementById('saveSocialLinksBtn')?.addEventListener('click', async () => {
+    const key = studioReferralUserKey();
+    if (!key) return;
+    const links = [
+      (document.getElementById('socialLink1').value || '').trim(),
+      (document.getElementById('socialLink2').value || '').trim(),
+      (document.getElementById('socialLink3').value || '').trim(),
+    ].filter(Boolean);
+    const savedMsg = document.getElementById('socialLinksSaved');
+    try {
+      await rtdbSet(ref2(db, 'FEATURED_SOCIAL_LINKS/' + key), {
+        links: links,
+        updatedAt: Date.now(),
+      });
+      if (savedMsg) { savedMsg.style.display = 'block'; setTimeout(() => { savedMsg.style.display = 'none'; }, 3000); }
+      console.log('[social-links] Saved:', links);
+    } catch (e) {
+      console.error('[social-links] Save failed:', e);
+      if (savedMsg) { savedMsg.textContent = 'Could not save links right now.'; savedMsg.style.display = 'block'; savedMsg.style.color = '#b91c1c'; }
+    }
+  });
+
+  // Real-time listener: watch the user's referral code for when it gets used
+  let _codeWatcherUnsub = null;
+  function watchReferralCodeUsage() {
+    const key = studioReferralUserKey();
+    if (!key) return;
+    // Watch REFERRAL_CODES_BY_USER/<key> for the code, then watch its used status
+    if (_codeWatcherUnsub) return; // already watching
+    _codeWatcherUnsub = onValue(ref2(db, 'REFERRAL_CODES_BY_USER/' + key), (snap) => {
+      if (!snap.exists()) return;
+      const data = snap.val();
+      const code = data && data.code;
+      if (!code) return;
+      // Now watch the code's used status in REFERRAL_CODE_INDEX
+      onValue(ref2(db, 'REFERRAL_CODE_INDEX/' + code), (idxSnap) => {
+        if (!idxSnap.exists()) return;
+        const idx = idxSnap.val();
+        if (typeof idx === 'object' && idx.used === true) {
+          console.log('[referral-watch] Code', code, 'has been used!');
+          localStorage.setItem('_studioReferralCodeUsed', '1');
+          updateStudioTutorial();
+          checkReferralCompletion();
+        }
+      });
+    });
+  }
 
   // Helper: RTDB get with a timeout so it never hangs
   function rtdbGet(dbRef, ms) {
