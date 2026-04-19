@@ -2735,6 +2735,26 @@ body.create-profile-active {
   text-decoration: none; transition: background 0.2s, color 0.2s;
 }
 .featuredCard .social-links a:hover { background: #ff7f50; color: #fff; }
+.featuredCard .artist-profile-block {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  padding-bottom: 12px; border-bottom: 1px solid rgba(255,127,80,0.15);
+}
+.featuredCard .artist-profile-block .avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, #ff7f50, #ff5722);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 16px; font-family: 'Montserrat', sans-serif;
+  flex-shrink: 0; overflow: hidden;
+}
+.featuredCard .artist-profile-block .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.featuredCard .artist-profile-block .artist-meta { display: flex; flex-direction: column; min-width: 0; }
+.featuredCard .artist-profile-block .artist-name {
+  font-weight: 700; color: #fff; font-size: 14px; font-family: 'Montserrat', sans-serif;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.featuredCard .artist-profile-block .artist-tag {
+  font-size: 11px; color: rgba(255,127,80,0.85); font-family: 'Poppins', sans-serif;
+}
     </style>
     <section id="featuredSection">
       <h2>🔥 Featured Songs</h2>
@@ -4584,53 +4604,75 @@ function whenElementReady(id, callback, retries = 10) {
       }
     }
     ownerKeys.forEach((ownerKey) => {
-      // Load the owner's song from SONGS/ (find any song uploaded by this user)
-      get(ref2(database, 'FEATURED_SOCIAL_LINKS/' + ownerKey)).then((linkSnap) => {
-        const socialData = linkSnap.exists() ? linkSnap.val() : {};
-        const socialLinks = (socialData.links || []).filter(Boolean);
-        // Find a song by this user — search SONGS tree
-        get(ref2(database, 'SONGS')).then((songsSnap) => {
-          if (!songsSnap.exists()) return;
-          const allSongs = songsSnap.val();
-          let song = null;
-          // Walk the SONGS/<title>/<album>/<artist> tree
-          for (const titleKey in allSongs) {
-            for (const albumKey in allSongs[titleKey]) {
-              for (const artistKey in allSongs[titleKey][albumKey]) {
-                const s = allSongs[titleKey][albumKey][artistKey];
-                if (s && s.uploader) {
-                  const uploaderKey = s.uploader.replace(/[.#$[\]]/g, '_');
-                  if (uploaderKey === ownerKey || s.uploader === ownerKey) {
-                    song = s;
-                    break;
-                  }
-                }
+      Promise.all([
+        get(ref2(database, 'FEATURED_SOCIAL_LINKS/' + ownerKey)).catch(() => null),
+        get(ref2(database, 'PROFILES/' + ownerKey)).catch(() => null),
+        get(ref2(database, 'SONGS')).catch(() => null)
+      ]).then(([linkSnap, profileSnap, songsSnap]) => {
+        if (!songsSnap || !songsSnap.exists()) return;
+        const socialData = (linkSnap && linkSnap.exists()) ? linkSnap.val() : {};
+        const savedLinks = (socialData.links || []).filter(Boolean);
+        const profile = (profileSnap && profileSnap.exists()) ? profileSnap.val() : {};
+        const allSongs = songsSnap.val();
+        let song = null;
+        for (const titleKey in allSongs) {
+          for (const albumKey in allSongs[titleKey]) {
+            for (const artistKey in allSongs[titleKey][albumKey]) {
+              const s = allSongs[titleKey][albumKey][artistKey];
+              if (s && s.uploader) {
+                const uploaderKey = s.uploader.replace(/[.#$[\]]/g, '_');
+                if (uploaderKey === ownerKey || s.uploader === ownerKey) { song = s; break; }
               }
-              if (song) break;
             }
             if (song) break;
           }
-          if (!song || !song.fileInp) return;
-          const audioId = 'dynAudio_' + (++_audioCounter);
-          const card = document.createElement('div');
-          card.className = 'featuredCard';
-          card.setAttribute('data-dynamic', '1');
-          let linksHtml = '';
-          if (socialLinks.length) {
-            linksHtml = '<div class="social-links">' +
-              socialLinks.map(u => '<a href="' + u.replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">' + prettifyUrl(u) + '</a>').join('') +
-              '</div>';
-          }
-          card.innerHTML =
-            '<h3>' + (song.title || 'Untitled').replace(/</g, '&lt;') + '</h3>' +
-            '<p>Album: ' + (song.album || '').replace(/</g, '&lt;') + '</p>' +
-            '<p>Artist: ' + (song.artist || song.uploaderName || '').replace(/</g, '&lt;') + '</p>' +
-            linksHtml +
-            '<audio id="' + audioId + '" src="' + song.fileInp + '" preload="none"></audio>' +
-            '<button onclick="document.getElementById(\'' + audioId + '\').play()">PLAY</button>' +
-            '<button onclick="document.getElementById(\'' + audioId + '\').pause()">PAUSE</button>';
-          container.appendChild(card);
-        }).catch(() => {});
+          if (song) break;
+        }
+        if (!song || !song.fileInp) return;
+
+        const profileSocialLinks = [
+          profile.instagram, profile.youtube, profile.soundcloud,
+          profile.spotify, profile.applemusic, profile.website, profile.tiktok
+        ].filter(u => u && /^https?:\/\//.test(u));
+        const allSocialLinks = Array.from(new Set([...savedLinks, ...profileSocialLinks]));
+
+        const artistName = profile.nickname || song.artist || song.uploaderName || 'Artist';
+        const avatarImg = profile.profileImage || profile.photoURL || '';
+        const initial = String(artistName).trim().charAt(0).toUpperCase() || 'A';
+        const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+        const avatarHtml = avatarImg
+          ? '<div class="avatar"><img src="' + esc(avatarImg) + '" alt="' + esc(artistName) + '"></div>'
+          : '<div class="avatar">' + esc(initial) + '</div>';
+
+        const profileBlockHtml =
+          '<div class="artist-profile-block">' +
+            avatarHtml +
+            '<div class="artist-meta">' +
+              '<span class="artist-name">' + esc(artistName) + '</span>' +
+              '<span class="artist-tag">Featured artist</span>' +
+            '</div>' +
+          '</div>';
+
+        const linksHtml = allSocialLinks.length
+          ? '<div class="social-links">' +
+              allSocialLinks.map(u => '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(prettifyUrl(u)) + '</a>').join('') +
+            '</div>'
+          : '';
+
+        const audioId = 'dynAudio_' + (++_audioCounter);
+        const card = document.createElement('div');
+        card.className = 'featuredCard';
+        card.setAttribute('data-dynamic', '1');
+        card.innerHTML =
+          profileBlockHtml +
+          '<h3>' + esc(song.title || 'Untitled') + '</h3>' +
+          '<p>Album: ' + esc(song.album || '') + '</p>' +
+          linksHtml +
+          '<audio id="' + audioId + '" src="' + esc(song.fileInp) + '" preload="none"></audio>' +
+          '<button onclick="document.getElementById(\'' + audioId + '\').play()">PLAY</button>' +
+          '<button onclick="document.getElementById(\'' + audioId + '\').pause()">PAUSE</button>';
+        container.appendChild(card);
       }).catch(() => {});
     });
   });
