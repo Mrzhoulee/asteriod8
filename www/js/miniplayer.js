@@ -20,6 +20,58 @@
     return d.innerHTML;
   }
 
+  // --- Firebase persistence (saves queue adds to PLAYLISTS/<uid>/<songId>) ---
+  // Uses the same globals and path that index.html's "save to playlist" writes to,
+  // so queued songs show up in the user's pat.html playlist too.
+  function currentUserKey() {
+    try {
+      const emailLike =
+        (localStorage.getItem('userEmail') ||
+          localStorage.getItem('email') ||
+          localStorage.getItem('CurrentUser') ||
+          '').trim();
+      if (!emailLike) return '';
+      return emailLike.replace(/[.#$[\]]/g, '_');
+    } catch (e) { return ''; }
+  }
+  function songIdFromUrl(url) {
+    return String(url || '').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 180) || 'song_' + Date.now();
+  }
+  function firebaseSaveToPlaylist(song) {
+    try {
+      const uid = currentUserKey();
+      const db = window.firebaseDatabase;
+      const refFn = window.firebaseRef;
+      const setFn = window.firebaseSet;
+      if (!uid || !db || !refFn || !setFn || !song || !song.url) return;
+      const sid = songIdFromUrl(song.url);
+      setFn(refFn(db, 'PLAYLISTS/' + uid + '/' + sid), {
+        title: song.title || 'Untitled',
+        artist: song.artist || 'Unknown artist',
+        src: song.url,
+        imageUrl: song.imageUrl || '',
+        addedAt: Date.now(),
+        source: 'queue'
+      }).catch(err => console.warn('[miniplayer] playlist save failed:', err));
+    } catch (e) {
+      console.warn('[miniplayer] firebaseSaveToPlaylist error:', e);
+    }
+  }
+  function firebaseRemoveFromPlaylist(song) {
+    try {
+      const uid = currentUserKey();
+      const db = window.firebaseDatabase;
+      const refFn = window.firebaseRef;
+      const rmFn = window.firebaseRemove;
+      if (!uid || !db || !refFn || !rmFn || !song || !song.url) return;
+      const sid = songIdFromUrl(song.url);
+      rmFn(refFn(db, 'PLAYLISTS/' + uid + '/' + sid))
+        .catch(err => console.warn('[miniplayer] playlist remove failed:', err));
+    } catch (e) {
+      console.warn('[miniplayer] firebaseRemoveFromPlaylist error:', e);
+    }
+  }
+
   function injectStyles() {
     if (document.getElementById('asteroid-miniplayer-style')) return;
     const s = document.createElement('style');
@@ -229,7 +281,9 @@
     popup.querySelector('.aqp-close').addEventListener('click', closeQueue);
     popup.querySelector('[data-act="done"]').addEventListener('click', closeQueue);
     popup.querySelector('[data-act="clear"]').addEventListener('click', () => {
+      const toRemove = queue.slice();
       queue.length = 0;
+      toRemove.forEach(firebaseRemoveFromPlaylist);
       renderPopup();
       render();
     });
@@ -340,7 +394,8 @@
           playSong(song);
           renderPopup();
         } else if (act === 'remove') {
-          queue.splice(i, 1);
+          const removed = queue.splice(i, 1)[0];
+          if (removed) firebaseRemoveFromPlaylist(removed);
           renderPopup();
           render();
         }
@@ -376,6 +431,7 @@
   function enqueue(song) {
     ensureUI();
     if (!song || !song.url) return;
+    firebaseSaveToPlaylist(song);
     if (!current) {
       playSong(song);
     } else {

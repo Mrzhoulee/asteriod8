@@ -263,7 +263,7 @@
   <script src="js/miniplayer.js" defer></script>
   <script type="module">
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-    import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+    import { getDatabase, ref, get, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
@@ -277,6 +277,12 @@
     };
     const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    // Expose firebase globals so miniplayer.js (regular script) can persist the queue.
+    window.firebaseDatabase = db;
+    window.firebaseRef = ref;
+    window.firebaseSet = set;
+    window.firebaseRemove = remove;
+    window.firebaseGet = get;
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {

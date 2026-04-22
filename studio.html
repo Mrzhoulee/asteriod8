@@ -1349,6 +1349,12 @@
 
   const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   const db = getDatabase(app);
+  // Expose firebase globals so miniplayer.js (regular script) can persist the queue.
+  window.firebaseDatabase = db;
+  window.firebaseRef = ref2;
+  window.firebaseSet = set;
+  window.firebaseRemove = remove;
+  window.firebaseGet = get;
   let auth;
   try {
     console.log('[studio][init] Calling initializeAuth…');
