@@ -1050,18 +1050,29 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 <div id="creatorPollsList" class="songs-list" style="margin-top: 1.5rem;"><div class="loading">No polls yet.</div></div>
             </div>
             <div class="analytics-section">
-                <h2 class="section-title"><i class="fas fa-bell"></i> Followers &amp; notices</h2>
+                <h2 class="section-title"><i class="fas fa-bell"></i> Followers &amp; updates</h2>
                 <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">
-                    Followers are stored under <code>FOLLOWS/{yourAccountKey}/{followerKey}</code>. To follow someone else by their public username, look them up in <code>USERNAME_REGISTRY</code> (same as the home page).
+                    When fans follow you, your posts show up on their home feed. Use this to announce a new song, a show, or anything you want your followers to see.
                 </p>
                 <div id="creatorFollowStatus" style="color: var(--text-secondary); margin-bottom: 12px;"></div>
+
                 <div class="form-group">
-                    <label class="form-label">Follow user by public username</label>
+                    <label class="form-label">Post an update to your followers</label>
+                    <textarea id="creatorNoticeText" class="form-input" rows="3" maxlength="800" placeholder="e.g. New single &quot;Midnight Drive&quot; is out now — link in my profile!"></textarea>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.35rem;">
+                        Tip: when you drop a new song, write a short update here. Everyone who follows you will see it on their home feed the next time they open the app. (Max 800 characters. You need a saved public username before you can post.)
+                    </p>
+                </div>
+                <button type="button" class="btn btn-primary" id="creatorPostNoticeBtn"><i class="fas fa-bullhorn"></i> Post update</button>
+                <div id="creatorPostNoticeStatus" style="color: var(--text-secondary); margin-top: 10px; font-size: 0.9rem;"></div>
+
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label class="form-label">Follow another artist by username</label>
                     <input type="text" id="creatorFollowUsername" class="form-input" placeholder="e.g. lunar_beats" maxlength="40" autocomplete="off">
-                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.35rem;">They must have saved a unique username on their profile. Uses the same <code>FOLLOWS</code> / <code>FOLLOWING</code> paths as the main site.</p>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.35rem;">Their posts will then appear on your home feed too. They need a saved public username.</p>
                 </div>
                 <button type="button" class="btn btn-primary" id="creatorFollowUserBtn"><i class="fas fa-user-plus"></i> Follow this user</button>
-                <p style="color: var(--text-secondary); margin-top: 12px; font-size: 0.9rem;">Set your own public username under <strong>Customize Profile</strong>; registry is <code>USERNAME_REGISTRY</code>.</p>
+                <p style="color: var(--text-secondary); margin-top: 12px; font-size: 0.9rem;">Don't have a public username yet? Set one under <strong>Customize Profile</strong> first.</p>
             </div>
         </div>
 
@@ -1458,6 +1469,42 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             } catch (e) {
                 console.error(e);
                 alert('Could not save poll (rules?)');
+            }
+        });
+
+        document.getElementById('creatorPostNoticeBtn')?.addEventListener('click', async () => {
+            const statusEl = document.getElementById('creatorPostNoticeStatus');
+            const setStatus = (msg, ok) => {
+                if (!statusEl) return;
+                statusEl.textContent = msg || '';
+                statusEl.style.color = ok ? '#10b981' : 'var(--text-secondary)';
+            };
+            if (!currentEmailKey) {
+                setStatus('Sign in first.', false);
+                return;
+            }
+            const textarea = document.getElementById('creatorNoticeText');
+            const text = (textarea?.value || '').trim();
+            if (!text) {
+                setStatus('Write something first.', false);
+                return;
+            }
+            if (text.length > 800) {
+                setStatus('Message is too long (max 800 characters).', false);
+                return;
+            }
+            try {
+                const noticesRef = ref(database, 'ARTIST_NOTICES/' + currentEmailKey);
+                await push(noticesRef, {
+                    text,
+                    ts: Date.now(),
+                    ownerKey: currentEmailKey
+                });
+                textarea.value = '';
+                setStatus('Posted! Followers will see this on their home feed.', true);
+            } catch (e) {
+                console.error('post notice failed', e);
+                setStatus('Could not post. Make sure you have a public profile and try again.', false);
             }
         });
 
