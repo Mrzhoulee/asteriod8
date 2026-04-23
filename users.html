@@ -323,6 +323,13 @@
       const hasAnyArtist = profile.instagram || profile.soundcloud || profile.spotify || profile.youtube || profile.applemusic || profile.bandcamp;
       return hasAnyArtist ? 'Artist' : 'Listener';
     }
+    function isPublicArtist(profile) {
+      if (!profile) return false;
+      const vis = String(profile.profileVisibility || '').toLowerCase();
+      if (vis === 'private') return false;
+      if (profile.publicProfile === false) return false;
+      return resolveRole(profile) === 'Artist';
+    }
 
     function render(list) {
       if (!list.length) {
@@ -432,22 +439,16 @@
       const btn = document.getElementById('modalFollowBtn');
       const hint = document.getElementById('modalFollowHint');
       if (!wrap || !btn || !hint) return;
-      if (!u || !u.key || u.role !== 'Artist') {
-        wrap.style.display = 'none';
-        return;
-      }
+      if (!u || !u.key) { wrap.style.display = 'none'; return; }
       const vk = viewerFollowKey();
-      if (vk && vk === u.key) {
-        wrap.style.display = 'none';
-        return;
-      }
+      if (vk && vk === u.key) { wrap.style.display = 'none'; return; }
       wrap.style.display = 'flex';
       btn.classList.remove('following');
-      if (!isSignedInForFollow() || !vk) {
+      btn.onclick = null;
+      if (!vk) {
         btn.textContent = 'Sign in to follow';
         btn.disabled = true;
-        hint.textContent = 'Sign in from the home page first, then you can follow this artist.';
-        btn.onclick = null;
+        hint.textContent = 'Sign in on the home page first, then reload this page to follow.';
         return;
       }
       btn.textContent = 'Loading…';
@@ -457,12 +458,15 @@
       try {
         const fs = await get(ref(db, 'FOLLOWING/' + vk + '/' + u.key));
         following = fs.exists() && fs.val() === true;
-      } catch (e) { console.warn('follow state', e); }
+      } catch (e) {
+        console.warn('follow state read failed', e);
+        hint.textContent = 'Could not check follow state: ' + (e && e.message ? e.message : 'network error');
+      }
       const renderState = () => {
         if (following) {
-          btn.textContent = 'Following';
+          btn.textContent = 'Following · tap to unfollow';
           btn.classList.add('following');
-          hint.textContent = 'Tap to unfollow.';
+          hint.textContent = 'You’ll see their posts under “From artists you follow” on the home page.';
         } else {
           btn.textContent = 'Follow artist';
           btn.classList.remove('following');
@@ -473,6 +477,7 @@
       renderState();
       btn.onclick = async () => {
         btn.disabled = true;
+        const prev = following;
         try {
           if (following) {
             await Promise.all([
@@ -487,11 +492,13 @@
             ]);
             following = true;
           }
+          renderState();
         } catch (e) {
-          console.warn('follow toggle', e);
-          hint.textContent = 'Could not update follow. Check your connection.';
+          console.warn('follow toggle failed', e);
+          following = prev;
+          renderState();
+          hint.textContent = 'Could not save follow: ' + (e && e.message ? e.message : 'unknown error') + '. Check your connection and try again.';
         }
-        renderState();
       };
     }
 
@@ -517,7 +524,7 @@
       }
       document.getElementById('modalSongsSection').style.display = 'none';
       document.getElementById('modalFollowWrap').style.display = 'none';
-      if (u.role === 'Artist' && u.key) {
+      if (u.key) {
         void loadArtistSongs(u.key, u.profile || {});
         void wireFollowButton(u);
       }
@@ -557,13 +564,14 @@
           const p = profiles[key] || {};
           const name = (p.nickname || p.fullName || p.displayName || '').trim();
           if (!name) continue;
+          if (!isPublicArtist(p)) continue;
           const links = [
             p.instagram, p.youtube, p.soundcloud, p.spotify, p.applemusic, p.bandcamp, p.tiktok, p.website
           ].filter(u => u && /^https?:\/\//.test(u));
           arr.push({
             key,
             name,
-            role: resolveRole(p),
+            role: 'Artist',
             avatar: p.profileImage || p.photoURL || p.profilePicture || '',
             bio: p.bio || '',
             links,
