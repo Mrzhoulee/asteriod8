@@ -1519,9 +1519,10 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 alert('Enter a valid public username (letters, numbers, underscores; 3–40 characters).');
                 return;
             }
-            const viewerKey = sanitizeEmail((localStorage.getItem('email') || localStorage.getItem('CurrentUser') || currentUserEmail || '').trim().toLowerCase());
+            // Use the same key index.html + followed-notices.js read from, so follows written here appear in the reader's feed.
+            const viewerKey = currentEmailKey || (localStorage.getItem('emailKey') || '').trim() || sanitizeEmail(localStorage.getItem('CurrentUser') || localStorage.getItem('email') || currentUserEmail || '');
             if (!viewerKey) {
-                alert('Could not resolve your account email. Sign in again.');
+                alert('Could not resolve your account. Sign in again.');
                 return;
             }
             try {
@@ -2057,29 +2058,28 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
         // Initialize
         onAuthStateChanged(auth, async (user) => {
           try {
-            let emailToUse = null;
+            // Match index.html getViewerFollowKeyForFollow(): prefer the canonical emailKey
+            // that index.html wrote to localStorage, then CurrentUser (stable per-provider id;
+            // Firebase uid for Apple users so relay emails never create a second PROFILES/<key>).
+            const storedEmailKey = (localStorage.getItem("emailKey") || "").trim();
+            const storedCurrentUser = (localStorage.getItem("CurrentUser") || "").trim();
+            const storedEmail = (localStorage.getItem("email") || "").trim();
+            const accountId =
+              storedCurrentUser ||
+              storedEmail ||
+              (user && (user.email || (user.providerData && user.providerData[0] && user.providerData[0].email) || user.uid)) ||
+              localStorage.getItem("artemail") ||
+              null;
 
-            if (user) {
-              emailToUse =
-                (localStorage.getItem("email") || "").trim() ||
-                user.email ||
-                (user.providerData && user.providerData[0] && user.providerData[0].email) ||
-                user.uid ||
-                null;
-            }
-            if (!emailToUse) {
-              emailToUse = localStorage.getItem("artemail") || localStorage.getItem("email") || null;
-            }
-
-            if (!emailToUse) {
+            if (!storedEmailKey && !accountId) {
                     window.location.href = "index.html";
               return;
             }
 
-                currentUserEmail = emailToUse;
-                currentEmailKey = sanitizeEmail(emailToUse);
+                currentUserEmail = accountId || storedEmailKey || "";
+                currentEmailKey = storedEmailKey || sanitizeEmail(accountId);
 
-                localStorage.setItem("artemail", emailToUse);
+                if (currentUserEmail) localStorage.setItem("artemail", currentUserEmail);
 
                 await loadAnalytics();
                 await loadProfile();
