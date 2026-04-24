@@ -5,6 +5,13 @@
  */
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const POLL_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+
+function isPollActive(p, now) {
+  const created = Number(p && p.createdAt) || 0;
+  if (!created) return true;
+  return now - created < POLL_LIFETIME_MS;
+}
 
 const RTDB_REST_FALLBACK =
   (typeof window !== "undefined" && window.__ASTER_RTDB_REST_BASE) ||
@@ -87,6 +94,12 @@ function cardHtml(p) {
   const labelA = esc(p.labelA || "Artist A");
   const labelB = esc(p.labelB || p.artistBName || "Artist B");
   const pid = esc(p.id);
+  const created = Number(p.createdAt) || 0;
+  const remaining = created ? Math.max(0, POLL_LIFETIME_MS - (Date.now() - created)) : POLL_LIFETIME_MS;
+  const daysLeft = Math.max(1, Math.ceil(remaining / (24 * 60 * 60 * 1000)));
+  const closesIn = created
+    ? "Closes in ~" + daysLeft + " day" + (daysLeft === 1 ? "" : "s")
+    : "Closes 7 days after it was posted";
   return `
   <article class="home-poll-card" style="--poll-a:${esc(colorA)};--poll-b:${esc(colorB)};" data-poll-id="${pid}">
     <div class="home-poll-card-head">
@@ -104,7 +117,7 @@ function cardHtml(p) {
         <button type="button" class="home-poll-vote-btn" data-home-poll-vote data-poll-id="${pid}" data-side="b" style="background:${esc(colorB)}">Vote · ${cb}</button>
       </div>
     </div>
-    <p class="home-poll-hint">One vote per week on this device / account.</p>
+    <p class="home-poll-hint">One vote per week on this device / account · ${esc(closesIn)}</p>
   </article>`;
 }
 
@@ -132,10 +145,12 @@ function rowsFromObject(obj) {
 }
 
 function renderPollRows(mount, rows, db, refFn, getFn, setFn) {
-  rows.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  const lim = rows.slice(0, 12);
+  const now = Date.now();
+  const active = rows.filter((r) => isPollActive(r, now));
+  active.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const lim = active.slice(0, 12);
   if (!lim.length) {
-    mount.innerHTML = '<p class="home-polls-empty">No artist battles yet.</p>';
+    mount.innerHTML = '<p class="home-polls-empty">No active artist battles — polls auto-close after 7 days.</p>';
     return;
   }
   mount.innerHTML = lim.map((p) => cardHtml({ ...p, id: p.id })).join("");

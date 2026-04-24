@@ -1023,7 +1023,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             </div>
             <div class="analytics-section">
                 <h2 class="section-title"><i class="fas fa-poll"></i> Artist vs artist poll</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Preview links: YouTube, Spotify, SoundCloud, Apple Music, or direct MP3. Fans vote <strong>once per week</strong> per account/device.</p>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Preview links: YouTube, Spotify, SoundCloud, Apple Music, or direct MP3. Fans vote <strong>once per week</strong> per account/device. Polls <strong>auto-close after 7 days</strong> and each artist can publish <strong>one battle every 3 months</strong>.</p>
                 <div class="form-group">
                     <label class="form-label">Duo theme (your side vs theirs)</label>
                     <select id="pollThemePreset" class="form-input">
@@ -1370,7 +1370,18 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                             const pidJs = String(p.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
                             const cA = p.colorA || '#2563eb';
                             const cB = p.colorB || '#dc2626';
-                            pollsHtml += `<div class="song-item creator-poll-row"><div class="song-info"><div class="song-title">You vs ${escapeHtml(p.artistBName || '')}</div><div class="creator-poll-duo" style="--pa:${escapeHtml(cA)};--pb:${escapeHtml(cB)};"><div class="creator-poll-cell" style="border-color:${escapeHtml(cA)}">${pollPreviewMarkup(p.songUrlA)}</div><div class="creator-poll-cell" style="border-color:${escapeHtml(cB)}">${pollPreviewMarkup(p.songUrlB)}</div></div><div class="song-stats" style="flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;"><button type="button" class="btn btn-secondary" onclick="window.castPollVote('${pidJs}','a')" style="background:${escapeHtml(cA)};border:none;">Vote you (${ca})</button><button type="button" class="btn btn-secondary" onclick="window.castPollVote('${pidJs}','b')" style="background:${escapeHtml(cB)};border:none;">Vote ${escapeHtml(p.artistBName || 'them')} (${cb})</button></div></div></div>`;
+                            const POLL_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+                            const createdAt = Number(p.createdAt) || 0;
+                            const ageMs = createdAt ? Date.now() - createdAt : 0;
+                            const closed = createdAt && ageMs >= POLL_LIFETIME_MS;
+                            const daysLeft = createdAt ? Math.max(0, Math.ceil((POLL_LIFETIME_MS - ageMs) / (24 * 60 * 60 * 1000))) : 7;
+                            const statusLabel = closed
+                                ? `<span style="color:#f87171;font-weight:600;">Closed · past 7 days</span>`
+                                : `<span style="color:#10b981;font-weight:600;">Active · closes in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</span>`;
+                            const voteButtons = closed
+                                ? `<span style="color:var(--text-secondary);font-size:0.85rem;">Voting closed · final ${ca} vs ${cb}</span>`
+                                : `<button type="button" class="btn btn-secondary" onclick="window.castPollVote('${pidJs}','a')" style="background:${escapeHtml(cA)};border:none;">Vote you (${ca})</button><button type="button" class="btn btn-secondary" onclick="window.castPollVote('${pidJs}','b')" style="background:${escapeHtml(cB)};border:none;">Vote ${escapeHtml(p.artistBName || 'them')} (${cb})</button>`;
+                            pollsHtml += `<div class="song-item creator-poll-row"><div class="song-info"><div class="song-title">You vs ${escapeHtml(p.artistBName || '')}</div><div style="font-size:0.85rem;margin:4px 0 8px;">${statusLabel}</div><div class="creator-poll-duo" style="--pa:${escapeHtml(cA)};--pb:${escapeHtml(cB)};"><div class="creator-poll-cell" style="border-color:${escapeHtml(cA)}">${pollPreviewMarkup(p.songUrlA)}</div><div class="creator-poll-cell" style="border-color:${escapeHtml(cB)}">${pollPreviewMarkup(p.songUrlB)}</div></div><div class="song-stats" style="flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;">${voteButtons}</div></div></div>`;
                         }
                         pollsEl.innerHTML = pollsHtml;
                     }
@@ -1412,6 +1423,15 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 }
                 vid = sanitizeEmail(pk);
             }
+            const POLL_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+            try {
+                const metaSnap = await get(ref(database, 'ARTIST_POLLS/' + pollId + '/createdAt'));
+                const created = metaSnap.exists() ? Number(metaSnap.val()) : 0;
+                if (created && Date.now() - created >= POLL_LIFETIME_MS) {
+                    alert('This poll has closed (7-day limit reached).');
+                    return;
+                }
+            } catch (e) { /* non-fatal */ }
             const voteRef = ref(database, 'ARTIST_POLLS/' + pollId + '/votes/' + vid);
             const now = Date.now();
             try {
@@ -1433,6 +1453,8 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             }
         };
 
+        const POLL_CREATE_COOLDOWN_MS = 90 * 24 * 60 * 60 * 1000; // 3 months
+
         document.getElementById('pollCreateBtn')?.addEventListener('click', async () => {
             if (!currentEmailKey) {
                 alert('Sign in first.');
@@ -1447,6 +1469,29 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 alert('Fill all poll fields.');
                 return;
             }
+
+            // Rate-limit: one poll per artist every 3 months.
+            try {
+                const existingSnap = await get(ref(database, 'ARTIST_POLLS'));
+                if (existingSnap.exists()) {
+                    const now = Date.now();
+                    let mostRecent = 0;
+                    existingSnap.forEach((c) => {
+                        const v = c.val();
+                        if (v && v.ownerKey === currentEmailKey && Number(v.createdAt) > mostRecent) {
+                            mostRecent = Number(v.createdAt);
+                        }
+                    });
+                    if (mostRecent && now - mostRecent < POLL_CREATE_COOLDOWN_MS) {
+                        const daysLeft = Math.max(1, Math.ceil((POLL_CREATE_COOLDOWN_MS - (now - mostRecent)) / (24 * 60 * 60 * 1000)));
+                        alert('You can only publish one battle poll every 3 months. Try again in about ' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + '.');
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('poll cooldown check failed', e);
+            }
+
             const pid = 'poll_' + Date.now();
             try {
                 await set(ref(database, 'ARTIST_POLLS/' + pid), {
