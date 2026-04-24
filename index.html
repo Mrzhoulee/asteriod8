@@ -2782,7 +2782,8 @@ body.create-profile-active {
     </style>
     <section id="featuredSection">
       <h2>🔥 Featured Songs</h2>
-    
+      <p style="text-align:center;color:rgba(255,255,255,0.55);font-size:13px;margin:-6px 0 14px;">Artists whose referral codes have been used show up here.</p>
+
       <div id="featuredContainer">
         <!-- Featured songs will appear here -->
         <div class="featuredCard">
@@ -4201,12 +4202,6 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
   </div>
   <center>  <div id="result"></div>
   </center>
-
-      <section id="followedNoticesSection" class="followed-notices-section" aria-label="Updates from artists you follow">
-        <h2 class="followed-notices-head">From artists you follow</h2>
-        <p class="followed-notices-sub">Posts from the dashboard show up here in real time.</p>
-        <div id="followedNoticesMount"></div>
-      </section>
 
       <section id="followedSongsSection" class="followed-notices-section" aria-label="Songs uploaded by artists you follow">
         <h2 class="followed-notices-head" style="color: #ff7f50;">Songs from artists you follow</h2>
@@ -9190,7 +9185,6 @@ console.log('1171')
 </style>
 <script type="module">
   import { initHomePolls } from "./js/home-polls.js";
-  import { initFollowedArtistNotices } from "./js/followed-notices.js";
   import { initFollowedArtistSongs } from "./js/followed-songs.js";
   let __homePollsBootAttempts = 0;
   function bootHomePolls() {
@@ -9205,7 +9199,6 @@ console.log('1171')
     }
     if (window.firebaseDatabase && window.firebaseRef && window.firebaseGet && window.firebaseSet && window.firebaseOnValue) {
       initHomePolls();
-      initFollowedArtistNotices();
       initFollowedArtistSongs();
       return;
     }
