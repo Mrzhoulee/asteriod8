@@ -1186,6 +1186,30 @@
   flex-direction: column;
   gap: 14px;
 }
+#followedSongsMount {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.followed-song-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(145deg, rgba(255,127,80,0.12), rgba(15,15,20,0.92));
+  border: 1px solid rgba(255,127,80,0.28);
+  border-radius: 14px;
+}
+.followed-song-info { flex: 1; min-width: 0; }
+.followed-song-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.followed-song-meta { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.followed-song-actions { display: flex; gap: 6px; }
+.followed-song-btn {
+  background: transparent; border: 1px solid rgba(255,127,80,0.5); color: #ff7f50;
+  width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
+  font-size: 16px; line-height: 1; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.followed-song-btn:hover { background: #ff7f50; color: #000; }
 .fan-feed-empty {
   text-align: center;
   color: rgba(255,255,255,0.45);
@@ -4182,6 +4206,12 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
         <h2 class="followed-notices-head">From artists you follow</h2>
         <p class="followed-notices-sub">Posts from the dashboard show up here in real time.</p>
         <div id="followedNoticesMount"></div>
+      </section>
+
+      <section id="followedSongsSection" class="followed-notices-section" aria-label="Songs uploaded by artists you follow">
+        <h2 class="followed-notices-head" style="color: #ff7f50;">Songs from artists you follow</h2>
+        <p class="followed-notices-sub">Fresh uploads from the people you follow.</p>
+        <div id="followedSongsMount"></div>
       </section>
 
       <div id="ab" style="margin-bottom: 100px;">      <button width="100%" height="500">Go to the next song</button></div>
@@ -9161,6 +9191,7 @@ console.log('1171')
 <script type="module">
   import { initHomePolls } from "./js/home-polls.js";
   import { initFollowedArtistNotices } from "./js/followed-notices.js";
+  import { initFollowedArtistSongs } from "./js/followed-songs.js";
   let __homePollsBootAttempts = 0;
   function bootHomePolls() {
     __homePollsBootAttempts += 1;
@@ -9175,6 +9206,7 @@ console.log('1171')
     if (window.firebaseDatabase && window.firebaseRef && window.firebaseGet && window.firebaseSet && window.firebaseOnValue) {
       initHomePolls();
       initFollowedArtistNotices();
+      initFollowedArtistSongs();
       return;
     }
     setTimeout(bootHomePolls, 120);
