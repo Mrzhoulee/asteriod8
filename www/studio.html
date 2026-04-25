@@ -3102,6 +3102,27 @@
       await withTimeout(update(ref2(db, dbPath), songData), rtdbTimeoutMs, "Saving song metadata");
       console.log("✅ Song data saved to database at:", dbPath);
 
+      // Pin this upload as the artist's featured song so the home page Featured Songs
+      // card surfaces THIS track (the one they just uploaded) the moment a fan redeems
+      // their referral code, instead of having to bridge by email/name later.
+      if (uploaderOwnerKey) {
+        try {
+          await Promise.race([
+            set(ref2(db, "FEATURED_ARTIST_SONG/" + uploaderOwnerKey), {
+              title: title,
+              album: album,
+              artist: artist,
+              fileInp: url,
+              uploader: email,
+              uploaderName: fullName,
+              songPath: dbPath,
+              uploadedAt: Date.now(),
+            }),
+            new Promise((r) => setTimeout(r, 5000)),
+          ]);
+        } catch (e) { console.warn("[studio] FEATURED_ARTIST_SONG write", e); }
+      }
+
       appendUploadStatus("Saving agreement record…");
       const agreementKey = email.replace(/[.#$[\]]/g, "_") + "_" + Date.now();
       await withTimeout(

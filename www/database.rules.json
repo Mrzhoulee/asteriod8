@@ -17,6 +17,13 @@
     "CONCERTUSERS": { ".read": true, ".write": true },
     "LiveRooms": { ".read": true, ".write": true },
     "AGREEMENTS": { ".read": true, ".write": "auth != null" },
+    "FEATURED_ARTIST_SONG": {
+      "$ownerKey": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['fileInp']) && newData.child('fileInp').isString() && newData.child('fileInp').val().length <= 2048"
+      }
+    },
     "referralCounts": { ".read": true, ".write": true },
     "CONCERT_CHATS": {
       "$room": {

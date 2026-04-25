@@ -4692,8 +4692,9 @@ function whenElementReady(id, callback, retries = 10) {
         get(ref2(database, 'PROFILES/' + ownerKey)).catch(() => null),
         get(ref2(database, 'SONGS')).catch(() => null),
         get(ref2(database, 'AGREEMENTS')).catch(() => null),
-        get(ref2(database, 'REFERRAL_CODES_BY_USER/' + ownerKey)).catch(() => null)
-      ]).then(([linkSnap, profileSnap, songsSnap, agSnap, codeSnap]) => {
+        get(ref2(database, 'REFERRAL_CODES_BY_USER/' + ownerKey)).catch(() => null),
+        get(ref2(database, 'FEATURED_ARTIST_SONG/' + ownerKey)).catch(() => null)
+      ]).then(([linkSnap, profileSnap, songsSnap, agSnap, codeSnap, pinnedSnap]) => {
         const socialData = (linkSnap && linkSnap.exists()) ? linkSnap.val() : {};
         const savedLinks = Array.isArray(socialData.links) ? socialData.links.filter(Boolean) : [];
         const profile = (profileSnap && profileSnap.exists()) ? profileSnap.val() : {};
@@ -4743,7 +4744,23 @@ function whenElementReady(id, callback, retries = 10) {
         }
 
         let song = null;
-        if (songsSnap && songsSnap.exists()) {
+        // 1. Honour the pinned song the artist saved at upload time, if present.
+        if (pinnedSnap && pinnedSnap.exists()) {
+          const pinned = pinnedSnap.val() || {};
+          if (pinned.fileInp) {
+            song = {
+              fileInp: pinned.fileInp,
+              title: pinned.title,
+              album: pinned.album,
+              artist: pinned.artist,
+              uploader: pinned.uploader,
+              uploaderName: pinned.uploaderName,
+              imageUrl: pinned.imageUrl || ''
+            };
+          }
+        }
+        // 2. Otherwise scan SONGS using the bridges and pick the newest matching upload.
+        if (!song && songsSnap && songsSnap.exists()) {
           const allSongs = songsSnap.val();
           const allMatches = [];
           for (const titleKey in allSongs) {
@@ -4763,13 +4780,38 @@ function whenElementReady(id, callback, retries = 10) {
                 );
                 const nameMatch = profileNick && (upName === profileNick || sArtist === profileNick);
                 if (ownerKeyMatch || uploaderMatch || nameMatch) {
-                  allMatches.push({ ...s, __created: Number(s.createdAt) || 0 });
+                  allMatches.push({
+                    ...s,
+                    __created: Number(s.createdAt) || 0,
+                    __songPath: 'SONGS/' + titleKey + '/' + albumKey + '/' + artistKey,
+                  });
                 }
               }
             }
           }
           allMatches.sort((a, b) => b.__created - a.__created);
-          song = allMatches[0] || null;
+          const top = allMatches[0] || null;
+          if (top) {
+            song = top;
+            // Self-heal: if the viewer is the featured artist, persist this match as
+            // FEATURED_ARTIST_SONG so the next visitor renders it instantly without
+            // having to re-run the bridge logic.
+            try {
+              const viewerKey = (localStorage.getItem('emailKey') || '').trim();
+              if (viewerKey && viewerKey === ownerKey) {
+                set(ref2(database, 'FEATURED_ARTIST_SONG/' + ownerKey), {
+                  title: top.title || '',
+                  album: top.album || '',
+                  artist: top.artist || '',
+                  fileInp: top.fileInp,
+                  uploader: top.uploader || '',
+                  uploaderName: top.uploaderName || '',
+                  songPath: top.__songPath || '',
+                  uploadedAt: top.__created || Date.now(),
+                }).catch(() => {});
+              }
+            } catch (e) { /* localStorage unavailable */ }
+          }
         }
 
         const profileSocialLinks = [
