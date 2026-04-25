@@ -2863,15 +2863,15 @@ body.create-profile-active {
   background: rgba(255,127,80,0.06);
   border: 1px solid rgba(255,127,80,0.2);
   border-radius: 12px;
-  padding: 12px 14px;
-  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding: 14px;
+  display: flex; flex-direction: column; gap: 12px;
 }
 .featuredCard.featuredCard--modern .ftd-track--empty {
-  justify-content: center;
+  align-items: center;
   font-size: 12px; color: rgba(255,255,255,0.5);
   font-style: italic;
 }
-.featuredCard.featuredCard--modern .ftd-track-meta { flex: 1; min-width: 120px; }
+.featuredCard.featuredCard--modern .ftd-track-meta { width: 100%; min-width: 0; }
 .featuredCard.featuredCard--modern .ftd-track-title {
   font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 14px; color: #fff;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -2881,28 +2881,20 @@ body.create-profile-active {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .featuredCard.featuredCard--modern .ftd-track-actions {
-  display: flex; gap: 6px; flex: 1; min-width: 160px;
+  width: 100%;
 }
 .featuredCard.featuredCard--modern .ftd-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-  flex: 1;
-  padding: 9px 8px; border-radius: 9px; border: none; cursor: pointer;
-  font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%;
+  padding: 11px 16px; border-radius: 10px; border: none; cursor: pointer;
+  font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 13px;
   margin: 0;
   transition: transform 0.1s, background 0.15s;
-  white-space: nowrap;
 }
 .featuredCard.featuredCard--modern .ftd-btn:active { transform: scale(0.97); }
-.featuredCard.featuredCard--modern .ftd-btn .material-symbols-outlined { font-size: 16px; }
+.featuredCard.featuredCard--modern .ftd-btn .material-symbols-outlined { font-size: 17px; }
 .featuredCard.featuredCard--modern .ftd-btn--play { background: #ff7f50; color: #000; }
-.featuredCard.featuredCard--modern .ftd-btn--play:hover { background: #ffa07f; }
-.featuredCard.featuredCard--modern .ftd-btn--queue {
-  background: transparent; color: #ff7f50;
-  border: 1px solid rgba(255,127,80,0.4);
-}
-.featuredCard.featuredCard--modern .ftd-btn--queue:hover {
-  background: rgba(255,127,80,0.12);
-}
+.featuredCard.featuredCard--modern .ftd-btn--play:hover { background: #ff9670; }
     </style>
     <section id="featuredSection">
       <h2>🔥 Featured Songs</h2>
@@ -4891,7 +4883,6 @@ function whenElementReady(id, callback, retries = 10) {
                </div>
                <div class="ftd-track-actions">
                  <button class="ftd-btn ftd-btn--play" type="button"><span class="material-symbols-outlined">play_arrow</span>Play</button>
-                 <button class="ftd-btn ftd-btn--queue" type="button"><span class="material-symbols-outlined">queue_music</span>Queue</button>
                </div>
              </div>`
           : `<div class="ftd-track ftd-track--empty">No track uploaded yet — check back soon.</div>`;
@@ -4925,10 +4916,6 @@ function whenElementReady(id, callback, retries = 10) {
           card.querySelector('.ftd-btn--play')?.addEventListener('click', (e) => {
             e.stopPropagation();
             if (window.AsteroidPlayer) window.AsteroidPlayer.play(songMeta);
-          });
-          card.querySelector('.ftd-btn--queue')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (window.AsteroidPlayer) window.AsteroidPlayer.enqueue(songMeta);
           });
         }
         container.appendChild(card);
