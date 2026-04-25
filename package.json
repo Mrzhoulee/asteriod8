@@ -1,11 +1,14 @@
 {
   "dependencies": {
+    "@amjed.gabteni/capacitor-lottie-splashscreen": "^0.0.2",
     "@capacitor-community/apple-sign-in": "^7.1.0",
     "@capacitor/app": "^8.0.1",
     "@capacitor/browser": "^8.0.1",
     "@capacitor/cli": "^8.1.0",
     "@capacitor/core": "^8.1.0",
     "@capacitor/ios": "^8.2.0",
+    "capacitor-plugin-cdv-purchase": "^13.15.2",
+    "cordova-plugin-purchase": "^13.15.2",
     "nodemailer": "^8.0.1"
   },
   "name": "asteriod8-main",
@@ -23,6 +26,7 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "patch-package": "^8.0.1"
   }
 }

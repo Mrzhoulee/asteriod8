@@ -5,6 +5,17 @@
   "ios": {
     "webContentsDebuggingEnabled": true
   },
+  "plugins": {
+    "LottieSplashscreen": {
+      "launchAutoShow": true,
+      "launchAnimationName": "public/splash",
+      "launchLoop": true,
+      "launchSpeed": 1,
+      "launchBackgroundColor": "#020617",
+      "launchAutoHideMs": 2500,
+      "launchSafetyHideMs": 7000
+    }
+  },
   "server": {
     "iosScheme": "ionic",
     "allowNavigation": [
@@ -18,7 +29,9 @@
       "https://accounts.google.com",
       "https://*.google.com",
       "https://*.googleapis.com",
-      "https://securetoken.googleapis.com"
+      "https://securetoken.googleapis.com",
+      "https://buy.stripe.com",
+      "https://*.stripe.com"
     ]
   }
 }

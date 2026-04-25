@@ -1263,12 +1263,6 @@
   </form>
 
   <script>
-
-    import { store, ProductType, Platform } from 'capacitor-plugin-cdv-purchase';
-
-    // The CdvPurchase namespace is available globally after plugin install
-    const store = CdvPurchase.store;
-    console.log("hello")
     function openBoostUpload(event) {
       if (event) event.preventDefault();
       const boostBtn = document.getElementById("boost");
@@ -3306,7 +3300,21 @@ boostBtn.addEventListener("click", async (e) => {
     const pendingBoostKey = (typeof authScopedKey === "function") ? authScopedKey("pendingBoostId") : "pendingBoostId";
     localStorage.setItem(pendingBoostKey, boostId);
 
-    window.location.href = "https://buy.stripe.com/bJe14nbpWfuV81idk7gQE04";
+    const stripeUrl = "https://buy.stripe.com/bJe14nbpWfuV81idk7gQE04";
+    const capBrowser = (() => {
+      try {
+        const C = window.Capacitor;
+        const P = C && C.Plugins && C.Plugins.Browser;
+        if (P && typeof P.open === "function") return P;
+        if (C && typeof C.nativePromise === "function") return { open: (o) => C.nativePromise("Browser", "open", o) };
+      } catch (e) {}
+      return null;
+    })();
+    if (capBrowser) {
+      await capBrowser.open({ url: stripeUrl, presentationStyle: "fullscreen" });
+    } else {
+      window.location.href = stripeUrl;
+    }
 
   } catch (err) {
     console.error(err);

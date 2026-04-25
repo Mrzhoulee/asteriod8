@@ -75,17 +75,17 @@
       }
     },
     "LISTEN_JOURNEYS": {
+      ".read": true,
       ".indexOn": ["uploaderKey", "ts"],
       "$jid": {
-        ".read": true,
         ".write": "!data.exists() || (!data.child('nextTitle').exists() && newData.hasChild('nextTitle'))",
         ".validate": "newData.hasChildren(['ts','playedTitle']) && newData.child('ts').isNumber() && newData.child('playedTitle').isString() && newData.child('playedTitle').val().length <= 300 && (!newData.hasChild('nextTitle') || (newData.child('nextTitle').isString() && newData.child('nextTitle').val().length <= 300))"
       }
     },
     "ARTIST_JOURNEYS": {
       "$artistKey": {
+        ".read": true,
         "$jid": {
-          ".read": true,
           ".write": "!data.exists() || (!data.child('nextTitle').exists() && newData.hasChild('nextTitle'))",
           ".validate": "newData.hasChildren(['ts','playedTitle']) && newData.child('ts').isNumber() && newData.child('playedTitle').isString() && newData.child('playedTitle').val().length <= 300 && (!newData.hasChild('nextTitle') || (newData.child('nextTitle').isString() && newData.child('nextTitle').val().length <= 300))"
         }

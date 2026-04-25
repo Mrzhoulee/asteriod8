@@ -18,12 +18,27 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.asteroid.asteroidinc8</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>asteroid</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Asteroid needs camera access to let you take photos for your profile and uploads.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Asteroid needs microphone access to let you record audio for your uploads.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Asteroid needs photo library access to let you pick cover art and profile images.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -43,6 +58,8 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
@@ -50,32 +67,13 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array> 
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>com.asteroid.asteroidinc8</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>asteroid</string>
-			</array>
-		</dict>
-	</array>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Asteroid needs microphone access to let you record audio for your uploads.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Asteroid needs camera access to let you take photos for your profile and uploads.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Asteroid needs photo library access to let you pick cover art and profile images.</string>
 </dict>
 </plist>
