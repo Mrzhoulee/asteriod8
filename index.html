@@ -4673,28 +4673,17 @@ function whenElementReady(id, callback, retries = 10) {
   }
   function sanitizeKeyPart(s) { return String(s || '').replace(/[.#$[\]]/g, '_'); }
 
-  onValue(ref2(database, 'FEATURE_REFERRAL_REQUESTS'), (snap) => {
+  function _injectFeaturedCard(ownerKey) {
     const container = document.getElementById('featuredContainer');
     if (!container) return;
-    container.querySelectorAll('.featuredCard[data-dynamic]').forEach(el => el.remove());
-    if (!snap.exists()) return;
-    const requests = snap.val();
-    const ownerKeys = new Set();
-    for (const ownerKey in requests) {
-      for (const fromKey in requests[ownerKey]) {
-        const req = requests[ownerKey][fromKey];
-        if (req && req.status === 'featured') ownerKeys.add(ownerKey);
-      }
-    }
-    ownerKeys.forEach((ownerKey) => {
-      Promise.all([
-        get(ref2(database, 'FEATURED_SOCIAL_LINKS/' + ownerKey)).catch(() => null),
-        get(ref2(database, 'PROFILES/' + ownerKey)).catch(() => null),
-        get(ref2(database, 'SONGS')).catch(() => null),
-        get(ref2(database, 'AGREEMENTS')).catch(() => null),
-        get(ref2(database, 'REFERRAL_CODES_BY_USER/' + ownerKey)).catch(() => null),
-        get(ref2(database, 'FEATURED_ARTIST_SONG/' + ownerKey)).catch(() => null)
-      ]).then(([linkSnap, profileSnap, songsSnap, agSnap, codeSnap, pinnedSnap]) => {
+    Promise.all([
+      get(ref2(database, 'FEATURED_SOCIAL_LINKS/' + ownerKey)).catch(() => null),
+      get(ref2(database, 'PROFILES/' + ownerKey)).catch(() => null),
+      get(ref2(database, 'SONGS')).catch(() => null),
+      get(ref2(database, 'AGREEMENTS')).catch(() => null),
+      get(ref2(database, 'REFERRAL_CODES_BY_USER/' + ownerKey)).catch(() => null),
+      get(ref2(database, 'FEATURED_ARTIST_SONG/' + ownerKey)).catch(() => null)
+    ]).then(([linkSnap, profileSnap, songsSnap, agSnap, codeSnap, pinnedSnap]) => {
         const socialData = (linkSnap && linkSnap.exists()) ? linkSnap.val() : {};
         const savedLinks = Array.isArray(socialData.links) ? socialData.links.filter(Boolean) : [];
         const profile = (profileSnap && profileSnap.exists()) ? profileSnap.val() : {};
@@ -4888,7 +4877,37 @@ function whenElementReady(id, callback, retries = 10) {
         }
         container.appendChild(card);
       }).catch((e) => { console.warn('[featured]', e); });
-    });
+  }
+
+  function _renderFeaturedFromOwnerKeys(ownerKeys) {
+    const container = document.getElementById('featuredContainer');
+    if (!container) return;
+    container.querySelectorAll('.featuredCard[data-dynamic]').forEach(el => el.remove());
+    if (!ownerKeys || !ownerKeys.size) return;
+    ownerKeys.forEach((ownerKey) => _injectFeaturedCard(ownerKey));
+  }
+
+  // Primary trigger: FEATURED_ARTIST_SONG (auto-pinned by ArtistDashboard + studio.html upload).
+  // We don't depend on FEATURE_REFERRAL_REQUESTS reads because rules for that path may not be deployed.
+  onValue(ref2(database, 'FEATURED_ARTIST_SONG'), (snap) => {
+    const ownerKeys = new Set();
+    if (snap.exists()) {
+      const v = snap.val() || {};
+      for (const k in v) if (v[k] && (v[k].fileInp || v[k].songPath)) ownerKeys.add(k);
+    }
+    // Fold in any owners marked featured via the legacy referral path, if readable.
+    get(ref2(database, 'FEATURE_REFERRAL_REQUESTS')).then((rqSnap) => {
+      if (rqSnap && rqSnap.exists()) {
+        const rq = rqSnap.val();
+        for (const k in rq) {
+          for (const f in rq[k]) {
+            const r = rq[k][f];
+            if (r && r.status === 'featured') ownerKeys.add(k);
+          }
+        }
+      }
+      _renderFeaturedFromOwnerKeys(ownerKeys);
+    }).catch(() => _renderFeaturedFromOwnerKeys(ownerKeys));
   });
 })();
 
