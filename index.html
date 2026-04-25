@@ -2554,7 +2554,7 @@ body.create-profile-active {
     <div id="deleteAccountStatus" style="display:none; margin-top:12px; text-align:center; font-size:13px;"></div>
   </div>
 </div>
-
+<a href="drtfyguhi.html">wevgehjsiytgwtujiojgtwyu</a>
     <section id="artists" class="content-section artists-section">
       <h2 class="section-title">Artists of the Month <b>(OG ARTISTS)</b></h2>
 <div id="artists-grid-8">
@@ -4683,20 +4683,34 @@ function whenElementReady(id, callback, retries = 10) {
   let _referralKeys = new Set(); // ownerKeys from FEATURE_REFERRAL_REQUESTS (status=featured)
   let featuredLiveOk = false;
 
+  const _FEATURED_TTL_MS = 90 * 24 * 60 * 60 * 1000; // 3 months
+
   function _ownerKeysFromPinnedObj(v) {
     const s = new Set();
     if (!v || typeof v !== 'object') return s;
-    for (const k in v) if (v[k] && (v[k].fileInp || v[k].songPath)) s.add(k);
+    const cutoff = Date.now() - _FEATURED_TTL_MS;
+    for (const k in v) {
+      if (!v[k] || (!v[k].fileInp && !v[k].songPath)) continue;
+      const ts = Number(v[k].uploadedAt) || 0;
+      if (!ts || ts >= cutoff) s.add(k);
+    }
     return s;
   }
 
   function _ownerKeysFromReferralObj(v) {
     const s = new Set();
     if (!v || typeof v !== 'object') return s;
+    const cutoff = Date.now() - _FEATURED_TTL_MS;
     for (const k in v) {
       const reqs = v[k];
       if (!reqs || typeof reqs !== 'object') continue;
-      for (const f in reqs) { if (reqs[f] && reqs[f].status === 'featured') { s.add(k); break; } }
+      for (const f in reqs) {
+        if (reqs[f] && reqs[f].status === 'featured') {
+          const ts = Number(reqs[f].requestedAt) || 0;
+          if (!ts || ts >= cutoff) s.add(k);
+          break;
+        }
+      }
     }
     return s;
   }
