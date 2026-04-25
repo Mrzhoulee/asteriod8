@@ -18,8 +18,8 @@
     "LiveRooms": { ".read": true, ".write": true },
     "AGREEMENTS": { ".read": true, ".write": "auth != null" },
     "FEATURED_ARTIST_SONG": {
+      ".read": true,
       "$ownerKey": {
-        ".read": true,
         ".write": true,
         ".validate": "newData.hasChildren(['fileInp']) && newData.child('fileInp').isString() && newData.child('fileInp').val().length <= 2048"
       }
