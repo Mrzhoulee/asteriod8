@@ -2710,8 +2710,8 @@ body.create-profile-active {
 }
 #featuredContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 20px;
 }
 .featuredCard {
   background: #111;
@@ -2832,8 +2832,9 @@ body.create-profile-active {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .featuredCard.featuredCard--modern .ftd-sub {
-  font-size: 11px; color: #ff7f50; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.6px; margin-top: 3px;
+  font-size: 10px; color: #ff7f50; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.3px; margin-top: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .featuredCard.featuredCard--modern .ftd-bio {
   font-size: 13px; color: rgba(255,255,255,0.7);
@@ -2863,14 +2864,14 @@ body.create-profile-active {
   border: 1px solid rgba(255,127,80,0.2);
   border-radius: 12px;
   padding: 12px 14px;
-  display: flex; align-items: center; gap: 10px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
 }
 .featuredCard.featuredCard--modern .ftd-track--empty {
   justify-content: center;
   font-size: 12px; color: rgba(255,255,255,0.5);
   font-style: italic;
 }
-.featuredCard.featuredCard--modern .ftd-track-meta { flex: 1; min-width: 0; }
+.featuredCard.featuredCard--modern .ftd-track-meta { flex: 1; min-width: 120px; }
 .featuredCard.featuredCard--modern .ftd-track-title {
   font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 14px; color: #fff;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -2879,15 +2880,19 @@ body.create-profile-active {
   font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.featuredCard.featuredCard--modern .ftd-track-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.featuredCard.featuredCard--modern .ftd-track-actions {
+  display: flex; gap: 6px; flex: 1; min-width: 160px;
+}
 .featuredCard.featuredCard--modern .ftd-btn {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 7px 11px; border-radius: 9px; border: none; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  flex: 1;
+  padding: 9px 8px; border-radius: 9px; border: none; cursor: pointer;
   font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 12px;
   margin: 0;
   transition: transform 0.1s, background 0.15s;
+  white-space: nowrap;
 }
-.featuredCard.featuredCard--modern .ftd-btn:hover { transform: translateY(-1px); }
+.featuredCard.featuredCard--modern .ftd-btn:active { transform: scale(0.97); }
 .featuredCard.featuredCard--modern .ftd-btn .material-symbols-outlined { font-size: 16px; }
 .featuredCard.featuredCard--modern .ftd-btn--play { background: #ff7f50; color: #000; }
 .featuredCard.featuredCard--modern .ftd-btn--play:hover { background: #ffa07f; }
@@ -4900,7 +4905,7 @@ function whenElementReady(id, callback, retries = 10) {
               ${avatarHtml}
               <div class="ftd-meta">
                 <div class="ftd-name">${esc(artistName)}</div>
-                <div class="ftd-sub">Referral-featured artist</div>
+                <div class="ftd-sub">Featured Artist</div>
               </div>
             </div>
             ${bio ? `<p class="ftd-bio">${esc(bio)}</p>` : ''}

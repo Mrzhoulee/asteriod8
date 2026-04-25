@@ -1263,12 +1263,6 @@
   </form>
 
   <script>
-
-    import { store, ProductType, Platform } from 'capacitor-plugin-cdv-purchase';
-
-    // The CdvPurchase namespace is available globally after plugin install
-    const store = CdvPurchase.store;
-    console.log("hello")
     function openBoostUpload(event) {
       if (event) event.preventDefault();
       const boostBtn = document.getElementById("boost");
@@ -2975,6 +2969,66 @@
         referralCode: rawCode,
         requestedAt: Date.now()
       });
+      // Fire-and-forget: auto-pin the referred artist's most recent song so their
+      // featured card shows a track immediately without them opening ArtistDashboard.
+      (async () => {
+        try {
+          const [existingPinSnap, profileSnap] = await Promise.all([
+            get(ref2(db, 'FEATURED_ARTIST_SONG/' + ownerKey)).catch(() => null),
+            get(ref2(db, 'PROFILES/' + ownerKey)).catch(() => null),
+          ]);
+          if (existingPinSnap && existingPinSnap.exists() && (existingPinSnap.val() || {}).fileInp) {
+            return; // already pinned — nothing to do
+          }
+          const profile = (profileSnap && profileSnap.exists()) ? (profileSnap.val() || {}) : {};
+          const profileEmail = String(profile.email || '').trim();
+          const emailVariants = new Set([ownerKey, sanitizeRtdbPathSegment(ownerKey)]);
+          if (profileEmail) {
+            emailVariants.add(profileEmail);
+            emailVariants.add(sanitizeRtdbPathSegment(profileEmail));
+            emailVariants.add(sanitizeRtdbPathSegment(profileEmail.toLowerCase()));
+          }
+          const songsSnap = await get(ref2(db, 'SONGS')).catch(() => null);
+          if (!songsSnap || !songsSnap.exists()) return;
+          const allSongs = songsSnap.val();
+          const matches = [];
+          for (const titleKey in allSongs) {
+            for (const albumKey in allSongs[titleKey]) {
+              for (const artistKeyInner in allSongs[titleKey][albumKey]) {
+                const s = allSongs[titleKey][albumKey][artistKeyInner];
+                if (!s || !s.fileInp) continue;
+                const ownerOnSong = String(s.uploaderOwnerKey || '').trim();
+                const up = String(s.uploader || '').trim();
+                const ownerKeyMatch = ownerOnSong && ownerOnSong === ownerKey;
+                const uploaderMatch = up && (
+                  emailVariants.has(up) ||
+                  emailVariants.has(sanitizeRtdbPathSegment(up)) ||
+                  emailVariants.has(sanitizeRtdbPathSegment(up.toLowerCase()))
+                );
+                if (ownerKeyMatch || uploaderMatch) {
+                  matches.push({ s, songPath: 'SONGS/' + titleKey + '/' + albumKey + '/' + artistKeyInner });
+                }
+              }
+            }
+          }
+          if (!matches.length) return;
+          matches.sort((a, b) => (Number(b.s.createdAt) || 0) - (Number(a.s.createdAt) || 0));
+          const top = matches[0];
+          await set(ref2(db, 'FEATURED_ARTIST_SONG/' + ownerKey), {
+            title: top.s.title || '',
+            album: top.s.album || '',
+            artist: top.s.artist || '',
+            fileInp: top.s.fileInp,
+            uploader: top.s.uploader || '',
+            uploaderName: top.s.uploaderName || '',
+            songPath: top.songPath,
+            uploadedAt: Number(top.s.createdAt) || Date.now(),
+          });
+          console.log('[referral-submit] auto-pinned FEATURED_ARTIST_SONG for', ownerKey, '->', top.songPath);
+        } catch (e) {
+          console.warn('[referral-submit] auto-pin failed (non-fatal):', e);
+        }
+      })();
       if (input) input.value = '';
       console.log('[referral-submit] Code submitted successfully');
       setReferralStatus('Code accepted! The artist who shared it will be featured.', 'ok');
@@ -3306,7 +3360,21 @@ boostBtn.addEventListener("click", async (e) => {
     const pendingBoostKey = (typeof authScopedKey === "function") ? authScopedKey("pendingBoostId") : "pendingBoostId";
     localStorage.setItem(pendingBoostKey, boostId);
 
-    window.location.href = "https://buy.stripe.com/bJe14nbpWfuV81idk7gQE04";
+    const stripeUrl = "https://buy.stripe.com/bJe14nbpWfuV81idk7gQE04";
+    const capBrowser = (() => {
+      try {
+        const C = window.Capacitor;
+        const P = C && C.Plugins && C.Plugins.Browser;
+        if (P && typeof P.open === "function") return P;
+        if (C && typeof C.nativePromise === "function") return { open: (o) => C.nativePromise("Browser", "open", o) };
+      } catch (e) {}
+      return null;
+    })();
+    if (capBrowser) {
+      await capBrowser.open({ url: stripeUrl, presentationStyle: "fullscreen" });
+    } else {
+      window.location.href = stripeUrl;
+    }
 
   } catch (err) {
     console.error(err);
