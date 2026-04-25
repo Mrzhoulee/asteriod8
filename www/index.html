@@ -2779,6 +2779,118 @@ body.create-profile-active {
 .featuredCard .artist-profile-block .artist-tag {
   font-size: 11px; color: rgba(255,127,80,0.85); font-family: 'Poppins', sans-serif;
 }
+
+/* Modern dynamic featured card */
+.featuredCard.featuredCard--modern {
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #16110e, #080606);
+  border: 1px solid rgba(255,127,80,0.18);
+  cursor: default;
+}
+.featuredCard.featuredCard--modern .ftd-cover {
+  height: 110px;
+  background: linear-gradient(135deg, rgba(255,127,80,0.45), rgba(255,80,40,0.25));
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  border-bottom: 1px solid rgba(255,127,80,0.2);
+}
+.featuredCard.featuredCard--modern .ftd-pill {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(0,0,0,0.65); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,127,80,0.45);
+  color: #ff7f50; font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 999px;
+  font-family: 'Montserrat', sans-serif; letter-spacing: 0.4px; text-transform: uppercase;
+}
+.featuredCard.featuredCard--modern .ftd-body { padding: 18px 18px 22px; }
+.featuredCard.featuredCard--modern .ftd-head {
+  display: flex; align-items: center; gap: 12px; margin-top: -38px; margin-bottom: 14px;
+}
+.featuredCard.featuredCard--modern .ftd-avatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  border: 3px solid #16110e; overflow: hidden;
+  background: linear-gradient(135deg, #ff7f50, #ff5722);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 800; font-size: 22px;
+  font-family: 'Montserrat', sans-serif; flex-shrink: 0;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+}
+.featuredCard.featuredCard--modern .ftd-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.featuredCard.featuredCard--modern .ftd-meta { min-width: 0; flex: 1; padding-top: 22px; }
+.featuredCard.featuredCard--modern .ftd-name {
+  font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 17px;
+  color: #fff; line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.featuredCard.featuredCard--modern .ftd-sub {
+  font-size: 11px; color: #ff7f50; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.6px; margin-top: 3px;
+}
+.featuredCard.featuredCard--modern .ftd-bio {
+  font-size: 13px; color: rgba(255,255,255,0.7);
+  line-height: 1.45; margin: 0 0 14px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.featuredCard.featuredCard--modern .ftd-socials {
+  display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 16px;
+}
+.featuredCard.featuredCard--modern .ftd-social {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 11px; border-radius: 999px;
+  font-size: 11px; font-weight: 600;
+  color: #ff7f50; text-decoration: none;
+  background: rgba(255,127,80,0.08);
+  border: 1px solid rgba(255,127,80,0.28);
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.featuredCard.featuredCard--modern .ftd-social:hover {
+  background: #ff7f50; color: #000; transform: translateY(-1px);
+}
+.featuredCard.featuredCard--modern .ftd-social .material-symbols-outlined {
+  font-size: 15px; line-height: 1;
+}
+.featuredCard.featuredCard--modern .ftd-track {
+  background: rgba(255,127,80,0.06);
+  border: 1px solid rgba(255,127,80,0.2);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.featuredCard.featuredCard--modern .ftd-track--empty {
+  justify-content: center;
+  font-size: 12px; color: rgba(255,255,255,0.5);
+  font-style: italic;
+}
+.featuredCard.featuredCard--modern .ftd-track-meta { flex: 1; min-width: 0; }
+.featuredCard.featuredCard--modern .ftd-track-title {
+  font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 14px; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.featuredCard.featuredCard--modern .ftd-track-album {
+  font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.featuredCard.featuredCard--modern .ftd-track-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.featuredCard.featuredCard--modern .ftd-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 7px 11px; border-radius: 9px; border: none; cursor: pointer;
+  font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 12px;
+  margin: 0;
+  transition: transform 0.1s, background 0.15s;
+}
+.featuredCard.featuredCard--modern .ftd-btn:hover { transform: translateY(-1px); }
+.featuredCard.featuredCard--modern .ftd-btn .material-symbols-outlined { font-size: 16px; }
+.featuredCard.featuredCard--modern .ftd-btn--play { background: #ff7f50; color: #000; }
+.featuredCard.featuredCard--modern .ftd-btn--play:hover { background: #ffa07f; }
+.featuredCard.featuredCard--modern .ftd-btn--queue {
+  background: transparent; color: #ff7f50;
+  border: 1px solid rgba(255,127,80,0.4);
+}
+.featuredCard.featuredCard--modern .ftd-btn--queue:hover {
+  background: rgba(255,127,80,0.12);
+}
     </style>
     <section id="featuredSection">
       <h2>🔥 Featured Songs</h2>
@@ -4531,7 +4643,6 @@ function whenElementReady(id, callback, retries = 10) {
 
 // --- Load dynamic featured songs from RTDB ---
 (function loadDynamicFeaturedSongs() {
-  let _audioCounter = 100;
   function prettifyUrl(url) {
     try {
       const h = new URL(url).hostname.replace('www.', '').replace('open.', '');
@@ -4542,17 +4653,33 @@ function whenElementReady(id, callback, retries = 10) {
       if (/tiktok/i.test(h)) return 'TikTok';
       if (/twitter|x\.com/i.test(h)) return 'X / Twitter';
       if (/apple/i.test(h)) return 'Apple Music';
+      if (/bandcamp/i.test(h)) return 'Bandcamp';
       return h.split('.')[0].charAt(0).toUpperCase() + h.split('.')[0].slice(1);
     } catch (e) { return 'Link'; }
   }
+  function socialIcon(url) {
+    try {
+      const h = new URL(url).hostname;
+      if (/instagram/i.test(h)) return 'photo_camera';
+      if (/spotify/i.test(h)) return 'graphic_eq';
+      if (/soundcloud/i.test(h)) return 'cloud';
+      if (/youtube|youtu\.be/i.test(h)) return 'play_circle';
+      if (/tiktok/i.test(h)) return 'movie';
+      if (/twitter|x\.com/i.test(h)) return 'tag';
+      if (/apple/i.test(h)) return 'apple';
+      if (/bandcamp/i.test(h)) return 'album';
+      return 'link';
+    } catch (e) { return 'link'; }
+  }
+  function sanitizeKeyPart(s) { return String(s || '').replace(/[.#$[\]]/g, '_'); }
+
   onValue(ref2(database, 'FEATURE_REFERRAL_REQUESTS'), (snap) => {
     const container = document.getElementById('featuredContainer');
-    if (!container || !snap.exists()) return;
-    // Remove previously injected dynamic cards
+    if (!container) return;
     container.querySelectorAll('.featuredCard[data-dynamic]').forEach(el => el.remove());
+    if (!snap.exists()) return;
     const requests = snap.val();
     const ownerKeys = new Set();
-    // Collect unique owner keys with status 'featured'
     for (const ownerKey in requests) {
       for (const fromKey in requests[ownerKey]) {
         const req = requests[ownerKey][fromKey];
@@ -4565,83 +4692,113 @@ function whenElementReady(id, callback, retries = 10) {
         get(ref2(database, 'PROFILES/' + ownerKey)).catch(() => null),
         get(ref2(database, 'SONGS')).catch(() => null)
       ]).then(([linkSnap, profileSnap, songsSnap]) => {
-        if (!songsSnap || !songsSnap.exists()) return;
         const socialData = (linkSnap && linkSnap.exists()) ? linkSnap.val() : {};
-        const savedLinks = (socialData.links || []).filter(Boolean);
+        const savedLinks = Array.isArray(socialData.links) ? socialData.links.filter(Boolean) : [];
         const profile = (profileSnap && profileSnap.exists()) ? profileSnap.val() : {};
-        const allSongs = songsSnap.val();
+
+        // Match uploader by ownerKey OR sanitized profile.email variants — Apple users
+        // upload with a relay email but the referral system identifies them by uid.
+        const profileEmail = String(profile.email || '').trim();
+        const matchKeys = new Set([ownerKey]);
+        if (profileEmail) {
+          matchKeys.add(profileEmail);
+          matchKeys.add(sanitizeKeyPart(profileEmail));
+          matchKeys.add(sanitizeKeyPart(profileEmail.toLowerCase()));
+        }
         let song = null;
-        for (const titleKey in allSongs) {
-          for (const albumKey in allSongs[titleKey]) {
-            for (const artistKey in allSongs[titleKey][albumKey]) {
-              const s = allSongs[titleKey][albumKey][artistKey];
-              if (s && s.uploader) {
-                const uploaderKey = s.uploader.replace(/[.#$[\]]/g, '_');
-                if (uploaderKey === ownerKey || s.uploader === ownerKey) { song = s; break; }
+        if (songsSnap && songsSnap.exists()) {
+          const allSongs = songsSnap.val();
+          const allMatches = [];
+          for (const titleKey in allSongs) {
+            for (const albumKey in allSongs[titleKey]) {
+              for (const artistKey in allSongs[titleKey][albumKey]) {
+                const s = allSongs[titleKey][albumKey][artistKey];
+                const up = String(s && s.uploader || '').trim();
+                if (!up) continue;
+                if (matchKeys.has(up) || matchKeys.has(sanitizeKeyPart(up)) || matchKeys.has(sanitizeKeyPart(up.toLowerCase()))) {
+                  allMatches.push({ ...s, __created: Number(s.createdAt) || 0 });
+                }
               }
             }
-            if (song) break;
           }
-          if (song) break;
+          allMatches.sort((a, b) => b.__created - a.__created);
+          song = allMatches[0] || null;
         }
-        if (!song || !song.fileInp) return;
 
         const profileSocialLinks = [
           profile.instagram, profile.youtube, profile.soundcloud,
-          profile.spotify, profile.applemusic, profile.website, profile.tiktok
+          profile.spotify, profile.applemusic, profile.website, profile.tiktok, profile.bandcamp
         ].filter(u => u && /^https?:\/\//.test(u));
         const allSocialLinks = Array.from(new Set([...savedLinks, ...profileSocialLinks]));
 
-        const artistName = profile.nickname || song.artist || song.uploaderName || 'Artist';
-        const avatarImg = profile.profileImage || profile.photoURL || '';
+        const artistName = profile.nickname || profile.profileNickname || (song && (song.artist || song.uploaderName)) || 'Featured Artist';
+        const bio = String(profile.bio || '').trim();
+        const avatarImg = profile.profileImage || profile.profilePicture || profile.photoURL || (song && song.imageUrl) || '';
         const initial = String(artistName).trim().charAt(0).toUpperCase() || 'A';
         const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
-        const avatarHtml = avatarImg
-          ? '<div class="avatar"><img src="' + esc(avatarImg) + '" alt="' + esc(artistName) + '"></div>'
-          : '<div class="avatar">' + esc(initial) + '</div>';
+        const card = document.createElement('div');
+        card.className = 'featuredCard featuredCard--modern';
+        card.setAttribute('data-dynamic', '1');
 
-        const profileBlockHtml =
-          '<div class="artist-profile-block">' +
-            avatarHtml +
-            '<div class="artist-meta">' +
-              '<span class="artist-name">' + esc(artistName) + '</span>' +
-              '<span class="artist-tag">Featured artist</span>' +
-            '</div>' +
-          '</div>';
+        const avatarHtml = avatarImg
+          ? `<div class="ftd-avatar"><img src="${esc(avatarImg)}" alt="${esc(artistName)}"></div>`
+          : `<div class="ftd-avatar ftd-avatar--initial">${esc(initial)}</div>`;
 
         const linksHtml = allSocialLinks.length
-          ? '<div class="social-links">' +
-              allSocialLinks.map(u => '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(prettifyUrl(u)) + '</a>').join('') +
-            '</div>'
+          ? `<div class="ftd-socials">${allSocialLinks.map(u => `<a class="ftd-social" href="${esc(u)}" target="_blank" rel="noopener"><span class="material-symbols-outlined">${esc(socialIcon(u))}</span><span>${esc(prettifyUrl(u))}</span></a>`).join('')}</div>`
           : '';
 
-        const card = document.createElement('div');
-        card.className = 'featuredCard';
-        card.setAttribute('data-dynamic', '1');
-        card.innerHTML =
-          profileBlockHtml +
-          '<h3>' + esc(song.title || 'Untitled') + '</h3>' +
-          '<p>Album: ' + esc(song.album || '') + '</p>' +
-          linksHtml +
-          '<button class="dyn-play">PLAY</button>' +
-          '<button class="dyn-queue">Queue</button>';
-        const playBtn = card.querySelector('.dyn-play');
-        const queueBtn = card.querySelector('.dyn-queue');
-        const songMeta = {
-          url: song.fileInp,
-          title: song.title || 'Untitled',
-          artist: artistName,
-          imageUrl: avatarImg || ''
-        };
-        playBtn.addEventListener('click', () => {
-          if (window.AsteroidPlayer) window.AsteroidPlayer.play(songMeta);
-        });
-        queueBtn.addEventListener('click', () => {
-          if (window.AsteroidPlayer) window.AsteroidPlayer.enqueue(songMeta);
-        });
+        const songBlock = song && song.fileInp
+          ? `<div class="ftd-track">
+               <div class="ftd-track-meta">
+                 <div class="ftd-track-title">${esc(song.title || 'Untitled')}</div>
+                 ${song.album ? `<div class="ftd-track-album">${esc(song.album)}</div>` : ''}
+               </div>
+               <div class="ftd-track-actions">
+                 <button class="ftd-btn ftd-btn--play" type="button"><span class="material-symbols-outlined">play_arrow</span>Play</button>
+                 <button class="ftd-btn ftd-btn--queue" type="button"><span class="material-symbols-outlined">queue_music</span>Queue</button>
+               </div>
+             </div>`
+          : `<div class="ftd-track ftd-track--empty">No track uploaded yet — check back soon.</div>`;
+
+        card.innerHTML = `
+          <div class="ftd-cover" style="${avatarImg ? `background-image:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.85)), url('${esc(avatarImg)}');` : ''}">
+            <span class="ftd-pill">Featured</span>
+          </div>
+          <div class="ftd-body">
+            <div class="ftd-head">
+              ${avatarHtml}
+              <div class="ftd-meta">
+                <div class="ftd-name">${esc(artistName)}</div>
+                <div class="ftd-sub">Referral-featured artist</div>
+              </div>
+            </div>
+            ${bio ? `<p class="ftd-bio">${esc(bio)}</p>` : ''}
+            ${linksHtml}
+            ${songBlock}
+          </div>
+        `;
+
+        if (song && song.fileInp) {
+          const songMeta = {
+            url: song.fileInp,
+            src: song.fileInp,
+            title: song.title || 'Untitled',
+            artist: artistName,
+            imageUrl: avatarImg || song.imageUrl || ''
+          };
+          card.querySelector('.ftd-btn--play')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.AsteroidPlayer) window.AsteroidPlayer.play(songMeta);
+          });
+          card.querySelector('.ftd-btn--queue')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.AsteroidPlayer) window.AsteroidPlayer.enqueue(songMeta);
+          });
+        }
         container.appendChild(card);
-      }).catch(() => {});
+      }).catch((e) => { console.warn('[featured]', e); });
     });
   });
 })();
