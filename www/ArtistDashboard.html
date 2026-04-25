@@ -1140,6 +1140,62 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
         const sanitizeEmail = (email) => (email || "").replace(/[.#$[\]]/g, '_');
 
+        async function pinFeaturedArtistSong(emailKey, signedInEmail) {
+            if (!emailKey) return;
+            const emailVariants = new Set();
+            const addVariant = (e) => {
+                if (!e) return;
+                emailVariants.add(e);
+                emailVariants.add(sanitizeEmail(e));
+                emailVariants.add(sanitizeEmail(e.toLowerCase()));
+            };
+            addVariant(signedInEmail);
+            addVariant((localStorage.getItem('email') || '').trim());
+            addVariant((localStorage.getItem('artemail') || '').trim());
+            addVariant(emailKey);
+            try {
+                const songsSnap = await get(ref(database, 'SONGS'));
+                if (!songsSnap.exists()) return;
+                const all = songsSnap.val();
+                const matches = [];
+                for (const titleKey in all) {
+                    for (const albumKey in all[titleKey]) {
+                        for (const artistKeyInner in all[titleKey][albumKey]) {
+                            const s = all[titleKey][albumKey][artistKeyInner];
+                            if (!s || !s.fileInp) continue;
+                            const ownerOnSong = String(s.uploaderOwnerKey || '').trim();
+                            const up = String(s.uploader || '').trim();
+                            const ownerKeyMatch = ownerOnSong && ownerOnSong === emailKey;
+                            const uploaderMatch = up && (
+                                emailVariants.has(up) ||
+                                emailVariants.has(sanitizeEmail(up)) ||
+                                emailVariants.has(sanitizeEmail(up.toLowerCase()))
+                            );
+                            if (ownerKeyMatch || uploaderMatch) {
+                                matches.push({ s, songPath: 'SONGS/' + titleKey + '/' + albumKey + '/' + artistKeyInner });
+                            }
+                        }
+                    }
+                }
+                if (!matches.length) return;
+                matches.sort((a, b) => (Number(b.s.createdAt) || 0) - (Number(a.s.createdAt) || 0));
+                const top = matches[0];
+                await set(ref(database, 'FEATURED_ARTIST_SONG/' + emailKey), {
+                    title: top.s.title || '',
+                    album: top.s.album || '',
+                    artist: top.s.artist || '',
+                    fileInp: top.s.fileInp,
+                    uploader: top.s.uploader || '',
+                    uploaderName: top.s.uploaderName || '',
+                    songPath: top.songPath,
+                    uploadedAt: Number(top.s.createdAt) || Date.now(),
+                });
+                console.log('[autopin] FEATURED_ARTIST_SONG pinned:', top.songPath);
+            } catch (e) {
+                console.warn('[autopin] failed', e);
+            }
+        }
+
         function fanEngagementKeyVariants(raw) {
             const s = String(raw || "").trim();
             if (!s) return [];
@@ -2125,6 +2181,12 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 currentEmailKey = storedEmailKey || sanitizeEmail(accountId);
 
                 if (currentUserEmail) localStorage.setItem("artemail", currentUserEmail);
+
+                // Self-heal for the Featured Songs card on the home page: pin this
+                // artist's most recent upload (matched by uploaderOwnerKey, then
+                // uploader email) to FEATURED_ARTIST_SONG/<currentEmailKey> so the
+                // home loader can surface it instantly without bridging.
+                pinFeaturedArtistSong(currentEmailKey, currentUserEmail).catch((e) => console.warn('[autopin]', e));
 
                 await loadAnalytics();
                 await loadProfile();

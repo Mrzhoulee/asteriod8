@@ -24,6 +24,11 @@
         ".validate": "newData.hasChildren(['fileInp']) && newData.child('fileInp').isString() && newData.child('fileInp').val().length <= 2048"
       }
     },
+    "FEATURED_SOCIAL_LINKS": { ".read": true, ".write": true },
+    "FEATURE_REFERRAL_REQUESTS": { ".read": true, ".write": true },
+    "FEATURE_REFERRAL_OUTBOX": { ".read": true, ".write": true },
+    "REFERRAL_CODE_INDEX": { ".read": true, ".write": true },
+    "REFERRAL_CODES_BY_USER": { ".read": true, ".write": true },
     "referralCounts": { ".read": true, ".write": true },
     "CONCERT_CHATS": {
       "$room": {
