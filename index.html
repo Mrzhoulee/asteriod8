@@ -4690,21 +4690,42 @@ function whenElementReady(id, callback, retries = 10) {
       Promise.all([
         get(ref2(database, 'FEATURED_SOCIAL_LINKS/' + ownerKey)).catch(() => null),
         get(ref2(database, 'PROFILES/' + ownerKey)).catch(() => null),
-        get(ref2(database, 'SONGS')).catch(() => null)
-      ]).then(([linkSnap, profileSnap, songsSnap]) => {
+        get(ref2(database, 'SONGS')).catch(() => null),
+        get(ref2(database, 'AGREEMENTS')).catch(() => null)
+      ]).then(([linkSnap, profileSnap, songsSnap, agSnap]) => {
         const socialData = (linkSnap && linkSnap.exists()) ? linkSnap.val() : {};
         const savedLinks = Array.isArray(socialData.links) ? socialData.links.filter(Boolean) : [];
         const profile = (profileSnap && profileSnap.exists()) ? profileSnap.val() : {};
 
-        // Match uploader by ownerKey OR sanitized profile.email variants — Apple users
-        // upload with a relay email but the referral system identifies them by uid.
+        // Build the full set of identifiers this artist might have uploaded under.
+        // Problem: Apple users have ownerKey = uid, but SONGS.uploader = relay email.
+        // Bridge: AGREEMENTS rows are written at upload time with email + name,
+        // so any agreement whose name matches the artist's profile nickname/fullName
+        // (or whose key starts with the sanitized profile email) gives us the upload-time email.
         const profileEmail = String(profile.email || '').trim();
+        const profileNick = String(profile.nickname || profile.profileNickname || profile.fullName || '').trim().toLowerCase();
         const matchKeys = new Set([ownerKey]);
         if (profileEmail) {
           matchKeys.add(profileEmail);
           matchKeys.add(sanitizeKeyPart(profileEmail));
           matchKeys.add(sanitizeKeyPart(profileEmail.toLowerCase()));
         }
+        if (agSnap && agSnap.exists()) {
+          const ags = agSnap.val();
+          for (const k in ags) {
+            const a = ags[k] || {};
+            const aEmail = String(a.email || '').trim();
+            const aName = String(a.name || '').trim().toLowerCase();
+            const matchByName = profileNick && aName && aName === profileNick;
+            const matchByKey = profileEmail && k.indexOf(sanitizeKeyPart(profileEmail.toLowerCase())) === 0;
+            if (aEmail && (matchByName || matchByKey)) {
+              matchKeys.add(aEmail);
+              matchKeys.add(sanitizeKeyPart(aEmail));
+              matchKeys.add(sanitizeKeyPart(aEmail.toLowerCase()));
+            }
+          }
+        }
+
         let song = null;
         if (songsSnap && songsSnap.exists()) {
           const allSongs = songsSnap.val();
@@ -4713,9 +4734,17 @@ function whenElementReady(id, callback, retries = 10) {
             for (const albumKey in allSongs[titleKey]) {
               for (const artistKey in allSongs[titleKey][albumKey]) {
                 const s = allSongs[titleKey][albumKey][artistKey];
-                const up = String(s && s.uploader || '').trim();
-                if (!up) continue;
-                if (matchKeys.has(up) || matchKeys.has(sanitizeKeyPart(up)) || matchKeys.has(sanitizeKeyPart(up.toLowerCase()))) {
+                if (!s || !s.fileInp) continue;
+                const up = String(s.uploader || '').trim();
+                const upName = String(s.uploaderName || '').trim().toLowerCase();
+                const sArtist = String(s.artist || '').trim().toLowerCase();
+                const uploaderMatch = up && (
+                  matchKeys.has(up) ||
+                  matchKeys.has(sanitizeKeyPart(up)) ||
+                  matchKeys.has(sanitizeKeyPart(up.toLowerCase()))
+                );
+                const nameMatch = profileNick && (upName === profileNick || sArtist === profileNick);
+                if (uploaderMatch || nameMatch) {
                   allMatches.push({ ...s, __created: Number(s.createdAt) || 0 });
                 }
               }
