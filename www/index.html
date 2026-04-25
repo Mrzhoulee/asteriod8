@@ -4680,24 +4680,61 @@ function whenElementReady(id, callback, retries = 10) {
   }
   function sanitizeKeyPart(s) { return String(s || '').replace(/[.#$[\]]/g, '_'); }
 
-  function _injectFeaturedCard(ownerKey) {
+  // --- shared state ---
+  let _renderGen = 0;          // incremented on each new render pass; async appends check this
+  let _pinnedKeys = new Set(); // ownerKeys from FEATURED_ARTIST_SONG
+  let _referralKeys = new Set(); // ownerKeys from FEATURE_REFERRAL_REQUESTS (status=featured)
+  let featuredLiveOk = false;
+
+  function _ownerKeysFromPinnedObj(v) {
+    const s = new Set();
+    if (!v || typeof v !== 'object') return s;
+    for (const k in v) if (v[k] && (v[k].fileInp || v[k].songPath)) s.add(k);
+    return s;
+  }
+
+  function _ownerKeysFromReferralObj(v) {
+    const s = new Set();
+    if (!v || typeof v !== 'object') return s;
+    for (const k in v) {
+      const reqs = v[k];
+      if (!reqs || typeof reqs !== 'object') continue;
+      for (const f in reqs) { if (reqs[f] && reqs[f].status === 'featured') { s.add(k); break; } }
+    }
+    return s;
+  }
+
+  // Clears stale dynamic cards, then kicks off a new inject per ownerKey.
+  // The generation counter ensures late-resolving promises from old renders
+  // don't append cards after the container has already been refreshed.
+  function _mergeAndRender() {
+    const gen = ++_renderGen;
     const container = document.getElementById('featuredContainer');
     if (!container) return;
+    container.querySelectorAll('.featuredCard[data-dynamic]').forEach(el => el.remove());
+    const combined = new Set([..._pinnedKeys, ..._referralKeys]);
+    if (!combined.size) return;
+    combined.forEach((ownerKey) => _injectFeaturedCard(ownerKey, gen));
+  }
+
+  function _injectFeaturedCard(ownerKey, gen) {
+    const container = document.getElementById('featuredContainer');
+    if (!container) return;
+
+    // Lightweight reads first — only fetch SONGS if the pinned entry is missing.
     Promise.all([
       get(ref2(database, 'FEATURED_SOCIAL_LINKS/' + ownerKey)).catch(() => null),
       get(ref2(database, 'PROFILES/' + ownerKey)).catch(() => null),
-      get(ref2(database, 'SONGS')).catch(() => null),
-      get(ref2(database, 'AGREEMENTS')).catch(() => null),
       get(ref2(database, 'REFERRAL_CODES_BY_USER/' + ownerKey)).catch(() => null),
       get(ref2(database, 'FEATURED_ARTIST_SONG/' + ownerKey)).catch(() => null)
-    ]).then(([linkSnap, profileSnap, songsSnap, agSnap, codeSnap, pinnedSnap]) => {
-        const socialData = (linkSnap && linkSnap.exists()) ? linkSnap.val() : {};
-        const savedLinks = Array.isArray(socialData.links) ? socialData.links.filter(Boolean) : [];
-        const profile = (profileSnap && profileSnap.exists()) ? profileSnap.val() : {};
-        const codeData = (codeSnap && codeSnap.exists()) ? codeSnap.val() : {};
+    ]).then(async ([linkSnap, profileSnap, codeSnap, pinnedSnap]) => {
+      if (gen !== _renderGen) return; // stale render — a newer one is in charge
 
-        // Build the full set of identifiers this artist might have uploaded under.
-        // Apple users have ownerKey = uid but SONGS.uploader = relay email, so we need bridges.
+      const socialData = (linkSnap && linkSnap.exists()) ? linkSnap.val() : {};
+      const savedLinks = Array.isArray(socialData.links) ? socialData.links.filter(Boolean) : [];
+      const profile = (profileSnap && profileSnap.exists()) ? profileSnap.val() : {};
+      const codeData = (codeSnap && codeSnap.exists()) ? codeSnap.val() : {};
+
         const profileEmail = String(profile.email || '').trim();
         const codeEmail = String(codeData.ownerEmail || '').trim();
         const profileNick = String(profile.nickname || profile.profileNickname || profile.fullName || '').trim().toLowerCase();
@@ -4712,8 +4749,6 @@ function whenElementReady(id, callback, retries = 10) {
         addEmailVariants(profileEmail);
         addEmailVariants(codeEmail);
 
-        // Self-heal: if the viewer IS the featured artist, surface their own localStorage
-        // email + write it back to REFERRAL_CODES_BY_USER so other visitors can use it next time.
         try {
           const viewerKey = (localStorage.getItem('emailKey') || '').trim();
           if (viewerKey && viewerKey === ownerKey) {
@@ -4727,20 +4762,8 @@ function whenElementReady(id, callback, retries = 10) {
           }
         } catch (e) { /* localStorage unavailable */ }
 
-        if (agSnap && agSnap.exists()) {
-          const ags = agSnap.val();
-          for (const k in ags) {
-            const a = ags[k] || {};
-            const aEmail = String(a.email || '').trim();
-            const aName = String(a.name || '').trim().toLowerCase();
-            const matchByName = profileNick && aName && aName === profileNick;
-            const matchByKey = profileEmail && k.indexOf(sanitizeKeyPart(profileEmail.toLowerCase())) === 0;
-            if (aEmail && (matchByName || matchByKey)) addEmailVariants(aEmail);
-          }
-        }
-
         let song = null;
-        // 1. Honour the pinned song the artist saved at upload time, if present.
+        // 1. Honour the pinned song first — no heavy SONGS read needed.
         if (pinnedSnap && pinnedSnap.exists()) {
           const pinned = pinnedSnap.val() || {};
           if (pinned.fileInp) {
@@ -4755,60 +4778,81 @@ function whenElementReady(id, callback, retries = 10) {
             };
           }
         }
-        // 2. Otherwise scan SONGS using the bridges and pick the newest matching upload.
-        if (!song && songsSnap && songsSnap.exists()) {
-          const allSongs = songsSnap.val();
-          const allMatches = [];
-          for (const titleKey in allSongs) {
-            for (const albumKey in allSongs[titleKey]) {
-              for (const artistKey in allSongs[titleKey][albumKey]) {
-                const s = allSongs[titleKey][albumKey][artistKey];
-                if (!s || !s.fileInp) continue;
-                const up = String(s.uploader || '').trim();
-                const upName = String(s.uploaderName || '').trim().toLowerCase();
-                const sArtist = String(s.artist || '').trim().toLowerCase();
-                const ownerKeyOnSong = String(s.uploaderOwnerKey || '').trim();
-                const ownerKeyMatch = ownerKeyOnSong && ownerKeyOnSong === ownerKey;
-                const uploaderMatch = up && (
-                  matchKeys.has(up) ||
-                  matchKeys.has(sanitizeKeyPart(up)) ||
-                  matchKeys.has(sanitizeKeyPart(up.toLowerCase()))
-                );
-                const nameMatch = profileNick && (upName === profileNick || sArtist === profileNick);
-                if (ownerKeyMatch || uploaderMatch || nameMatch) {
-                  allMatches.push({
-                    ...s,
-                    __created: Number(s.createdAt) || 0,
-                    __songPath: 'SONGS/' + titleKey + '/' + albumKey + '/' + artistKey,
-                  });
+
+        // 2. Only scan SONGS (expensive) when no pinned song exists.
+        if (!song) {
+          const [songsSnap, agSnap] = await Promise.all([
+            get(ref2(database, 'SONGS')).catch(() => null),
+            get(ref2(database, 'AGREEMENTS')).catch(() => null)
+          ]);
+          if (gen !== _renderGen) return; // stale check after the heavy reads
+
+          if (agSnap && agSnap.exists()) {
+            const ags = agSnap.val();
+            for (const k in ags) {
+              const a = ags[k] || {};
+              const aEmail = String(a.email || '').trim();
+              const aName = String(a.name || '').trim().toLowerCase();
+              const matchByName = profileNick && aName && aName === profileNick;
+              const matchByKey = profileEmail && k.indexOf(sanitizeKeyPart(profileEmail.toLowerCase())) === 0;
+              if (aEmail && (matchByName || matchByKey)) addEmailVariants(aEmail);
+            }
+          }
+
+          if (songsSnap && songsSnap.exists()) {
+            const allSongs = songsSnap.val();
+            const allMatches = [];
+            for (const titleKey in allSongs) {
+              for (const albumKey in allSongs[titleKey]) {
+                for (const artistKey in allSongs[titleKey][albumKey]) {
+                  const s = allSongs[titleKey][albumKey][artistKey];
+                  if (!s || !s.fileInp) continue;
+                  const up = String(s.uploader || '').trim();
+                  const upName = String(s.uploaderName || '').trim().toLowerCase();
+                  const sArtist = String(s.artist || '').trim().toLowerCase();
+                  const ownerKeyOnSong = String(s.uploaderOwnerKey || '').trim();
+                  const ownerKeyMatch = ownerKeyOnSong && ownerKeyOnSong === ownerKey;
+                  const uploaderMatch = up && (
+                    matchKeys.has(up) ||
+                    matchKeys.has(sanitizeKeyPart(up)) ||
+                    matchKeys.has(sanitizeKeyPart(up.toLowerCase()))
+                  );
+                  const nameMatch = profileNick && (upName === profileNick || sArtist === profileNick);
+                  if (ownerKeyMatch || uploaderMatch || nameMatch) {
+                    allMatches.push({
+                      ...s,
+                      __created: Number(s.createdAt) || 0,
+                      __songPath: 'SONGS/' + titleKey + '/' + albumKey + '/' + artistKey,
+                    });
+                  }
                 }
               }
             }
-          }
-          allMatches.sort((a, b) => b.__created - a.__created);
-          const top = allMatches[0] || null;
-          if (top) {
-            song = top;
-            // Self-heal: if the viewer is the featured artist, persist this match as
-            // FEATURED_ARTIST_SONG so the next visitor renders it instantly without
-            // having to re-run the bridge logic.
-            try {
-              const viewerKey = (localStorage.getItem('emailKey') || '').trim();
-              if (viewerKey && viewerKey === ownerKey) {
-                set(ref2(database, 'FEATURED_ARTIST_SONG/' + ownerKey), {
-                  title: top.title || '',
-                  album: top.album || '',
-                  artist: top.artist || '',
-                  fileInp: top.fileInp,
-                  uploader: top.uploader || '',
-                  uploaderName: top.uploaderName || '',
-                  songPath: top.__songPath || '',
-                  uploadedAt: top.__created || Date.now(),
-                }).catch(() => {});
-              }
-            } catch (e) { /* localStorage unavailable */ }
+            allMatches.sort((a, b) => b.__created - a.__created);
+            const top = allMatches[0] || null;
+            if (top) {
+              song = top;
+              // Self-heal: pin this match back to FEATURED_ARTIST_SONG for future visitors.
+              try {
+                const viewerKey = (localStorage.getItem('emailKey') || '').trim();
+                if (viewerKey && viewerKey === ownerKey) {
+                  set(ref2(database, 'FEATURED_ARTIST_SONG/' + ownerKey), {
+                    title: top.title || '',
+                    album: top.album || '',
+                    artist: top.artist || '',
+                    fileInp: top.fileInp,
+                    uploader: top.uploader || '',
+                    uploaderName: top.uploaderName || '',
+                    songPath: top.__songPath || '',
+                    uploadedAt: top.__created || Date.now(),
+                  }).catch(() => {});
+                }
+              } catch (e) { /* localStorage unavailable */ }
+            }
           }
         }
+
+      if (gen !== _renderGen) return; // final stale check before touching the DOM
 
         const profileSocialLinks = [
           profile.instagram, profile.youtube, profile.soundcloud,
@@ -4886,62 +4930,44 @@ function whenElementReady(id, callback, retries = 10) {
       }).catch((e) => { console.warn('[featured]', e); });
   }
 
-  function _renderFeaturedFromOwnerKeys(ownerKeys) {
-    const container = document.getElementById('featuredContainer');
-    if (!container) return;
-    container.querySelectorAll('.featuredCard[data-dynamic]').forEach(el => el.remove());
-    if (!ownerKeys || !ownerKeys.size) return;
-    ownerKeys.forEach((ownerKey) => _injectFeaturedCard(ownerKey));
-  }
-
-  let featuredLiveOk = false;
-
-  function _ownerKeysFromFeaturedObj(v) {
-    const s = new Set();
-    if (!v || typeof v !== 'object') return s;
-    for (const k in v) if (v[k] && (v[k].fileInp || v[k].songPath)) s.add(k);
-    return s;
-  }
-
-  function _foldReferralRequests(ownerKeys) {
-    return get(ref2(database, 'FEATURE_REFERRAL_REQUESTS')).then((rqSnap) => {
-      if (rqSnap && rqSnap.exists()) {
-        const rq = rqSnap.val();
-        for (const k in rq) {
-          for (const f in rq[k]) {
-            const r = rq[k][f];
-            if (r && r.status === 'featured') ownerKeys.add(k);
-          }
-        }
-      }
-      _renderFeaturedFromOwnerKeys(ownerKeys);
-    }).catch(() => _renderFeaturedFromOwnerKeys(ownerKeys));
-  }
-
+  // Listener 1: FEATURED_ARTIST_SONG — auto-pinned by ArtistDashboard + studio upload.
   onValue(
     ref2(database, 'FEATURED_ARTIST_SONG'),
     (snap) => {
       featuredLiveOk = true;
-      const ownerKeys = _ownerKeysFromFeaturedObj(snap.exists() ? snap.val() : null);
-      _foldReferralRequests(ownerKeys);
+      _pinnedKeys = _ownerKeysFromPinnedObj(snap.exists() ? snap.val() : null);
+      _mergeAndRender();
     },
-    (err) => {
-      console.warn('[featured] onValue denied:', err && (err.message || err));
-      featuredLiveOk = false;
-    }
+    (err) => { console.warn('[featured] FEATURED_ARTIST_SONG onValue error:', err && (err.message || err)); }
   );
 
-  // REST fallback for iOS WebView where onValue may never fire.
+  // Listener 2: FEATURE_REFERRAL_REQUESTS — real-time so referred artists appear
+  // the moment a fan enters their code, without waiting for a page refresh.
+  onValue(
+    ref2(database, 'FEATURE_REFERRAL_REQUESTS'),
+    (snap) => {
+      _referralKeys = _ownerKeysFromReferralObj(snap.exists() ? snap.val() : null);
+      _mergeAndRender();
+    },
+    (err) => { console.warn('[featured] FEATURE_REFERRAL_REQUESTS onValue error:', err && (err.message || err)); }
+  );
+
+  // REST fallback for iOS WebView where WebSocket onValue may never fire.
   setTimeout(() => {
     if (featuredLiveOk) return;
-    fetch('https://asteroid-cdc13-default-rtdb.firebaseio.com/FEATURED_ARTIST_SONG.json', { cache: 'no-store' })
-      .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then((obj) => {
-        if (featuredLiveOk) return;
-        const ownerKeys = _ownerKeysFromFeaturedObj(obj);
-        _foldReferralRequests(ownerKeys);
-      })
-      .catch((e) => console.warn('[featured] REST fallback failed:', e));
+    const BASE = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+    Promise.all([
+      fetch(BASE + '/FEATURED_ARTIST_SONG.json', { cache: 'no-store' })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .catch(() => null),
+      fetch(BASE + '/FEATURE_REFERRAL_REQUESTS.json', { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : null).catch(() => null)
+    ]).then(([pinnedObj, referralObj]) => {
+      if (featuredLiveOk) return;
+      _pinnedKeys = _ownerKeysFromPinnedObj(pinnedObj);
+      _referralKeys = _ownerKeysFromReferralObj(referralObj);
+      _mergeAndRender();
+    }).catch(e => console.warn('[featured] REST fallback failed:', e));
   }, 4500);
 })();
 
