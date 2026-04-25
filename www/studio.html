@@ -2631,8 +2631,15 @@
       if (oldCode && oldCode !== code) {
         try { await remove(ref2(db, 'REFERRAL_CODE_INDEX/' + oldCode)); } catch (eRm) {}
       }
-      await set(userRef, { code, ownerKey: key, createdAt: Date.now(), codeSource: 'username-encrypted' });
-      await set(ref2(db, 'REFERRAL_CODE_INDEX/' + code), { ownerKey: key, used: false });
+      const ownerEmailRaw = (localStorage.getItem('email') || (auth && auth.currentUser && auth.currentUser.email) || '').trim();
+      await set(userRef, {
+        code,
+        ownerKey: key,
+        ownerEmail: ownerEmailRaw || '',
+        createdAt: Date.now(),
+        codeSource: 'username-encrypted'
+      });
+      await set(ref2(db, 'REFERRAL_CODE_INDEX/' + code), { ownerKey: key, ownerEmail: ownerEmailRaw || '', used: false });
     }
     out.value = code;
     if (shareInput) shareInput.value = code;
@@ -3075,6 +3082,9 @@
       const fullName = localStorage.getItem("fullName") || "";
       const markExplicitEl = document.getElementById("studioMarkExplicit");
       const markExplicitChecked = !!(markExplicitEl && markExplicitEl.checked);
+      const uploaderOwnerKey = (localStorage.getItem('emailKey') || '').trim() ||
+        (localStorage.getItem('CurrentUser') || '').trim().replace(/[.#$[\]]/g, '_') ||
+        (email || '').replace(/[.#$[\]]/g, '_');
       const songData = {
         album: album,
         artist: artist,
@@ -3082,6 +3092,7 @@
         fileInp: url,
         uploader: email,
         uploaderName: fullName,
+        uploaderOwnerKey: uploaderOwnerKey || '',
         campaign: "ARTISTSOFFEB26",
         createdAt: Date.now(),
         isExplicit: markExplicitChecked || songMetadataExplicit({ title, artist, album }),
@@ -3231,7 +3242,7 @@ boostBtn.addEventListener("click", async (e) => {
   const email = (localStorage.getItem("email") || "").trim() || (auth.currentUser && (auth.currentUser.email || auth.currentUser.uid)) || "";
   const file = document.getElementById("boostFileInp").files[0];
 
-  if (!email || !file) {
+  if (!email || !file) {             
     alert("Sign in and select a file!");
     return;
   }
