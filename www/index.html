@@ -4894,16 +4894,17 @@ function whenElementReady(id, callback, retries = 10) {
     ownerKeys.forEach((ownerKey) => _injectFeaturedCard(ownerKey));
   }
 
-  // Primary trigger: FEATURED_ARTIST_SONG (auto-pinned by ArtistDashboard + studio.html upload).
-  // We don't depend on FEATURE_REFERRAL_REQUESTS reads because rules for that path may not be deployed.
-  onValue(ref2(database, 'FEATURED_ARTIST_SONG'), (snap) => {
-    const ownerKeys = new Set();
-    if (snap.exists()) {
-      const v = snap.val() || {};
-      for (const k in v) if (v[k] && (v[k].fileInp || v[k].songPath)) ownerKeys.add(k);
-    }
-    // Fold in any owners marked featured via the legacy referral path, if readable.
-    get(ref2(database, 'FEATURE_REFERRAL_REQUESTS')).then((rqSnap) => {
+  let featuredLiveOk = false;
+
+  function _ownerKeysFromFeaturedObj(v) {
+    const s = new Set();
+    if (!v || typeof v !== 'object') return s;
+    for (const k in v) if (v[k] && (v[k].fileInp || v[k].songPath)) s.add(k);
+    return s;
+  }
+
+  function _foldReferralRequests(ownerKeys) {
+    return get(ref2(database, 'FEATURE_REFERRAL_REQUESTS')).then((rqSnap) => {
       if (rqSnap && rqSnap.exists()) {
         const rq = rqSnap.val();
         for (const k in rq) {
@@ -4915,7 +4916,33 @@ function whenElementReady(id, callback, retries = 10) {
       }
       _renderFeaturedFromOwnerKeys(ownerKeys);
     }).catch(() => _renderFeaturedFromOwnerKeys(ownerKeys));
-  });
+  }
+
+  onValue(
+    ref2(database, 'FEATURED_ARTIST_SONG'),
+    (snap) => {
+      featuredLiveOk = true;
+      const ownerKeys = _ownerKeysFromFeaturedObj(snap.exists() ? snap.val() : null);
+      _foldReferralRequests(ownerKeys);
+    },
+    (err) => {
+      console.warn('[featured] onValue denied:', err && (err.message || err));
+      featuredLiveOk = false;
+    }
+  );
+
+  // REST fallback for iOS WebView where onValue may never fire.
+  setTimeout(() => {
+    if (featuredLiveOk) return;
+    fetch('https://asteroid-cdc13-default-rtdb.firebaseio.com/FEATURED_ARTIST_SONG.json', { cache: 'no-store' })
+      .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then((obj) => {
+        if (featuredLiveOk) return;
+        const ownerKeys = _ownerKeysFromFeaturedObj(obj);
+        _foldReferralRequests(ownerKeys);
+      })
+      .catch((e) => console.warn('[featured] REST fallback failed:', e));
+  }, 4500);
 })();
 
 // Firebase REST fallback for iOS WebView (when WebSocket/onValue never fires)
