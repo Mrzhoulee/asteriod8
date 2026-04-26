@@ -225,30 +225,6 @@
             text-transform: uppercase;
         }
 
-        .creator-poll-duo {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 10px;
-        }
-        @media (max-width: 720px) {
-            .creator-poll-duo { grid-template-columns: 1fr; }
-        }
-        .creator-poll-cell {
-            border: 2px solid rgba(255,127,80,0.35);
-            border-radius: 10px;
-            padding: 8px;
-            overflow: hidden;
-            background: rgba(0,0,0,0.2);
-        }
-        .creator-poll-cell .home-poll-embed iframe {
-            width: 100%;
-            height: 152px;
-            border: 0;
-            border-radius: 8px;
-        }
-        .creator-poll-cell .home-poll-embed--sc iframe { height: 120px; }
-
         /* Profile Customization */
         .profile-editor {
             background: var(--card-bg);
@@ -1022,34 +998,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 <div id="creatorJourneysList" class="songs-list"><div class="loading">Loading…</div></div>
             </div>
             <div class="analytics-section">
-                <h2 class="section-title"><i class="fas fa-poll"></i> Artist vs artist poll</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Preview links: YouTube, Spotify, SoundCloud, Apple Music, or direct MP3. Fans vote <strong>once per week</strong> per account/device. Polls <strong>auto-close after 7 days</strong> and each artist can publish <strong>one battle every 3 months</strong>.</p>
-                <div class="form-group">
-                    <label class="form-label">Duo theme (your side vs theirs)</label>
-                    <select id="pollThemePreset" class="form-input">
-                        <option value="blue_red">Blue vs red</option>
-                        <option value="coral_navy">Coral vs navy</option>
-                        <option value="purple_gold">Purple vs gold</option>
-                        <option value="teal_rose">Teal vs rose</option>
-                        <option value="green_slate">Green vs slate</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Other artist name</label>
-                    <input type="text" id="pollArtistB" class="form-input" placeholder="Artist B">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Your preview URL</label>
-                    <input type="text" id="pollUrlA" class="form-input" placeholder="Spotify / YouTube / SoundCloud / MP3…">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Their preview URL</label>
-                    <input type="text" id="pollUrlB" class="form-input" placeholder="Spotify / YouTube / SoundCloud / MP3…">
-                </div>
-                <button type="button" class="btn btn-primary" id="pollCreateBtn"><i class="fas fa-plus"></i> Publish poll</button>
-                <div id="creatorPollsList" class="songs-list" style="margin-top: 1.5rem;"><div class="loading">No polls yet.</div></div>
-            </div>
-            <div class="analytics-section">
                 <h2 class="section-title"><i class="fas fa-bell"></i> Followers &amp; updates</h2>
                 <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">
                     When fans follow you, your posts show up on their home feed. Use this to announce a new song, a show, or anything you want your followers to see.
@@ -1112,15 +1060,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
         import { getDatabase, ref, get, set, update, onValue, query, orderByChild, equalTo, limitToLast, push, increment } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-        import { pollPreviewMarkup } from "./js/home-polls.js";
-
-        const POLL_THEME_PRESETS = {
-            blue_red: { colorA: "#2563eb", colorB: "#dc2626" },
-            coral_navy: { colorA: "#ff7f50", colorB: "#1e3a5f" },
-            purple_gold: { colorA: "#7c3aed", colorB: "#d97706" },
-            teal_rose: { colorA: "#0d9488", colorB: "#e11d48" },
-            green_slate: { colorA: "#16a34a", colorB: "#475569" }
-        };
 
         const firebaseConfig = {
             apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
@@ -1255,7 +1194,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             const fansEl = document.getElementById('creatorFansList');
             const agrEl = document.getElementById('creatorAgreementsList');
             const jouEl = document.getElementById('creatorJourneysList');
-            const pollsEl = document.getElementById('creatorPollsList');
             if (!safe) {
                 if (fansEl) fansEl.innerHTML = '<div class="empty-state">Sign in to view creator tools.</div>';
                 return;
@@ -1394,60 +1332,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             }
 
             try {
-                const polSnap = await get(ref(database, 'ARTIST_POLLS'));
-                const mine = [];
-                if (polSnap.exists()) {
-                    polSnap.forEach((c) => {
-                        const v = c.val();
-                        if (v && v.ownerKey === safe) mine.push({ id: c.key, ...v });
-                    });
-                }
-                mine.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                if (pollsEl) {
-                    if (!mine.length) {
-                        pollsEl.innerHTML = '<div class="empty-state">Create a poll above.</div>';
-                    } else {
-                        let pollsHtml = '';
-                        for (const p of mine) {
-                            let ca = 0;
-                            let cb = 0;
-                            try {
-                                const vSnap = await get(ref(database, 'ARTIST_POLLS/' + p.id + '/votes'));
-                                if (vSnap.exists()) {
-                                    vSnap.forEach((c) => {
-                                        const s = (c.val() && c.val().side) || '';
-                                        if (s === 'a') ca++;
-                                        else if (s === 'b') cb++;
-                                    });
-                                }
-                            } catch (ve) {
-                                console.warn(ve);
-                            }
-                            const pidJs = String(p.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-                            const cA = p.colorA || '#2563eb';
-                            const cB = p.colorB || '#dc2626';
-                            const POLL_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
-                            const createdAt = Number(p.createdAt) || 0;
-                            const ageMs = createdAt ? Date.now() - createdAt : 0;
-                            const closed = createdAt && ageMs >= POLL_LIFETIME_MS;
-                            const daysLeft = createdAt ? Math.max(0, Math.ceil((POLL_LIFETIME_MS - ageMs) / (24 * 60 * 60 * 1000))) : 7;
-                            const statusLabel = closed
-                                ? `<span style="color:#f87171;font-weight:600;">Closed · past 7 days</span>`
-                                : `<span style="color:#10b981;font-weight:600;">Active · closes in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</span>`;
-                            const voteButtons = closed
-                                ? `<span style="color:var(--text-secondary);font-size:0.85rem;">Voting closed · final ${ca} vs ${cb}</span>`
-                                : `<button type="button" class="btn btn-secondary" onclick="window.castPollVote('${pidJs}','a')" style="background:${escapeHtml(cA)};border:none;">Vote you (${ca})</button><button type="button" class="btn btn-secondary" onclick="window.castPollVote('${pidJs}','b')" style="background:${escapeHtml(cB)};border:none;">Vote ${escapeHtml(p.artistBName || 'them')} (${cb})</button>`;
-                            pollsHtml += `<div class="song-item creator-poll-row"><div class="song-info"><div class="song-title">You vs ${escapeHtml(p.artistBName || '')}</div><div style="font-size:0.85rem;margin:4px 0 8px;">${statusLabel}</div><div class="creator-poll-duo" style="--pa:${escapeHtml(cA)};--pb:${escapeHtml(cB)};"><div class="creator-poll-cell" style="border-color:${escapeHtml(cA)}">${pollPreviewMarkup(p.songUrlA)}</div><div class="creator-poll-cell" style="border-color:${escapeHtml(cB)}">${pollPreviewMarkup(p.songUrlB)}</div></div><div class="song-stats" style="flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;">${voteButtons}</div></div></div>`;
-                        }
-                        pollsEl.innerHTML = pollsHtml;
-                    }
-                }
-            } catch (e) {
-                console.error('Creator tools: ARTIST_POLLS', e);
-                if (pollsEl) pollsEl.innerHTML = '<div class="empty-state">Could not load polls.</div>';
-            }
-
-            try {
                 const fs = document.getElementById('creatorFollowStatus');
                 if (fs && safe) {
                     const folSnap = await get(ref(database, 'FOLLOWS/' + safe));
@@ -1466,112 +1350,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             d.textContent = String(s);
             return d.innerHTML;
         }
-
-        const POLL_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-
-        window.castPollVote = async function (pollId, side) {
-            let vid = sanitizeEmail((currentUserEmail || '').trim() || (localStorage.getItem('email') || '').trim());
-            if (!vid) {
-                let pk = localStorage.getItem('pollVoterKey');
-                if (!pk) {
-                    pk = 'pv_' + Math.random().toString(36).slice(2) + Date.now();
-                    localStorage.setItem('pollVoterKey', pk);
-                }
-                vid = sanitizeEmail(pk);
-            }
-            const POLL_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
-            try {
-                const metaSnap = await get(ref(database, 'ARTIST_POLLS/' + pollId + '/createdAt'));
-                const created = metaSnap.exists() ? Number(metaSnap.val()) : 0;
-                if (created && Date.now() - created >= POLL_LIFETIME_MS) {
-                    alert('This poll has closed (7-day limit reached).');
-                    return;
-                }
-            } catch (e) { /* non-fatal */ }
-            const voteRef = ref(database, 'ARTIST_POLLS/' + pollId + '/votes/' + vid);
-            const now = Date.now();
-            try {
-                const snap = await get(voteRef);
-                if (snap.exists()) {
-                    const prev = snap.val();
-                    const t = prev && typeof prev.ts === 'number' ? prev.ts : 0;
-                    if (now - t < POLL_WEEK_MS) {
-                        const days = Math.max(1, Math.ceil((POLL_WEEK_MS - (now - t)) / (24 * 60 * 60 * 1000)));
-                        alert('You can vote again in about ' + days + ' day(s).');
-                        return;
-                    }
-                }
-                await set(voteRef, { side: side, ts: now });
-                loadCreatorTools();
-            } catch (e) {
-                console.error(e);
-                alert('Could not record vote (wait a week to change vote, or check network / rules).');
-            }
-        };
-
-        const POLL_CREATE_COOLDOWN_MS = 90 * 24 * 60 * 60 * 1000; // 3 months
-
-        document.getElementById('pollCreateBtn')?.addEventListener('click', async () => {
-            if (!currentEmailKey) {
-                alert('Sign in first.');
-                return;
-            }
-            const artistBName = (document.getElementById('pollArtistB')?.value || '').trim();
-            const songUrlA = (document.getElementById('pollUrlA')?.value || '').trim();
-            const songUrlB = (document.getElementById('pollUrlB')?.value || '').trim();
-            const themeKey = (document.getElementById('pollThemePreset')?.value || 'blue_red').trim();
-            const colors = POLL_THEME_PRESETS[themeKey] || POLL_THEME_PRESETS.blue_red;
-            if (!artistBName || !songUrlA || !songUrlB) {
-                alert('Fill all poll fields.');
-                return;
-            }
-
-            // Rate-limit: one poll per artist every 3 months.
-            try {
-                const existingSnap = await get(ref(database, 'ARTIST_POLLS'));
-                if (existingSnap.exists()) {
-                    const now = Date.now();
-                    let mostRecent = 0;
-                    existingSnap.forEach((c) => {
-                        const v = c.val();
-                        if (v && v.ownerKey === currentEmailKey && Number(v.createdAt) > mostRecent) {
-                            mostRecent = Number(v.createdAt);
-                        }
-                    });
-                    if (mostRecent && now - mostRecent < POLL_CREATE_COOLDOWN_MS) {
-                        const daysLeft = Math.max(1, Math.ceil((POLL_CREATE_COOLDOWN_MS - (now - mostRecent)) / (24 * 60 * 60 * 1000)));
-                        alert('You can only publish one battle poll every 3 months. Try again in about ' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + '.');
-                        return;
-                    }
-                }
-            } catch (e) {
-                console.warn('poll cooldown check failed', e);
-            }
-
-            const pid = 'poll_' + Date.now();
-            try {
-                await set(ref(database, 'ARTIST_POLLS/' + pid), {
-                    ownerKey: currentEmailKey,
-                    ownerEmail: currentUserEmail,
-                    artistBName,
-                    songUrlA,
-                    songUrlB,
-                    colorA: colors.colorA,
-                    colorB: colors.colorB,
-                    themePreset: themeKey,
-                    labelA: 'You',
-                    labelB: artistBName,
-                    createdAt: Date.now()
-                });
-                document.getElementById('pollArtistB').value = '';
-                document.getElementById('pollUrlA').value = '';
-                document.getElementById('pollUrlB').value = '';
-                loadCreatorTools();
-            } catch (e) {
-                console.error(e);
-                alert('Could not save poll (rules?)');
-            }
-        });
 
         document.getElementById('creatorPostNoticeBtn')?.addEventListener('click', async () => {
             const statusEl = document.getElementById('creatorPostNoticeStatus');

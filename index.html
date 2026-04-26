@@ -1045,127 +1045,6 @@
 .because-you-liked .because-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin: 0 0 16px; }
 .because-you-liked .because-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; }
 
-/* Home artist polls (duo theme) */
-.home-polls-section {
-  max-width: 960px;
-  margin: 32px auto 48px;
-  padding: 0 16px 24px;
-}
-.home-polls-head {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: #fff;
-  margin: 0 0 6px;
-  text-align: center;
-}
-.home-polls-sub {
-  text-align: center;
-  font-size: 13px;
-  color: rgba(255,255,255,0.55);
-  margin: 0 0 20px;
-}
-.home-polls-mount {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-.home-polls-empty {
-  text-align: center;
-  color: rgba(255,255,255,0.45);
-  font-size: 14px;
-  margin: 12px 0;
-}
-.home-poll-card {
-  background: linear-gradient(165deg, rgba(20,22,32,0.95), rgba(10,12,18,0.98));
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 18px;
-  padding: 18px 16px 14px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.35);
-}
-.home-poll-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.home-poll-tag {
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-family: 'Montserrat', sans-serif;
-}
-.home-poll-vs {
-  color: rgba(255,255,255,0.4);
-  font-weight: 800;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-}
-.home-poll-duo {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-@media (max-width: 640px) {
-  .home-poll-duo { grid-template-columns: 1fr; }
-}
-.home-poll-side {
-  border-radius: 14px;
-  padding: 10px;
-  background: rgba(0,0,0,0.25);
-  border: 2px solid rgba(255,255,255,0.06);
-}
-.home-poll-side--a { border-color: color-mix(in srgb, var(--poll-a) 55%, transparent); }
-.home-poll-side--b { border-color: color-mix(in srgb, var(--poll-b) 55%, transparent); }
-.home-poll-embed iframe {
-  width: 100%;
-  height: 152px;
-  border: 0;
-  border-radius: 10px;
-  background: #000;
-}
-.home-poll-embed--sc iframe { height: 132px; }
-.home-poll-audio audio { width: 100%; margin-top: 6px; }
-.home-poll-linkout { margin-top: 8px; }
-.home-poll-ext {
-  color: #7eb8ff;
-  font-size: 13px;
-  font-weight: 600;
-}
-.home-poll-no-prev { font-size: 12px; color: rgba(255,255,255,0.35); padding: 8px 0; }
-.home-poll-vote-btn {
-  width: 100%;
-  margin-top: 10px;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 14px;
-  color: #fff;
-  font-weight: 800;
-  font-size: 14px;
-  cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-}
-.home-poll-vote-btn:hover { filter: brightness(1.08); }
-.home-poll-hint {
-  margin: 12px 0 0;
-  font-size: 11px;
-  color: rgba(255,255,255,0.38);
-  text-align: center;
-}
-#featuredSection .home-polls-section {
-  margin-top: 28px;
-  margin-bottom: 8px;
-  padding-top: 28px;
-  border-top: 1px solid rgba(255, 127, 80, 0.22);
-  max-width: 960px;
-  margin-left: auto;
-  margin-right: auto;
-}
 
 /* Followed artist updates */
 .followed-notices-section {
@@ -2943,13 +2822,6 @@ body.create-profile-active {
         
       </div>
 
-      <section id="homePollsSection" class="home-polls-section" aria-label="Artist polls">
-        <h2 class="home-polls-head">Artist battles</h2>
-        <p class="home-polls-sub">Pick a side · Same vote again after one week · YouTube, Spotify, SoundCloud, or MP3 previews</p>
-        <div id="homePollsMount" class="home-polls-mount">
-          <p class="home-polls-empty">Loading polls…</p>
-        </div>
-      </section>
     </section>
     
 
@@ -4323,6 +4195,12 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
         <h2 class="followed-notices-head" style="color: #ff7f50;">Songs from artists you follow</h2>
         <p class="followed-notices-sub">Fresh uploads from the people you follow.</p>
         <div id="followedSongsMount"></div>
+      </section>
+
+      <section id="followedNoticesSection" class="followed-notices-section" aria-label="Posts from artists you follow">
+        <h2 class="followed-notices-head" style="color: #ff7f50;">Posts from artists you follow</h2>
+        <p class="followed-notices-sub">Releases, announcements, and updates.</p>
+        <div id="followedNoticesMount"></div>
       </section>
 
       <div id="ab" style="margin-bottom: 100px;">      <button width="100%" height="500">Go to the next song</button></div>
@@ -9517,27 +9395,20 @@ console.log('1171')
 }
 </style>
 <script type="module">
-  import { initHomePolls } from "./js/home-polls.js";
   import { initFollowedArtistSongs } from "./js/followed-songs.js";
-  let __homePollsBootAttempts = 0;
-  function bootHomePolls() {
-    __homePollsBootAttempts += 1;
-    if (__homePollsBootAttempts > 200) {
-      const pm = document.getElementById("homePollsMount");
-      if (pm && /loading/i.test(pm.textContent || "")) {
-        pm.innerHTML =
-          '<p class="home-polls-empty">Could not connect to polls. Reopen the app or check your network.</p>';
-      }
-      return;
-    }
-    if (window.firebaseDatabase && window.firebaseRef && window.firebaseGet && window.firebaseSet && window.firebaseOnValue) {
-      initHomePolls();
+  import { initFollowedArtistNotices } from "./js/followed-notices.js";
+  let __feedBootAttempts = 0;
+  function bootFeed() {
+    __feedBootAttempts += 1;
+    if (__feedBootAttempts > 200) return;
+    if (window.firebaseDatabase && window.firebaseRef && window.firebaseGet && window.firebaseSet && window.firebaseOnValue && window.firebaseAuth) {
       initFollowedArtistSongs();
+      initFollowedArtistNotices();
       return;
     }
-    setTimeout(bootHomePolls, 120);
+    setTimeout(bootFeed, 120);
   }
-  bootHomePolls();
+  bootFeed();
 </script>
 <script src="js/miniplayer.js" defer></script>
 </body>
