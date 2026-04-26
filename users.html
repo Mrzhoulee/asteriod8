@@ -226,6 +226,9 @@
         <button class="user-follow-btn" id="modalFollowBtn" type="button">Follow artist</button>
         <p class="user-follow-hint" id="modalFollowHint">Their posts will show up under “From artists you follow” on your home page.</p>
       </div>
+      <a id="modalQALink" href="#" style="display:none;margin-top:12px;padding:11px;text-align:center;background:rgba(255,122,89,0.1);border:1px solid rgba(255,122,89,0.25);border-radius:12px;color:#ff7a59;font-weight:700;font-size:13px;text-decoration:none;font-family:Montserrat,sans-serif;">
+        <span style="vertical-align:middle;margin-right:6px;">💬</span> Ask a question
+      </a>
       <div class="user-songs" id="modalSongsSection" style="display:none;">
         <div class="user-songs-title">Songs</div>
         <div id="modalSongsList"><p class="user-songs-empty">Loading tracks…</p></div>
@@ -524,6 +527,11 @@
       }
       document.getElementById('modalSongsSection').style.display = 'none';
       document.getElementById('modalFollowWrap').style.display = 'none';
+      const qaLink = document.getElementById('modalQALink');
+      if (qaLink) {
+        if (u.key) { qaLink.href = 'qa.html?artist=' + encodeURIComponent(u.key); qaLink.style.display = 'block'; }
+        else qaLink.style.display = 'none';
+      }
       if (u.key) {
         void loadArtistSongs(u.key, u.profile || {});
         void wireFollowButton(u);

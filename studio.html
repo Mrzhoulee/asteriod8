@@ -524,6 +524,18 @@
     .bar-bg.bar-success #progressBarStatus {
       background: linear-gradient(90deg, #00e676, #00c853, #008044) !important;
     }
+    /* Q&A inbox */
+    .qa-inbox-card { background: #0f172a; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; }
+    .qa-inbox-q { font-size: 14px; font-weight: 600; line-height: 1.5; margin-bottom: 4px; color: #fff; }
+    .qa-inbox-meta { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+    .qa-inbox-answered { border-top: 1px solid rgba(255,255,255,0.07); padding-top: 12px; margin-top: 4px; }
+    .qa-inbox-answered-label { font-size: 11px; color: #00e676; font-weight: 700; margin-bottom: 6px; }
+    .qa-inbox-answered-text { font-size: 13px; color: rgba(255,255,255,0.75); }
+    .qa-answer-form { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.07); padding-top: 12px; }
+    .qa-answer-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-family: Montserrat, sans-serif; font-size: 13px; padding: 10px 12px; resize: vertical; min-height: 60px; outline: none; }
+    .qa-answer-input:focus { border-color: #ff7a59; }
+    .qa-answer-submit { align-self: flex-end; padding: 9px 18px; background: #ff7a59; color: #fff; border: none; border-radius: 10px; font-family: Montserrat, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .qa-answer-submit:disabled { opacity: 0.5; }
   </style>
 </head>
 <body>
@@ -818,6 +830,21 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ── Q&A Inbox ── -->
+  <div id="qaInboxSection" style="max-width:600px;margin:32px auto 0;padding:0 16px;display:none;">
+    <h2 style="font-size:16px;font-weight:700;margin-bottom:14px;color:#fff;display:flex;align-items:center;gap:8px;">
+      <span class="material-symbols-outlined" style="font-size:20px;color:#ff7a59">question_answer</span>
+      Fan Questions
+      <span id="qaUnreadBadge" style="display:none;background:#ff7a59;color:#fff;font-size:10px;font-weight:700;border-radius:99px;padding:2px 7px;"></span>
+    </h2>
+    <div id="qaInboxList" style="display:flex;flex-direction:column;gap:12px;">
+      <p style="color:rgba(255,255,255,0.35);font-size:13px;">Loading questions…</p>
+    </div>
+    <a id="qaShareLink" href="#" target="_blank" style="display:block;margin-top:18px;padding:13px;text-align:center;background:rgba(255,122,89,0.12);border:1px solid rgba(255,122,89,0.3);border-radius:12px;color:#ff7a59;font-weight:700;font-size:13px;text-decoration:none;">
+      Share your Q&amp;A page →
+    </a>
   </div>
 
   <div id="boostuploadContainer" class="boost-container">
@@ -1600,6 +1627,8 @@
     closeAppleOnboardingModal();
     try {
       loadUserProgress(nickname);
+      const _qaKey = studioReferralUserKey();
+      if (_qaKey) loadQAInbox(_qaKey);
     } catch (e3) {}
   }
 
@@ -2366,6 +2395,7 @@
       lastLogin: Date.now()
     });
     try { loadUserProgress(user.displayName || rawEmail || accountId || "Artist"); } catch (e) { console.warn("[studio] loadUserProgress:", e); }
+    try { const _qaKey2 = studioReferralUserKey(); if (_qaKey2) loadQAInbox(_qaKey2); } catch (e) { console.warn("[studio] loadQAInbox:", e); }
     applyStudioAuthUI();
     void maybeShowAppleOnboarding();
     try { sessionStorage.setItem("_studioJustSignedIn", "1"); } catch (e) {}
@@ -2536,6 +2566,87 @@
           localStorage.removeItem('_studioReferralCodeUsed');
           localStorage.removeItem(rewardKey);
       }
+    });
+  }
+
+  function loadQAInbox(artistKey) {
+    if (!artistKey) return;
+    const section = document.getElementById('qaInboxSection');
+    const listEl = document.getElementById('qaInboxList');
+    const badge = document.getElementById('qaUnreadBadge');
+    const shareLink = document.getElementById('qaShareLink');
+    if (!section || !listEl) return;
+
+    section.style.display = 'block';
+    if (shareLink) {
+      shareLink.href = 'qa.html?artist=' + encodeURIComponent(artistKey);
+    }
+
+    function timeAgo(ts) {
+      const d = Math.floor((Date.now() - ts) / 1000);
+      if (d < 60) return 'just now';
+      if (d < 3600) return Math.floor(d / 60) + 'm ago';
+      if (d < 86400) return Math.floor(d / 3600) + 'h ago';
+      return Math.floor(d / 86400) + 'd ago';
+    }
+    function escH(s) {
+      const d = document.createElement('div');
+      d.textContent = s == null ? '' : String(s);
+      return d.innerHTML;
+    }
+
+    onValue(ref2(db, 'ARTIST_QA/' + artistKey), (snap) => {
+      if (!snap.exists()) {
+        listEl.innerHTML = '<p style="color:rgba(255,255,255,0.35);font-size:13px;">No questions yet. Share your Q&A link to get started.</p>';
+        if (badge) badge.style.display = 'none';
+        return;
+      }
+      const items = [];
+      snap.forEach((child) => items.push({ id: child.key, ...child.val() }));
+      items.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+      const unanswered = items.filter(q => !q.answer).length;
+      if (badge) {
+        if (unanswered) { badge.textContent = unanswered + ' new'; badge.style.display = ''; }
+        else badge.style.display = 'none';
+      }
+
+      listEl.innerHTML = items.slice(0, 30).map(q => `
+        <div class="qa-inbox-card" id="qa-card-${escH(q.id)}">
+          <div class="qa-inbox-q">${escH(q.question)}</div>
+          <div class="qa-inbox-meta">${escH(q.askerName || 'Anonymous')} · ${timeAgo(q.ts || 0)}</div>
+          ${q.answer
+            ? `<div class="qa-inbox-answered">
+                <div class="qa-inbox-answered-label">✓ You answered</div>
+                <div class="qa-inbox-answered-text">${escH(q.answer)}</div>
+               </div>`
+            : `<div class="qa-answer-form">
+                <textarea class="qa-answer-input" id="qa-ans-${escH(q.id)}" placeholder="Type your answer…" rows="2" maxlength="1000"></textarea>
+                <button class="qa-answer-submit" data-qid="${escH(q.id)}" data-akey="${escH(artistKey)}">Reply</button>
+               </div>`
+          }
+        </div>`).join('');
+
+      listEl.querySelectorAll('.qa-answer-submit').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const qid = btn.dataset.qid;
+          const akey = btn.dataset.akey;
+          const ta = document.getElementById('qa-ans-' + qid);
+          if (!ta) return;
+          const ansText = ta.value.trim();
+          if (!ansText) return;
+          btn.disabled = true; btn.textContent = 'Sending…';
+          try {
+            await update(ref2(db, 'ARTIST_QA/' + akey + '/' + qid), {
+              answer: ansText,
+              answeredAt: Date.now(),
+            });
+          } catch (e) {
+            console.warn('[qa-inbox] answer write failed', e);
+            btn.disabled = false; btn.textContent = 'Reply';
+          }
+        });
+      });
     });
   }
 
@@ -3260,6 +3371,7 @@
       const gcdEl = document.getElementById("gcd");
       if (gcdEl) gcdEl.textContent = savedName;
       if (savedName) try { loadUserProgress(savedName); } catch (e) { console.warn("[studio] loadUserProgress:", e); }
+      try { const _qaKey3 = studioReferralUserKey(); if (_qaKey3) loadQAInbox(_qaKey3); } catch (e) { console.warn("[studio] loadQAInbox:", e); }
   }
   applyStudioAuthUI();
 

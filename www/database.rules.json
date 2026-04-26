@@ -140,6 +140,15 @@
         ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40"
       }
     },
+    "ARTIST_QA": {
+      "$artistKey": {
+        ".read": true,
+        "$questionId": {
+          ".write": "!data.exists() || (data.exists() && !data.child('answer').exists() && newData.hasChild('answer') && newData.child('answer').isString())",
+          ".validate": "newData.hasChildren(['question','ts']) && newData.child('question').isString() && newData.child('question').val().length >= 1 && newData.child('question').val().length <= 500 && newData.child('ts').isNumber() && (!newData.hasChild('fcmToken') || (newData.child('fcmToken').isString() && newData.child('fcmToken').val().length <= 4096)) && (!newData.hasChild('askerName') || (newData.child('askerName').isString() && newData.child('askerName').val().length <= 60)) && (!newData.hasChild('answer') || (newData.child('answer').isString() && newData.child('answer').val().length <= 1000))"
+        }
+      }
+    },
     "CONTENT_REPORTS": {
       "$reportId": {
         ".read": false,
