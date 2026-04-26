@@ -551,41 +551,71 @@
     searchEl.addEventListener('input', applyFilter);
     clearBtn.addEventListener('click', () => { searchEl.value = ''; applyFilter(); searchEl.focus(); });
 
-    (async () => {
-      try {
-        const snap = await get(ref(db, 'PROFILES'));
-        if (!snap.exists()) {
-          gridEl.innerHTML = `<div class="state-msg"><span class="material-symbols-outlined">group_off</span><br>No users yet.</div>`;
-          return;
-        }
-        const profiles = snap.val();
-        const arr = [];
-        for (const key in profiles) {
-          const p = profiles[key] || {};
-          const name = (p.nickname || p.fullName || p.displayName || '').trim();
-          if (!name) continue;
-          if (!isPublicArtist(p)) continue;
-          const links = [
-            p.instagram, p.youtube, p.soundcloud, p.spotify, p.applemusic, p.bandcamp, p.tiktok, p.website
-          ].filter(u => u && /^https?:\/\//.test(u));
-          arr.push({
-            key,
-            name,
-            role: 'Artist',
-            avatar: p.profileImage || p.photoURL || p.profilePicture || '',
-            bio: p.bio || '',
-            links,
-            profile: p,
-          });
-        }
-        arr.sort((a, b) => a.name.localeCompare(b.name));
-        allUsers = arr;
-        render(allUsers);
-      } catch (e) {
-        console.error('[users]', e);
-        gridEl.innerHTML = `<div class="state-msg"><span class="material-symbols-outlined">error</span><br>Could not load users.</div>`;
+    function buildArtistList(profiles) {
+      const arr = [];
+      for (const key in profiles) {
+        const p = profiles[key] || {};
+        const name = (p.nickname || p.fullName || p.displayName || '').trim();
+        if (!name) continue;
+        if (!isPublicArtist(p)) continue;
+        const links = [
+          p.instagram, p.youtube, p.soundcloud, p.spotify, p.applemusic, p.bandcamp, p.tiktok, p.website
+        ].filter(u => u && /^https?:\/\//.test(u));
+        arr.push({
+          key,
+          name,
+          role: 'Artist',
+          avatar: p.profileImage || p.photoURL || p.profilePicture || '',
+          bio: p.bio || '',
+          links,
+          profile: p,
+        });
       }
-    })();
+      arr.sort((a, b) => a.name.localeCompare(b.name));
+      return arr;
+    }
+
+    function showLoadError(msg) {
+      gridEl.innerHTML = `<div class="state-msg"><span class="material-symbols-outlined">error</span><br>${escHtml(msg || 'Could not load users.')}<br><button id="usersRetryBtn" style="margin-top:12px;padding:8px 16px;border:none;border-radius:8px;background:var(--coral,#ff7a59);color:#fff;font-weight:700;cursor:pointer;">Retry</button></div>`;
+      const btn = document.getElementById('usersRetryBtn');
+      if (btn) btn.addEventListener('click', () => { gridEl.innerHTML = `<div class="state-msg"><span class="material-symbols-outlined">hourglass_top</span><br>Loading users…</div>`; loadUsers(); });
+    }
+
+    let _renderedFromCache = false;
+    function loadUsers() {
+      _renderedFromCache = false;
+      let timeoutFired = false;
+      const timeoutId = setTimeout(() => {
+        if (allUsers.length) return;
+        timeoutFired = true;
+        console.warn('[users] PROFILES read timed out after 10s');
+        showLoadError('Loading is taking too long. Check your connection.');
+      }, 10000);
+      // Use onValue: streams cache + live data, more resilient than one-shot get on iOS WebView.
+      try {
+        onValue(ref(db, 'PROFILES'), (snap) => {
+          clearTimeout(timeoutId);
+          if (timeoutFired && allUsers.length) return;
+          if (!snap.exists()) {
+            gridEl.innerHTML = `<div class="state-msg"><span class="material-symbols-outlined">group_off</span><br>No users yet.</div>`;
+            return;
+          }
+          const arr = buildArtistList(snap.val() || {});
+          allUsers = arr;
+          render(arr);
+          _renderedFromCache = true;
+        }, (err) => {
+          clearTimeout(timeoutId);
+          console.error('[users] PROFILES read error:', err);
+          showLoadError('Could not load users: ' + (err && err.message ? err.message : 'unknown error'));
+        });
+      } catch (e) {
+        clearTimeout(timeoutId);
+        console.error('[users] onValue threw:', e);
+        showLoadError('Could not load users: ' + (e && e.message ? e.message : 'init error'));
+      }
+    }
+    loadUsers();
   </script>
   <script src="js/miniplayer.js" defer></script>
 </body>
