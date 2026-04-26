@@ -531,7 +531,7 @@
     <div class="referral-success-card">
       <div class="referral-success-icon">&#127881;</div>
       <h2 class="referral-success-title">Referral Submitted!</h2>
-      <p class="referral-success-msg">You entered the code successfully. The artist who shared it will have their song added to <strong>Featured Songs</strong> on Asteroid.</p>
+      <p class="referral-success-msg">You entered the code successfully. The artist who shared it will appear in <strong>Featured Songs</strong> once they upload a track.</p>
       <button type="button" class="referral-success-close" id="referralSuccessCloseBtn">Got it</button>
     </div>
   </div>
@@ -777,6 +777,14 @@
         </div>
       </div>
     </section>
+
+    <div id="pendingUploadBanner" style="display:none;margin:0 auto 16px;max-width:600px;padding:16px 18px;border-radius:14px;background:linear-gradient(135deg,#fff4e0,#ffe8c2);border:2px solid #f59e0b;text-align:left;font-family:Montserrat,sans-serif;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span style="font-size:22px;">🎉</span>
+        <strong style="color:#92400e;font-size:15px;">Someone used your referral code!</strong>
+      </div>
+      <p style="margin:0;color:#7c2d12;font-size:13px;line-height:1.45;">Upload a song below to claim your spot in <strong>Featured Songs</strong>. You won't appear until you upload.</p>
+    </div>
 
     <div class="progress-box">
       <h3 style="margin: 0; color: coral;">Reward Progress</h3>
@@ -2485,6 +2493,20 @@
     const safeEmail = emailRaw.replace(/\./g, ',');
     const rewardKey = (typeof authScopedKey === "function") ? authScopedKey("rewardNotified") : "rewardNotified";
 
+    // Watch for pending_upload referrals so we can prompt this artist to upload.
+    onValue(ref2(db, 'FEATURE_REFERRAL_REQUESTS/' + userKey), (snap) => {
+      const banner = document.getElementById('pendingUploadBanner');
+      if (!banner) return;
+      let hasPending = false;
+      if (snap.exists()) {
+        const reqs = snap.val() || {};
+        for (const fk in reqs) {
+          if (reqs[fk] && reqs[fk].status === 'pending_upload') { hasPending = true; break; }
+        }
+      }
+      banner.style.display = hasPending ? 'block' : 'none';
+    });
+
     onValue(ref2(db, 'referralCounts/' + userKey), async (snap) => {
       const count = snap.val()?.count || 0;
       const countEl = document.getElementById('countText');
@@ -2965,7 +2987,7 @@
         fromKey: key,
         ownerKey: ownerKey,
         referralCode: rawCode,
-        status: 'featured',
+        status: 'pending_upload',
         requestedAt: Date.now()
       });
       await rtdbSet(ref2(db, 'FEATURE_REFERRAL_OUTBOX/' + key + '/' + ownerKey), {
@@ -2973,69 +2995,9 @@
         referralCode: rawCode,
         requestedAt: Date.now()
       });
-      // Fire-and-forget: auto-pin the referred artist's most recent song so their
-      // featured card shows a track immediately without them opening ArtistDashboard.
-      (async () => {
-        try {
-          const [existingPinSnap, profileSnap] = await Promise.all([
-            get(ref2(db, 'FEATURED_ARTIST_SONG/' + ownerKey)).catch(() => null),
-            get(ref2(db, 'PROFILES/' + ownerKey)).catch(() => null),
-          ]);
-          if (existingPinSnap && existingPinSnap.exists() && (existingPinSnap.val() || {}).fileInp) {
-            return; // already pinned — nothing to do
-          }
-          const profile = (profileSnap && profileSnap.exists()) ? (profileSnap.val() || {}) : {};
-          const profileEmail = String(profile.email || '').trim();
-          const emailVariants = new Set([ownerKey, sanitizeRtdbPathSegment(ownerKey)]);
-          if (profileEmail) {
-            emailVariants.add(profileEmail);
-            emailVariants.add(sanitizeRtdbPathSegment(profileEmail));
-            emailVariants.add(sanitizeRtdbPathSegment(profileEmail.toLowerCase()));
-          }
-          const songsSnap = await get(ref2(db, 'SONGS')).catch(() => null);
-          if (!songsSnap || !songsSnap.exists()) return;
-          const allSongs = songsSnap.val();
-          const matches = [];
-          for (const titleKey in allSongs) {
-            for (const albumKey in allSongs[titleKey]) {
-              for (const artistKeyInner in allSongs[titleKey][albumKey]) {
-                const s = allSongs[titleKey][albumKey][artistKeyInner];
-                if (!s || !s.fileInp) continue;
-                const ownerOnSong = String(s.uploaderOwnerKey || '').trim();
-                const up = String(s.uploader || '').trim();
-                const ownerKeyMatch = ownerOnSong && ownerOnSong === ownerKey;
-                const uploaderMatch = up && (
-                  emailVariants.has(up) ||
-                  emailVariants.has(sanitizeRtdbPathSegment(up)) ||
-                  emailVariants.has(sanitizeRtdbPathSegment(up.toLowerCase()))
-                );
-                if (ownerKeyMatch || uploaderMatch) {
-                  matches.push({ s, songPath: 'SONGS/' + titleKey + '/' + albumKey + '/' + artistKeyInner });
-                }
-              }
-            }
-          }
-          if (!matches.length) return;
-          matches.sort((a, b) => (Number(b.s.createdAt) || 0) - (Number(a.s.createdAt) || 0));
-          const top = matches[0];
-          await set(ref2(db, 'FEATURED_ARTIST_SONG/' + ownerKey), {
-            title: top.s.title || '',
-            album: top.s.album || '',
-            artist: top.s.artist || '',
-            fileInp: top.s.fileInp,
-            uploader: top.s.uploader || '',
-            uploaderName: top.s.uploaderName || '',
-            songPath: top.songPath,
-            uploadedAt: Number(top.s.createdAt) || Date.now(),
-          });
-          console.log('[referral-submit] auto-pinned FEATURED_ARTIST_SONG for', ownerKey, '->', top.songPath);
-        } catch (e) {
-          console.warn('[referral-submit] auto-pin failed (non-fatal):', e);
-        }
-      })();
       if (input) input.value = '';
       console.log('[referral-submit] Code submitted successfully');
-      setReferralStatus('Code accepted! The artist who shared it will be featured.', 'ok');
+      setReferralStatus('Code accepted! The artist will be featured once they upload a song.', 'ok');
       localStorage.setItem('_studioTutorialSubmittedAt', String(Date.now()));
       updateStudioTutorial();
       // NOTE: do NOT touch countText / progressBarStatus / unlockMsg here.
@@ -3174,6 +3136,31 @@
             new Promise((r) => setTimeout(r, 5000)),
           ]);
         } catch (e) { console.warn("[studio] FEATURED_ARTIST_SONG write", e); }
+        // Promote any pending_upload referrals for this artist to 'featured'
+        // now that they have actually uploaded a song.
+        try {
+          const pendingSnap = await Promise.race([
+            get(ref2(db, "FEATURE_REFERRAL_REQUESTS/" + uploaderOwnerKey)),
+            new Promise((r) => setTimeout(() => r(null), 5000)),
+          ]);
+          if (pendingSnap && pendingSnap.exists && pendingSnap.exists()) {
+            const reqs = pendingSnap.val() || {};
+            const updates = {};
+            for (const fk in reqs) {
+              if (reqs[fk] && reqs[fk].status === 'pending_upload') {
+                updates[fk + '/status'] = 'featured';
+                updates[fk + '/featuredAt'] = Date.now();
+              }
+            }
+            if (Object.keys(updates).length) {
+              await Promise.race([
+                update(ref2(db, "FEATURE_REFERRAL_REQUESTS/" + uploaderOwnerKey), updates),
+                new Promise((r) => setTimeout(r, 5000)),
+              ]);
+              console.log("[studio] promoted", Object.keys(updates).length / 2, "pending_upload referrals to featured");
+            }
+          }
+        } catch (e) { console.warn("[studio] referral promotion failed (non-fatal):", e); }
       }
 
       appendUploadStatus("Saving agreement record…");
