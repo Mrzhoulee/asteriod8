@@ -2786,14 +2786,6 @@
         if (badge) badge.textContent = 'Pending';
       }
     });
-    // Step 3: update text when code has been used by another artist
-    if (codeUsedByAnother) {
-      const step3 = steps[2];
-      const desc3 = step3 && step3.querySelector('.step-desc');
-      const title3 = step3 && step3.querySelector('.step-title');
-      if (title3) title3.textContent = 'Referral code shared';
-      if (desc3) desc3.textContent = 'Your code was used by another artist. Nice work!';
-    }
     // Always check completion state after tutorial update
     try { checkReferralCompletion(); } catch (e) {}
     // Start watching for code usage if signed in
