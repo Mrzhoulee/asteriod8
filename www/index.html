@@ -4718,12 +4718,14 @@ function whenElementReady(id, callback, retries = 10) {
   // Clears stale dynamic cards, then kicks off a new inject per ownerKey.
   // The generation counter ensures late-resolving promises from old renders
   // don't append cards after the container has already been refreshed.
+  // ONLY referred artists (FEATURE_REFERRAL_REQUESTS) appear — FEATURED_ARTIST_SONG
+  // is just a song-cache for those referred artists, not a source of cards.
   function _mergeAndRender() {
     const gen = ++_renderGen;
     const container = document.getElementById('featuredContainer');
     if (!container) return;
     container.querySelectorAll('.featuredCard[data-dynamic]').forEach(el => el.remove());
-    const combined = new Set([..._pinnedKeys, ..._referralKeys]);
+    const combined = new Set(_referralKeys);
     if (!combined.size) return;
     combined.forEach((ownerKey) => _injectFeaturedCard(ownerKey, gen));
   }
