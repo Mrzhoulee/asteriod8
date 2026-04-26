@@ -2487,20 +2487,32 @@
 
     onValue(ref2(db, 'referralCounts/' + userKey), async (snap) => {
       const count = snap.val()?.count || 0;
-      document.getElementById('countText').innerText = `${count} / 1 Artist Joined`;
-      document.getElementById('progressBarStatus').style.width = (count >= 1 ? 100 : 0) + "%";
+      const countEl = document.getElementById('countText');
+      const barEl = document.getElementById('progressBarStatus');
+      const barBg = document.querySelector('.bar-bg');
+      const unlockEl = document.getElementById('unlockMsg');
+      const vipBox = document.getElementById('vipSuccessBox');
+      if (countEl) countEl.innerText = `${count} / 1 Artist Joined`;
+      if (barEl) barEl.style.width = (count >= 1 ? 100 : 0) + "%";
 
-      if(count >= 1) {
-          document.getElementById('unlockMsg').style.display = 'block';
-          // Mark step 3 as done — someone used our referral code
+      if (count >= 1) {
+          if (barBg) barBg.classList.add('bar-success');
+          if (unlockEl) unlockEl.style.display = 'block';
           localStorage.setItem('_studioReferralCodeUsed', '1');
           updateStudioTutorial();
           if (localStorage.getItem(rewardKey) !== 'true') {
-              document.getElementById('vipSuccessBox').style.display = 'block';
+              if (vipBox) vipBox.style.display = 'block';
               await update(ref2(db, 'users/' + safeEmail), { eligibility: "3_MONTH_FEATURE" });
               jsConfetti.addConfetti({ emojis: ['🎉', '🚀', '🔥'] });
               localStorage.setItem(rewardKey, 'true');
           }
+      } else {
+          // Reset unlock UI when no one has used this user's code (e.g. data cleared)
+          if (barBg) barBg.classList.remove('bar-success');
+          if (unlockEl) unlockEl.style.display = 'none';
+          if (vipBox) vipBox.style.display = 'none';
+          localStorage.removeItem('_studioReferralCodeUsed');
+          localStorage.removeItem(rewardKey);
       }
     });
   }
@@ -3034,15 +3046,10 @@
       setReferralStatus('Code accepted! The artist who shared it will be featured.', 'ok');
       localStorage.setItem('_studioTutorialSubmittedAt', String(Date.now()));
       updateStudioTutorial();
+      // NOTE: do NOT touch countText / progressBarStatus / unlockMsg here.
+      // Those belong to the OWNER's progress (people who used THEIR code).
+      // Submitting someone else's code does not advance the submitter's own bar.
       try {
-        var countEl = document.getElementById('countText');
-        if (countEl) countEl.innerText = '1 / 1 Artist Joined';
-        var barBg = document.querySelector('.bar-bg');
-        var bar = document.getElementById('progressBarStatus');
-        if (barBg) barBg.classList.add('bar-success');
-        if (bar) { bar.style.width = '100%'; bar.style.transition = 'width 0.8s ease'; }
-        var unlockEl = document.getElementById('unlockMsg');
-        if (unlockEl) unlockEl.style.display = 'block';
         var overlay = document.getElementById('referralSuccessOverlay');
         if (overlay) {
           overlay.classList.add('visible');
