@@ -1358,10 +1358,10 @@
 <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
 
 <script type="module">
-  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getDatabase, goOnline, ref as ref2, update, get, set, onValue, increment, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-  import { initializeAuth, getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInAnonymously, OAuthProvider, onAuthStateChanged, browserLocalPersistence, browserPopupRedirectResolver } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-  import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+  import { getDatabase, goOnline, ref as ref2, update, get, set, onValue, increment, remove } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+  import { initializeAuth, getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInAnonymously, OAuthProvider, onAuthStateChanged, browserLocalPersistence, browserPopupRedirectResolver } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+  import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
   import { processReferralURL, createOrUpdateUserOnSignup, getReferralFromURL, onSongUploaded } from "./js/referral-system.js";
   import { songMetadataExplicit } from "./js/explicit-appendix.js";
 
@@ -2445,7 +2445,7 @@
           }
           try {
             console.log("[studio] Attempting signInWithPopup (Apple)");
-            const result = await signInWithPopup(auth, appleProvider);
+            const result = await signInWithPopup(auth, appleProvider, browserPopupRedirectResolver);
             await completeStudioSignIn(result);
           } catch (popupErr) {
             const code = popupErr && popupErr.code ? String(popupErr.code) : "";
@@ -2483,7 +2483,7 @@
       }
       try {
         console.log("[studio] Attempting signInWithPopup (Apple)");
-        const result = await signInWithPopup(auth, appleProvider);
+        const result = await signInWithPopup(auth, appleProvider, browserPopupRedirectResolver);
         await completeStudioSignIn(result);
       } catch (popupErr) {
         const code = popupErr && popupErr.code ? String(popupErr.code) : "";
@@ -3623,8 +3623,8 @@ boostBtn.addEventListener("click", async (e) => {
 
 <script src="js/miniplayer.js" defer></script>
 <script type="module">
-  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getDatabase, ref as ref2, get, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+  import { getDatabase, ref as ref2, get, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
   const studioFeaturedConfig = {
     apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
