@@ -761,17 +761,41 @@
             }
         }
 
-        .qa-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; }
-        .qa-card-q { font-size: 14px; font-weight: 600; line-height: 1.5; margin-bottom: 4px; color: var(--text-primary); }
-        .qa-card-meta { font-size: 11px; color: var(--text-secondary); margin-bottom: 12px; }
-        .qa-answered { border-top: 1px solid var(--card-border); padding-top: 12px; margin-top: 4px; }
-        .qa-answered-label { font-size: 11px; color: #00e676; font-weight: 700; margin-bottom: 6px; }
-        .qa-answered-text { font-size: 13px; color: var(--text-secondary); }
-        .qa-answer-form { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; border-top: 1px solid var(--card-border); padding-top: 12px; }
-        .qa-answer-input { background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); border-radius: 10px; color: var(--text-primary); font-family: inherit; font-size: 13px; padding: 10px 12px; resize: vertical; min-height: 60px; outline: none; }
-        .qa-answer-input:focus { border-color: var(--primary); }
-        .qa-answer-submit { align-self: flex-end; padding: 9px 18px; background: var(--primary); color: #fff; border: none; border-radius: 10px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
-        .qa-answer-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+        /* Q&A tab */
+        .qa-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+        .qa-header-left { display:flex; align-items:center; gap:10px; }
+        .qa-header-title { font-size:20px; font-weight:800; color:var(--text-primary); letter-spacing:-0.3px; }
+        .qa-new-badge { background:linear-gradient(135deg,#ff7a59,#ff4e2a); color:#fff; font-size:10px; font-weight:800; padding:3px 9px; border-radius:20px; letter-spacing:0.04em; text-transform:uppercase; }
+        .qa-share-btn { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--primary); background:rgba(255,127,80,0.1); border:1px solid rgba(255,127,80,0.25); border-radius:20px; padding:7px 14px; text-decoration:none; transition:background 0.18s, border-color 0.18s; }
+        .qa-share-btn:hover { background:rgba(255,127,80,0.18); border-color:rgba(255,127,80,0.5); }
+
+        .qa-card { background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:0; overflow:hidden; transition:box-shadow 0.2s; }
+        .qa-card:hover { box-shadow:0 4px 24px rgba(0,0,0,0.35); }
+        .qa-card.qa-unanswered { border-left:3px solid var(--primary); }
+        .qa-card-body { padding:18px 20px 0; }
+        .qa-card-top { display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+        .qa-card-avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,rgba(255,127,80,0.25),rgba(255,78,42,0.15)); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px; color:var(--primary); }
+        .qa-card-info { flex:1; min-width:0; }
+        .qa-card-asker { font-size:13px; font-weight:700; color:var(--text-primary); margin-bottom:1px; }
+        .qa-card-time { font-size:11px; color:var(--text-secondary); }
+        .qa-card-q { font-size:15px; font-weight:600; line-height:1.55; color:var(--text-primary); margin-bottom:16px; }
+
+        .qa-answered-wrap { background:rgba(0,230,118,0.06); border-top:1px solid rgba(0,230,118,0.15); padding:14px 20px 16px; }
+        .qa-answered-label { display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:800; color:#00e676; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:7px; }
+        .qa-answered-text { font-size:13px; line-height:1.6; color:rgba(255,255,255,0.8); }
+
+        .qa-answer-form { border-top:1px solid var(--card-border); padding:14px 20px 16px; display:flex; flex-direction:column; gap:10px; }
+        .qa-answer-input { background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.1); border-radius:12px; color:var(--text-primary); font-family:inherit; font-size:13px; padding:12px 14px; resize:none; min-height:72px; outline:none; transition:border-color 0.18s; width:100%; box-sizing:border-box; }
+        .qa-answer-input:focus { border-color:var(--primary); background:rgba(255,127,80,0.04); }
+        .qa-answer-footer { display:flex; align-items:center; justify-content:flex-end; }
+        .qa-answer-submit { padding:10px 22px; background:linear-gradient(135deg,#ff7a59,#ff4e2a); color:#fff; border:none; border-radius:12px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.18s, transform 0.15s; letter-spacing:0.02em; }
+        .qa-answer-submit:hover { opacity:0.9; transform:translateY(-1px); }
+        .qa-answer-submit:active { transform:translateY(0); }
+        .qa-answer-submit:disabled { opacity:0.45; cursor:not-allowed; transform:none; }
+
+        .qa-empty { text-align:center; padding:48px 20px; color:var(--text-secondary); }
+        .qa-empty-icon { font-size:40px; margin-bottom:12px; opacity:0.4; }
+        .qa-empty-text { font-size:14px; font-weight:500; }
     </style>
 </head>
 <body>
@@ -1055,13 +1079,18 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
     </div>
 
     <div id="qa-tab" class="tab-content">
-        <div style="max-width:640px;margin:0 auto;padding:0 4px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-                <h2 class="section-title" style="margin:0;"><i class="fas fa-question-circle"></i> Fan Q&amp;A <span id="qaTabBadge" style="display:none;background:#ff7a59;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px;"></span></h2>
-                <a id="qaTabShareLink" href="qa.html" target="_blank" style="font-size:12px;color:#ff7a59;text-decoration:none;font-weight:600;">Share Q&amp;A link ↗</a>
+        <div style="max-width:660px;margin:0 auto;padding:0 4px;">
+            <div class="qa-header">
+                <div class="qa-header-left">
+                    <div class="qa-header-title">Fan Q&amp;A</div>
+                    <span id="qaTabBadge" class="qa-new-badge" style="display:none;"></span>
+                </div>
+                <a id="qaTabShareLink" href="qa.html" target="_blank" class="qa-share-btn">
+                    <i class="fas fa-share-alt"></i> Share your Q&amp;A page
+                </a>
             </div>
-            <div id="qaTabList" style="display:flex;flex-direction:column;gap:12px;">
-                <p style="color:rgba(255,255,255,0.35);font-size:13px;">Loading questions…</p>
+            <div id="qaTabList" style="display:flex;flex-direction:column;gap:14px;">
+                <p style="color:rgba(255,255,255,0.3);font-size:13px;padding:8px 0;">Loading questions…</p>
             </div>
         </div>
     </div>
@@ -1257,7 +1286,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
             onValue(ref(database, 'ARTIST_QA/' + artistKey), (snap) => {
                 if (!snap.exists()) {
-                    listEl.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">No questions yet. Share your Q&A link to get started.</p>';
+                    listEl.innerHTML = `<div class="qa-empty"><div class="qa-empty-icon">💬</div><div class="qa-empty-text">No questions yet.<br>Share your Q&amp;A link to get started.</div></div>`;
                     if (badge) badge.style.display = 'none';
                     return;
                 }
@@ -1271,18 +1300,33 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     else badge.style.display = 'none';
                 }
 
+                const initials = (name) => {
+                    const n = String(name || 'A').trim();
+                    return n === 'Anonymous' ? '?' : n.charAt(0).toUpperCase();
+                };
+
                 listEl.innerHTML = items.slice(0, 50).map(q => `
-                    <div class="qa-card" id="qa-card-${escH(q.id)}">
-                        <div class="qa-card-q">${escH(q.question)}</div>
-                        <div class="qa-card-meta">${escH(q.askerName || 'Anonymous')} · ${timeAgo(q.ts || 0)}</div>
+                    <div class="qa-card ${q.answer ? '' : 'qa-unanswered'}" id="qa-card-${escH(q.id)}">
+                        <div class="qa-card-body">
+                            <div class="qa-card-top">
+                                <div class="qa-card-avatar">${escH(initials(q.askerName))}</div>
+                                <div class="qa-card-info">
+                                    <div class="qa-card-asker">${escH(q.askerName || 'Anonymous')}</div>
+                                    <div class="qa-card-time">${timeAgo(q.ts || 0)}</div>
+                                </div>
+                            </div>
+                            <div class="qa-card-q">${escH(q.question)}</div>
+                        </div>
                         ${q.answer
-                            ? `<div class="qa-answered">
-                                <div class="qa-answered-label">✓ You answered</div>
+                            ? `<div class="qa-answered-wrap">
+                                <div class="qa-answered-label"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="6" fill="#00e676" opacity=".2"/><path d="M3.5 6l1.8 1.8L8.5 4.5" stroke="#00e676" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Your reply</div>
                                 <div class="qa-answered-text">${escH(q.answer)}</div>
                                </div>`
                             : `<div class="qa-answer-form">
-                                <textarea class="qa-answer-input" id="qa-ans-${escH(q.id)}" placeholder="Type your answer…" rows="2" maxlength="1000"></textarea>
-                                <button class="qa-answer-submit" data-qid="${escH(q.id)}" data-akey="${escH(artistKey)}">Reply</button>
+                                <textarea class="qa-answer-input" id="qa-ans-${escH(q.id)}" placeholder="Write your reply…" rows="3" maxlength="1000"></textarea>
+                                <div class="qa-answer-footer">
+                                    <button class="qa-answer-submit" data-qid="${escH(q.id)}" data-akey="${escH(artistKey)}">Send Reply</button>
+                                </div>
                                </div>`
                         }
                     </div>`).join('');
