@@ -760,6 +760,18 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        .qa-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; }
+        .qa-card-q { font-size: 14px; font-weight: 600; line-height: 1.5; margin-bottom: 4px; color: var(--text-primary); }
+        .qa-card-meta { font-size: 11px; color: var(--text-secondary); margin-bottom: 12px; }
+        .qa-answered { border-top: 1px solid var(--card-border); padding-top: 12px; margin-top: 4px; }
+        .qa-answered-label { font-size: 11px; color: #00e676; font-weight: 700; margin-bottom: 6px; }
+        .qa-answered-text { font-size: 13px; color: var(--text-secondary); }
+        .qa-answer-form { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; border-top: 1px solid var(--card-border); padding-top: 12px; }
+        .qa-answer-input { background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); border-radius: 10px; color: var(--text-primary); font-family: inherit; font-size: 13px; padding: 10px 12px; resize: vertical; min-height: 60px; outline: none; }
+        .qa-answer-input:focus { border-color: var(--primary); }
+        .qa-answer-submit { align-self: flex-end; padding: 9px 18px; background: var(--primary); color: #fff; border: none; border-radius: 10px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .qa-answer-submit:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -791,6 +803,9 @@
             </button>
             <button class="tab-btn" onclick="switchTab('parties')">
                 <i class="fas fa-dollar-sign"></i> Asteroid Parties
+            </button>
+            <button class="tab-btn" onclick="switchTab('qa')">
+                <i class="fas fa-question-circle"></i> Q&amp;A
             </button>
 
         </div>
@@ -1039,6 +1054,18 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
         ></iframe>
     </div>
 
+    <div id="qa-tab" class="tab-content">
+        <div style="max-width:640px;margin:0 auto;padding:0 4px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+                <h2 class="section-title" style="margin:0;"><i class="fas fa-question-circle"></i> Fan Q&amp;A <span id="qaTabBadge" style="display:none;background:#ff7a59;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px;"></span></h2>
+                <a id="qaTabShareLink" href="qa.html" target="_blank" style="font-size:12px;color:#ff7a59;text-decoration:none;font-weight:600;">Share Q&amp;A link ↗</a>
+            </div>
+            <div id="qaTabList" style="display:flex;flex-direction:column;gap:12px;">
+                <p style="color:rgba(255,255,255,0.35);font-size:13px;">Loading questions…</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Profile Modal -->
     <div id="profileModal" class="profile-modal">
         <div class="profile-modal-content" id="profileModalContent">
@@ -1200,7 +1227,88 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             if (tabName === 'creator' && currentEmailKey) {
                 loadCreatorTools();
             }
+            if (tabName === 'qa' && currentEmailKey) {
+                loadQATab(currentEmailKey);
+            }
         };
+
+        let _qaTabLoaded = false;
+        function loadQATab(artistKey) {
+            if (_qaTabLoaded) return;
+            _qaTabLoaded = true;
+
+            const listEl = document.getElementById('qaTabList');
+            const badge = document.getElementById('qaTabBadge');
+            const shareLink = document.getElementById('qaTabShareLink');
+            if (shareLink) shareLink.href = 'qa.html?artist=' + encodeURIComponent(artistKey);
+
+            function timeAgo(ts) {
+                const d = Math.floor((Date.now() - ts) / 1000);
+                if (d < 60) return 'just now';
+                if (d < 3600) return Math.floor(d / 60) + 'm ago';
+                if (d < 86400) return Math.floor(d / 3600) + 'h ago';
+                return Math.floor(d / 86400) + 'd ago';
+            }
+            function escH(s) {
+                const el = document.createElement('div');
+                el.textContent = s == null ? '' : String(s);
+                return el.innerHTML;
+            }
+
+            onValue(ref(database, 'ARTIST_QA/' + artistKey), (snap) => {
+                if (!snap.exists()) {
+                    listEl.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">No questions yet. Share your Q&A link to get started.</p>';
+                    if (badge) badge.style.display = 'none';
+                    return;
+                }
+                const items = [];
+                snap.forEach((child) => items.push({ id: child.key, ...child.val() }));
+                items.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+                const unanswered = items.filter(q => !q.answer).length;
+                if (badge) {
+                    if (unanswered) { badge.textContent = unanswered + ' new'; badge.style.display = ''; }
+                    else badge.style.display = 'none';
+                }
+
+                listEl.innerHTML = items.slice(0, 50).map(q => `
+                    <div class="qa-card" id="qa-card-${escH(q.id)}">
+                        <div class="qa-card-q">${escH(q.question)}</div>
+                        <div class="qa-card-meta">${escH(q.askerName || 'Anonymous')} · ${timeAgo(q.ts || 0)}</div>
+                        ${q.answer
+                            ? `<div class="qa-answered">
+                                <div class="qa-answered-label">✓ You answered</div>
+                                <div class="qa-answered-text">${escH(q.answer)}</div>
+                               </div>`
+                            : `<div class="qa-answer-form">
+                                <textarea class="qa-answer-input" id="qa-ans-${escH(q.id)}" placeholder="Type your answer…" rows="2" maxlength="1000"></textarea>
+                                <button class="qa-answer-submit" data-qid="${escH(q.id)}" data-akey="${escH(artistKey)}">Reply</button>
+                               </div>`
+                        }
+                    </div>`).join('');
+
+                listEl.querySelectorAll('.qa-answer-submit').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const qid = btn.dataset.qid;
+                        const akey = btn.dataset.akey;
+                        const ta = document.getElementById('qa-ans-' + qid);
+                        if (!ta) return;
+                        const ansText = ta.value.trim();
+                        if (!ansText) return;
+                        btn.disabled = true; btn.textContent = 'Sending…';
+                        try {
+                            await update(ref(database, 'ARTIST_QA/' + akey + '/' + qid), {
+                                answer: ansText,
+                                answeredAt: Date.now(),
+                            });
+                        } catch (e) {
+                            console.warn('[qa-tab] answer write failed', e);
+                            btn.disabled = false; btn.textContent = 'Reply';
+                        }
+                    });
+                });
+            });
+        }
 
         async function loadCreatorTools() {
             const safe = currentEmailKey;
@@ -1982,6 +2090,17 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 await loadAnalytics();
                 await loadProfile();
                 await loadAllUsers();
+
+                // Preload Q&A badge count (so tab button shows "N new" before switching)
+                onValue(ref(database, 'ARTIST_QA/' + currentEmailKey), (snap) => {
+                    const badge = document.getElementById('qaTabBadge');
+                    if (!badge) return;
+                    if (!snap.exists()) { badge.style.display = 'none'; return; }
+                    let unanswered = 0;
+                    snap.forEach((child) => { if (!child.val().answer) unanswered++; });
+                    if (unanswered) { badge.textContent = unanswered + ' new'; badge.style.display = ''; }
+                    else badge.style.display = 'none';
+                });
 
                 // Set up real-time listeners
                 const songplaysRef = ref(database, 'songplayed');
