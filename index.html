@@ -1886,7 +1886,6 @@ html.song-overflow-menu-open {
 .asteroid-onboarding { display: none; position: fixed; inset: 0; z-index: 50000; background: #000; flex-direction: column; font-family: 'Poppins', sans-serif; -webkit-user-select: none; user-select: none; overflow: hidden; }
 .asteroid-onboarding.active { display: flex !important; }
 body.onboarding-active .mobile-nav,
-body.onboarding-active .bottom-queue-dock,
 body.onboarding-active .lol {
   display: none !important;
 }
@@ -1894,7 +1893,6 @@ body.onboarding-active {
   padding-bottom: 0 !important;
 }
 body.profile-focus-active .mobile-nav,
-body.profile-focus-active .bottom-queue-dock,
 body.profile-focus-active .lol {
   display: none !important;
 }
@@ -1903,15 +1901,12 @@ body.profile-focus-active {
 }
 /* Fallback: hide bottom UI whenever profile overlays are open */
 #profileModal.active ~ .mobile-nav,
-#profileModal.active ~ .bottom-queue-dock,
 #profileModal.active ~ .lol,
 #artistProfileOverlay.active ~ .mobile-nav,
-#artistProfileOverlay.active ~ .bottom-queue-dock,
 #artistProfileOverlay.active ~ .lol {
   display: none !important;
 }
 body.create-profile-active .mobile-nav,
-body.create-profile-active .bottom-queue-dock,
 body.create-profile-active .lol {
   display: none !important;
 }
@@ -4280,9 +4275,25 @@ setInterval(flySanta, 10000);
 </script>
 
 
-
-
 <div class="lol lol-mini-player" style="position: fixed; width: 100%; bottom: 0; left: 0; z-index: 9999;">
+  <!-- Queue popup — slides up from above the player -->
+  <div id="queuePopup" aria-label="Queue" style="
+    position: absolute; bottom: 100%; left: 0; right: 0;
+    background: #0e0e0e; border-top: 1px solid rgba(255,127,80,0.25);
+    border-bottom: none; max-height: 52vh; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    transform: translateY(100%); opacity: 0; pointer-events: none;
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease;
+    padding: 12px 14px 10px; box-sizing: border-box;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <span style="color:#ff7f50;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;font-family:'Poppins',sans-serif;">
+        <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;margin-right:4px;">queue_music</span>Up Next
+      </span>
+      <button onclick="window._toggleQueue()" aria-label="Close queue" style="background:none;border:none;color:rgba(255,255,255,0.45);cursor:pointer;font-size:18px;line-height:1;padding:2px 4px;">✕</button>
+    </div>
+    <div id="queues" style="display:flex;flex-direction:column;gap:6px;min-height:24px;"></div>
+    <p id="queueEmptyMsg" style="color:rgba(255,255,255,0.3);font-size:12px;font-family:'Poppins',sans-serif;margin:0;display:none;">No songs in queue yet.</p>
+  </div>
   <div class="lol-main-row">
     <div class="lol-now-wrap">
       <div id="tata" style="display: flex; align-items: center; justify-content: center; color: #ff7f50; font-weight: 600; flex-wrap: wrap; text-align: center;">SELECT A SONG</div>
@@ -4295,9 +4306,43 @@ setInterval(flySanta, 10000);
       <button type="button" class="lol-transport-btn" id="lolPauseMain" aria-label="Pause">
         <span class="material-symbols-outlined" aria-hidden="true">pause_circle</span>
       </button>
+      <button type="button" class="lol-transport-btn player-toggle-btn" id="queueToggleBtn" aria-label="Toggle queue" onclick="window._toggleQueue()" style="position:relative;">
+        <span class="material-symbols-outlined" aria-hidden="true" style="font-size:40px!important;width:40px;height:40px;">queue_music</span>
+        <span id="queueBadge" style="display:none;position:absolute;top:2px;right:2px;background:#ff7f50;color:#000;font-size:9px;font-weight:800;border-radius:50%;width:15px;height:15px;line-height:15px;text-align:center;font-family:'Poppins',sans-serif;"></span>
+      </button>
     </div>
   </div>
 </div>
+<script>
+(function () {
+  let queueOpen = false;
+  window._toggleQueue = function () {
+    const popup = document.getElementById('queuePopup');
+    const btn = document.getElementById('queueToggleBtn');
+    if (!popup) return;
+    queueOpen = !queueOpen;
+    popup.style.transform = queueOpen ? 'translateY(0)' : 'translateY(100%)';
+    popup.style.opacity = queueOpen ? '1' : '0';
+    popup.style.pointerEvents = queueOpen ? 'auto' : 'none';
+    if (btn) btn.style.color = queueOpen ? '#ff7f50' : '';
+    _updateQueueEmpty();
+  };
+  window._updateQueueEmpty = function () {
+    const queues = document.getElementById('queues');
+    const msg = document.getElementById('queueEmptyMsg');
+    if (!queues || !msg) return;
+    msg.style.display = queues.children.length === 0 ? '' : 'none';
+  };
+  window._updateQueueBadge = function () {
+    const queues = document.getElementById('queues');
+    const badge = document.getElementById('queueBadge');
+    if (!queues || !badge) return;
+    const n = queues.children.length;
+    badge.textContent = n > 9 ? '9+' : String(n);
+    badge.style.display = n > 0 ? '' : 'none';
+  };
+})();
+</script>
 
 <script>
 window.getMasterPlaybackAudio = function () {
@@ -6052,7 +6097,11 @@ window.queuemusic = function(fileInp, title) {
   const el = document.createElement("div");
   el.innerText = title;
   el.style.cssText = "font-size:12px;margin:3px 0;color:white;padding:4px 8px;border:1px solid coral;border-radius:999px;background:rgba(255,127,80,0.1);white-space:nowrap;";
-  if (queueDock) queueDock.appendChild(el);
+  if (queueDock) {
+    queueDock.appendChild(el);
+    if (typeof window._updateQueueBadge === "function") window._updateQueueBadge();
+    if (typeof window._updateQueueEmpty === "function") window._updateQueueEmpty();
+  }
   function processQueue() {
     if (window.jkjk.length === 0) { if (tata) tata.innerHTML = '<font color="coral">SELECT A SONG</font>'; return; }
     if (window.pauseAllLibraryAudioExcept) window.pauseAllLibraryAudioExcept(null);
@@ -6065,7 +6114,7 @@ window.queuemusic = function(fileInp, title) {
     audio.onended = function() {
       window.jkjk.shift();
       window.ujk.shift();
-      if (queueDock) { const first = queueDock.querySelector("div"); if (first) first.remove(); }
+      if (queueDock) { const first = queueDock.querySelector("div"); if (first) first.remove(); if (typeof window._updateQueueBadge === "function") window._updateQueueBadge(); if (typeof window._updateQueueEmpty === "function") window._updateQueueEmpty(); }
       if (window.jkjk.length > 0) processQueue(); else if (tata) tata.innerHTML = '<font color="coral">SELECT A SONG</font>';
     };
   }
@@ -9527,10 +9576,6 @@ console.log('1171')
 
 
 
-<div class="bottom-queue-dock">
-  <div class="bottom-queue-title">Music Queue</div>
-  <div id="queues" class="bottom-queue-list"></div>
-</div>
 <!-- Bottom nav bar -->
 <nav class="mobile-nav">
   <a href="index.html" class="mobile-nav-item mobile-nav-active">
@@ -9585,30 +9630,6 @@ console.log('1171')
   width: 100% !important;
   max-width: 100% !important;
   padding: 20px 18px 150px !important;
-}
-.bottom-queue-dock {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-  z-index: 99998;
-  background: #0a0a0a;
-  border-top: 1px solid rgba(255,127,80,0.22);
-  padding: 6px 12px;
-}
-.bottom-queue-title {
-  color: #ff7f50;
-  font-size: 11px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-.bottom-queue-list {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  white-space: nowrap;
-  min-height: 20px;
 }
 .mobile-nav-item {
   display: flex;
