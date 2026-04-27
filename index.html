@@ -2343,6 +2343,20 @@ body.create-profile-active {
         Review Terms &amp; Privacy
       </button>
     </div>
+    <!-- Role switch -->
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.1);">
+      <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.07em;text-transform:uppercase;margin-bottom:10px;">Your role</p>
+      <div id="roleSwitchRow" style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button id="switchToArtistBtn" onclick="window._switchToArtist()" style="flex:1;min-width:120px;padding:9px 12px;background:rgba(66,133,244,0.12);border:1px solid rgba(66,133,244,0.35);border-radius:10px;color:#7ab3ff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.7C34.2 33.3 29.6 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8.1 3.1l6-6C34.4 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.5-4z"/></svg>
+          Switch to Artist
+        </button>
+        <button id="switchToListenerBtn" onclick="window._switchToListener()" style="flex:1;min-width:120px;padding:9px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">
+          Switch to Listener
+        </button>
+      </div>
+      <div id="roleSwitchStatus" style="font-size:12px;margin-top:8px;min-height:16px;font-family:'Poppins',sans-serif;"></div>
+    </div>
     <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
       <button id="deleteAccountBtn" style="background: none; border: none; color: rgba(255,80,80,0.8); font-size: 12px; cursor: pointer; font-family: 'Poppins', sans-serif; padding: 4px 8px; transition: color 0.2s;">Delete my account permanently</button>
     </div>
@@ -2368,19 +2382,23 @@ body.create-profile-active {
     <label>Profile type</label>
     <div class="apple-onboarding-choice-group" role="radiogroup" aria-label="Profile type">
       <label class="apple-onboarding-choice" for="appleProfileTypeArtist">
-        <input type="radio" id="appleProfileTypeArtist" name="appleOnboardingProfileType" value="artist">
+        <input type="radio" id="appleProfileTypeArtist" name="appleOnboardingProfileType" value="artist" onchange="document.getElementById('artistGoogleNote').style.display='flex'">
         <div>
           <strong>Public / Artist</strong>
           <span>Your profile shows in the app so others can find you, follow you, and hear your music.</span>
         </div>
       </label>
       <label class="apple-onboarding-choice" for="appleProfileTypeListener">
-        <input type="radio" id="appleProfileTypeListener" name="appleOnboardingProfileType" value="listener" checked>
+        <input type="radio" id="appleProfileTypeListener" name="appleOnboardingProfileType" value="listener" checked onchange="document.getElementById('artistGoogleNote').style.display='none'">
         <div>
           <strong>Private / Listener</strong>
           <span>Your profile stays private—you are not shown to others in the app.</span>
         </div>
       </label>
+      <div id="artistGoogleNote" style="display:none;align-items:center;gap:10px;padding:10px 12px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.3);border-radius:10px;margin-top:6px;">
+        <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#4285F4" d="M44.5 20H24v8.5h11.7C34.2 33.3 29.6 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8.1 3.1l6-6C34.4 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.5-4z"/></svg>
+        <span style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.4;">Artist profiles require a <strong style="color:#4285f4">Google account</strong> verification — a sign-in window will open after you tap Save.</span>
+      </div>
     </div>
     <p class="apple-onboarding-hint" style="margin:8px 0 0;font-size:12px;color:rgba(255,255,255,0.55);line-height:1.45;">Public shows you in the app; private keeps you private.</p>
     <p class="apple-onboarding-optional">Socials (optional)</p>
@@ -4464,7 +4482,7 @@ console.log("960");
      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
   import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-  import { initializeAuth, getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, OAuthProvider, signOut, onAuthStateChanged, deleteUser, setPersistence, browserLocalPersistence, browserPopupRedirectResolver } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+  import { initializeAuth, getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, OAuthProvider, GoogleAuthProvider, linkWithPopup, signOut, onAuthStateChanged, deleteUser, setPersistence, browserLocalPersistence, browserPopupRedirectResolver } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
   import { getDatabase, ref as ref2, onValue, update, get, set, remove, push, limitToFirst, startAt, orderByKey, query} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
   import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
   import { songShowsExplicitBadge } from "./js/explicit-appendix.js";
@@ -6917,7 +6935,129 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
           appleProvider.addScope("name");
 
           const isCapacitorNative = () => typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
-          const getAppPlugin = () => { try { return window.Capacitor?.Plugins?.App || null; } catch (e) { return null; } };
+          const getAppPlugin = () => { try { return window.Capacitor?.Plugins?.App || null; } catch (e) { return null; } }
+
+          // Google sign-in required for Artist role (popup on web, redirect on Capacitor iOS).
+          window._signInWithGoogleForArtist = async function(userKey) {
+            const googleProvider = new GoogleAuthProvider();
+            googleProvider.addScope("email");
+            googleProvider.addScope("profile");
+
+            async function saveGoogleLink(googleUser) {
+              const gEmail = googleUser.email || (googleUser.providerData && googleUser.providerData[0]?.email) || "";
+              const gUid = googleUser.uid || "";
+              const ekKey = userKey || localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
+              if (ekKey) {
+                try {
+                  await set(ref2(database, "GOOGLE_LINKED/" + ekKey), {
+                    googleEmail: gEmail,
+                    googleUid: gUid,
+                    linkedAt: Date.now(),
+                  });
+                } catch (e) { console.warn("[google-link] RTDB write failed:", e); }
+              }
+              localStorage.setItem("_googleLinked", "1");
+              localStorage.setItem("_googleEmail", gEmail);
+            }
+
+            if (isCapacitorNative()) {
+              // Store that we need to complete artist setup after the redirect
+              try { sessionStorage.setItem("_googleArtistRedirectPending", "1"); } catch (_) {}
+              await signInWithRedirectCapacitorBrowser(auth, googleProvider);
+              throw new Error("redirect"); // signal caller to bail — resume happens in getRedirectResult
+            }
+
+            // Web: popup
+            try {
+              const currentUser = auth.currentUser;
+              let result;
+              if (currentUser) {
+                result = await linkWithPopup(currentUser, googleProvider).catch(async (e) => {
+                  // Already linked or credential-already-in-use — just sign in to confirm
+                  if (e.code === "auth/credential-already-in-use" || e.code === "auth/provider-already-linked" || e.code === "auth/email-already-in-use") {
+                    const cred = GoogleAuthProvider.credentialFromError(e);
+                    if (cred) return await signInWithCredential(auth, cred);
+                  }
+                  throw e;
+                });
+              } else {
+                result = await signInWithPopup(auth, googleProvider);
+              }
+              await saveGoogleLink(result.user);
+              return result;
+            } catch (e) {
+              if (e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request") {
+                try { sessionStorage.setItem("_googleArtistRedirectPending", "1"); } catch (_) {}
+                await signInWithRedirect(auth, googleProvider);
+                throw new Error("redirect");
+              }
+              throw e;
+            }
+          };
+
+          window._switchToArtist = async function() {
+            const statusEl = document.getElementById("roleSwitchStatus");
+            const btn = document.getElementById("switchToArtistBtn");
+            if (statusEl) statusEl.textContent = "";
+            if (btn) { btn.disabled = true; btn.style.opacity = "0.6"; }
+            const key = localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
+            if (!key) {
+              if (statusEl) { statusEl.style.color = "#ff6b6b"; statusEl.textContent = "Not signed in."; }
+              if (btn) { btn.disabled = false; btn.style.opacity = "1"; }
+              return;
+            }
+            try {
+              try { sessionStorage.setItem("_switchToArtistPending", "1"); } catch (_) {}
+              await window._signInWithGoogleForArtist(key);
+              // Popup succeeded — clear the flag and update PROFILES role
+              try { sessionStorage.removeItem("_switchToArtistPending"); } catch (_) {}
+              await update(ref2(database, "PROFILES/" + key), {
+                profileType: "artist",
+                profileVisibility: "public",
+                publicProfile: true,
+                hideEmail: false,
+                role: "Artist",
+                profileRole: "Artist",
+              });
+              localStorage.setItem("profileType", "artist");
+              if (statusEl) { statusEl.style.color = "#6bffb0"; statusEl.textContent = "Switched to Artist!"; }
+            } catch (e) {
+              if (e && e.message === "redirect") return; // flow continues after redirect
+              if (statusEl) { statusEl.style.color = "#ff6b6b"; statusEl.textContent = e.message || "Google sign-in failed."; }
+            } finally {
+              if (btn) { btn.disabled = false; btn.style.opacity = "1"; }
+            }
+          };
+
+          window._switchToListener = async function() {
+            const statusEl = document.getElementById("roleSwitchStatus");
+            const btn = document.getElementById("switchToListenerBtn");
+            if (statusEl) statusEl.textContent = "";
+            if (btn) { btn.disabled = true; btn.style.opacity = "0.6"; }
+            const key = localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
+            if (!key) {
+              if (statusEl) { statusEl.style.color = "#ff6b6b"; statusEl.textContent = "Not signed in."; }
+              if (btn) { btn.disabled = false; btn.style.opacity = "1"; }
+              return;
+            }
+            try {
+              await update(ref2(database, "PROFILES/" + key), {
+                profileType: "listener",
+                profileVisibility: "private",
+                publicProfile: false,
+                hideEmail: true,
+                role: "Listener",
+                profileRole: "Listener",
+              });
+              localStorage.setItem("profileType", "listener");
+              if (statusEl) { statusEl.style.color = "#6bffb0"; statusEl.textContent = "Switched to Listener!"; }
+            } catch (e) {
+              if (statusEl) { statusEl.style.color = "#ff6b6b"; statusEl.textContent = e.message || "Failed to switch role."; }
+            } finally {
+              if (btn) { btn.disabled = false; btn.style.opacity = "1"; }
+            }
+          };
+
           const getBrowserPlugin = () => {
             try {
               const C = window.Capacitor;
@@ -7373,6 +7513,38 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             const selectedTypeEl = document.querySelector('input[name="appleOnboardingProfileType"]:checked');
             const profileType = selectedTypeEl ? selectedTypeEl.value : "listener";
             const isPublicArtist = profileType === "artist";
+
+            // Artist role requires Google sign-in verification.
+            if (isPublicArtist) {
+              const saveBtn = document.getElementById("appleOnboardingSaveBtn");
+              const origText = saveBtn ? saveBtn.textContent : "Save";
+              if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Opening Google sign-in…"; }
+              try {
+                await window._signInWithGoogleForArtist(key);
+              } catch (googleErr) {
+                console.warn("[onboarding] Google sign-in failed:", googleErr);
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = origText; }
+                // Store form data for redirect resume
+                try {
+                  sessionStorage.setItem("_pendingArtistProfile", JSON.stringify({
+                    key, nickname, handleRaw,
+                    instagram: gv("appleOnboardingInstagram"),
+                    twitter: gv("appleOnboardingTwitter"),
+                    tiktok: gv("appleOnboardingTiktok"),
+                    youtube: gv("appleOnboardingYoutube"),
+                    spotify: gv("appleOnboardingSpotify"),
+                    soundcloud: gv("appleOnboardingSoundcloud"),
+                    website: gv("appleOnboardingWebsite"),
+                  }));
+                } catch (_) {}
+                // Redirect flow will resume automatically via getRedirectResult
+                if (String(googleErr).includes("redirect")) return;
+                alert("Google sign-in is required for Artist profiles. Please try again.");
+                return;
+              }
+              if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = origText; }
+            }
+
             const payload = {
               nickname,
               profileNickname: nickname,
@@ -7774,6 +7946,66 @@ document.getElementById("user-profile-button")?.addEventListener("click", () => 
               const hadPreviousUser = localStorage.getItem("asteroidSignedInBefore") === "true";
               const result = await getRedirectResult(auth);
               if (result && result.user) {
+                const isGoogleArtistResume = sessionStorage.getItem("_googleArtistRedirectPending") === "1";
+                if (isGoogleArtistResume) {
+                  // Google redirect completed for artist verification — save the linked Google info
+                  sessionStorage.removeItem("_googleArtistRedirectPending");
+                  const gEmail = result.user.email || "";
+                  const ekKey = localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
+                  if (ekKey) {
+                    try {
+                      await set(ref2(database, "GOOGLE_LINKED/" + ekKey), {
+                        googleEmail: gEmail,
+                        googleUid: result.user.uid || "",
+                        linkedAt: Date.now(),
+                      });
+                    } catch (e) { console.warn("[google-link] RTDB write:", e); }
+                  }
+                  localStorage.setItem("_googleLinked", "1");
+                  localStorage.setItem("_googleEmail", gEmail);
+                  // Role switch via redirect: update PROFILES to Artist
+                  if (sessionStorage.getItem("_switchToArtistPending") === "1") {
+                    sessionStorage.removeItem("_switchToArtistPending");
+                    if (ekKey) {
+                      try {
+                        await update(ref2(database, "PROFILES/" + ekKey), {
+                          profileType: "artist", profileVisibility: "public",
+                          publicProfile: true, hideEmail: false,
+                          role: "Artist", profileRole: "Artist",
+                        });
+                        localStorage.setItem("profileType", "artist");
+                      } catch (rErr) { console.warn("[google-link] role switch update:", rErr); }
+                    }
+                    return;
+                  }
+                  // Resume pending artist profile if saved
+                  const pending = sessionStorage.getItem("_pendingArtistProfile");
+                  if (pending) {
+                    sessionStorage.removeItem("_pendingArtistProfile");
+                    try {
+                      const p = JSON.parse(pending);
+                      const profilePayload = {
+                        nickname: p.nickname, profileNickname: p.nickname,
+                        publicUsername: p.handleRaw, email: p.key,
+                        profileType: "artist", profileVisibility: "public",
+                        publicProfile: true, hideEmail: false,
+                        role: "Artist", profileRole: "Artist",
+                        onboardingComplete: true, onboardingUpdatedAt: Date.now(),
+                      };
+                      ["instagram","twitter","tiktok","youtube","spotify","soundcloud","website"].forEach(k => {
+                        if (p[k]) profilePayload[k] = p[k];
+                      });
+                      await update(ref2(database, "PROFILES/" + p.key), profilePayload);
+                      localStorage.setItem("fullName", p.nickname);
+                      localStorage.setItem("profileType", "artist");
+                      localStorage.setItem("appleOnboardingDone", "1");
+                      localStorage.removeItem("appleOnboardingSkipped");
+                      const gcd = document.getElementById("gcd");
+                      if (gcd) gcd.textContent = p.nickname;
+                    } catch (rErr) { console.warn("[google-link] resume profile save:", rErr); }
+                  }
+                  return; // Don't call handleSignInSuccess — the Apple session is already active
+                }
                 console.log("[auth] getRedirectResult: completed redirect sign-in");
                 await handleSignInSuccess(result, hadPreviousUser);
               }

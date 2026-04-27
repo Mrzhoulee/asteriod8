@@ -156,6 +156,13 @@
         ".validate": "newData.hasChildren(['name','date','tier','submittedAt']) && newData.child('name').isString() && newData.child('name').val().length <= 80 && newData.child('date').isString() && newData.child('tier').isString() && newData.child('submittedAt').isNumber()"
       }
     },
+    "GOOGLE_LINKED": {
+      "$userKey": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['googleEmail','linkedAt']) && newData.child('googleEmail').isString() && newData.child('linkedAt').isNumber()"
+      }
+    },
     "CONTENT_REPORTS": {
       "$reportId": {
         ".read": false,
