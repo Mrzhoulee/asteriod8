@@ -6819,6 +6819,12 @@ function openLogoutModal(user) {
 
   if (nameEl) nameEl.textContent = displayName;
 
+  const isArtist = (localStorage.getItem("profileType") || "").toLowerCase() === "artist";
+  const artistBtn = document.getElementById("switchToArtistBtn");
+  const listenerBtn = document.getElementById("switchToListenerBtn");
+  if (artistBtn) artistBtn.style.display = isArtist ? "none" : "flex";
+  if (listenerBtn) listenerBtn.style.display = isArtist ? "" : "none";
+
   setProfileUiFocus(true);
   modal.style.display = "flex";
 }
@@ -7021,6 +7027,10 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               });
               localStorage.setItem("profileType", "artist");
               if (statusEl) { statusEl.style.color = "#6bffb0"; statusEl.textContent = "Switched to Artist!"; }
+              const aBtn = document.getElementById("switchToArtistBtn");
+              const lBtn = document.getElementById("switchToListenerBtn");
+              if (aBtn) aBtn.style.display = "none";
+              if (lBtn) lBtn.style.display = "";
             } catch (e) {
               if (e && e.message === "redirect") return; // flow continues after redirect
               if (statusEl) { statusEl.style.color = "#ff6b6b"; statusEl.textContent = e.message || "Google sign-in failed."; }
@@ -7051,6 +7061,10 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               });
               localStorage.setItem("profileType", "listener");
               if (statusEl) { statusEl.style.color = "#6bffb0"; statusEl.textContent = "Switched to Listener!"; }
+              const aBtn = document.getElementById("switchToArtistBtn");
+              const lBtn = document.getElementById("switchToListenerBtn");
+              if (aBtn) aBtn.style.display = "flex";
+              if (lBtn) lBtn.style.display = "none";
             } catch (e) {
               if (statusEl) { statusEl.style.color = "#ff6b6b"; statusEl.textContent = e.message || "Failed to switch role."; }
             } finally {
