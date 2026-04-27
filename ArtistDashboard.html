@@ -789,10 +789,10 @@
             <button class="tab-btn" onclick="switchTab('creator')">
                 <i class="fas fa-wand-magic-sparkles"></i> Creator tools
             </button>
-                        <button class="tab-btn" onclick="window.location.href = 'parties.html';">
-                <i class="fas fa-wand-magic-sparkles"></i>  Parties
+            <button class="tab-btn" onclick="switchTab('parties')">
+                <i class="fas fa-dollar-sign"></i> Asteroid Parties
             </button>
-            
+
         </div>
 
         <!-- Analytics Tab -->
@@ -1027,6 +1027,16 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             </div>
         </div>
 
+    </div>
+
+    <!-- Asteroid Parties Tab -->
+    <div id="parties-tab" class="tab-content">
+        <iframe
+            id="partiesFrame"
+            src="parties.html"
+            style="width:100%;height:calc(100vh - 140px);border:none;border-radius:12px;display:block;"
+            title="Asteroid Parties"
+        ></iframe>
     </div>
 
     <!-- Profile Modal -->
