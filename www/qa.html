@@ -68,7 +68,7 @@
 <body>
 
 <div class="topbar">
-  <button class="topbar-back" onclick="history.back()">
+  <button class="topbar-back" onclick="history.length > 1 ? history.back() : location.replace('index.html')">
     <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span> Back
   </button>
   <span class="topbar-title">Q&amp;A</span>
