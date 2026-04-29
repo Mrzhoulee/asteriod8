@@ -547,19 +547,25 @@
     async function loadVip() {
       vipLoaded = true;
       const el = document.getElementById('vipList');
-      // Prefer RTDB (source of truth for referralCounts + PROFILES, includes
-      // the public/private visibility flag so we can hide private users).
+      // Safety net: if nothing resolves within 8 s, show empty state.
+      let resolved = false;
+      const safetyTimer = setTimeout(() => {
+        if (!resolved) { resolved = true; renderVipList([]); }
+      }, 8000);
+
+      const finish = (artists) => {
+        if (resolved) return;
+        resolved = true;
+        clearTimeout(safetyTimer);
+        renderVipList(artists);
+      };
+
       try {
         const rtdbArtists = await loadVipFromRtdb();
-        if (rtdbArtists.length) {
-          renderVipList(rtdbArtists);
-          return;
-        }
+        if (rtdbArtists.length) { finish(rtdbArtists); return; }
       } catch (e) {
         console.warn('VIP RTDB load', e);
       }
-      // RTDB empty — optionally try Firestore, but still filter private users
-      // by cross-checking their email against RTDB PROFILES.
       try {
         const mod = await import('./js/referral-system.js');
         if (typeof mod.subscribeToTopVipArtists === 'function') {
@@ -571,14 +577,14 @@
               const p = emailKey ? profiles[emailKey] : null;
               return !isProfilePrivate(p);
             });
-            renderVipList(visible);
+            finish(visible);
           });
           return;
         }
       } catch (e) {
         console.warn('VIP firestore load', e);
       }
-      renderVipList([]);
+      finish([]);
     }
 
     (async () => {

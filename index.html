@@ -1753,6 +1753,36 @@ html.song-overflow-menu-open {
   align-items: stretch !important;
   gap: 10px !important;
   padding: 14px 16px max(18px, env(safe-area-inset-bottom)) !important;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.lol-mini-player.player-collapsed {
+  transform: translateY(calc(100% - 40px)) !important;
+}
+.lol-player-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  cursor: pointer;
+  margin: -6px -16px 0;
+  padding: 0 16px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+.lol-player-handle-pill {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.22);
+  transition: background 0.15s;
+}
+.lol-player-handle:hover .lol-player-handle-pill,
+.lol-player-handle:active .lol-player-handle-pill {
+  background: rgba(255,127,80,0.6);
+}
+.lol-mini-player.player-collapsed .lol-player-handle-pill {
+  background: rgba(255,127,80,0.5);
 }
 .lol-mini-player .lol-main-row {
   display: flex;
@@ -4275,7 +4305,11 @@ setInterval(flySanta, 10000);
 </script>
 
 
-<div class="lol lol-mini-player" style="position: fixed; width: 100%; bottom: 0; left: 0; z-index: 9999;">
+<div class="lol lol-mini-player" id="lolMiniPlayer" style="position: fixed; width: 100%; bottom: 0; left: 0; z-index: 9999;">
+  <!-- Drag handle — tap to collapse/expand -->
+  <div class="lol-player-handle" onclick="window._togglePlayerCollapse()" aria-label="Toggle player" role="button" tabindex="0">
+    <div class="lol-player-handle-pill"></div>
+  </div>
   <!-- Queue popup — slides up from above the player -->
   <div id="queuePopup" aria-label="Queue" style="
     position: absolute; bottom: 100%; left: 0; right: 0;
@@ -4295,7 +4329,7 @@ setInterval(flySanta, 10000);
     <p id="queueEmptyMsg" style="color:rgba(255,255,255,0.3);font-size:12px;font-family:'Poppins',sans-serif;margin:0;display:none;">No songs in queue yet.</p>
   </div>
   <audio id="gaga_global" playsinline preload="none"
-    onplay="if(window.actual1)window.actual1('gaga_global')"
+    onplay="if(window._expandPlayer)window._expandPlayer();if(window.actual1)window.actual1('gaga_global')"
     onended="if(window.handleKKK)window.handleKKK()">
   </audio>
   <div class="lol-main-row">
@@ -4344,6 +4378,34 @@ setInterval(flySanta, 10000);
     const n = queues.children.length;
     badge.textContent = n > 9 ? '9+' : String(n);
     badge.style.display = n > 0 ? '' : 'none';
+  };
+
+  let playerCollapsed = false;
+  window._togglePlayerCollapse = function () {
+    const player = document.getElementById('lolMiniPlayer');
+    if (!player) return;
+    playerCollapsed = !playerCollapsed;
+    player.classList.toggle('player-collapsed', playerCollapsed);
+    // Close queue popup when collapsing so it doesn't float detached
+    if (playerCollapsed && queueOpen) {
+      queueOpen = false;
+      const popup = document.getElementById('queuePopup');
+      if (popup) {
+        popup.style.transform = 'translateY(100%)';
+        popup.style.opacity = '0';
+        popup.style.pointerEvents = 'none';
+      }
+      const btn = document.getElementById('queueToggleBtn');
+      if (btn) btn.style.color = '';
+    }
+    // Re-expand when a song starts playing
+  };
+  window._expandPlayer = function () {
+    if (playerCollapsed) {
+      playerCollapsed = false;
+      const player = document.getElementById('lolMiniPlayer');
+      if (player) player.classList.remove('player-collapsed');
+    }
   };
 })();
 </script>
