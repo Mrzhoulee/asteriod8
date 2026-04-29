@@ -4294,6 +4294,10 @@ setInterval(flySanta, 10000);
     <div id="queues" style="display:flex;flex-direction:column;gap:6px;min-height:24px;"></div>
     <p id="queueEmptyMsg" style="color:rgba(255,255,255,0.3);font-size:12px;font-family:'Poppins',sans-serif;margin:0;display:none;">No songs in queue yet.</p>
   </div>
+  <audio id="gaga_global" playsinline preload="none"
+    onplay="if(window.actual1)window.actual1('gaga_global')"
+    onended="if(window.handleKKK)window.handleKKK()">
+  </audio>
   <div class="lol-main-row">
     <div class="lol-now-wrap">
       <div id="tata" style="display: flex; align-items: center; justify-content: center; color: #ff7f50; font-weight: 600; flex-wrap: wrap; text-align: center;">SELECT A SONG</div>
@@ -5398,60 +5402,24 @@ if (!window.__songOverflowMobileSafety) {
 function renderDiscoveryRows(list, mountId) {
   const mount = document.getElementById(mountId);
   if (!mount) return;
-  try {
-    mount.querySelectorAll("audio").forEach(function (a) {
-      try {
-        a.pause();
-      } catch (e0) {}
-      try {
-        a.removeAttribute("src");
-        while (a.firstChild) a.removeChild(a.firstChild);
-        a.load();
-      } catch (e1) {}
-    });
-  } catch (e2) {}
   if (!Array.isArray(list) || list.length === 0) {
     mount.innerHTML = '<div class="discovery-empty">No songs found in this section yet.</div>';
     return;
   }
   mount.innerHTML = list.slice(0, 18).map((s, idx) => {
-    const tid =
-      "discover_" +
-      mountId +
-      "_" +
-      idx +
-      "_" +
-      Date.now() +
-      "_" +
-      (typeof crypto !== "undefined" && crypto.randomUUID
-        ? crypto.randomUUID().replace(/-/g, "").slice(0, 12)
-        : Math.random().toString(36).slice(2, 14));
-    const t = String(s.title || "Untitled").replace(/&/g, "&amp;").replace(/</g, "&lt;");
-    const a = String(s.artist || "Unknown").replace(/&/g, "&amp;").replace(/</g, "&lt;");
-    const url = String(s.fileInp || "").replace(/"/g, "&quot;");
-    const up = String(pickSongUploaderDiscovery(s) || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-    const st = String(s.title || "Untitled").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-    const sa = String(s.artist || "Unknown").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-    const sfile = String(s.fileInp || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-    const eb = songShowsExplicitBadge(s) ? '<span class="explicit-badge" title="Explicit">E</span>' : "";
+    const tid = "discover_" + mountId + "_" + idx + "_" + Math.random().toString(36).slice(2, 10);
+    const t   = String(s.title  || "Untitled").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+    const a   = String(s.artist || "Unknown" ).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+    const url = String(s.fileInp || "").replace(/"/g,"&quot;");
+    const up  = String(pickSongUploaderDiscovery(s) || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+    const st  = String(s.title  || "Untitled").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+    const sa  = String(s.artist || "Unknown" ).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+    const sfile = String(s.fileInp || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+    const eb  = songShowsExplicitBadge(s) ? '<span class="explicit-badge" title="Explicit">E</span>' : "";
     const exDa = songShowsExplicitBadge(s) ? ' data-explicit="1"' : "";
     const transport = songTransportIconsHtml(tid);
-    const overflow = songOverflowActionsHtml({
-      queueFileRaw: s.fileInp,
-      queueTitleRaw: s.title,
-      playlistArtistRaw: s.artist || "",
-      blockFile: sfile,
-      blockTitle: st,
-      notrecFile: sfile,
-      notrecTitle: st,
-      reportFile: sfile,
-      reportTitle: st,
-      reportArtist: sa,
-      reportUploader: up,
-    });
-    return (
-      `<div class="song-row song-row--discovery"><audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" data-uploader="${up}"${exDa} playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio><div class="song-row-num">${idx + 1}</div><div class="song-row-info"><div class="song-row-title-row">${eb}<span class="song-row-title">${t}</span></div><span class="song-row-artist">${a}</span></div><div class="song-row-actions">${transport}${overflow}</div></div>`
-    );
+    const overflow  = songOverflowActionsHtml({ queueFileRaw:s.fileInp, queueTitleRaw:s.title, playlistArtistRaw:s.artist||"", blockFile:sfile, blockTitle:st, notrecFile:sfile, notrecTitle:st, reportFile:sfile, reportTitle:st, reportArtist:sa, reportUploader:up });
+    return `<div id="song_${tid}" class="song-row song-row--discovery" data-src="${url}" data-display-title="${t}" data-display-artist="${a}" data-uploader="${up}"${exDa}><div class="song-row-num">${idx+1}</div><div class="song-row-info"><div class="song-row-title-row">${eb}<span class="song-row-title">${t}</span></div><span class="song-row-artist">${a}</span></div><div class="song-row-actions">${transport}${overflow}</div></div>`;
   }).join("");
 }
 
@@ -5589,8 +5557,7 @@ function renderSongsFromData(songsData) {
       reportArtist: esc(s.artist),
       reportUploader: up,
     });
-    return `<div class="sssh song-row" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="${al.toLowerCase()}">
-      <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}"${explicitDataAttr(s)} playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
+    return `<div id="song_${tid}" class="sssh song-row" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="${al.toLowerCase()}" data-src="${url}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}"${explicitDataAttr(s)}>
       <div class="song-row-num">${idx + 1}</div>
       <div class="song-row-info">
         <div class="song-row-title-row">${explicitBadge(s)}<span class="song-row-title">${t}</span></div>
@@ -5717,6 +5684,61 @@ function fetchTrendingViaREST() {
 whenElementReady("ab", (ab) => { ab.innerHTML = "<p style='text-align:center;color:rgba(255,255,255,0.7);padding:20px;'>⏳ Loading songs...</p>"; });
 whenElementReady("asteroidLeaderboard", (lb) => { lb.innerHTML = "<p style='text-align: center; color: rgba(255,255,255,0.7); padding: 20px;'>⏳ Loading trending...</p>"; });
 
+// ── Daily 75-song picker ──────────────────────────────────────────────────
+// Deterministic seeded shuffle keyed to YYYY-MM-DD so today's list is
+// stable across page loads and resets the next day.
+function _dailySeed() {
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+function _seededRand(seed) {
+  // mulberry32 — fast, good distribution
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function flattenSongsData(data) {
+  const out = [];
+  if (!data) return out;
+  Object.values(data).forEach(function (titleObj) {
+    if (!titleObj || typeof titleObj !== "object") return;
+    Object.values(titleObj).forEach(function (albumObj) {
+      if (!albumObj || typeof albumObj !== "object") return;
+      Object.values(albumObj).forEach(function (song) {
+        if (song && song.fileInp && song.title) out.push(song);
+      });
+    });
+  });
+  return out;
+}
+function getDailyPick(songsData, n) {
+  const all = flattenSongsData(songsData);
+  if (all.length <= n) return null; // fewer than limit — show all
+  const rand = _seededRand(_dailySeed());
+  const shuffled = all.slice();
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, n);
+}
+// Rebuild a minimal SONGS-shaped object from a flat list for renderSongsFromData
+function flatListToSongsData(list) {
+  const out = {};
+  list.forEach(function (s) {
+    const tk = String(s.title || "Untitled").replace(/[.#$[\]]/g, "_");
+    const ak = String(s.album || "__single__").replace(/[.#$[\]]/g, "_");
+    const uk = String(s.uploader || s.artist || "unknown").replace(/[.#$[\]]/g, "_");
+    if (!out[tk]) out[tk] = {};
+    if (!out[tk][ak]) out[tk][ak] = {};
+    out[tk][ak][uk] = s;
+  });
+  return out;
+}
+
 // SONGS: Load immediately on Firebase init (reference display script)
 let globalSongsData = null;
 let sorg = [];
@@ -5735,9 +5757,12 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
   }
   globalSongsData = songsData;
   window.__asteroidSongsDataForDiscovery = songsData;
-  const html = renderSongsFromData(songsData);
+  // Pick 75 songs for today (deterministic per-day shuffle)
+  const dailyList = getDailyPick(songsData, 75);
+  const renderData = dailyList ? flatListToSongsData(dailyList) : songsData;
+  const html = renderSongsFromData(renderData);
   const songCount = html ? (html.match(/class="sssh"/g) || []).length : 0;
-  console.log("✅ Songs rendered:", songCount);
+  console.log("✅ Songs rendered:", songCount, dailyList ? "(daily pick of 75)" : "(all songs)");
   whenElementReady("ab", (ab) => {
     const extra = document.getElementById("artists-grid-8");
     ab.innerHTML = html + (extra ? extra.innerHTML : "");
@@ -5942,144 +5967,92 @@ window.updateBecauseYouLiked = function (seedTitle, moodRaw) {
 
 window.playRecommendedSong = function (song) {
   if (!song || !song.fileInp) return;
-  const tid = "zrec" + __dynRecCounter++ + "_" + Date.now();
-  const el = document.createElement("audio");
-  el.id = "gaga_" + tid;
-  el.setAttribute("playsinline", "");
-  el.setAttribute("preload", "metadata");
-  el.dataset.displayTitle = song.title || "";
-  el.dataset.displayArtist = song.artist || "";
-  el.dataset.displayAlbum = song.album || "";
-  el.dataset.mood = String(song.mood || song.primaryMood || (Array.isArray(song.moods) && song.moods[0] ? song.moods[0] : "") || "");
-  el.dataset.uploader = String(song.uploader || "");
-  if (songShowsExplicitBadge(song)) el.dataset.explicit = "1";
-  const src = document.createElement("source");
-  src.src = song.fileInp;
-  src.type = "audio/mpeg";
-  el.appendChild(src);
-  el.addEventListener("play", function () {
-    if (window.actual1) window.actual1("gaga_" + tid);
-  });
-  el.addEventListener("ended", function () {
-    if (window.handleKKK) window.handleKKK();
-  });
-  document.body.appendChild(el);
-  window.playLibraryTrack(tid);
+  const g = document.getElementById("gaga_global");
+  if (!g) return;
+  if (window.pauseAllLibraryAudioExcept) window.pauseAllLibraryAudioExcept(g);
+  g.dataset.displayTitle  = song.title  || "";
+  g.dataset.displayArtist = song.artist || "";
+  g.dataset.displayAlbum  = song.album  || "";
+  g.dataset.mood = String(song.mood || song.primaryMood || (Array.isArray(song.moods) && song.moods[0] ? song.moods[0] : "") || "");
+  g.dataset.uploader = String(song.uploader || "");
+  if (songShowsExplicitBadge(song)) g.dataset.explicit = "1"; else delete g.dataset.explicit;
+  g.src = song.fileInp;
+  g.load();
+  var p = g.play();
+  if (p && typeof p.then === "function") p.catch(function () {});
+  window.currentPlaying = g;
 };
 
 window.pauseAllLibraryAudioExcept = function (except) {
-  document.querySelectorAll('audio[id^="gaga_"]').forEach(function (a) {
-    if (except && a === except) return;
-    try {
-      a.pause();
-    } catch (e) {}
-  });
-  try {
-    document.querySelectorAll("#moodDiscoveryList audio, #genreDiscoveryList audio").forEach(function (a) {
-      if (except && a === except) return;
-      try {
-        a.pause();
-      } catch (e2) {}
-    });
-  } catch (e3) {}
+  var g = document.getElementById("gaga_global");
+  if (g && g !== except) { try { g.pause(); } catch (e) {} }
 };
 
+function _loadGlobalFromCard(card) {
+  var g = document.getElementById("gaga_global");
+  if (!g || !card) return null;
+  g.dataset.displayTitle  = card.dataset.displayTitle  || "";
+  g.dataset.displayArtist = card.dataset.displayArtist || "";
+  g.dataset.displayAlbum  = card.dataset.displayAlbum  || "";
+  g.dataset.mood          = card.dataset.mood          || "";
+  g.dataset.uploader      = card.dataset.uploader      || "";
+  if (card.dataset.explicit === "1") g.dataset.explicit = "1";
+  else delete g.dataset.explicit;
+  g.src = card.dataset.src || "";
+  g.load();
+  return g;
+}
+
 window.playLibraryTrack = function (tid) {
-  const el = document.getElementById("gaga_" + tid);
-  if (!el) return;
-  try {
-    if (window.currentPlaying && window.currentPlaying !== el && typeof window.currentPlaying.pause === "function") {
-      window.currentPlaying.pause();
-    }
-  } catch (eCP) {}
-  logListenEngagement(el);
-  window.pauseAllLibraryAudioExcept(el);
+  const card = document.getElementById("song_" + tid);
+  if (!card) return;
+  const g = _loadGlobalFromCard(card);
+  if (!g) return;
+  try { if (window.currentPlaying && window.currentPlaying !== g && typeof window.currentPlaying.pause === "function") window.currentPlaying.pause(); } catch (_) {}
+  logListenEngagement(g);
   window.action = tid;
-  window.currentPlaying = el;
+  window.currentPlaying = g;
   const tata = document.getElementById("tata");
-  const title = (el.dataset && el.dataset.displayTitle) || "";
-  const artist = (el.dataset && el.dataset.displayArtist) || "";
+  const title  = g.dataset.displayTitle  || "";
+  const artist = g.dataset.displayArtist || "";
   if (tata) {
     tata.textContent = "";
     const wrap = document.createElement("span");
-    wrap.style.fontWeight = "600";
-    wrap.style.color = "#ff7f50";
-    wrap.style.display = "inline-flex";
-    wrap.style.alignItems = "center";
-    wrap.style.gap = "6px";
-    wrap.style.flexWrap = "wrap";
-    if (el.dataset && el.dataset.explicit === "1") {
-      const badge = document.createElement("span");
-      badge.className = "explicit-badge";
-      badge.title = "Explicit";
-      badge.textContent = "E";
-      wrap.appendChild(badge);
-    }
-    const txt = document.createElement("span");
-    txt.textContent = (title + (artist ? " · " + artist : "")) || "Playing…";
-    wrap.appendChild(txt);
+    wrap.style.cssText = "font-weight:600;color:#ff7f50;display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;";
+    if (g.dataset.explicit === "1") { const b = document.createElement("span"); b.className = "explicit-badge"; b.title = "Explicit"; b.textContent = "E"; wrap.appendChild(b); }
+    wrap.appendChild(Object.assign(document.createElement("span"), { textContent: (title + (artist ? " · " + artist : "")) || "Playing…" }));
     tata.appendChild(wrap);
   }
   if (window.turnToCoral) window.turnToCoral();
-  var p = el.play();
-  if (p && typeof p.then === "function") {
-    p.catch(function () {
-      if (tata) {
-        tata.textContent = "";
-        var err = document.createElement("span");
-        err.style.color = "#ffb4a2";
-        err.style.fontSize = "13px";
-        err.textContent = "Still loading — tap play again in a moment.";
-        tata.appendChild(err);
-      }
-    });
-  }
+  var p = g.play();
+  if (p && typeof p.then === "function") p.catch(function () {
+    if (tata) { tata.textContent = ""; var err = document.createElement("span"); err.style.cssText = "color:#ffb4a2;font-size:13px;"; err.textContent = "Still loading — tap play again in a moment."; tata.appendChild(err); }
+  });
 };
 
 window.pauseLibraryTrack = function (tid) {
-  var id = String(tid || "").replace(/'/g, "");
-  var el = document.getElementById("gaga_" + id);
-  if (!el || typeof el.pause !== "function") return;
-  try {
-    el.pause();
-  } catch (e) {}
-  if (window.currentPlaying === el) {
-    try {
-      var ap = document.getElementById("audioPlayer");
-      if (ap && typeof ap.pause === "function") ap.pause();
-    } catch (e3) {}
-  }
+  var g = document.getElementById("gaga_global");
+  if (!g) return;
+  try { g.pause(); } catch (e) {}
 };
 
 window.actual1 = function (audioDomId) {
   const db = getDatabase(app);
   const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   const ofctime = month[new Date().getMonth()];
-  const el = document.getElementById(audioDomId);
-  const displayTitle =
-    (el && el.dataset && el.dataset.displayTitle) ||
-    (audioDomId || "").replace(/^gaga_/, "").replace(/_/g, " ");
+  const g = document.getElementById("gaga_global");
+  const displayTitle = (g && g.dataset && g.dataset.displayTitle) || String(audioDomId || "").replace(/^gaga_/, "").replace(/_/g, " ");
   push(ref2(db, "songplayed"), { title2: displayTitle, ofctime });
-  window.pauseAllLibraryAudioExcept(el || null);
-  if (el) window.currentPlaying = el;
-  window.action = (audioDomId || "").replace(/^gaga_/, "");
+  window.pauseAllLibraryAudioExcept(g || null);
+  if (g) window.currentPlaying = g;
   const tata = document.getElementById("tata");
   if (tata) {
     tata.textContent = "";
     const sp = document.createElement("span");
-    sp.style.color = "coral";
-    sp.style.fontWeight = "600";
-    sp.style.display = "inline-flex";
-    sp.style.alignItems = "center";
-    sp.style.gap = "6px";
-    sp.style.flexWrap = "wrap";
+    sp.style.cssText = "color:coral;font-weight:600;display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;";
     sp.appendChild(document.createTextNode("🎵 NOW PLAYING: "));
-    if (el && el.dataset && el.dataset.explicit === "1") {
-      const badge = document.createElement("span");
-      badge.className = "explicit-badge";
-      badge.title = "Explicit";
-      badge.textContent = "E";
-      sp.appendChild(badge);
+    if (g && g.dataset && g.dataset.explicit === "1") {
+      const badge = document.createElement("span"); badge.className = "explicit-badge"; badge.title = "Explicit"; badge.textContent = "E"; sp.appendChild(badge);
     }
     sp.appendChild(document.createTextNode(displayTitle));
     tata.appendChild(sp);
@@ -6105,17 +6078,23 @@ window.queuemusic = function(fileInp, title) {
   function processQueue() {
     if (window.jkjk.length === 0) { if (tata) tata.innerHTML = '<font color="coral">SELECT A SONG</font>'; return; }
     if (window.pauseAllLibraryAudioExcept) window.pauseAllLibraryAudioExcept(null);
-    const audio = new Audio(window.jkjk[0]);
-    if (typeof window.currentPlaying !== "undefined" && window.currentPlaying) try { window.currentPlaying.pause(); } catch (e) {}
-    window.currentPlaying = audio;
-    var qp = audio.play();
+    const g = document.getElementById("gaga_global");
+    if (!g) return;
+    if (window.currentPlaying && window.currentPlaying !== g) try { window.currentPlaying.pause(); } catch (e) {}
+    g.src = window.jkjk[0];
+    g.dataset.displayTitle = window.ujk[0] || "";
+    delete g.dataset.displayArtist;
+    g.load();
+    window.currentPlaying = g;
+    var qp = g.play();
     if (qp && typeof qp.then === "function") qp.catch(function () {});
     if (tata) tata.innerHTML = '<div style="color:white;font-weight:bold;">Now Playing: ' + window.ujk[0] + '</div>';
-    audio.onended = function() {
+    g.onended = function() {
+      g.onended = null;
       window.jkjk.shift();
       window.ujk.shift();
       if (queueDock) { const first = queueDock.querySelector("div"); if (first) first.remove(); if (typeof window._updateQueueBadge === "function") window._updateQueueBadge(); if (typeof window._updateQueueEmpty === "function") window._updateQueueEmpty(); }
-      if (window.jkjk.length > 0) processQueue(); else if (tata) tata.innerHTML = '<font color="coral">SELECT A SONG</font>';
+      if (window.jkjk.length > 0) processQueue(); else { if (tata) tata.innerHTML = '<font color="coral">SELECT A SONG</font>'; g.removeAttribute("src"); }
     };
   }
   if (typeof window.currentPlaying === "undefined" || !window.currentPlaying || window.currentPlaying.paused) processQueue();
@@ -6134,14 +6113,19 @@ window.handleKKK = function() {
   if (!artists || artists.length === 0) return;
   const song = artists[0];
   if (!song || !song.fileInp || !song.title) return;
-  if (window.pauseAllLibraryAudioExcept) window.pauseAllLibraryAudioExcept(null);
-  const audio = new Audio(song.fileInp);
-  var hp = audio.play();
+  const g = document.getElementById("gaga_global");
+  if (!g) return;
+  if (window.pauseAllLibraryAudioExcept) window.pauseAllLibraryAudioExcept(g);
+  g.src = song.fileInp;
+  g.dataset.displayTitle  = song.title  || "";
+  g.dataset.displayArtist = song.artist || "";
+  delete g.dataset.explicit;
+  g.load();
+  var hp = g.play();
   if (hp && typeof hp.then === "function") hp.catch(function () {});
-  window.currentPlaying = audio;
+  window.currentPlaying = g;
   const tata = document.getElementById("tata");
   if (tata) tata.innerHTML = "<font color='coral'>🎵 NOW PLAYING: " + song.title + "</font>";
-  audio.onended = function() { window.handleKKK(); };
 };
 
 // Make Firebase functions globally available for use in regular script tags
