@@ -7075,11 +7075,16 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                 profileRole: "Artist",
               });
               localStorage.setItem("profileType", "artist");
-              if (statusEl) { statusEl.style.color = "#6bffb0"; statusEl.textContent = "Switched to Artist!"; }
               const aBtn = document.getElementById("switchToArtistBtn");
               const lBtn = document.getElementById("switchToListenerBtn");
               if (aBtn) aBtn.style.display = "none";
               if (lBtn) lBtn.style.display = "";
+              // Close the logout modal and open the profile form so they can fill in artist info
+              closeLogoutModal();
+              if (typeof openAppleOnboardingModal === "function") {
+                localStorage.removeItem("appleOnboardingDone");
+                openAppleOnboardingModal();
+              }
             } catch (e) {
               if (e && e.message === "redirect") return; // flow continues after redirect
               if (statusEl) { statusEl.style.color = "#ff6b6b"; statusEl.textContent = e.message || "Google sign-in failed."; }
@@ -7482,6 +7487,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             appleOnboardingUiOpen = false;
             if (window.setCreateProfileMode) window.setCreateProfileMode(false);
           }
+          window.openAppleOnboardingModal = openAppleOnboardingModal;
 
           async function maybeShowAppleOnboarding() {
             if (appleOnboardingUiOpen || appleOnboardingCheckLock) return;
@@ -8037,8 +8043,11 @@ document.getElementById("user-profile-button")?.addEventListener("click", () => 
                           role: "Artist", profileRole: "Artist",
                         });
                         localStorage.setItem("profileType", "artist");
+                        localStorage.removeItem("appleOnboardingDone");
                       } catch (rErr) { console.warn("[google-link] role switch update:", rErr); }
                     }
+                    // Open onboarding form so they can fill in artist profile info
+                    if (typeof window.openAppleOnboardingModal === "function") window.openAppleOnboardingModal();
                     return;
                   }
                   // Resume pending artist profile if saved
