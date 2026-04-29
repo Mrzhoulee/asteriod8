@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asteroid Parties — Admin</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #050810; color: #fff; font-family: 'Poppins', sans-serif; min-height: 100vh; }
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.08); position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+  .topbar-title span { color: #ff7a59; }
+  .topbar-back { background: none; border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .topbar-back:hover { background: rgba(255,255,255,0.06); }
+
+  #loginGate { display: flex; align-items: center; justify-content: center; min-height: 80vh; flex-direction: column; gap: 16px; }
+  .login-box { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 32px 28px; width: 100%; max-width: 340px; text-align: center; }
+  .login-box h2 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .login-box p { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 20px; }
+  .login-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; color: #fff; font-size: 14px; padding: 11px 14px; font-family: inherit; outline: none; margin-bottom: 12px; }
+  .login-input:focus { border-color: #ff7a59; }
+  .login-btn { width: 100%; background: linear-gradient(135deg,#ff7a59,#ff4e2a); color: #fff; border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .login-error { font-size: 12px; color: #f87171; margin-top: 6px; min-height: 16px; }
+
+  .page { max-width: 780px; margin: 0 auto; padding: 28px 16px 60px; }
+  .section-title { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 16px; }
+  .filter-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-btn { padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); background: none; color: rgba(255,255,255,0.55); font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .filter-btn.active, .filter-btn:hover { background: rgba(255,127,80,0.15); border-color: rgba(255,127,80,0.4); color: #ff7a59; }
+
+  .party-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); border-radius: 16px; padding: 18px 20px; display: flex; gap: 16px; align-items: flex-start; margin-bottom: 12px; transition: border-color 0.2s; }
+  .party-card.pending { border-left: 3px solid #f59e0b; }
+  .party-card.approved { border-left: 3px solid #10b981; }
+  .party-card.rejected { border-left: 3px solid #f87171; opacity: 0.55; }
+
+  .party-date-box { background: rgba(255,127,80,0.12); border: 1px solid rgba(255,127,80,0.25); border-radius: 10px; padding: 8px 12px; text-align: center; flex-shrink: 0; min-width: 52px; }
+  .party-date-month { font-size: 10px; font-weight: 800; color: #ff7a59; letter-spacing: 0.07em; text-transform: uppercase; }
+  .party-date-day { font-size: 22px; font-weight: 800; line-height: 1.1; }
+
+  .party-info { flex: 1; min-width: 0; }
+  .party-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .party-meta { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 8px; line-height: 1.5; }
+  .party-contact { font-size: 11px; color: rgba(255,127,80,0.8); margin-top: 4px; word-break: break-all; }
+  .party-desc { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 8px; line-height: 1.5; }
+
+  .status-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .status-badge.pending  { background: rgba(245,158,11,0.12); color: #f59e0b; }
+  .status-badge.approved { background: rgba(16,185,129,0.12); color: #10b981; }
+  .status-badge.rejected { background: rgba(248,113,113,0.12); color: #f87171; }
+
+  .party-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .btn-approve { padding: 8px 18px; background: linear-gradient(135deg,#10b981,#059669); color: #fff; border: none; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+  .btn-approve:hover { opacity: 0.85; }
+  .btn-reject  { padding: 8px 18px; background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.3); border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .btn-reject:hover { background: rgba(248,113,113,0.2); }
+  .btn-pending { padding: 8px 18px; background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .action-status { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 6px; min-height: 14px; }
+
+  .empty { text-align: center; padding: 48px 16px; color: rgba(255,255,255,0.3); font-size: 14px; }
+  .count-pill { display: inline-flex; align-items: center; justify-content: center; background: #ff7a59; color: #fff; font-size: 10px; font-weight: 800; border-radius: 50%; width: 18px; height: 18px; margin-left: 6px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="topbar-back" onclick="history.length > 1 ? history.back() : location.replace('ArtistDashboard.html')">← Back</button>
+  <div class="topbar-title">Asteroid Parties <span>Admin</span></div>
+  <div id="topbarPending" style="font-size:12px;color:#f59e0b;font-weight:700;"></div>
+</div>
+
+<div id="loginGate">
+  <div class="login-box">
+    <h2>Admin Access</h2>
+    <p>Enter the admin password to manage party requests.</p>
+    <input class="login-input" type="password" id="adminPwInput" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="login-btn" onclick="checkPw()">Enter</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<div id="adminContent" style="display:none;">
+  <div class="page">
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('pending',this)">Pending <span id="pendingCount" class="count-pill" style="display:none;"></span></button>
+      <button class="filter-btn" onclick="setFilter('approved',this)">Approved</button>
+      <button class="filter-btn" onclick="setFilter('rejected',this)">Rejected</button>
+    </div>
+    <div id="partiesList"></div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+  import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+
+  const ADMIN_PASSWORD = "asteroid_admin_2024";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+    authDomain: "asteroid-cdc13.firebaseapp.com",
+    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+    projectId: "asteroid-cdc13",
+    storageBucket: "asteroid-cdc13.appspot.com",
+    messagingSenderId: "793353824502",
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+  };
+
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let allParties = [];
+  let currentFilter = 'all';
+
+  function escH(s) {
+    const d = document.createElement('div');
+    d.textContent = s == null ? '' : String(s);
+    return d.innerHTML;
+  }
+
+  window.checkPw = function() {
+    const val = document.getElementById('adminPwInput').value;
+    if (val === ADMIN_PASSWORD) {
+      sessionStorage.setItem('_partyAdmin', '1');
+      document.getElementById('loginGate').style.display = 'none';
+      document.getElementById('adminContent').style.display = 'block';
+      startListening();
+    } else {
+      document.getElementById('loginError').textContent = 'Incorrect password.';
+    }
+  };
+
+  if (sessionStorage.getItem('_partyAdmin') === '1') {
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('adminContent').style.display = 'block';
+    startListening();
+  }
+
+  window.setFilter = function(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    render();
+  };
+
+  function startListening() {
+    onValue(ref(db, 'ASTEROID_PARTIES'), (snap) => {
+      allParties = [];
+      if (snap.exists()) snap.forEach(c => allParties.push({ id: c.key, ...c.val() }));
+      allParties.sort((a, b) => (b.submittedAt || 0) - (a.submittedAt || 0));
+      updateCounts();
+      render();
+    });
+  }
+
+  function updateCounts() {
+    const pending = allParties.filter(p => (p.status || 'pending') === 'pending').length;
+    const pill = document.getElementById('pendingCount');
+    const topbar = document.getElementById('topbarPending');
+    if (pill) { pill.textContent = pending; pill.style.display = pending > 0 ? '' : 'none'; }
+    if (topbar) topbar.textContent = pending > 0 ? pending + ' pending' : '';
+  }
+
+  function render() {
+    const listEl = document.getElementById('partiesList');
+    const items = currentFilter === 'all'
+      ? allParties
+      : allParties.filter(p => (p.status || 'pending') === currentFilter);
+
+    if (items.length === 0) {
+      listEl.innerHTML = `<div class="empty">No ${currentFilter === 'all' ? '' : currentFilter + ' '}parties yet.</div>`;
+      return;
+    }
+
+    listEl.innerHTML = items.map(p => {
+      const status = p.status || 'pending';
+      const d = p.date ? new Date(p.date + 'T12:00:00') : null;
+      const month = d ? d.toLocaleString('en', { month: 'short' }).toUpperCase() : '—';
+      const day = d ? d.getDate() : '—';
+      const submittedDate = p.submittedAt ? new Date(p.submittedAt).toLocaleDateString('en', { day:'numeric', month:'short', year:'numeric' }) : '—';
+
+      const actionBtns = status === 'pending'
+        ? `<button class="btn-approve" onclick="setStatus('${escH(p.id)}','approved',this)">✓ Approve</button>
+           <button class="btn-reject"  onclick="setStatus('${escH(p.id)}','rejected',this)">✕ Reject</button>`
+        : status === 'approved'
+        ? `<button class="btn-reject"  onclick="setStatus('${escH(p.id)}','rejected',this)">✕ Reject</button>
+           <button class="btn-pending" onclick="setStatus('${escH(p.id)}','pending',this)">↺ Back to Pending</button>`
+        : `<button class="btn-approve" onclick="setStatus('${escH(p.id)}','approved',this)">✓ Approve</button>
+           <button class="btn-pending" onclick="setStatus('${escH(p.id)}','pending',this)">↺ Back to Pending</button>`;
+
+      return `
+        <div class="party-card ${escH(status)}" id="card-${escH(p.id)}">
+          <div class="party-date-box">
+            <div class="party-date-month">${escH(month)}</div>
+            <div class="party-date-day">${escH(String(day))}</div>
+          </div>
+          <div class="party-info">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+              <div class="party-name">${escH(p.name || 'Untitled')}</div>
+              <span class="status-badge ${escH(status)}">${status === 'pending' ? '⏳ Pending' : status === 'approved' ? '✓ Approved' : '✕ Rejected'}</span>
+            </div>
+            <div class="party-meta">
+              <b>Tier:</b> ${escH(p.tier || '—')} &nbsp;·&nbsp;
+              <b>Date:</b> ${escH(p.date || '—')} ${p.time ? '@ ' + escH(p.time) : ''} &nbsp;·&nbsp;
+              <b>Host:</b> ${escH(p.hostName || '—')} &nbsp;·&nbsp;
+              <b>Submitted:</b> ${escH(submittedDate)}
+            </div>
+            ${p.email ? `<div class="party-contact">📧 ${escH(p.email)}</div>` : ''}
+            ${p.desc ? `<div class="party-desc">${escH(p.desc)}</div>` : ''}
+            <div class="party-actions">${actionBtns}</div>
+            <div class="action-status" id="action-${escH(p.id)}"></div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  window.setStatus = async function(partyId, newStatus, btn) {
+    const statusEl = document.getElementById('action-' + partyId);
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+    if (statusEl) statusEl.textContent = 'Saving…';
+    try {
+      await update(ref(db, 'ASTEROID_PARTIES/' + partyId), { status: newStatus, reviewedAt: Date.now() });
+      if (statusEl) statusEl.textContent = '';
+    } catch (e) {
+      if (statusEl) statusEl.textContent = 'Error: ' + (e.message || 'failed');
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    }
+  };
+</script>
+</body>
+</html>
