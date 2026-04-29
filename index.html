@@ -7661,6 +7661,11 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             localStorage.removeItem("appleOnboardingSkipped");
             const gcd = document.getElementById("gcd");
             if (gcd) gcd.textContent = nickname;
+            const logoutName = document.getElementById("logoutUserName");
+            if (logoutName) logoutName.textContent = nickname;
+            // Show/hide artist dashboard link based on new role
+            const dashLink = document.getElementById("mobile-artist-dashboard-link");
+            if (dashLink) dashLink.style.display = profileType === "artist" ? "" : "none";
             closeAppleOnboardingModal();
           }
 

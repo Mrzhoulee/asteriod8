@@ -313,6 +313,13 @@
     </div>
   </div>
 
+  <!-- Artist-only gate -->
+  <div class="card" id="notArtistGate" style="display:none;text-align:center;padding:32px 20px;">
+    <div style="font-size:36px;margin-bottom:12px;">🎤</div>
+    <h2 style="font-size:17px;font-weight:800;margin-bottom:8px;">Artists Only</h2>
+    <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;">Only artist accounts can host an Asteroid Party.<br>Switch to Artist in your profile to get started.</p>
+  </div>
+
   <!-- Host a party form -->
   <div class="card" id="hostFormCard">
     <div class="section-head">
@@ -404,13 +411,24 @@
     return d.innerHTML;
   }
 
-  // ── pre-fill artist info from parent page localStorage ──
+  // ── artist gate + pre-fill ──
   window.addEventListener('DOMContentLoaded', () => {
-    const email = localStorage.getItem('email') || localStorage.getItem('CurrentUser') || '';
-    if (email) {
+    const profileType = (localStorage.getItem('profileType') || '').toLowerCase();
+    const isArtist = profileType === 'artist';
+    const formCard = document.getElementById('hostFormCard');
+    const gateCard = document.getElementById('notArtistGate');
+    if (formCard) formCard.style.display = isArtist ? '' : 'none';
+    if (gateCard) gateCard.style.display = isArtist ? 'none' : '';
+
+    if (isArtist) {
+      // Use Google email as contact; fall back to account email
+      const googleEmail = localStorage.getItem('_googleEmail') || '';
+      const accountEmail = localStorage.getItem('email') || localStorage.getItem('CurrentUser') || '';
+      const contactEmail = googleEmail || accountEmail;
       const emailEl = document.getElementById('partyEmail');
-      if (emailEl && !emailEl.value) emailEl.value = email;
+      if (emailEl && !emailEl.value) emailEl.value = contactEmail;
     }
+
     loadParties();
   });
 
@@ -446,13 +464,15 @@
     btn.textContent = 'Submitting…';
     try {
       const hostKey = localStorage.getItem('emailKey') || localStorage.getItem('CurrentUser') || 'unknown';
+      const googleEmail = localStorage.getItem('_googleEmail') || '';
       await set(push(ref(db, 'ASTEROID_PARTIES')), {
         name,
         date,
         time,
         tier,
         desc,
-        email,
+        email: email || googleEmail,
+        googleEmail: googleEmail || null,
         hostKey,
         hostName: localStorage.getItem('fullName') || localStorage.getItem('nickname') || '',
         status: 'pending',
