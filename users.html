@@ -220,6 +220,7 @@
       <div class="user-avatar" id="modalAvatar"></div>
       <h2 class="user-modal-name" id="modalName"></h2>
       <div class="user-modal-role" id="modalRole"></div>
+      <div id="modalFollowerStats" style="display:flex;gap:18px;justify-content:center;font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:10px;font-family:'Poppins',sans-serif;"></div>
       <p class="user-modal-bio" id="modalBio"></p>
       <div class="user-social-links" id="modalSocialLinks"></div>
       <div class="user-follow-wrap" id="modalFollowWrap" style="display:none;">
@@ -525,6 +526,24 @@
       } else {
         linksEl.innerHTML = '';
       }
+      // Follower / following counts
+      const statsEl = document.getElementById('modalFollowerStats');
+      if (statsEl) {
+        statsEl.innerHTML = '';
+        if (u.key) {
+          Promise.all([
+            get(ref(db, 'FOLLOWS/' + u.key)).catch(() => null),
+            get(ref(db, 'FOLLOWING/' + u.key)).catch(() => null)
+          ]).then(function([fSnap, gSnap]) {
+            const nf = fSnap && fSnap.exists() ? Object.keys(fSnap.val()).length : 0;
+            const ng = gSnap && gSnap.exists() ? Object.keys(gSnap.val()).length : 0;
+            statsEl.innerHTML =
+              '<span><b style="color:#fff;font-weight:700;">' + nf + '</b> followers</span>' +
+              '<span><b style="color:#fff;font-weight:700;">' + ng + '</b> following</span>';
+          }).catch(function() {});
+        }
+      }
+
       document.getElementById('modalSongsSection').style.display = 'none';
       document.getElementById('modalFollowWrap').style.display = 'none';
       const qaLink = document.getElementById('modalQALink');
