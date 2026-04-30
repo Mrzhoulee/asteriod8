@@ -116,6 +116,7 @@
     },
     "FOLLOWING": {
       "$fanKey": {
+        ".read": true,
         "$artistKey": {
           ".read": true,
           ".write": true,
