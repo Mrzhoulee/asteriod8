@@ -1753,11 +1753,12 @@ html.song-overflow-menu-open {
   align-items: stretch !important;
   gap: 10px !important;
   padding: 14px 16px max(18px, env(safe-area-inset-bottom)) !important;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: transform 0.3s ease !important;
 }
 .lol-mini-player.player-collapsed {
-  transform: translateY(calc(100% - 40px)) !important;
+  transform: translateY(calc(100% - 44px)) !important;
 }
+/* Pill handle at top of player — visual affordance for drag */
 .lol-player-handle {
   display: flex;
   align-items: center;
@@ -1783,6 +1784,35 @@ html.song-overflow-menu-open {
 }
 .lol-mini-player.player-collapsed .lol-player-handle-pill {
   background: rgba(255,127,80,0.5);
+}
+/* Fixed collapse/expand toggle button */
+.lol-collapse-btn {
+  position: fixed;
+  right: 16px;
+  bottom: calc(52px + env(safe-area-inset-bottom, 0px) + 140px + 6px);
+  z-index: 99999;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ff7f50;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.45);
+  transition: bottom 0.3s ease;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.lol-collapse-btn svg {
+  transition: transform 0.3s ease;
+}
+.lol-collapse-btn.player-collapsed {
+  bottom: calc(52px + env(safe-area-inset-bottom, 0px) + 44px + 6px);
+}
+.lol-collapse-btn.player-collapsed svg {
+  transform: rotate(180deg);
 }
 .lol-mini-player .lol-main-row {
   display: flex;
@@ -4305,8 +4335,14 @@ setInterval(flySanta, 10000);
 </script>
 
 
-<div class="lol lol-mini-player" id="lolMiniPlayer" style="position: fixed; width: 100%; bottom: 0; left: 0; z-index: 9999;">
-  <!-- Drag handle — tap to collapse/expand -->
+<button class="lol-collapse-btn player-collapsed" id="lolCollapseBtn" aria-label="Toggle player" onclick="window._togglePlayerCollapse()">
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+    <path d="M2 9L7 4L12 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<div class="lol lol-mini-player player-collapsed" id="lolMiniPlayer" style="position: fixed; width: 100%; bottom: 0; left: 0; z-index: 9999;">
+  <!-- Pill handle — also taps to collapse/expand -->
   <div class="lol-player-handle" onclick="window._togglePlayerCollapse()" aria-label="Toggle player" role="button" tabindex="0">
     <div class="lol-player-handle-pill"></div>
   </div>
@@ -4380,12 +4416,19 @@ setInterval(flySanta, 10000);
     badge.style.display = n > 0 ? '' : 'none';
   };
 
-  let playerCollapsed = false;
-  window._togglePlayerCollapse = function () {
+  // Default: collapsed (per design doc)
+  let playerCollapsed = true;
+
+  function _syncCollapseUI() {
     const player = document.getElementById('lolMiniPlayer');
-    if (!player) return;
+    const collapseBtn = document.getElementById('lolCollapseBtn');
+    if (player) player.classList.toggle('player-collapsed', playerCollapsed);
+    if (collapseBtn) collapseBtn.classList.toggle('player-collapsed', playerCollapsed);
+  }
+
+  window._togglePlayerCollapse = function () {
     playerCollapsed = !playerCollapsed;
-    player.classList.toggle('player-collapsed', playerCollapsed);
+    _syncCollapseUI();
     // Close queue popup when collapsing so it doesn't float detached
     if (playerCollapsed && queueOpen) {
       queueOpen = false;
@@ -4395,18 +4438,20 @@ setInterval(flySanta, 10000);
         popup.style.opacity = '0';
         popup.style.pointerEvents = 'none';
       }
-      const btn = document.getElementById('queueToggleBtn');
-      if (btn) btn.style.color = '';
+      const qBtn = document.getElementById('queueToggleBtn');
+      if (qBtn) qBtn.style.color = '';
     }
-    // Re-expand when a song starts playing
   };
+
   window._expandPlayer = function () {
     if (playerCollapsed) {
       playerCollapsed = false;
-      const player = document.getElementById('lolMiniPlayer');
-      if (player) player.classList.remove('player-collapsed');
+      _syncCollapseUI();
     }
   };
+
+  // Apply initial collapsed state after DOM is ready
+  document.addEventListener('DOMContentLoaded', _syncCollapseUI);
 })();
 </script>
 
