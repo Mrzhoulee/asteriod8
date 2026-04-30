@@ -8560,8 +8560,9 @@ console.log('1171')
           if (artistFollowKey) {
             const getFArt = window.firebaseGet;
             const refFArt = window.firebaseRef;
-            if (getFArt && refFArt && db) {
-              getFArt(refFArt(db, 'FOLLOWS/' + artistFollowKey)).then(function(snap) {
+            const dbFArt = window.firebaseDatabase;
+            if (getFArt && refFArt && dbFArt) {
+              getFArt(refFArt(dbFArt, 'FOLLOWS/' + artistFollowKey)).then(function(snap) {
                 const n = snap && snap.exists() ? Object.keys(snap.val()).length : 0;
                 fcArtEl.textContent = n === 1 ? '1 follower' : n.toLocaleString() + ' followers';
               }).catch(function() {});
