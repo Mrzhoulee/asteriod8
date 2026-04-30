@@ -2384,6 +2384,7 @@ body.create-profile-active {
     </div>
     <div class="logout-modal-user">
       <div id="logoutUserName" class="logout-modal-name"></div>
+      <div id="logoutFollowerStats" style="display:flex;gap:18px;margin-top:6px;font-size:12px;color:rgba(255,255,255,0.45);font-family:'Poppins',sans-serif;"></div>
     </div>
     <div class="logout-modal-actions">
       <button id="logoutCancelBtn" class="logout-btn-cancel">Cancel</button>
@@ -2613,6 +2614,7 @@ body.create-profile-active {
         <div>
           <h2 id="artistProfileName" class="artist-profile-name">Artist</h2>
           <div id="artistProfileTag" class="artist-profile-tag">Featured artist</div>
+          <div id="artistProfileFollowerCount" style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:4px;font-family:'Poppins',sans-serif;"></div>
           <div id="artistProfileFollowWrap" class="profile-modal-follow-wrap artist-profile-follow-wrap" style="display: none;">
             <button type="button" class="profile-follow-btn" id="artistProfileFollowBtn" onclick="if(window.__runFollowFromButtonById){window.__runFollowFromButtonById('artistProfileFollowBtn'); return false;}">Follow artist</button>
             <p class="profile-follow-hint" id="artistProfileFollowHint"></p>
@@ -6959,6 +6961,29 @@ function openLogoutModal(user) {
 
   if (nameEl) nameEl.textContent = displayName;
 
+  // Follower / following counts for the signed-in user
+  const statsEl = document.getElementById('logoutFollowerStats');
+  if (statsEl) {
+    statsEl.textContent = '';
+    const ek = (localStorage.getItem('emailKey') || '').trim();
+    const dbLM = window.firebaseDatabase;
+    const getFnLM = window.firebaseGet;
+    const refFnLM = window.firebaseRef;
+    if (ek && dbLM && getFnLM && refFnLM) {
+      Promise.all([
+        getFnLM(refFnLM(dbLM, 'FOLLOWS/' + ek)).catch(() => null),
+        getFnLM(refFnLM(dbLM, 'FOLLOWING/' + ek)).catch(() => null)
+      ]).then(function(results) {
+        const followersSnap = results[0], followingSnap = results[1];
+        const nFollowers = followersSnap && followersSnap.exists() ? Object.keys(followersSnap.val()).length : 0;
+        const nFollowing = followingSnap && followingSnap.exists() ? Object.keys(followingSnap.val()).length : 0;
+        statsEl.innerHTML =
+          '<span><b style="color:#fff;font-weight:700;">' + nFollowers + '</b> followers</span>' +
+          '<span><b style="color:#fff;font-weight:700;">' + nFollowing + '</b> following</span>';
+      }).catch(function() {});
+    }
+  }
+
   const isArtist = (localStorage.getItem("profileType") || "").toLowerCase() === "artist";
   const artistBtn = document.getElementById("switchToArtistBtn");
   const listenerBtn = document.getElementById("switchToListenerBtn");
@@ -8527,6 +8552,23 @@ console.log('1171')
         const artistFollowKey = featuredFollowKey(artistId, profile);
         overlay.dataset.followArtistKey = artistFollowKey;
         refreshFeaturedFollowUI(artistFollowKey);
+
+        // Show follower count for this featured artist
+        const fcArtEl = document.getElementById('artistProfileFollowerCount');
+        if (fcArtEl) {
+          fcArtEl.textContent = '';
+          if (artistFollowKey) {
+            const getFArt = window.firebaseGet;
+            const refFArt = window.firebaseRef;
+            if (getFArt && refFArt && db) {
+              getFArt(refFArt(db, 'FOLLOWS/' + artistFollowKey)).then(function(snap) {
+                const n = snap && snap.exists() ? Object.keys(snap.val()).length : 0;
+                fcArtEl.textContent = n === 1 ? '1 follower' : n.toLocaleString() + ' followers';
+              }).catch(function() {});
+            }
+          }
+        }
+
         overlay.classList.add("active");
         window.setProfileFocusMode(true);
       }
@@ -8598,6 +8640,7 @@ console.log('1171')
         </div>
         <div class="profile-modal-name-large" id="profileModalName">User Name</div>
         <div class="profile-modal-bio" id="profileModalBio">No bio available</div>
+        <div id="profileModalFollowerCount" style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:4px;display:flex;gap:16px;justify-content:center;font-family:'Poppins',sans-serif;"></div>
         <div id="profileModalFollowWrap" class="profile-modal-follow-wrap" style="display: none;">
           <button type="button" class="profile-follow-btn" id="profileFollowBtn" onclick="if(window.__runFollowFromButtonById){window.__runFollowFromButtonById('profileFollowBtn'); return false;}">Follow artist</button>
           <p class="profile-follow-hint" id="profileFollowHint"></p>
@@ -9305,6 +9348,29 @@ console.log('1171')
       // Set bio
       const bio = userData.profile?.bio || 'No bio available';
       document.getElementById('profileModalBio').textContent = bio;
+
+      // Follower count for this user
+      (function () {
+        const fcEl = document.getElementById('profileModalFollowerCount');
+        if (!fcEl) return;
+        fcEl.innerHTML = '';
+        if (!userData.emailKey) return;
+        const dbfc = getDb();
+        const getFc = window.firebaseGet;
+        const refFc = window.firebaseRef;
+        if (!dbfc || !getFc || !refFc) return;
+        Promise.all([
+          getFc(refFc(dbfc, 'FOLLOWS/' + userData.emailKey)).catch(() => null),
+          getFc(refFc(dbfc, 'FOLLOWING/' + userData.emailKey)).catch(() => null)
+        ]).then(function(results) {
+          const fSnap = results[0], gSnap = results[1];
+          const nf = fSnap && fSnap.exists() ? Object.keys(fSnap.val()).length : 0;
+          const ng = gSnap && gSnap.exists() ? Object.keys(gSnap.val()).length : 0;
+          fcEl.innerHTML =
+            '<span><b style="color:#fff;font-weight:700;">' + nf + '</b> followers</span>' +
+            '<span><b style="color:#fff;font-weight:700;">' + ng + '</b> following</span>';
+        }).catch(function() {});
+      })();
 
       const tinp = userData.profile?.tinp || 'No Donation Box Available';
       const tinpo = []

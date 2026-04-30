@@ -861,6 +861,16 @@
                     <div class="stat-value" id="profileViews">0</div>
                     <div class="stat-change">All time</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-label">Followers</div>
+                    <div class="stat-value" id="statFollowers">—</div>
+                    <div class="stat-change"><i class="fas fa-user-friends"></i> People following you</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Following</div>
+                    <div class="stat-value" id="statFollowing">—</div>
+                    <div class="stat-change"><i class="fas fa-user-plus"></i> Artists you follow</div>
+                </div>
             </div>
 
             <div class="analytics-section">
@@ -1871,6 +1881,20 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     console.warn('Profile views unavailable (deploy PROFILEVIEWS rules):', pvErr);
                 }
                 setStat('profileViews', Number.isFinite(viewCount) ? viewCount.toLocaleString() : '0');
+
+                // Follower / following counts
+                try {
+                    const [folSnap, fingSingle] = await Promise.all([
+                        get(ref(database, 'FOLLOWS/' + currentEmailKey)).catch(() => null),
+                        get(ref(database, 'FOLLOWING/' + currentEmailKey)).catch(() => null)
+                    ]);
+                    const followers = folSnap && folSnap.exists() ? Object.keys(folSnap.val()).length : 0;
+                    const following = fingSingle && fingSingle.exists() ? Object.keys(fingSingle.val()).length : 0;
+                    setStat('statFollowers', followers.toLocaleString());
+                    setStat('statFollowing', following.toLocaleString());
+                } catch (fErr) {
+                    console.warn('Follow stats:', fErr);
+                }
 
                 if (!songsList || !monthlyBreakdown) return;
 
