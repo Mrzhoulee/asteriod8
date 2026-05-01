@@ -6961,34 +6961,37 @@ function openLogoutModal(user) {
 
   if (nameEl) nameEl.textContent = displayName;
 
-  // Follower / following counts for the signed-in user
-  const statsEl = document.getElementById('logoutFollowerStats');
-  if (statsEl) {
-    statsEl.textContent = '';
-    const ek = (localStorage.getItem('emailKey') || '').trim();
-    const dbLM = window.firebaseDatabase;
-    const getFnLM = window.firebaseGet;
-    const refFnLM = window.firebaseRef;
-    if (ek && dbLM && getFnLM && refFnLM) {
-      Promise.all([
-        getFnLM(refFnLM(dbLM, 'FOLLOWS/' + ek)).catch(() => null),
-        getFnLM(refFnLM(dbLM, 'FOLLOWING/' + ek)).catch(() => null)
-      ]).then(function(results) {
-        const followersSnap = results[0], followingSnap = results[1];
-        const nFollowers = followersSnap && followersSnap.exists() ? Object.keys(followersSnap.val()).length : 0;
-        const nFollowing = followingSnap && followingSnap.exists() ? Object.keys(followingSnap.val()).length : 0;
-        statsEl.innerHTML =
-          '<span><b style="color:#fff;font-weight:700;">' + nFollowers + '</b> followers</span>' +
-          '<span><b style="color:#fff;font-weight:700;">' + nFollowing + '</b> following</span>';
-      }).catch(function() {});
-    }
-  }
-
   const isArtist = (localStorage.getItem("profileType") || "").toLowerCase() === "artist";
   const artistBtn = document.getElementById("switchToArtistBtn");
   const listenerBtn = document.getElementById("switchToListenerBtn");
   if (artistBtn) artistBtn.style.display = isArtist ? "none" : "flex";
   if (listenerBtn) listenerBtn.style.display = isArtist ? "" : "none";
+
+  // Follower / following counts — only for artists
+  const statsEl = document.getElementById('logoutFollowerStats');
+  if (statsEl) {
+    statsEl.innerHTML = '';
+    statsEl.style.display = isArtist ? 'flex' : 'none';
+    if (isArtist) {
+      const ek = (localStorage.getItem('emailKey') || '').trim();
+      const dbLM = window.firebaseDatabase;
+      const getFnLM = window.firebaseGet;
+      const refFnLM = window.firebaseRef;
+      if (ek && dbLM && getFnLM && refFnLM) {
+        Promise.all([
+          getFnLM(refFnLM(dbLM, 'FOLLOWS/' + ek)).catch(() => null),
+          getFnLM(refFnLM(dbLM, 'FOLLOWING/' + ek)).catch(() => null)
+        ]).then(function(results) {
+          const followersSnap = results[0], followingSnap = results[1];
+          const nFollowers = followersSnap && followersSnap.exists() ? Object.keys(followersSnap.val()).length : 0;
+          const nFollowing = followingSnap && followingSnap.exists() ? Object.keys(followingSnap.val()).length : 0;
+          statsEl.innerHTML =
+            '<span><b style="color:#fff;font-weight:700;">' + nFollowers + '</b> followers</span>' +
+            '<span><b style="color:#fff;font-weight:700;">' + nFollowing + '</b> following</span>';
+        }).catch(function() {});
+      }
+    }
+  }
 
   setProfileUiFocus(true);
   modal.style.display = "flex";
@@ -7235,6 +7238,9 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               const lBtn = document.getElementById("switchToListenerBtn");
               if (aBtn) aBtn.style.display = "flex";
               if (lBtn) lBtn.style.display = "none";
+              // Hide follower stats — listeners don't show these
+              const fStatsEl = document.getElementById('logoutFollowerStats');
+              if (fStatsEl) { fStatsEl.innerHTML = ''; fStatsEl.style.display = 'none'; }
             } catch (e) {
               if (statusEl) { statusEl.style.color = "#ff6b6b"; statusEl.textContent = e.message || "Failed to switch role."; }
             } finally {

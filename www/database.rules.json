@@ -153,8 +153,7 @@
     "ASTEROID_PARTIES": {
       ".read": true,
       "$partyId": {
-        ".write": "!data.exists()",
-        ".validate": "newData.hasChildren(['name','date','tier','submittedAt']) && newData.child('name').isString() && newData.child('name').val().length <= 80 && newData.child('date').isString() && newData.child('tier').isString() && newData.child('submittedAt').isNumber()"
+        ".write": "!data.exists() || newData.hasChild('status')"
       }
     },
     "GOOGLE_LINKED": {

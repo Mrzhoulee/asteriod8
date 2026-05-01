@@ -313,11 +313,17 @@
     </div>
   </div>
 
-  <!-- Artist-only gate -->
+  <!-- Artist-only gate (not an artist) -->
   <div class="card" id="notArtistGate" style="display:none;text-align:center;padding:32px 20px;">
     <div style="font-size:36px;margin-bottom:12px;">🎤</div>
     <h2 style="font-size:17px;font-weight:800;margin-bottom:8px;">Artists Only</h2>
     <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;">Only artist accounts can host an Asteroid Party.<br>Switch to Artist in your profile to get started.</p>
+  </div>
+  <!-- No Google email gate (is artist but hasn't connected Google) -->
+  <div class="card" id="noGoogleGate" style="display:none;text-align:center;padding:32px 20px;">
+    <div style="font-size:36px;margin-bottom:12px;">🔗</div>
+    <h2 style="font-size:17px;font-weight:800;margin-bottom:8px;">Google Email Required</h2>
+    <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;">You need to sign in with Google to host a party.<br>Go to your profile and switch to Artist using a Google account.</p>
   </div>
 
   <!-- Host a party form -->
@@ -415,18 +421,28 @@
   window.addEventListener('DOMContentLoaded', () => {
     const profileType = (localStorage.getItem('profileType') || '').toLowerCase();
     const isArtist = profileType === 'artist';
-    const formCard = document.getElementById('hostFormCard');
-    const gateCard = document.getElementById('notArtistGate');
-    if (formCard) formCard.style.display = isArtist ? '' : 'none';
-    if (gateCard) gateCard.style.display = isArtist ? 'none' : '';
+    const googleEmail = localStorage.getItem('_googleEmail') || '';
+    const hasGoogle = !!googleEmail;
 
-    if (isArtist) {
-      // Use Google email as contact; fall back to account email
-      const googleEmail = localStorage.getItem('_googleEmail') || '';
-      const accountEmail = localStorage.getItem('email') || localStorage.getItem('CurrentUser') || '';
-      const contactEmail = googleEmail || accountEmail;
+    const formCard    = document.getElementById('hostFormCard');
+    const gateCard    = document.getElementById('notArtistGate');
+    const googleGate  = document.getElementById('noGoogleGate');
+
+    if (!isArtist) {
+      if (gateCard)   gateCard.style.display   = '';
+      if (googleGate) googleGate.style.display  = 'none';
+      if (formCard)   formCard.style.display    = 'none';
+    } else if (!hasGoogle) {
+      if (gateCard)   gateCard.style.display   = 'none';
+      if (googleGate) googleGate.style.display  = '';
+      if (formCard)   formCard.style.display    = 'none';
+    } else {
+      if (gateCard)   gateCard.style.display   = 'none';
+      if (googleGate) googleGate.style.display  = 'none';
+      if (formCard)   formCard.style.display    = '';
+      // Pre-fill Google email
       const emailEl = document.getElementById('partyEmail');
-      if (emailEl && !emailEl.value) emailEl.value = contactEmail;
+      if (emailEl && !emailEl.value) emailEl.value = googleEmail;
     }
 
     loadParties();
