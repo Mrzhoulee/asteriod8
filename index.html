@@ -6115,10 +6115,13 @@ function _loadGlobalFromCard(card) {
 window.playLibraryTrack = function (tid) {
   const card = document.getElementById("song_" + tid);
   if (!card) return;
+  // Read title from card BEFORE loading into gaga_global, so we have it regardless of dataset state
+  const cardTitle = (card.dataset.displayTitle || "").trim();
   const g = _loadGlobalFromCard(card);
   if (!g) return;
   try { if (window.currentPlaying && window.currentPlaying !== g && typeof window.currentPlaying.pause === "function") window.currentPlaying.pause(); } catch (_) {}
-  // Record play immediately (don't wait for onplay which can be unreliable on iOS/Capacitor)
+  // Record play directly with the card title — no dependency on gaga_global.dataset
+  if (cardTitle) window.recordSongPlay(cardTitle);
   if (window.actual1) window.actual1('gaga_global');
   logListenEngagement(g);
   window.action = tid;
@@ -6147,20 +6150,25 @@ window.pauseLibraryTrack = function (tid) {
   try { g.pause(); } catch (e) {}
 };
 
-window.actual1 = function (audioDomId) {
+// Dedicated play-recorder: deduped push to songplayed. Call with the actual title string.
+window.recordSongPlay = function (title) {
+  if (!title) return;
   const db = getDatabase(app);
   const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   const ofctime = month[new Date().getMonth()];
+  const now = Date.now();
+  const dupKey = title + "|" + ofctime;
+  if (window.__lastSongplayedKey === dupKey && now - (window.__lastSongplayedTs || 0) < 3000) return;
+  window.__lastSongplayedKey = dupKey;
+  window.__lastSongplayedTs = now;
+  push(ref2(db, "songplayed"), { title2: title, ofctime });
+};
+
+window.actual1 = function (audioDomId) {
   const g = document.getElementById("gaga_global");
   const displayTitle = (g && g.dataset && g.dataset.displayTitle) || String(audioDomId || "").replace(/^gaga_/, "").replace(/_/g, " ");
-  // Dedup: skip songplayed push if same title was pushed in last 3 seconds (prevents double-count when called from both playLibraryTrack and onplay)
-  const now = Date.now();
-  const dupKey = displayTitle + "|" + ofctime;
-  if (!window.__lastSongplayedKey || window.__lastSongplayedKey !== dupKey || now - (window.__lastSongplayedTs || 0) > 3000) {
-    window.__lastSongplayedKey = dupKey;
-    window.__lastSongplayedTs = now;
-    push(ref2(db, "songplayed"), { title2: displayTitle, ofctime });
-  }
+  // Record if not already recorded by playLibraryTrack (covers paths like featured artist cards)
+  if (displayTitle && window.recordSongPlay) window.recordSongPlay(displayTitle);
   window.pauseAllLibraryAudioExcept(g || null);
   if (g) window.currentPlaying = g;
   const tata = document.getElementById("tata");
