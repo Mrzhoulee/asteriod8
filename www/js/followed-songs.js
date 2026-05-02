@@ -97,37 +97,68 @@ export async function initFollowedArtistSongs() {
           }
         }
 
-        const songsSnap = await getFn(refFn(db, "SONGS"));
-        if (!songsSnap.exists()) { renderEmpty("No songs uploaded by people you follow yet."); return; }
-        const all = songsSnap.val();
+        // Separate featured-artist keys (feat_XX) from regular SONGS keys.
+        const featKeys = artistKeys.filter(ak => ak.startsWith("feat_"));
+        const regularKeys = artistKeys.filter(ak => !ak.startsWith("feat_"));
+
         const matches = [];
-        for (const titleKey in all) {
-          for (const albumKey in all[titleKey]) {
-            for (const artistKeyInner in all[titleKey][albumKey]) {
-              const s = all[titleKey][albumKey][artistKeyInner];
-              if (!s || !s.fileInp) continue;
-              const up = String(s.uploader || "").trim();
-              if (!up) continue;
-              if (
-                matchKeys.has(up) ||
-                matchKeys.has(sanitizeKeyPart(up)) ||
-                matchKeys.has(sanitizeKeyPart(up.toLowerCase()))
-              ) {
-                // Figure out which artist this song belongs to, for name lookup.
-                let ownerKey = sanitizeKeyPart(up);
-                if (!artistKeys.includes(ownerKey)) {
-                  for (const ak of artistKeys) if (matchKeys.has(up) && ak) { ownerKey = ak; break; }
+
+        // Load songs for featured artists from FEATURED_ARTIST_SONG/{rawId}.
+        await Promise.all(featKeys.map(async (ak) => {
+          const rawId = ak.slice(5); // strip "feat_"
+          try {
+            const featSnap = await getFn(refFn(db, "FEATURED_ARTIST_SONG/" + rawId));
+            if (!featSnap.exists()) return;
+            const s = featSnap.val();
+            if (!s || !s.fileInp) return;
+            // Get artist name from PROFILES/feat_{rawId} or fallback to rawId.
+            let artistLabel = await artistNameForKey(ak, rawId);
+            matches.push({
+              ownerKey: ak,
+              title: s.title || rawId,
+              artist: s.artist || artistLabel,
+              album: s.album || "",
+              src: s.fileInp,
+              imageUrl: s.imageUrl || s.coverUrl || "",
+              createdAt: s.createdAt || 0,
+              uploaderName: artistLabel,
+            });
+          } catch (e) { /* ignore */ }
+        }));
+
+        // Only fetch SONGS if there are regular (non-featured) followed artists.
+        if (regularKeys.length > 0 || (featKeys.length === 0 && regularKeys.length === 0)) {
+          const songsSnap = await getFn(refFn(db, "SONGS"));
+          if (songsSnap.exists()) {
+            const all = songsSnap.val();
+            for (const titleKey in all) {
+              for (const albumKey in all[titleKey]) {
+                for (const artistKeyInner in all[titleKey][albumKey]) {
+                  const s = all[titleKey][albumKey][artistKeyInner];
+                  if (!s || !s.fileInp) continue;
+                  const up = String(s.uploader || "").trim();
+                  if (!up) continue;
+                  if (
+                    matchKeys.has(up) ||
+                    matchKeys.has(sanitizeKeyPart(up)) ||
+                    matchKeys.has(sanitizeKeyPart(up.toLowerCase()))
+                  ) {
+                    let ownerKey = sanitizeKeyPart(up);
+                    if (!artistKeys.includes(ownerKey)) {
+                      for (const ak of artistKeys) if (matchKeys.has(up) && ak) { ownerKey = ak; break; }
+                    }
+                    matches.push({
+                      ownerKey,
+                      title: s.title || titleKey.replace(/_/g, " "),
+                      artist: s.artist || "",
+                      album: s.album || "",
+                      src: s.fileInp,
+                      imageUrl: s.imageUrl || "",
+                      createdAt: s.createdAt || 0,
+                      uploaderName: s.uploaderName || "",
+                    });
+                  }
                 }
-                matches.push({
-                  ownerKey,
-                  title: s.title || titleKey.replace(/_/g, " "),
-                  artist: s.artist || "",
-                  album: s.album || "",
-                  src: s.fileInp,
-                  imageUrl: s.imageUrl || "",
-                  createdAt: s.createdAt || 0,
-                  uploaderName: s.uploaderName || "",
-                });
               }
             }
           }
