@@ -98,17 +98,58 @@ export async function initFollowedArtistNotices() {
         return;
       }
 
-      const all = [];
-      for (const ak of artistKeys) {
+      // Resolve feat_* keys → real ownerKeys via ARTIST_PROFILES + AGREEMENTS,
+      // so static featured artists' posts appear when their dashboard owner posts.
+      const profiles = window.ARTIST_PROFILES || {};
+      let agreementsCache = null;
+      const getAgreements = async () => {
+        if (agreementsCache !== null) return agreementsCache;
         try {
-          const ns = await getFn(refFn(db, "ARTIST_NOTICES/" + ak));
+          const ag = await getFn(refFn(db, "AGREEMENTS"));
+          agreementsCache = ag.exists() ? (ag.val() || {}) : {};
+        } catch (e) { agreementsCache = {}; }
+        return agreementsCache;
+      };
+
+      // Build [{ readKey, displayKey, fallbackName }]:
+      // readKey = where ARTIST_NOTICES are stored
+      // displayKey = the key in FOLLOWING (used for caching display name)
+      const noticeTargets = [];
+      for (const ak of artistKeys) {
+        if (!ak.startsWith("feat_")) {
+          noticeTargets.push({ readKey: ak, displayKey: ak, fallbackName: "" });
+          continue;
+        }
+        const artistId = ak.slice(5);
+        const profileName = (profiles[artistId] && profiles[artistId].name) ? String(profiles[artistId].name).trim() : "";
+        // Always also try the literal artistId (in case notices were posted by that key directly)
+        noticeTargets.push({ readKey: artistId, displayKey: ak, fallbackName: profileName });
+        if (profileName) {
+          const ags = await getAgreements();
+          const wanted = profileName.toLowerCase();
+          for (const k in ags) {
+            const a = ags[k] || {};
+            const nm = String(a.name || "").trim().toLowerCase();
+            if (nm && nm === wanted) noticeTargets.push({ readKey: k, displayKey: ak, fallbackName: profileName });
+          }
+        }
+      }
+
+      const all = [];
+      const seenIds = new Set();
+      for (const tgt of noticeTargets) {
+        try {
+          const ns = await getFn(refFn(db, "ARTIST_NOTICES/" + tgt.readKey));
           if (!ns.exists()) continue;
-          const name = await artistDisplayName(ak);
+          const name = tgt.fallbackName || await artistDisplayName(tgt.readKey);
           ns.forEach((ch) => {
             const v = ch.val();
+            const dedupKey = tgt.readKey + "|" + ch.key;
+            if (seenIds.has(dedupKey)) return;
             if (v && typeof v.text === "string") {
+              seenIds.add(dedupKey);
               all.push({
-                artistKey: ak,
+                artistKey: tgt.displayKey,
                 artistName: name,
                 id: ch.key,
                 text: v.text,
@@ -117,7 +158,7 @@ export async function initFollowedArtistNotices() {
             }
           });
         } catch (e) {
-          console.warn("notices for", ak, e);
+          console.warn("notices for", tgt.readKey, e);
         }
       }
 
