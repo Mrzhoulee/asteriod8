@@ -103,28 +103,63 @@ export async function initFollowedArtistSongs() {
 
         const matches = [];
 
-        // Load songs for featured artists from FEATURED_ARTIST_SONG/{rawId}.
-        await Promise.all(featKeys.map(async (ak) => {
-          const rawId = ak.slice(5); // strip "feat_"
-          try {
-            const featSnap = await getFn(refFn(db, "FEATURED_ARTIST_SONG/" + rawId));
-            if (!featSnap.exists()) return;
-            const s = featSnap.val();
-            if (!s || !s.fileInp) return;
-            // Get artist name from PROFILES/feat_{rawId} or fallback to rawId.
-            let artistLabel = await artistNameForKey(ak, rawId);
-            matches.push({
-              ownerKey: ak,
-              title: s.title || rawId,
-              artist: s.artist || artistLabel,
-              album: s.album || "",
-              src: s.fileInp,
-              imageUrl: s.imageUrl || s.coverUrl || "",
-              createdAt: s.createdAt || 0,
-              uploaderName: artistLabel,
-            });
-          } catch (e) { /* ignore */ }
-        }));
+        // Resolve featured-artist follow keys (feat_MB, feat_DCC, …) → ownerKey via ARTIST_PROFILES + AGREEMENTS.
+        // ARTIST_PROFILES maps short id ("MB") to display name ("Melodic Black").
+        // AGREEMENTS is keyed by sanitized email (= ownerKey for FEATURED_ARTIST_SONG) and contains { name, email }.
+        if (featKeys.length) {
+          const profiles = window.ARTIST_PROFILES || {};
+          let agreementsCache = null;
+          const getAgreements = async () => {
+            if (agreementsCache !== null) return agreementsCache;
+            try {
+              const ag = await getFn(refFn(db, "AGREEMENTS"));
+              agreementsCache = ag.exists() ? (ag.val() || {}) : {};
+            } catch (e) { agreementsCache = {}; }
+            return agreementsCache;
+          };
+
+          await Promise.all(featKeys.map(async (ak) => {
+            const artistId = ak.slice(5); // strip "feat_"
+            const profileName = (profiles[artistId] && profiles[artistId].name) ? String(profiles[artistId].name).trim() : "";
+            const ownerKeysToTry = new Set();
+
+            // Direct attempt: FEATURED_ARTIST_SONG/{artistId} (covers static-id pins).
+            ownerKeysToTry.add(artistId);
+
+            // Resolve via AGREEMENTS by name match.
+            if (profileName) {
+              const ags = await getAgreements();
+              const wanted = profileName.toLowerCase();
+              for (const k in ags) {
+                const a = ags[k] || {};
+                const nm = String(a.name || "").trim().toLowerCase();
+                if (nm && nm === wanted) ownerKeysToTry.add(k);
+              }
+            }
+
+            // Pull every candidate's pinned song.
+            for (const ok of ownerKeysToTry) {
+              try {
+                const featSnap = await getFn(refFn(db, "FEATURED_ARTIST_SONG/" + ok));
+                if (!featSnap.exists()) continue;
+                const s = featSnap.val();
+                if (!s || !s.fileInp) continue;
+                const artistLabel = profileName || s.artist || s.uploaderName || artistId;
+                matches.push({
+                  ownerKey: ak,
+                  title: s.title || artistId,
+                  artist: s.artist || artistLabel,
+                  album: s.album || "",
+                  src: s.fileInp,
+                  imageUrl: s.imageUrl || s.coverUrl || "",
+                  createdAt: s.uploadedAt || s.createdAt || 0,
+                  uploaderName: artistLabel,
+                });
+                break; // one pinned song per featured artist is enough
+              } catch (e) { /* ignore */ }
+            }
+          }));
+        }
 
         // Only fetch SONGS if there are regular (non-featured) followed artists.
         if (regularKeys.length > 0 || (featKeys.length === 0 && regularKeys.length === 0)) {
