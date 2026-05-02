@@ -403,9 +403,35 @@
     });
   }
 
+  function recordPlayToTrending(song) {
+    try {
+      const title = (song && song.title || '').toString().trim();
+      if (!title) return;
+      // Prefer the canonical recorder if loaded (handles dedup across the whole app)
+      if (typeof window.recordSongPlay === 'function') {
+        window.recordSongPlay(title);
+        return;
+      }
+      // Standalone fallback (charts.html, pat.html — pages without index.html's recorder)
+      const db = window.firebaseDatabase;
+      const refFn = window.firebaseRef;
+      const pushFn = window.firebasePush;
+      if (!db || !refFn || !pushFn) return;
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const ofctime = months[new Date().getMonth()];
+      const now = Date.now();
+      const dupKey = title + '|' + ofctime;
+      if (window.__lastSongplayedKey === dupKey && now - (window.__lastSongplayedTs || 0) < 3000) return;
+      window.__lastSongplayedKey = dupKey;
+      window.__lastSongplayedTs = now;
+      pushFn(refFn(db, 'songplayed'), { title2: title, ofctime });
+    } catch (e) { console.warn('[miniplayer] recordPlayToTrending', e); }
+  }
+
   function playSong(song) {
     ensureUI();
     if (!song || !song.url) return;
+    recordPlayToTrending(song);
     if (audio) {
       try { audio.pause(); } catch (e) {}
       audio.src = '';
