@@ -6509,6 +6509,11 @@ onAuthStateChanged(auth, (user) => {
     localStorage.removeItem("userName");
     console.log("[index] onAuthStateChanged: signed in as", accountId, "provider:", user.providerData[0]?.providerId);
 
+    // Re-render any open follow button that was shown before auth resolved
+    setTimeout(function () {
+      if (window._refreshFeaturedFollowIfOpen) window._refreshFeaturedFollowIfOpen();
+    }, 300);
+
     setArtistDashboardNavVisible(true);
 
     const isApple = user.providerData && user.providerData.some((p) => p && p.providerId === "apple.com");
@@ -7499,11 +7504,13 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                 }
                 const appleBtnNative = document.getElementById("apple-sign-in");
                 if (appleBtnNative) appleBtnNative.style.setProperty("display", "none", "important");
+                setTimeout(function () { if (window._refreshFeaturedFollowIfOpen) window._refreshFeaturedFollowIfOpen(); }, 300);
               }
               if (!idToken) {
                 console.warn("[auth] Native Apple authorize returned no identityToken", res);
                 if (nativeAccountId) {
                   localStorage.setItem("localAuthOnly", "1");
+                  setTimeout(function () { if (window._refreshFeaturedFollowIfOpen) window._refreshFeaturedFollowIfOpen(); }, 300);
                   return true;
                 }
                 return false;
@@ -8628,6 +8635,15 @@ console.log('1171')
           if (profile) openArtistModal(profile, artistId);
         }, true);
       });
+
+      // Re-check follow button if auth state changes while overlay is open
+      window._refreshFeaturedFollowIfOpen = function () {
+        const fk = overlay.dataset.followArtistKey;
+        if (overlay.classList.contains("active") && fk) {
+          featuredFollowHelperAttempts = 0;
+          refreshFeaturedFollowUI(fk);
+        }
+      };
     })();
   </script>
 
