@@ -6118,6 +6118,8 @@ window.playLibraryTrack = function (tid) {
   const g = _loadGlobalFromCard(card);
   if (!g) return;
   try { if (window.currentPlaying && window.currentPlaying !== g && typeof window.currentPlaying.pause === "function") window.currentPlaying.pause(); } catch (_) {}
+  // Record play immediately (don't wait for onplay which can be unreliable on iOS/Capacitor)
+  if (window.actual1) window.actual1('gaga_global');
   logListenEngagement(g);
   window.action = tid;
   window.currentPlaying = g;
@@ -6151,7 +6153,14 @@ window.actual1 = function (audioDomId) {
   const ofctime = month[new Date().getMonth()];
   const g = document.getElementById("gaga_global");
   const displayTitle = (g && g.dataset && g.dataset.displayTitle) || String(audioDomId || "").replace(/^gaga_/, "").replace(/_/g, " ");
-  push(ref2(db, "songplayed"), { title2: displayTitle, ofctime });
+  // Dedup: skip songplayed push if same title was pushed in last 3 seconds (prevents double-count when called from both playLibraryTrack and onplay)
+  const now = Date.now();
+  const dupKey = displayTitle + "|" + ofctime;
+  if (!window.__lastSongplayedKey || window.__lastSongplayedKey !== dupKey || now - (window.__lastSongplayedTs || 0) > 3000) {
+    window.__lastSongplayedKey = dupKey;
+    window.__lastSongplayedTs = now;
+    push(ref2(db, "songplayed"), { title2: displayTitle, ofctime });
+  }
   window.pauseAllLibraryAudioExcept(g || null);
   if (g) window.currentPlaying = g;
   const tata = document.getElementById("tata");
