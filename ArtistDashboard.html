@@ -825,9 +825,6 @@
             <button class="tab-btn" onclick="switchTab('creator', event)">
                 <i class="fas fa-wand-magic-sparkles"></i> Creator tools
             </button>
-            <button class="tab-btn" onclick="switchTab('parties', event)">
-                <i class="fas fa-dollar-sign"></i> Asteroid Parties
-            </button>
             <button class="tab-btn" onclick="switchTab('qa', event)">
                 <i class="fas fa-question-circle"></i> Q&amp;A
             </button>
@@ -1076,16 +1073,6 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             </div>
         </div>
 
-    </div>
-
-    <!-- Asteroid Parties Tab -->
-    <div id="parties-tab" class="tab-content">
-        <iframe
-            id="partiesFrame"
-            src="parties.html"
-            style="width:100%;height:calc(100vh - 140px);border:none;border-radius:12px;display:block;"
-            title="Asteroid Parties"
-        ></iframe>
     </div>
 
     <div id="qa-tab" class="tab-content">
@@ -1568,6 +1555,14 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
         });
 
         document.getElementById('creatorFollowUserBtn')?.addEventListener('click', async () => {
+            const btn = document.getElementById('creatorFollowUserBtn');
+            const origBtnHtml = btn ? btn.innerHTML : '';
+            const setBtnBusy = (busy, label) => {
+                if (!btn) return;
+                btn.disabled = !!busy;
+                if (label) btn.innerHTML = label;
+                else if (!busy) btn.innerHTML = origBtnHtml;
+            };
             if (!currentEmailKey) {
                 alert('Sign in first.');
                 return;
@@ -1578,37 +1573,66 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 alert('Enter a valid public username (letters, numbers, underscores; 3–40 characters).');
                 return;
             }
-            // Use the same key index.html + followed-notices.js read from, so follows written here appear in the reader's feed.
-            const viewerKey = currentEmailKey || (localStorage.getItem('emailKey') || '').trim() || sanitizeEmail(localStorage.getItem('CurrentUser') || localStorage.getItem('email') || currentUserEmail || '');
-            if (!viewerKey) {
-                alert('Could not resolve your account. Sign in again.');
-                return;
-            }
+            const viewerKey = currentEmailKey;
+            setBtnBusy(true, '<i class="fas fa-spinner fa-spin"></i> Following…');
             try {
+                console.log('[follow-user] looking up username:', normalized);
                 const regSnap = await get(ref(database, 'USERNAME_REGISTRY/' + normalized));
                 if (!regSnap.exists()) {
                     alert('That username is not registered yet.');
+                    setBtnBusy(false);
                     return;
                 }
                 const targetKey = String(regSnap.val() || '').trim();
+                console.log('[follow-user] resolved target:', targetKey, 'viewer:', viewerKey);
                 if (!targetKey) {
                     alert('Invalid registry entry.');
+                    setBtnBusy(false);
                     return;
                 }
                 if (targetKey === viewerKey) {
                     alert('You cannot follow yourself.');
+                    setBtnBusy(false);
                     return;
                 }
-                // Atomic two-leg write so the follower count and the viewer's feed never disagree.
-                await update(ref(database), {
-                    ['FOLLOWS/' + targetKey + '/' + viewerKey]: true,
-                    ['FOLLOWING/' + viewerKey + '/' + targetKey]: true
-                });
-                document.getElementById('creatorFollowUsername').value = '';
-                await loadCreatorTools();
+                // Try atomic multi-path update first. If that fails (some rule
+                // configurations reject root-relative updates), fall back to
+                // two sequential set() calls.
+                let writeOk = false;
+                try {
+                    await update(ref(database), {
+                        ['FOLLOWS/' + targetKey + '/' + viewerKey]: true,
+                        ['FOLLOWING/' + viewerKey + '/' + targetKey]: true
+                    });
+                    writeOk = true;
+                    console.log('[follow-user] atomic update OK');
+                } catch (atomicErr) {
+                    console.warn('[follow-user] atomic update failed, falling back:', atomicErr && (atomicErr.code || atomicErr.message || atomicErr));
+                    try {
+                        await set(ref(database, 'FOLLOWS/' + targetKey + '/' + viewerKey), true);
+                        await set(ref(database, 'FOLLOWING/' + viewerKey + '/' + targetKey), true);
+                        writeOk = true;
+                        console.log('[follow-user] sequential write OK');
+                    } catch (seqErr) {
+                        console.error('[follow-user] sequential write failed:', seqErr && (seqErr.code || seqErr.message || seqErr));
+                        throw seqErr;
+                    }
+                }
+                if (writeOk) {
+                    document.getElementById('creatorFollowUsername').value = '';
+                    setBtnBusy(false, '<i class="fas fa-check"></i> Followed!');
+                    setTimeout(() => setBtnBusy(false), 1500);
+                    try { await loadCreatorTools(); } catch (lErr) { console.warn('[follow-user] loadCreatorTools refresh failed:', lErr); }
+                }
             } catch (e) {
-                console.error(e);
-                alert('Could not complete follow. Check network and database rules.');
+                console.error('[follow-user] failed:', e);
+                const code = e && e.code ? String(e.code) : '';
+                if (code === 'PERMISSION_DENIED') {
+                    alert('Could not follow: database permission denied. Make sure database.rules.json is deployed (firebase deploy --only database).');
+                } else {
+                    alert('Could not complete follow: ' + (e && (e.message || e.code) || 'unknown error') + '. See console for details.');
+                }
+                setBtnBusy(false);
             }
         });
 
