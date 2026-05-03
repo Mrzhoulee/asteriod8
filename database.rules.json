@@ -163,6 +163,24 @@
         ".validate": "newData.hasChildren(['googleEmail','linkedAt']) && newData.child('googleEmail').isString() && newData.child('linkedAt').isNumber()"
       }
     },
+    "subAsteroids": {
+      ".read": true,
+      "$sub": {
+        "posts": {
+          "$postId": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['title','createdAt']) && newData.child('title').isString() && newData.child('title').val().length <= 200 && newData.child('createdAt').isNumber() && (!newData.hasChild('description') || (newData.child('description').isString() && newData.child('description').val().length <= 2000)) && (!newData.hasChild('songURL') || (newData.child('songURL').isString() && newData.child('songURL').val().length <= 2048)) && (!newData.hasChild('artist') || (newData.child('artist').isString() && newData.child('artist').val().length <= 200))",
+            "comments": {
+              "$commentId": {
+                ".write": "!data.exists()",
+                ".validate": "newData.hasChildren(['text','createdAt']) && newData.child('text').isString() && newData.child('text').val().length <= 1000 && newData.child('createdAt').isNumber() && (!newData.hasChild('user') || (newData.child('user').isString() && newData.child('user').val().length <= 200))"
+              }
+            },
+            "planes": { ".validate": "newData.isNumber()" }
+          }
+        }
+      }
+    },
     "CONTENT_REPORTS": {
       "$reportId": {
         ".read": false,
