@@ -799,6 +799,32 @@
     </style>
 </head>
 <body>
+<!-- Artist role gate — shown immediately if profileType != 'artist' -->
+<div id="artistRoleGate" style="display:none;position:fixed;inset:0;z-index:99999;background:#0a0a0f;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="max-width:420px;">
+    <div style="font-size:3.5rem;margin-bottom:1rem;">🎵</div>
+    <h2 style="color:#ff7f50;font-size:1.6rem;font-weight:700;margin-bottom:0.75rem;">Artist Access Required</h2>
+    <p style="color:rgba(255,255,255,0.75);font-size:0.97rem;line-height:1.7;margin-bottom:2rem;">
+      This page is only available for <strong style="color:#ffffff;">Artist</strong> accounts.<br><br>
+      To get access:<br>
+      1. Go to the <strong style="color:#ff7f50;">Home page</strong><br>
+      2. Tap the <strong style="color:#ff7f50;">Profile icon</strong><br>
+      3. Select <strong style="color:#ff7f50;">Switch to Artist</strong><br>
+      4. Come back here
+    </p>
+    <a href="index.html" style="display:inline-block;background:linear-gradient(135deg,#ff7f50,#e66a3a);color:#0a0a0a;padding:0.9rem 2.2rem;border-radius:14px;font-weight:700;font-size:1rem;text-decoration:none;box-shadow:0 8px 24px rgba(255,127,80,0.35);">Go to Home Page</a>
+  </div>
+</div>
+<script>
+(function () {
+  var pt = (localStorage.getItem('profileType') || '').trim().toLowerCase();
+  if (pt !== 'artist') {
+    var gate = document.getElementById('artistRoleGate');
+    if (gate) gate.style.display = 'flex';
+  }
+})();
+</script>
+
     <div class="dashboard-container">
         <div class="dashboard-header">
             <h1><i class="fas fa-chart-line"></i> Artist Dashboard</h1>
