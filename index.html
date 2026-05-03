@@ -6499,6 +6499,7 @@ onAuthStateChanged(auth, (user) => {
 
   // If user is signed in, update UI and check premium status
   if (user) {
+    try { window.dispatchEvent(new CustomEvent("asteroid:auth-changed", { detail: { signedIn: true } })); } catch (e) {}
     if (appleSignInHeader) appleSignInHeader.style.setProperty("display", "none", "important");
     const gcd = document.getElementById("gcd");
     const name =
@@ -7521,12 +7522,14 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                 }
                 const appleBtnNative = document.getElementById("apple-sign-in");
                 if (appleBtnNative) appleBtnNative.style.setProperty("display", "none", "important");
+                try { window.dispatchEvent(new CustomEvent("asteroid:auth-changed", { detail: { signedIn: true, source: "apple-native" } })); } catch (e) {}
                 setTimeout(function () { if (window._refreshFeaturedFollowIfOpen) window._refreshFeaturedFollowIfOpen(); }, 300);
               }
               if (!idToken) {
                 console.warn("[auth] Native Apple authorize returned no identityToken", res);
                 if (nativeAccountId) {
                   localStorage.setItem("localAuthOnly", "1");
+                  try { window.dispatchEvent(new CustomEvent("asteroid:auth-changed", { detail: { signedIn: true, source: "apple-local-only" } })); } catch (e) {}
                   setTimeout(function () { if (window._refreshFeaturedFollowIfOpen) window._refreshFeaturedFollowIfOpen(); }, 300);
                   return true;
                 }
@@ -7536,6 +7539,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               try {
                 const result = await signInWithCredential(auth, appleCred);
                 await handleSignInSuccess(result, hadPreviousUser);
+                try { window.dispatchEvent(new CustomEvent("asteroid:auth-changed", { detail: { signedIn: true, source: "apple-credential" } })); } catch (e) {}
                 console.log("[auth] Native Sign in with Apple + Firebase signInWithCredential OK");
                 return true;
               } catch (fe) {
@@ -7543,6 +7547,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                 console.error("[auth] Firebase signInWithCredential (Apple) failed:", c, fe && (fe.message || fe));
                 if (nativeAccountId) {
                   localStorage.setItem("localAuthOnly", "1");
+                  try { window.dispatchEvent(new CustomEvent("asteroid:auth-changed", { detail: { signedIn: true, source: "apple-local-only" } })); } catch (e) {}
                   return true;
                 }
                 return false;
@@ -7857,6 +7862,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             } catch (eCFU) {}
             const appleSignInHeader = document.getElementById("apple-sign-in");
             if (appleSignInHeader) appleSignInHeader.style.setProperty("display", "none", "important");
+            try { window.dispatchEvent(new CustomEvent("asteroid:auth-changed", { detail: { signedIn: true, source: "redirect-resume" } })); } catch (e) {}
             var fullName = user.displayName || localStorage.getItem("fullName") || "";
             const gcd = document.getElementById("gcd");
             if (gcd) { gcd.innerHTML = fullName; gcd.innerText = fullName; }
@@ -8662,6 +8668,51 @@ console.log('1171')
           refreshFeaturedFollowUI(fk);
         }
       };
+
+      // Belt-and-suspenders: any time the user signs in (Apple native, Apple
+      // redirect, Google, email) localStorage flips. Listen on `storage` (fires
+      // for cross-tab writes) AND on a custom 'asteroid:auth-changed' event we
+      // dispatch ourselves. Also poll for the first 30s after the modal opens
+      // — covers Apple redirect resume where getRedirectResult lands AFTER the
+      // user has already reopened the artist card.
+      let _featuredFollowPollTimer = null;
+      function _featuredFollowKeepFresh() {
+        if (!overlay.classList.contains("active")) {
+          if (_featuredFollowPollTimer) { clearInterval(_featuredFollowPollTimer); _featuredFollowPollTimer = null; }
+          return;
+        }
+        const fk = overlay.dataset.followArtistKey;
+        if (!fk) return;
+        const wasSignIn = followBtn && followBtn.dataset.mode === "signin";
+        if (wasSignIn || !followBtn || !followBtn.textContent || followBtn.textContent === "Loading…") {
+          refreshFeaturedFollowUI(fk);
+        }
+      }
+      window.addEventListener("storage", function (ev) {
+        if (!ev.key) return;
+        if (/^(emailKey|CurrentUser|email|asteroidSignedInBefore|isLoggedIn|localAuthOnly|fullName)$/.test(ev.key)) {
+          _featuredFollowKeepFresh();
+        }
+      });
+      window.addEventListener("asteroid:auth-changed", _featuredFollowKeepFresh);
+      // Start a short poll whenever the modal opens — handles same-tab writes
+      // that don't trigger the storage event.
+      const _origOpenObs = overlay;
+      const _modalObserver = new MutationObserver(function () {
+        if (overlay.classList.contains("active")) {
+          if (_featuredFollowPollTimer) clearInterval(_featuredFollowPollTimer);
+          let ticks = 0;
+          _featuredFollowPollTimer = setInterval(function () {
+            ticks++;
+            _featuredFollowKeepFresh();
+            if (ticks >= 60) { clearInterval(_featuredFollowPollTimer); _featuredFollowPollTimer = null; }
+          }, 500);
+        } else if (_featuredFollowPollTimer) {
+          clearInterval(_featuredFollowPollTimer);
+          _featuredFollowPollTimer = null;
+        }
+      });
+      _modalObserver.observe(overlay, { attributes: true, attributeFilter: ["class"] });
     })();
   </script>
 
@@ -8881,11 +8932,10 @@ console.log('1171')
       try {
         if (window.firebaseAuth && window.firebaseAuth.currentUser) return true;
       } catch (e) {}
-      const signedFlag =
-        localStorage.getItem('asteroidSignedInBefore') === 'true' ||
-        localStorage.getItem('isLoggedIn') === 'true' ||
-        localStorage.getItem('localAuthOnly') === '1';
-      if (!signedFlag) return false;
+      // Presence of an identity in localStorage IS the proof of sign-in —
+      // the boolean signedFlag is just a stale-flag tracker that races behind
+      // the actual identity writes during Apple redirect resume. Don't gate
+      // on it. (Sign-out paths clear the identity keys, so we're still safe.)
       const ek = (localStorage.getItem('emailKey') || '').trim();
       const cu = (localStorage.getItem('CurrentUser') || '').trim();
       const em = (localStorage.getItem('email') || '').trim();
