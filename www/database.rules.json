@@ -163,6 +163,15 @@
         ".validate": "newData.hasChildren(['googleEmail','linkedAt']) && newData.child('googleEmail').isString() && newData.child('linkedAt').isNumber()"
       }
     },
+    "PLAYLISTS": {
+      "$uid": {
+        ".read": true,
+        ".write": true,
+        "$songId": {
+          ".validate": "newData.hasChildren(['src','addedAt']) && newData.child('src').isString() && newData.child('src').val().length <= 4096 && newData.child('addedAt').isNumber() && (!newData.hasChild('title') || (newData.child('title').isString() && newData.child('title').val().length <= 400)) && (!newData.hasChild('artist') || (newData.child('artist').isString() && newData.child('artist').val().length <= 400)) && (!newData.hasChild('imageUrl') || (newData.child('imageUrl').isString() && newData.child('imageUrl').val().length <= 4096)) && (!newData.hasChild('source') || (newData.child('source').isString() && newData.child('source').val().length <= 64))"
+        }
+      }
+    },
     "subAsteroids": {
       ".read": true,
       "$sub": {

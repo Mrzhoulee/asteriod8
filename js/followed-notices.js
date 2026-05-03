@@ -182,11 +182,79 @@ export async function initFollowedArtistNotices() {
         </article>`
         )
         .join("");
+
+      // Surface a popup for any unseen announcements (anything posted after
+      // the last time the viewer opened the feed). Tracked per-viewer in
+      // localStorage so the popup only fires for genuinely new posts.
+      try { showAnnouncementPopup(top, vk); } catch (e) { console.warn("[followed-notices] popup", e); }
     } catch (e) {
       console.error(e);
       if (myGen === gen) renderEmpty("Could not load updates.");
     }
     });
+  }
+
+  // Show a coral-styled popup over the page for any announcement the viewer
+  // hasn't seen yet. Stack new ones; auto-dismiss after 8s; tap to close.
+  function showAnnouncementPopup(notices, viewerKey) {
+    if (!Array.isArray(notices) || !notices.length || !viewerKey) return;
+    const lsKey = "noticeSeen_" + viewerKey;
+    let seen = {};
+    try { seen = JSON.parse(localStorage.getItem(lsKey) || "{}") || {}; } catch (e) { seen = {}; }
+
+    // First-ever load: don't blast every existing post; just mark them all as seen.
+    if (!seen.__bootstrapped) {
+      const initial = { __bootstrapped: 1 };
+      notices.forEach((n) => { initial[n.artistKey + "|" + n.id] = 1; });
+      try { localStorage.setItem(lsKey, JSON.stringify(initial)); } catch (e) {}
+      return;
+    }
+
+    const fresh = notices.filter((n) => !seen[n.artistKey + "|" + n.id]).slice(0, 3);
+    if (!fresh.length) return;
+
+    let host = document.getElementById("followedNoticePopupHost");
+    if (!host) {
+      host = document.createElement("div");
+      host.id = "followedNoticePopupHost";
+      host.style.cssText = "position:fixed;top:max(14px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;width:min(440px,calc(100% - 24px));pointer-events:none;";
+      document.body.appendChild(host);
+    }
+
+    fresh.forEach((n) => {
+      const card = document.createElement("div");
+      card.setAttribute("role", "alert");
+      card.style.cssText = "pointer-events:auto;background:linear-gradient(135deg,#ff7f50,#e66a3a);color:#0a0a0a;padding:14px 16px;border-radius:14px;box-shadow:0 14px 32px rgba(255,127,80,0.45),0 0 0 1px rgba(255,255,255,0.18) inset;font-family:'Poppins',system-ui,-apple-system,sans-serif;font-size:13px;font-weight:600;line-height:1.4;cursor:pointer;transform:translateY(-12px);opacity:0;transition:opacity .25s ease,transform .25s ease;display:flex;gap:10px;align-items:flex-start;";
+      const headLine = document.createElement("div");
+      headLine.style.cssText = "flex:1;min-width:0;";
+      headLine.innerHTML =
+        '<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin-bottom:4px;">New from ' + esc(n.artistName) + '</div>' +
+        '<div style="font-weight:700;color:#0a0a0a;white-space:normal;word-break:break-word;">' + esc(n.text.length > 160 ? n.text.slice(0, 160) + "…" : n.text) + '</div>';
+      const closeBtn = document.createElement("button");
+      closeBtn.setAttribute("aria-label", "Dismiss");
+      closeBtn.textContent = "×";
+      closeBtn.style.cssText = "background:rgba(0,0,0,0.18);border:none;color:#0a0a0a;width:24px;height:24px;border-radius:12px;font-size:18px;font-weight:700;line-height:1;cursor:pointer;flex-shrink:0;";
+      const dismiss = () => {
+        card.style.opacity = "0";
+        card.style.transform = "translateY(-12px)";
+        setTimeout(() => { try { card.remove(); } catch (e) {} }, 250);
+      };
+      card.appendChild(headLine);
+      card.appendChild(closeBtn);
+      closeBtn.addEventListener("click", (ev) => { ev.stopPropagation(); dismiss(); });
+      card.addEventListener("click", () => {
+        const sec = document.getElementById("followedNoticesSection");
+        if (sec && typeof sec.scrollIntoView === "function") sec.scrollIntoView({ behavior: "smooth", block: "start" });
+        dismiss();
+      });
+      host.appendChild(card);
+      requestAnimationFrame(() => { card.style.opacity = "1"; card.style.transform = "translateY(0)"; });
+      setTimeout(dismiss, 8000);
+    });
+
+    fresh.forEach((n) => { seen[n.artistKey + "|" + n.id] = 1; });
+    seen.__bootstrapped = 1;
+    try { localStorage.setItem(lsKey, JSON.stringify(seen)); } catch (e) {}
   }
 
   bindFollowingListener();
