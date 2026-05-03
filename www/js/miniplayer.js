@@ -406,7 +406,7 @@
   function recordPlayToTrending(song) {
     try {
       const title = (song && song.title || '').toString().trim();
-      if (!title) return;
+      if (!title) { console.warn('[miniplayer] recordPlayToTrending: empty title'); return; }
       // Prefer the canonical recorder if loaded (handles dedup across the whole app)
       if (typeof window.recordSongPlay === 'function') {
         window.recordSongPlay(title);
@@ -416,16 +416,26 @@
       const db = window.firebaseDatabase;
       const refFn = window.firebaseRef;
       const pushFn = window.firebasePush;
-      if (!db || !refFn || !pushFn) return;
+      if (!db || !refFn || !pushFn) {
+        console.warn('[miniplayer] recordPlayToTrending: Firebase globals missing', { db: !!db, refFn: !!refFn, pushFn: !!pushFn });
+        return;
+      }
       const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       const ofctime = months[new Date().getMonth()];
       const now = Date.now();
       const dupKey = title + '|' + ofctime;
-      if (window.__lastSongplayedKey === dupKey && now - (window.__lastSongplayedTs || 0) < 3000) return;
+      if (window.__lastSongplayedKey === dupKey && now - (window.__lastSongplayedTs || 0) < 3000) {
+        console.log('[miniplayer] dedup skip:', title);
+        return;
+      }
       window.__lastSongplayedKey = dupKey;
       window.__lastSongplayedTs = now;
-      pushFn(refFn(db, 'songplayed'), { title2: title, ofctime });
-    } catch (e) { console.warn('[miniplayer] recordPlayToTrending', e); }
+      const result = pushFn(refFn(db, 'songplayed'), { title2: title, ofctime });
+      console.log('[miniplayer] pushed to songplayed:', title);
+      if (result && typeof result.then === 'function') {
+        result.catch(err => console.error('[miniplayer] push failed:', err && (err.code || err.message || err)));
+      }
+    } catch (e) { console.error('[miniplayer] recordPlayToTrending threw:', e); }
   }
 
   function playSong(song) {

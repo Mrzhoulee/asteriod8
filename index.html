@@ -5517,8 +5517,8 @@ function renderDiscoveryRows(list, mountId) {
   }
   mount.innerHTML = list.slice(0, 18).map((s, idx) => {
     const tid = "discover_" + mountId + "_" + idx + "_" + Math.random().toString(36).slice(2, 10);
-    const t   = String(s.title  || "Untitled").replace(/&/g,"&amp;").replace(/</g,"&lt;");
-    const a   = String(s.artist || "Unknown" ).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+    const t   = String(s.title  || "Untitled").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+    const a   = String(s.artist || "Unknown" ).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
     const url = String(s.fileInp || "").replace(/"/g,"&quot;");
     const up  = String(pickSongUploaderDiscovery(s) || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
     const st  = String(s.title  || "Untitled").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -6115,13 +6115,20 @@ function _loadGlobalFromCard(card) {
 window.playLibraryTrack = function (tid) {
   const card = document.getElementById("song_" + tid);
   if (!card) return;
-  // Read title from card BEFORE loading into gaga_global, so we have it regardless of dataset state
-  const cardTitle = (card.dataset.displayTitle || "").trim();
+  // Read title from MULTIPLE sources — dataset may be empty if attr was malformed
+  let cardTitle = (card.dataset.displayTitle || "").trim();
+  if (!cardTitle) {
+    // Fallback: pull from inner .song-row-title text
+    const titleEl = card.querySelector('.song-row-title');
+    if (titleEl) cardTitle = (titleEl.textContent || "").trim();
+  }
   const g = _loadGlobalFromCard(card);
   if (!g) return;
   try { if (window.currentPlaying && window.currentPlaying !== g && typeof window.currentPlaying.pause === "function") window.currentPlaying.pause(); } catch (_) {}
   // Record play directly with the card title — no dependency on gaga_global.dataset
-  if (cardTitle) window.recordSongPlay(cardTitle);
+  if (cardTitle && window.recordSongPlay) {
+    try { window.recordSongPlay(cardTitle); } catch (recErr) { console.warn("[playLibraryTrack] recordSongPlay threw:", recErr); }
+  }
   if (window.actual1) window.actual1('gaga_global');
   logListenEngagement(g);
   window.action = tid;
@@ -6152,16 +6159,28 @@ window.pauseLibraryTrack = function (tid) {
 
 // Dedicated play-recorder: deduped push to songplayed. Call with the actual title string.
 window.recordSongPlay = function (title) {
-  if (!title) return;
-  const db = getDatabase(app);
-  const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const ofctime = month[new Date().getMonth()];
-  const now = Date.now();
-  const dupKey = title + "|" + ofctime;
-  if (window.__lastSongplayedKey === dupKey && now - (window.__lastSongplayedTs || 0) < 3000) return;
-  window.__lastSongplayedKey = dupKey;
-  window.__lastSongplayedTs = now;
-  push(ref2(db, "songplayed"), { title2: title, ofctime });
+  try {
+    const cleanTitle = String(title || "").trim();
+    if (!cleanTitle) { console.warn("[recordSongPlay] empty title — skipped"); return; }
+    const db = getDatabase(app);
+    const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const ofctime = month[new Date().getMonth()];
+    const now = Date.now();
+    const dupKey = cleanTitle + "|" + ofctime;
+    if (window.__lastSongplayedKey === dupKey && now - (window.__lastSongplayedTs || 0) < 3000) {
+      console.log("[recordSongPlay] dedup skip:", cleanTitle);
+      return;
+    }
+    window.__lastSongplayedKey = dupKey;
+    window.__lastSongplayedTs = now;
+    const result = push(ref2(db, "songplayed"), { title2: cleanTitle, ofctime });
+    console.log("[recordSongPlay] pushed:", cleanTitle, "→", ofctime);
+    if (result && typeof result.then === "function") {
+      result.catch(err => console.error("[recordSongPlay] push failed:", err && (err.code || err.message || err)));
+    }
+  } catch (e) {
+    console.error("[recordSongPlay] threw:", e);
+  }
 };
 
 window.actual1 = function (audioDomId) {
