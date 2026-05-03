@@ -6439,11 +6439,10 @@ window.doDeleteAccount = async function(statusCallback) {
 /** True when this device still has a saved session (matches profile / follow helpers). */
 function hasRememberedAppSession() {
   try {
-    const signedFlag =
-      localStorage.getItem("asteroidSignedInBefore") === "true" ||
-      localStorage.getItem("isLoggedIn") === "true" ||
-      localStorage.getItem("localAuthOnly") === "1";
-    if (!signedFlag) return false;
+    // Identity presence IS the proof of a remembered session — the boolean
+    // flags (asteroidSignedInBefore / isLoggedIn / localAuthOnly) race behind
+    // identity writes during Apple-redirect resume. Sign-out paths clear the
+    // identity keys, so this is still safe.
     const ek = (localStorage.getItem("emailKey") || "").trim();
     const cu = (localStorage.getItem("CurrentUser") || "").trim();
     const em = (localStorage.getItem("email") || "").trim();
@@ -6479,6 +6478,33 @@ document.addEventListener("DOMContentLoaded", function () {
     syncHeaderSignInGroupFromStorage();
   } catch (eSync1) {}
 });
+// Also re-sync whenever auth state changes through any path. This catches
+// the case where Apple popup-closed-by-user fires but the user actually
+// signed in (or was already signed in) and localStorage has identity but
+// the button never got hidden.
+try {
+  window.addEventListener("storage", function (ev) {
+    if (!ev.key) return;
+    if (/^(emailKey|CurrentUser|email|asteroidSignedInBefore|isLoggedIn|localAuthOnly|fullName|profileNickname)$/.test(ev.key)) {
+      try { syncHeaderSignInGroupFromStorage(); } catch (e) {}
+    }
+  });
+  window.addEventListener("asteroid:auth-changed", function () {
+    try { syncHeaderSignInGroupFromStorage(); } catch (e) {}
+  });
+  // Backstop poll for the first 10 seconds after page load — iOS WebView
+  // sometimes restores the Firebase session 1-3s after DOMContentLoaded;
+  // popup/redirect Apple flows can also resolve late. A short poll guarantees
+  // the button hides as soon as identity becomes available.
+  let _hdrSyncTicks = 0;
+  const _hdrSyncTimer = setInterval(function () {
+    _hdrSyncTicks++;
+    try { syncHeaderSignInGroupFromStorage(); } catch (e) {}
+    if (_hdrSyncTicks >= 20 || hasRememberedAppSession()) {
+      clearInterval(_hdrSyncTimer);
+    }
+  }, 500);
+} catch (eSync2) {}
 
 // Keep track of auth state so UI can react correctly
 onAuthStateChanged(auth, (user) => {
@@ -8051,8 +8077,14 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                   signInWithPopup(auth, appleProvider)
                     .then((result) => handleSignInSuccess(result, hadPreviousUser))
                     .catch(async (error) => {
-                      console.error("Apple sign-in:", error);
                       const code = error && error.code ? String(error.code) : "";
+                      // If the user already has a session, swallow popup errors silently
+                      if (typeof hasRememberedAppSession === "function" && hasRememberedAppSession()) {
+                        console.warn("Apple sign-in: ignored (already signed in):", code);
+                        try { syncHeaderSignInGroupFromStorage(); } catch (eSyn) {}
+                        return;
+                      }
+                      console.error("Apple sign-in:", error);
                       if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
                         try {
                           await signInWithRedirect(auth, appleProvider);
@@ -8101,8 +8133,15 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               signInWithPopup(auth, appleProvider)
                 .then((result) => handleSignInSuccess(result, hadPreviousUser))
                 .catch(async (error) => {
-                  console.error("Apple sign-in:", error);
                   const code = error && error.code ? String(error.code) : "";
+                  // If the user already has a session, swallow popup errors silently —
+                  // they're already signed in, this attempt was probably an accidental tap.
+                  if (typeof hasRememberedAppSession === "function" && hasRememberedAppSession()) {
+                    console.warn("Apple sign-in: ignored (already signed in):", code);
+                    try { syncHeaderSignInGroupFromStorage(); } catch (eSyn) {}
+                    return;
+                  }
+                  console.error("Apple sign-in:", error);
                   if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
                     try {
                       await signInWithRedirect(auth, appleProvider);
