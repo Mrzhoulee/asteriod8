@@ -126,9 +126,9 @@
     },
     "ARTIST_NOTICES": {
       "$artistKey": {
+        ".read": true,
         ".indexOn": "ts",
         "$noticeId": {
-          ".read": true,
           ".write": "!data.exists()",
           ".validate": "newData.hasChildren(['text','ts','ownerKey']) && newData.child('text').isString() && newData.child('text').val().length <= 800 && newData.child('ts').isNumber() && newData.child('ownerKey').isString() && newData.child('ownerKey').val() == $artistKey"
         }
