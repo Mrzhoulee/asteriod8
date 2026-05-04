@@ -5398,6 +5398,20 @@ window.__songOverflowQueueFromDataset = function (btn) {
   } catch (eQ) {}
 };
 
+/** REST PUT fallback for PLAYLISTS — guarantees the save lands in Firebase even when the SDK is asleep. */
+function _restSavePlaylistEntry(uid, sid, payload) {
+  try {
+    fetch(RTDB_BASE + "/PLAYLISTS/" + uid + "/" + sid + ".json", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(function (r) {
+      if (!r.ok) console.error("[playlist/REST] HTTP", r.status, "for", sid);
+      else console.log("[playlist/REST] saved:", sid);
+    }).catch(function (err) { console.error("[playlist/REST] network err:", err); });
+  } catch (e) { console.error("[playlist/REST] threw:", e); }
+}
+
 /** Same storage key pattern as www/pat.html + www/auth.js (authScopedKey("playlists")). */
 window.__saveSongToPersonalPlaylistFromDataset = function (btn) {
   try {
@@ -5451,22 +5465,41 @@ window.__saveSongToPersonalPlaylistFromDataset = function (btn) {
     list.push({ title: t, artist: a || "Unknown artist", src: f });
     localStorage.setItem(pk, JSON.stringify(list));
 
-    // Also persist per-user playlist in Firebase Realtime Database.
+    // Also persist per-user playlist in Firebase Realtime Database. Try the SDK
+    // first; fall back to REST PUT so the save can't silently disappear when
+    // the SDK globals aren't ready or the WebSocket is stalled.
+    var sid = String(f).replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 180);
+    var fbPayload = {
+      title: t,
+      artist: a || "Unknown artist",
+      src: f,
+      addedAt: Date.now()
+    };
+    var fbWroteViaSdk = false;
     try {
       var db = window.firebaseDatabase;
       var refFn = window.firebaseRef;
       var setFn = window.firebaseSet;
       if (db && refFn && setFn && uid) {
-        var sid = String(f).replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 180);
-        setFn(refFn(db, "PLAYLISTS/" + uid + "/" + sid), {
-          title: t,
-          artist: a || "Unknown artist",
-          src: f,
-          addedAt: Date.now()
-        });
+        var sdkResult = setFn(refFn(db, "PLAYLISTS/" + uid + "/" + sid), fbPayload);
+        fbWroteViaSdk = true;
+        if (sdkResult && typeof sdkResult.then === "function") {
+          sdkResult
+            .then(function () { console.log("[playlist] SDK saved:", sid); })
+            .catch(function (err) {
+              console.warn("[playlist] SDK save failed — falling back to REST:", err && (err.code || err.message));
+              _restSavePlaylistEntry(uid, sid, fbPayload);
+            });
+        } else {
+          console.log("[playlist] SDK save fired:", sid);
+        }
       }
     } catch (eFbPl) {
-      console.warn("[playlist-firebase]", eFbPl);
+      console.warn("[playlist-firebase] SDK threw:", eFbPl);
+    }
+    if (!fbWroteViaSdk && uid) {
+      console.warn("[playlist] SDK globals missing — using REST");
+      _restSavePlaylistEntry(uid, sid, fbPayload);
     }
 
     if (window.confirm('Saved to your playlist. Open "My Playlist" (pat.html) now?')) {

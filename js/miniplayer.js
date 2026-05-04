@@ -39,38 +39,85 @@
   function songIdFromUrl(url) {
     return String(url || '').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 180) || 'song_' + Date.now();
   }
+  const MP_RTDB_BASE = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+  function restPlaylistPut(uid, sid, payload) {
+    fetch(MP_RTDB_BASE + '/PLAYLISTS/' + uid + '/' + sid + '.json', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(r => {
+      if (!r.ok) console.error('[miniplayer/REST] PLAYLISTS PUT', r.status, sid);
+      else console.log('[miniplayer/REST] PLAYLISTS saved:', sid);
+    }).catch(err => console.error('[miniplayer/REST] PLAYLISTS net err:', err));
+  }
+  function restPlaylistDelete(uid, sid) {
+    fetch(MP_RTDB_BASE + '/PLAYLISTS/' + uid + '/' + sid + '.json', { method: 'DELETE' })
+      .then(r => {
+        if (!r.ok) console.warn('[miniplayer/REST] PLAYLISTS DELETE', r.status, sid);
+        else console.log('[miniplayer/REST] PLAYLISTS removed:', sid);
+      })
+      .catch(err => console.error('[miniplayer/REST] PLAYLISTS DELETE net err:', err));
+  }
   function firebaseSaveToPlaylist(song) {
     try {
       const uid = currentUserKey();
-      const db = window.firebaseDatabase;
-      const refFn = window.firebaseRef;
-      const setFn = window.firebaseSet;
-      if (!uid || !db || !refFn || !setFn || !song || !song.url) return;
+      if (!uid || !song || !song.url) return;
       const sid = songIdFromUrl(song.url);
-      setFn(refFn(db, 'PLAYLISTS/' + uid + '/' + sid), {
+      const payload = {
         title: song.title || 'Untitled',
         artist: song.artist || 'Unknown artist',
         src: song.url,
         imageUrl: song.imageUrl || '',
         addedAt: Date.now(),
         source: 'queue'
-      }).catch(err => console.warn('[miniplayer] playlist save failed:', err));
+      };
+      const db = window.firebaseDatabase;
+      const refFn = window.firebaseRef;
+      const setFn = window.firebaseSet;
+      if (db && refFn && setFn) {
+        const result = setFn(refFn(db, 'PLAYLISTS/' + uid + '/' + sid), payload);
+        if (result && typeof result.then === 'function') {
+          result
+            .then(() => console.log('[miniplayer] PLAYLISTS SDK saved:', sid))
+            .catch(err => {
+              console.warn('[miniplayer] SDK save failed — REST fallback:', err && (err.code || err.message));
+              restPlaylistPut(uid, sid, payload);
+            });
+        }
+        return;
+      }
+      console.warn('[miniplayer] SDK globals missing — REST fallback for PLAYLISTS');
+      restPlaylistPut(uid, sid, payload);
     } catch (e) {
-      console.warn('[miniplayer] firebaseSaveToPlaylist error:', e);
+      console.warn('[miniplayer] firebaseSaveToPlaylist threw — REST fallback:', e);
+      try {
+        const uid2 = currentUserKey();
+        if (uid2 && song && song.url) restPlaylistPut(uid2, songIdFromUrl(song.url), { title: song.title || 'Untitled', artist: song.artist || 'Unknown artist', src: song.url, imageUrl: song.imageUrl || '', addedAt: Date.now(), source: 'queue' });
+      } catch (_) {}
     }
   }
   function firebaseRemoveFromPlaylist(song) {
     try {
       const uid = currentUserKey();
+      if (!uid || !song || !song.url) return;
+      const sid = songIdFromUrl(song.url);
       const db = window.firebaseDatabase;
       const refFn = window.firebaseRef;
       const rmFn = window.firebaseRemove;
-      if (!uid || !db || !refFn || !rmFn || !song || !song.url) return;
-      const sid = songIdFromUrl(song.url);
-      rmFn(refFn(db, 'PLAYLISTS/' + uid + '/' + sid))
-        .catch(err => console.warn('[miniplayer] playlist remove failed:', err));
+      if (db && refFn && rmFn) {
+        const result = rmFn(refFn(db, 'PLAYLISTS/' + uid + '/' + sid));
+        if (result && typeof result.then === 'function') {
+          result.catch(err => {
+            console.warn('[miniplayer] SDK remove failed — REST fallback:', err);
+            restPlaylistDelete(uid, sid);
+          });
+        }
+        return;
+      }
+      restPlaylistDelete(uid, sid);
     } catch (e) {
-      console.warn('[miniplayer] firebaseRemoveFromPlaylist error:', e);
+      console.warn('[miniplayer] firebaseRemoveFromPlaylist threw — REST fallback:', e);
+      try { const uid2 = currentUserKey(); if (uid2 && song && song.url) restPlaylistDelete(uid2, songIdFromUrl(song.url)); } catch (_) {}
     }
   }
 

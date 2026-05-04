@@ -240,6 +240,18 @@
   </nav>
 
   <script>
+    var PAT_RTDB_BASE = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+
+    /** Same UID derivation as index.html __saveSongToPersonalPlaylistFromDataset + miniplayer firebaseSaveToPlaylist. */
+    function patPlaylistUid() {
+      return String(
+        (localStorage.getItem('userEmail') || localStorage.getItem('email') || localStorage.getItem('CurrentUser') || '').trim()
+      ).replace(/[.#$[\]]/g, '_');
+    }
+    function patSongIdFromSrc(src) {
+      return String(src || '').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 180);
+    }
+
     function playlistStorageKey() {
       return (typeof authScopedKey === 'function') ? authScopedKey('playlists') : 'playlists_guest';
     }
@@ -261,6 +273,58 @@
         } catch (e) {}
       }
       return playlist;
+    }
+
+    /** Pull PLAYLISTS/{uid} from Firebase via REST, merge with localStorage, persist, re-render. */
+    function syncPlaylistFromFirebase() {
+      var uid = patPlaylistUid();
+      if (!uid) return Promise.resolve();
+      return fetch(PAT_RTDB_BASE + '/PLAYLISTS/' + uid + '.json', { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function (remote) {
+          if (!remote || typeof remote !== 'object') {
+            console.log('[pat] Firebase playlist empty for', uid);
+            return;
+          }
+          var local = getPlaylist();
+          var bySrc = {};
+          local.forEach(function (s) { if (s && s.src) bySrc[s.src] = s; });
+          var added = 0;
+          Object.keys(remote).forEach(function (sid) {
+            var entry = remote[sid] || {};
+            if (!entry.src) return;
+            if (!bySrc[entry.src]) {
+              bySrc[entry.src] = {
+                title: entry.title || 'Unknown',
+                artist: entry.artist || 'Unknown artist',
+                src: entry.src,
+                imageUrl: entry.imageUrl || ''
+              };
+              added++;
+            }
+          });
+          var merged = Object.keys(bySrc).map(function (k) { return bySrc[k]; });
+          var pk = playlistStorageKey();
+          try { localStorage.setItem(pk, JSON.stringify(merged)); } catch (e) {}
+          console.log('[pat] Firebase sync: pulled', Object.keys(remote).length, '— added', added, 'new');
+          render();
+        })
+        .catch(function (err) {
+          console.warn('[pat] Firebase sync failed:', err && (err.message || err));
+        });
+    }
+
+    /** Remove a song from Firebase via REST DELETE on PLAYLISTS/{uid}/{sid}. */
+    function deleteSongFromFirebase(src) {
+      var uid = patPlaylistUid();
+      if (!uid || !src) return;
+      var sid = patSongIdFromSrc(src);
+      fetch(PAT_RTDB_BASE + '/PLAYLISTS/' + uid + '/' + sid + '.json', { method: 'DELETE' })
+        .then(function (r) {
+          if (!r.ok) console.warn('[pat] Firebase delete HTTP', r.status);
+          else console.log('[pat] Firebase delete OK:', sid);
+        })
+        .catch(function (err) { console.warn('[pat] Firebase delete failed:', err); });
     }
 
     var currentAudio = null;
@@ -292,8 +356,10 @@
       var playlist = [];
       try { playlist = JSON.parse(localStorage.getItem(pk) || '[]'); } catch (e) {}
       if (!Array.isArray(playlist)) playlist = [];
+      var removed = playlist[index];
       playlist.splice(index, 1);
       localStorage.setItem(pk, JSON.stringify(playlist));
+      if (removed && removed.src) deleteSongFromFirebase(removed.src);
       render();
     }
 
@@ -362,6 +428,8 @@
         return;
       }
       render();
+      // Pull any songs the user added on another device — runs in parallel with the local render.
+      syncPlaylistFromFirebase();
     });
   </script>
 </body>
