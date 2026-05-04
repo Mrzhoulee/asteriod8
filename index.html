@@ -6122,12 +6122,35 @@ window.playLibraryTrack = function (tid) {
     const titleEl = card.querySelector('.song-row-title');
     if (titleEl) cardTitle = (titleEl.textContent || "").trim();
   }
+  if (!cardTitle) {
+    // Last-ditch: derive from tid (mood/genre rows include the song title segment in nothing,
+    // so fall back to the audio src filename if even the title element is missing)
+    const src = (card.dataset.src || "").trim();
+    if (src) {
+      try {
+        const fname = decodeURIComponent(src.split("/").pop().split("?")[0] || "").replace(/\.[a-z0-9]+$/i, "").trim();
+        if (fname) cardTitle = fname;
+      } catch (_) {}
+    }
+  }
+  console.log("[playLibraryTrack] tid:", tid, "title resolved to:", cardTitle);
   const g = _loadGlobalFromCard(card);
   if (!g) return;
   try { if (window.currentPlaying && window.currentPlaying !== g && typeof window.currentPlaying.pause === "function") window.currentPlaying.pause(); } catch (_) {}
   // Record play directly with the card title — no dependency on gaga_global.dataset
-  if (cardTitle && window.recordSongPlay) {
-    try { window.recordSongPlay(cardTitle); } catch (recErr) { console.warn("[playLibraryTrack] recordSongPlay threw:", recErr); }
+  if (cardTitle) {
+    if (typeof window.recordSongPlay === "function") {
+      try { window.recordSongPlay(cardTitle); }
+      catch (recErr) {
+        console.warn("[playLibraryTrack] recordSongPlay threw — using REST fallback:", recErr);
+        _restRecordSongPlay(cardTitle);
+      }
+    } else {
+      console.warn("[playLibraryTrack] recordSongPlay missing — using REST fallback");
+      _restRecordSongPlay(cardTitle);
+    }
+  } else {
+    console.warn("[playLibraryTrack] could not resolve title from card — skipped recording");
   }
   if (window.actual1) window.actual1('gaga_global');
   logListenEngagement(g);
@@ -6157,7 +6180,33 @@ window.pauseLibraryTrack = function (tid) {
   try { g.pause(); } catch (e) {}
 };
 
+// REST fallback for songplayed write — works even if Firebase SDK push fails for any reason.
+function _restRecordSongPlay(title) {
+  try {
+    const cleanTitle = String(title || "").trim();
+    if (!cleanTitle) return;
+    const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const ofctime = month[new Date().getMonth()];
+    const playerKey  = (localStorage.getItem("emailKey") || "").trim() || "";
+    const playerName = (localStorage.getItem("profileNickname") || localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim() || "";
+    const payload = { title2: cleanTitle, ofctime, ts: Date.now() };
+    if (playerKey)  payload.playerKey  = playerKey;
+    if (playerName) payload.playerName = playerName;
+    fetch(RTDB_BASE + "/songplayed.json", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(r => {
+      if (!r.ok) console.error("[_restRecordSongPlay] HTTP", r.status);
+      else console.log("[_restRecordSongPlay] OK:", cleanTitle, "by:", playerKey || playerName || "(anon)");
+    }).catch(err => console.error("[_restRecordSongPlay] network err:", err));
+  } catch (e) {
+    console.error("[_restRecordSongPlay] threw:", e);
+  }
+}
+
 // Dedicated play-recorder: deduped push to songplayed. Call with the actual title string.
+// Also captures WHO played it (emailKey + display name) when the viewer is signed in.
 window.recordSongPlay = function (title) {
   try {
     const cleanTitle = String(title || "").trim();
@@ -6173,8 +6222,20 @@ window.recordSongPlay = function (title) {
     }
     window.__lastSongplayedKey = dupKey;
     window.__lastSongplayedTs = now;
-    const result = push(ref2(db, "songplayed"), { title2: cleanTitle, ofctime });
-    console.log("[recordSongPlay] pushed:", cleanTitle, "→", ofctime);
+
+    // Capture player identity if signed in. Never block the write on missing identity.
+    const playerKey  = (localStorage.getItem("emailKey") || "").trim() || "";
+    const playerName = (localStorage.getItem("profileNickname") || localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim() || "";
+    let authUid = "";
+    try { if (window.firebaseAuth && window.firebaseAuth.currentUser) authUid = window.firebaseAuth.currentUser.uid || ""; } catch (e) {}
+
+    const payload = { title2: cleanTitle, ofctime, ts: now };
+    if (playerKey)  payload.playerKey  = playerKey;
+    if (playerName) payload.playerName = playerName;
+    if (authUid)    payload.playerUid  = authUid;
+
+    const result = push(ref2(db, "songplayed"), payload);
+    console.log("[recordSongPlay] pushed:", cleanTitle, "→", ofctime, "by:", playerKey || playerName || "(anon)");
     if (result && typeof result.then === "function") {
       result.catch(err => console.error("[recordSongPlay] push failed:", err && (err.code || err.message || err)));
     }
