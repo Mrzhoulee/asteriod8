@@ -63,6 +63,7 @@
             margin-bottom: 2rem;
             border-bottom: 2px solid var(--card-border);
             flex-wrap: wrap;
+            -webkit-overflow-scrolling: touch;
         }
 
         .tab-btn {
@@ -77,10 +78,14 @@
             transition: all 0.3s ease;
             position: relative;
             top: 2px;
+            -webkit-tap-highlight-color: rgba(255,127,80,0.18);
+            touch-action: manipulation;
         }
 
-        .tab-btn:hover {
-            color: var(--text-primary);
+        /* Hover only on devices that actually support it — iOS Safari otherwise
+           "stickies" the hover state after a tap, hiding the active tab color. */
+        @media (hover: hover) {
+            .tab-btn:hover { color: var(--text-primary); }
         }
 
         .tab-btn.active {
@@ -759,6 +764,44 @@
             .theme-selector {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            /* Horizontal-scroll tabs on mobile so all 6 fit without breaking layout. */
+            .nav-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            .nav-tabs::-webkit-scrollbar { display: none; }
+            .tab-btn {
+                flex-shrink: 0;
+                white-space: nowrap;
+                padding: 0.85rem 1.1rem;
+                font-size: 0.95rem;
+            }
+
+            /* Bump form input font-size to 16px so iOS Safari doesn't auto-zoom on focus. */
+            .form-input,
+            input[type="text"],
+            input[type="email"],
+            input[type="url"],
+            input[type="number"],
+            textarea,
+            select {
+                font-size: 16px !important;
+            }
+
+            /* Make all buttons more tappable on mobile (44pt min target per Apple HIG). */
+            .btn, .tab-btn, .theme-option, .qa-answer-submit {
+                min-height: 44px;
+            }
+        }
+
+        /* Module-wide iOS-friendly tweaks. */
+        button, .tab-btn, .theme-option, .user-card, .profile-modal-close {
+            -webkit-tap-highlight-color: rgba(255,127,80,0.18);
+            touch-action: manipulation;
         }
 
         /* Q&A tab */
@@ -1320,15 +1363,20 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
-            document.getElementById(tabName + '-tab').classList.add('active');
+            const target = document.getElementById(tabName + '-tab');
+            if (target) target.classList.add('active');
+
+            // On iOS, taps on the button's child <i> or <span> mean evt.target is
+            // NOT the button. Walk up to .tab-btn first, then fall back to
+            // currentTarget, then to the onclick selector.
             const e = evt || (typeof event !== 'undefined' ? event : null);
-            if (e && e.target) {
-                e.target.classList.add('active');
-            } else {
-                // Fallback: find the tab button by its onclick attribute
-                const btn = document.querySelector('.tab-btn[onclick*="' + tabName + '"]');
-                if (btn) btn.classList.add('active');
+            let btn = null;
+            if (e) {
+                if (e.target && typeof e.target.closest === 'function') btn = e.target.closest('.tab-btn');
+                if (!btn && e.currentTarget && e.currentTarget.classList && e.currentTarget.classList.contains('tab-btn')) btn = e.currentTarget;
             }
+            if (!btn) btn = document.querySelector('.tab-btn[onclick*="' + tabName + '"]');
+            if (btn) btn.classList.add('active');
             
             // Load social accounts when switching to social tab
             if (tabName === 'creator' && currentEmailKey) {
