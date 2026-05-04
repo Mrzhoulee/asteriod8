@@ -403,6 +403,33 @@
     });
   }
 
+  const RTDB_BASE_MP = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+
+  function buildSongplayedPayload(title) {
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const ofctime = months[new Date().getMonth()];
+    const playerKey  = (localStorage.getItem('emailKey') || '').trim() || '';
+    const playerName = (localStorage.getItem('profileNickname') || localStorage.getItem('CurrentUser') || localStorage.getItem('email') || '').trim() || '';
+    const payload = { title2: title, ofctime, ts: Date.now() };
+    if (playerKey)  payload.playerKey  = playerKey;
+    if (playerName) payload.playerName = playerName;
+    return payload;
+  }
+
+  function restPushSongplayed(title) {
+    try {
+      const payload = buildSongplayedPayload(title);
+      fetch(RTDB_BASE_MP + '/songplayed.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(r => {
+        if (!r.ok) console.error('[miniplayer/REST] HTTP', r.status, 'for', title);
+        else console.log('[miniplayer/REST] OK:', title, 'by:', payload.playerKey || payload.playerName || '(anon)');
+      }).catch(err => console.error('[miniplayer/REST] network err:', err));
+    } catch (e) { console.error('[miniplayer/REST] threw:', e); }
+  }
+
   function recordPlayToTrending(song) {
     try {
       const title = (song && song.title || '').toString().trim();
@@ -412,16 +439,9 @@
         window.recordSongPlay(title);
         return;
       }
-      // Standalone fallback (charts.html, pat.html — pages without index.html's recorder)
-      const db = window.firebaseDatabase;
-      const refFn = window.firebaseRef;
-      const pushFn = window.firebasePush;
-      if (!db || !refFn || !pushFn) {
-        console.warn('[miniplayer] recordPlayToTrending: Firebase globals missing', { db: !!db, refFn: !!refFn, pushFn: !!pushFn });
-        return;
-      }
-      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      const ofctime = months[new Date().getMonth()];
+      // Dedup window — same as index.html's recorder
+      const monthArr = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const ofctime = monthArr[new Date().getMonth()];
       const now = Date.now();
       const dupKey = title + '|' + ofctime;
       if (window.__lastSongplayedKey === dupKey && now - (window.__lastSongplayedTs || 0) < 3000) {
@@ -430,12 +450,29 @@
       }
       window.__lastSongplayedKey = dupKey;
       window.__lastSongplayedTs = now;
-      const result = pushFn(refFn(db, 'songplayed'), { title2: title, ofctime });
-      console.log('[miniplayer] pushed to songplayed:', title);
-      if (result && typeof result.then === 'function') {
-        result.catch(err => console.error('[miniplayer] push failed:', err && (err.code || err.message || err)));
+
+      // Try the SDK path first (fast + offline-queueable). Fall back to REST when globals missing.
+      const db = window.firebaseDatabase;
+      const refFn = window.firebaseRef;
+      const pushFn = window.firebasePush;
+      if (db && refFn && pushFn) {
+        const payload = buildSongplayedPayload(title);
+        const result = pushFn(refFn(db, 'songplayed'), payload);
+        console.log('[miniplayer] pushed to songplayed:', title, 'by:', payload.playerKey || payload.playerName || '(anon)');
+        if (result && typeof result.then === 'function') {
+          result.catch(err => {
+            console.error('[miniplayer] SDK push failed — using REST:', err && (err.code || err.message || err));
+            restPushSongplayed(title);
+          });
+        }
+        return;
       }
-    } catch (e) { console.error('[miniplayer] recordPlayToTrending threw:', e); }
+      console.warn('[miniplayer] Firebase globals missing — using REST fallback', { db: !!db, refFn: !!refFn, pushFn: !!pushFn });
+      restPushSongplayed(title);
+    } catch (e) {
+      console.error('[miniplayer] recordPlayToTrending threw — using REST:', e);
+      try { const t = (song && song.title || '').toString().trim(); if (t) restPushSongplayed(t); } catch (_) {}
+    }
   }
 
   function playSong(song) {
