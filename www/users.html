@@ -272,6 +272,15 @@
     window.firebasePush = push;
     window.firebaseAuth = auth;
 
+    const RTDB_BASE_USERS = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+    // REST GET wrapper — bypasses the SDK WebSocket so a stalled realtime
+    // connection can't leave reads hanging forever. Returns parsed JSON or null.
+    function restGet(path) {
+      const url = RTDB_BASE_USERS + '/' + String(path || '').replace(/^\//, '') + '.json';
+      return fetch(url, { cache: 'no-store' })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    }
+
     function sanitizeKeyPart(s) {
       return String(s || "").replace(/[.#$[\]]/g, "_");
     }
@@ -372,9 +381,8 @@
       section.style.display = 'block';
       mount.innerHTML = '<p class="user-songs-empty">Loading tracks…</p>';
       try {
-        const snap = await get(ref(db, 'SONGS'));
-        if (!snap.exists()) { mount.innerHTML = '<p class="user-songs-empty">No songs yet.</p>'; return; }
-        const all = snap.val();
+        const all = await restGet('SONGS');
+        if (!all) { mount.innerHTML = '<p class="user-songs-empty">No songs yet.</p>'; return; }
         const profileEmail = String((profile && (profile.email || '')) || '').trim();
         const keyVariants = new Set();
         if (artistKey) keyVariants.add(artistKey);
@@ -460,8 +468,8 @@
       hint.textContent = '';
       let following = false;
       try {
-        const fs = await get(ref(db, 'FOLLOWING/' + vk + '/' + u.key));
-        following = fs.exists() && fs.val() === true;
+        const val = await restGet('FOLLOWING/' + vk + '/' + u.key);
+        following = val === true;
       } catch (e) {
         console.warn('follow state read failed', e);
         hint.textContent = 'Could not check follow state: ' + (e && e.message ? e.message : 'network error');
