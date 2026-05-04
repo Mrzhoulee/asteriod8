@@ -13,6 +13,8 @@
   let bar = null;            // sticky bar root
   let popup = null;          // queue popup root
   let els = {};              // cached inner nodes
+  let autoplayProvider = null; // optional fn(currentSong) -> nextSong | null
+  function setAutoplayProvider(fn) { autoplayProvider = (typeof fn === 'function') ? fn : null; }
 
   function esc(s) {
     const d = document.createElement('div');
@@ -517,13 +519,20 @@
   function next() {
     if (queue.length) {
       playSong(queue.shift());
-    } else {
-      if (audio) { try { audio.pause(); } catch (e) {} }
-      if (els && els.progress) els.progress.style.width = '0%';
-      current = null;
-      render();
-      renderPopup();
+      return;
     }
+    // No manual queue — ask the host page for the next song (autoplay).
+    if (autoplayProvider && current) {
+      try {
+        const nx = autoplayProvider(current);
+        if (nx && nx.url) { playSong(nx); return; }
+      } catch (e) { console.warn('[miniplayer] autoplayProvider threw:', e); }
+    }
+    if (audio) { try { audio.pause(); } catch (e) {} }
+    if (els && els.progress) els.progress.style.width = '0%';
+    current = null;
+    render();
+    renderPopup();
   }
 
   function toggle() {
@@ -566,5 +575,5 @@
     pauseOtherAudio(t);
   }, true);
 
-  window.AsteroidPlayer = { play, enqueue, next, pause, toggle, openQueue, closeQueue, state };
+  window.AsteroidPlayer = { play, enqueue, next, pause, toggle, openQueue, closeQueue, state, setAutoplayProvider };
 })();

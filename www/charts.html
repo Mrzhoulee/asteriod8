@@ -336,6 +336,26 @@
         imageUrl: btn.dataset.img || ''
       } : {};
       window.AsteroidPlayer.play({ url, ...meta });
+      registerAutoplayProvider();
+    }
+
+    // Tell the miniplayer how to find the next song when its queue is empty.
+    // Walks allSongs from the current URL forward; wraps to the start; returns
+    // the next playable song so "Next" never leaves the user with a blank player.
+    let __autoplayRegistered = false;
+    function registerAutoplayProvider() {
+      if (__autoplayRegistered || !window.AsteroidPlayer || typeof window.AsteroidPlayer.setAutoplayProvider !== 'function') return;
+      window.AsteroidPlayer.setAutoplayProvider(function (currentSong) {
+        if (!Array.isArray(allSongs) || !allSongs.length) return null;
+        const playable = allSongs.filter(s => s && s.fileInp);
+        if (!playable.length) return null;
+        const curUrl = currentSong && currentSong.url;
+        let idx = curUrl ? playable.findIndex(s => s.fileInp === curUrl) : -1;
+        const nextIdx = (idx >= 0) ? (idx + 1) % playable.length : 0;
+        const nx = playable[nextIdx];
+        return { url: nx.fileInp, title: nx.title || '', artist: nx.artist || '', imageUrl: nx.imageUrl || '' };
+      });
+      __autoplayRegistered = true;
     }
     function queueTrack(url, btn) {
       if (!url || !window.AsteroidPlayer) return;
