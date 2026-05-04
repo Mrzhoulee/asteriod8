@@ -2231,6 +2231,29 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 try { fn && fn(); } catch (e) {}
             }
         }
+        // FAST-PATH: kick off the loaders IMMEDIATELY using the localStorage-derived
+        // identity. Don't wait for onAuthStateChanged — Firebase Auth init can take
+        // several seconds (especially on Apple sign-in), and we already have the
+        // emailKey that index.html persisted. The auth callback below will re-run
+        // the loaders later if the identity changes, so this is safe.
+        (function bootDashboardASAP() {
+            const storedEmailKey = (localStorage.getItem("emailKey") || "").trim();
+            const storedCurrentUser = (localStorage.getItem("CurrentUser") || "").trim();
+            const storedEmail = (localStorage.getItem("email") || "").trim();
+            const accountId = storedCurrentUser || storedEmail || localStorage.getItem("artemail") || "";
+            if (!storedEmailKey && !accountId) return; // No identity yet — wait for auth callback
+            currentUserEmail = accountId || storedEmailKey || "";
+            currentEmailKey = storedEmailKey || sanitizeEmail(accountId);
+            if (currentUserEmail) try { localStorage.setItem("artemail", currentUserEmail); } catch (e) {}
+            console.log('[dashboard][fast-boot] loaders firing for', currentEmailKey);
+            window.__dashboardFastBootEmailKey = currentEmailKey;
+            Promise.all([
+                loadAnalytics().catch((e) => console.warn('[fast-boot] loadAnalytics:', e)),
+                loadProfile().catch((e) => console.warn('[fast-boot] loadProfile:', e)),
+                loadAllUsers().catch((e) => console.warn('[fast-boot] loadAllUsers:', e))
+            ]).then(() => console.log('[dashboard][fast-boot] initial paint complete'));
+        })();
+
         onAuthStateChanged(auth, async (user) => {
           try {
             // Match index.html getViewerFollowKeyForFollow(): prefer the canonical emailKey
@@ -2262,13 +2285,18 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 // home loader can surface it instantly without bridging.
                 pinFeaturedArtistSong(currentEmailKey, currentUserEmail).catch((e) => console.warn('[autopin]', e));
 
-                // Run all three loaders in PARALLEL — they don't depend on each other.
-                // Previously these ran sequentially, multiplying any single slow read.
-                await Promise.all([
-                    loadAnalytics().catch((e) => console.warn('[dashboard] loadAnalytics:', e)),
-                    loadProfile().catch((e) => console.warn('[dashboard] loadProfile:', e)),
-                    loadAllUsers().catch((e) => console.warn('[dashboard] loadAllUsers:', e))
-                ]);
+                // Skip the second loader run if fast-boot already painted with the same emailKey.
+                // (Prevents pointless re-rendering when localStorage emailKey matches Firebase Auth.)
+                if (window.__dashboardFastBootEmailKey !== currentEmailKey) {
+                    window.__dashboardFastBootEmailKey = currentEmailKey;
+                    await Promise.all([
+                        loadAnalytics().catch((e) => console.warn('[dashboard] loadAnalytics:', e)),
+                        loadProfile().catch((e) => console.warn('[dashboard] loadProfile:', e)),
+                        loadAllUsers().catch((e) => console.warn('[dashboard] loadAllUsers:', e))
+                    ]);
+                } else {
+                    console.log('[dashboard] auth callback — same emailKey as fast-boot, skipping reload');
+                }
 
                 // Tear down any listeners from a previous auth-state fire before re-subscribing.
                 _clearListeners();
