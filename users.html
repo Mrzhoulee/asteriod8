@@ -609,22 +609,50 @@
     }
 
     let _renderedFromCache = false;
+    let _restRendered = false;
+
+    // REST first — bypasses the WebSocket entirely, so a flaky/slow
+    // realtime connection can't leave the page hanging on a blank screen.
+    function loadUsersViaREST() {
+      const url = 'https://asteroid-cdc13-default-rtdb.firebaseio.com/PROFILES.json';
+      return fetch(url, { cache: 'no-store' })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(data => {
+          if (allUsers.length) return; // SDK already won
+          if (!data) {
+            gridEl.innerHTML = `<div class="state-msg"><span class="material-symbols-outlined">group_off</span><br>No users yet.</div>`;
+            _restRendered = true;
+            return;
+          }
+          const arr = buildArtistList(data);
+          allUsers = arr;
+          render(arr);
+          _restRendered = true;
+          console.log('[users] rendered via REST:', arr.length, 'profiles');
+        });
+    }
+
     function loadUsers() {
       _renderedFromCache = false;
-      let timeoutFired = false;
-      const timeoutId = setTimeout(() => {
-        if (allUsers.length) return;
-        timeoutFired = true;
-        console.warn('[users] PROFILES read timed out after 10s');
-        showLoadError('Loading is taking too long. Check your connection.');
-      }, 10000);
-      // Use onValue: streams cache + live data, more resilient than one-shot get on iOS WebView.
+      _restRendered = false;
+
+      // Kick off REST immediately — usually completes in 1-2s and unblocks the UI.
+      loadUsersViaREST().catch(err => {
+        console.warn('[users] REST load failed:', err && (err.message || err));
+        // Only show the error wall if the SDK also hasn't rendered yet.
+        if (!allUsers.length) {
+          showLoadError('Could not load users. Check your connection.');
+        }
+      });
+
+      // SDK onValue runs in parallel for live updates (new sign-ups, profile edits).
+      // No timeout-driven error wall here anymore — REST already covers initial paint.
       try {
         onValue(ref(db, 'PROFILES'), (snap) => {
-          clearTimeout(timeoutId);
-          if (timeoutFired && allUsers.length) return;
           if (!snap.exists()) {
-            gridEl.innerHTML = `<div class="state-msg"><span class="material-symbols-outlined">group_off</span><br>No users yet.</div>`;
+            if (!_restRendered) {
+              gridEl.innerHTML = `<div class="state-msg"><span class="material-symbols-outlined">group_off</span><br>No users yet.</div>`;
+            }
             return;
           }
           const arr = buildArtistList(snap.val() || {});
@@ -632,14 +660,11 @@
           render(arr);
           _renderedFromCache = true;
         }, (err) => {
-          clearTimeout(timeoutId);
-          console.error('[users] PROFILES read error:', err);
-          showLoadError('Could not load users: ' + (err && err.message ? err.message : 'unknown error'));
+          console.error('[users] PROFILES onValue error:', err);
+          // REST will have already painted (or failed loud); don't double-error.
         });
       } catch (e) {
-        clearTimeout(timeoutId);
         console.error('[users] onValue threw:', e);
-        showLoadError('Could not load users: ' + (e && e.message ? e.message : 'init error'));
       }
     }
     loadUsers();
