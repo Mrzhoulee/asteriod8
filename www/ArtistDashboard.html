@@ -1171,6 +1171,56 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
         const sanitizeEmail = (email) => (email || "").replace(/[.#$[\]]/g, '_');
 
+        // -------- FAST REST READS --------
+        // The SDK's get()/onValue() routes through a WebSocket that frequently
+        // stalls in iOS WebView and on flaky networks, leaving the dashboard
+        // hanging on "Loading…" for every panel. fastGet() bypasses the WS and
+        // returns a snapshot-shaped object so all the existing call sites
+        // (snap.exists() / snap.val() / snap.forEach()) keep working.
+        const RTDB_BASE_AD = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+        function _mkSnap(data, key) {
+          const snap = {
+            key: key,
+            exists: () => data !== null && data !== undefined,
+            val: () => data,
+            forEach: (cb) => {
+              if (data && typeof data === 'object') {
+                for (const k in data) {
+                  const stop = cb(_mkSnap(data[k], k));
+                  if (stop === true) return true;
+                }
+              }
+              return false;
+            }
+          };
+          return snap;
+        }
+        async function fastGet(path) {
+          const cleanPath = String(path || '').replace(/^\//, '');
+          const url = RTDB_BASE_AD + '/' + cleanPath + '.json';
+          const r = await fetch(url, { cache: 'no-store' });
+          if (!r.ok) throw new Error('REST GET ' + cleanPath + ' HTTP ' + r.status);
+          const data = await r.json();
+          return _mkSnap(data);
+        }
+        // Helpers for common patterns
+        async function fastGetRef(refOrPath) {
+          // Accepts either a string path or a Firebase Reference (uses ._path or .key chain).
+          if (typeof refOrPath === 'string') return fastGet(refOrPath);
+          // Reference object — extract path from internal _path or fall back to toString.
+          let p = '';
+          try {
+            if (refOrPath && refOrPath._path && refOrPath._path.pieces_) {
+              p = refOrPath._path.pieces_.join('/');
+            } else if (refOrPath && typeof refOrPath.toString === 'function') {
+              const s = refOrPath.toString();
+              const m = s.match(/firebaseio\.com\/(.+)$/);
+              if (m) p = m[1];
+            }
+          } catch (e) {}
+          return fastGet(p);
+        }
+
         async function pinFeaturedArtistSong(emailKey, signedInEmail) {
             if (!emailKey) return;
             const emailVariants = new Set();
@@ -1185,7 +1235,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             addVariant((localStorage.getItem('artemail') || '').trim());
             addVariant(emailKey);
             try {
-                const songsSnap = await get(ref(database, 'SONGS'));
+                const songsSnap = await fastGet('SONGS');
                 if (!songsSnap.exists()) return;
                 const all = songsSnap.val();
                 const matches = [];
@@ -1397,7 +1447,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 const fanRows = [];
                 const seenEventIds = new Set();
                 for (const k of readKeys) {
-                    const feSnap = await get(ref(database, 'FAN_ENGAGEMENT/' + k + '/events'));
+                    const feSnap = await fastGet('FAN_ENGAGEMENT/' + k + '/events');
                     if (!feSnap.exists()) continue;
                     feSnap.forEach((c) => {
                         if (seenEventIds.has(c.key)) return;
@@ -1462,7 +1512,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             }
 
             try {
-                const agSnap = await get(ref(database, 'AGREEMENTS'));
+                const agSnap = await fastGet('AGREEMENTS');
                 const agreements = [];
                 const me = String(currentUserEmail || '').trim().toLowerCase();
                 if (agSnap.exists()) {
@@ -1485,7 +1535,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
             try {
                 const journeys = [];
-                const ajSnap = await get(ref(database, 'ARTIST_JOURNEYS/' + safe));
+                const ajSnap = await fastGet('ARTIST_JOURNEYS/' + safe);
                 if (ajSnap.exists()) {
                     ajSnap.forEach((c) => {
                         const v = c.val();
@@ -1527,7 +1577,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             try {
                 const fs = document.getElementById('creatorFollowStatus');
                 if (fs && safe) {
-                    const folSnap = await get(ref(database, 'FOLLOWS/' + safe));
+                    const folSnap = await fastGet('FOLLOWS/' + safe);
                     let n = 0;
                     if (folSnap.exists()) folSnap.forEach(() => { n++; });
                     fs.textContent = n === 0 ? 'No followers recorded yet under FOLLOWS/' + safe + '.' : n + ' follower(s) under FOLLOWS/' + safe + '.';
@@ -1603,7 +1653,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             setBtnBusy(true, '<i class="fas fa-spinner fa-spin"></i> Following…');
             try {
                 console.log('[follow-user] looking up username:', normalized);
-                const regSnap = await get(ref(database, 'USERNAME_REGISTRY/' + normalized));
+                const regSnap = await fastGet('USERNAME_REGISTRY/' + normalized);
                 if (!regSnap.exists()) {
                     alert('That username is not registered yet.');
                     setBtnBusy(false);
@@ -1837,7 +1887,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
             try {
                 const profileRef = ref(database, 'PROFILES/' + currentEmailKey);
-                const prevSnap = await get(profileRef);
+                const prevSnap = await fastGet('PROFILES/' + currentEmailKey);
                 const prevProf = prevSnap.exists() ? prevSnap.val() : {};
                 const rawUsername = (document.getElementById('profilePublicUsername') && document.getElementById('profilePublicUsername').value) || '';
                 const normalized = rawUsername.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
@@ -1852,7 +1902,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     if (unEl) unEl.value = prevProf.publicUsername;
                 } else if (normalized) {
                     const regRef = ref(database, 'USERNAME_REGISTRY/' + normalized);
-                    const regSnap = await get(regRef);
+                    const regSnap = await fastGet('USERNAME_REGISTRY/' + normalized);
                     const owner = regSnap.exists() ? regSnap.val() : null;
                     if (owner && owner !== currentEmailKey) {
                         alert('That username is already taken. Pick another.');
@@ -1894,8 +1944,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             const currentYear = new Date().getFullYear();
 
             try {
-                const songplaysRef = ref(database, 'songplayed');
-                const snapshot = await get(songplaysRef);
+                const snapshot = await fastGet('songplayed');
                 const playsRaw = snapshot.exists() ? snapshot.val() : null;
 
                 const songCounts = {};
@@ -1934,32 +1983,22 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 setStat('topSong', topStr.length > 20 ? topStr.substring(0, 20) + '...' : topStr);
                 setStat('topSongPlays', topSongPlays + ' plays');
 
+                // Profile views + follow counts run in parallel via REST.
+                const [viewsSnapshot, folSnap, fingSingle] = await Promise.all([
+                    fastGet('PROFILEVIEWS/' + currentEmailKey).catch(() => null),
+                    fastGet('FOLLOWS/' + currentEmailKey).catch(() => null),
+                    fastGet('FOLLOWING/' + currentEmailKey).catch(() => null)
+                ]);
                 let viewCount = 0;
-                try {
-                    const profileViewsRef = ref(database, 'PROFILEVIEWS/' + currentEmailKey);
-                    const viewsSnapshot = await get(profileViewsRef);
-                    if (viewsSnapshot.exists()) {
-                        const v = viewsSnapshot.val();
-                        viewCount = typeof v === 'number' ? v : parseInt(String(v), 10) || 0;
-                    }
-                } catch (pvErr) {
-                    console.warn('Profile views unavailable (deploy PROFILEVIEWS rules):', pvErr);
+                if (viewsSnapshot && viewsSnapshot.exists()) {
+                    const v = viewsSnapshot.val();
+                    viewCount = typeof v === 'number' ? v : parseInt(String(v), 10) || 0;
                 }
                 setStat('profileViews', Number.isFinite(viewCount) ? viewCount.toLocaleString() : '0');
-
-                // Follower / following counts
-                try {
-                    const [folSnap, fingSingle] = await Promise.all([
-                        get(ref(database, 'FOLLOWS/' + currentEmailKey)).catch(() => null),
-                        get(ref(database, 'FOLLOWING/' + currentEmailKey)).catch(() => null)
-                    ]);
-                    const followers = folSnap && folSnap.exists() ? Object.keys(folSnap.val()).length : 0;
-                    const following = fingSingle && fingSingle.exists() ? Object.keys(fingSingle.val()).length : 0;
-                    setStat('statFollowers', followers.toLocaleString());
-                    setStat('statFollowing', following.toLocaleString());
-                } catch (fErr) {
-                    console.warn('Follow stats:', fErr);
-                }
+                const followers = folSnap && folSnap.exists() ? Object.keys(folSnap.val()).length : 0;
+                const following = fingSingle && fingSingle.exists() ? Object.keys(fingSingle.val()).length : 0;
+                setStat('statFollowers', followers.toLocaleString());
+                setStat('statFollowing', following.toLocaleString());
 
                 if (!songsList || !monthlyBreakdown) return;
 
@@ -2037,12 +2076,11 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             if (!currentEmailKey) return;
 
             try {
-                const profileRef = ref(database, 'PROFILES/' + currentEmailKey);
-                const snapshot = await get(profileRef);
-                
+                const snapshot = await fastGet('PROFILES/' + currentEmailKey);
+
                 if (snapshot.exists()) {
                     const profile = snapshot.val();
-                    
+
                     document.getElementById('profileNickname').value = profile.nickname || '';
                     const pu = document.getElementById('profilePublicUsername');
                     if (pu) {
@@ -2084,11 +2122,10 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
         // Load all users from /PROFILES
         async function loadAllUsers() {
             try {
-                const profilesRef = ref(database, 'PROFILES/');
-                const snapshot = await get(profilesRef);
-                
+                const snapshot = await fastGet('PROFILES');
+
                 const usersList = document.getElementById('usersList');
-                
+
                 if (!snapshot.exists()) {
                     usersList.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
                     return;
@@ -2118,34 +2155,30 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     return;
                 }
 
-                // Get additional user data (email, role) and premium status for each profile
-                const usersWithProfiles = await Promise.all(profilesArray.map(async (item) => {
+                // Pre-fetch CONCERTUSERS and PREMIUM ONCE in parallel via REST. Previously this
+                // did 2 sequential SDK gets per profile (≈ 200 reads for 100 users) which is
+                // why the dashboard hung for 10+ seconds. Now it's 2 reads total.
+                const [concertSnap, premiumSnap] = await Promise.all([
+                    fastGet('CONCERTUSERS').catch(() => null),
+                    fastGet('PREMIUM').catch(() => null)
+                ]);
+                const concertByEmailKey = new Map();
+                if (concertSnap && concertSnap.exists()) {
+                    const concertUsers = concertSnap.val() || {};
+                    Object.values(concertUsers).forEach((u) => {
+                        if (!u || !u.email) return;
+                        concertByEmailKey.set(sanitizeEmail(u.email), u);
+                    });
+                }
+                const premiumByKey = (premiumSnap && premiumSnap.exists()) ? (premiumSnap.val() || {}) : {};
+
+                const usersWithProfiles = profilesArray.map((item) => {
                     const emailKey = item.emailKey;
-                    
-                    // Try to get user data from CONCERTUSERS or other sources
-                    let userEmail = null;
-                    let userRole = null;
-                    let userFullName = null;
-                    
-                    // Check CONCERTUSERS for email/role
-                    const concertUsersRef = ref(database, 'CONCERTUSERS/');
-                    const concertUsersSnapshot = await get(concertUsersRef);
-                    if (concertUsersSnapshot.exists()) {
-                        const concertUsers = concertUsersSnapshot.val();
-                        const userEntry = Object.values(concertUsers).find(u => {
-                            const uEmailKey = sanitizeEmail(u.email || '');
-                            return uEmailKey === emailKey;
-                        });
-                        if (userEntry) {
-                            userEmail = userEntry.email;
-                            userRole = userEntry.role;
-                        }
-                    }
-                    
-                    // Check if premium
-                    const premiumRef = ref(database, 'PREMIUM/' + emailKey);
-                    const premiumSnapshot = await get(premiumRef);
-                    const premium = premiumSnapshot.exists() ? premiumSnapshot.val() : null;
+                    const userEntry = concertByEmailKey.get(emailKey) || null;
+                    const userEmail = userEntry ? userEntry.email : null;
+                    const userRole = userEntry ? userEntry.role : null;
+                    const userFullName = null;
+                    const premium = premiumByKey[emailKey] || null;
                     const isPremium = premium && (premium.ITG === true || premium.ITG === "true");
 
                     return {
@@ -2156,7 +2189,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                         profile: item.profile,
                         isPremium: isPremium
                     };
-                }));
+                });
 
                 // Store users data globally for modal access
                 allUsersData = usersWithProfiles;
@@ -2229,9 +2262,13 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 // home loader can surface it instantly without bridging.
                 pinFeaturedArtistSong(currentEmailKey, currentUserEmail).catch((e) => console.warn('[autopin]', e));
 
-                await loadAnalytics();
-                await loadProfile();
-                await loadAllUsers();
+                // Run all three loaders in PARALLEL — they don't depend on each other.
+                // Previously these ran sequentially, multiplying any single slow read.
+                await Promise.all([
+                    loadAnalytics().catch((e) => console.warn('[dashboard] loadAnalytics:', e)),
+                    loadProfile().catch((e) => console.warn('[dashboard] loadProfile:', e)),
+                    loadAllUsers().catch((e) => console.warn('[dashboard] loadAllUsers:', e))
+                ]);
 
                 // Tear down any listeners from a previous auth-state fire before re-subscribing.
                 _clearListeners();
