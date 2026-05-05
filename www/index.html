@@ -9062,12 +9062,33 @@ console.log('1171')
       const ek = (userData.emailKey || "").trim();
       if (!ek) return false;
       const k = rtdbUploaderKey(raw);
-      if (k === ek || k.toLowerCase() === ek.toLowerCase()) return true;
+
+      // First gate: uploader email must match the profile.
+      let uploaderMatches = false;
+      if (k === ek || k.toLowerCase() === ek.toLowerCase()) uploaderMatches = true;
       const pe = userData.profile && userData.profile.email ? String(userData.profile.email).trim() : "";
-      if (pe && (raw === pe || k === rtdbUploaderKey(pe))) return true;
+      if (!uploaderMatches && pe && (raw === pe || k === rtdbUploaderKey(pe))) uploaderMatches = true;
       const em = (userData.email || "").trim();
-      if (em && (raw === em || k === rtdbUploaderKey(em))) return true;
-      return false;
+      if (!uploaderMatches && em && (raw === em || k === rtdbUploaderKey(em))) uploaderMatches = true;
+      if (!uploaderMatches) return false;
+
+      // Second gate: song.artist must look like the profile's display name.
+      // An admin uploading on behalf of another artist (e.g., an Otto Tan
+      // upload tagged with artist "SwainWaves") must NOT show on the
+      // uploader's profile. Fall through if the profile has no display name.
+      const songArtistLc = String(song.artist || song.__pathArtistKey || "").replace(/_/g, " ").trim().toLowerCase();
+      const nameVariants = [];
+      const addName = (s) => { const v = String(s || "").trim().toLowerCase(); if (v) nameVariants.push(v); };
+      const p = userData.profile || {};
+      addName(p.nickname);
+      addName(p.profileNickname);
+      addName(p.publicUsername);
+      addName(p.fullName);
+      addName(p.name);
+      addName(userData.fullName);
+      if (!nameVariants.length) return true; // No name on profile — accept the upload.
+      if (!songArtistLc) return true; // Song has no artist tag — fall back to uploader.
+      return nameVariants.some(n => n === songArtistLc || songArtistLc.includes(n) || n.includes(songArtistLc));
     }
 
     function profileSongLineText(value, pathKeyFallback, emptyLabel) {

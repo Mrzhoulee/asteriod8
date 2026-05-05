@@ -839,6 +839,89 @@
         .qa-empty { text-align:center; padding:48px 20px; color:var(--text-secondary); }
         .qa-empty-icon { font-size:40px; margin-bottom:12px; opacity:0.4; }
         .qa-empty-text { font-size:14px; font-weight:500; }
+
+        /* ============== SUBASTEROID FEED ============== */
+        #subFeed { display:flex; flex-direction:column; gap:16px; }
+        .sub-empty {
+            text-align:center; padding:48px 24px; color:var(--text-secondary);
+            background:rgba(255,255,255,0.02); border:1px dashed rgba(255,255,255,0.08);
+            border-radius:18px; font-size:14px;
+        }
+        .sub-post {
+            background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:20px; padding:18px 18px 16px; transition:border-color 0.2s, transform 0.2s;
+        }
+        @media (hover: hover) {
+            .sub-post:hover { border-color:rgba(255,127,80,0.32); transform:translateY(-1px); }
+        }
+        .sub-post-head { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+        .sub-avatar {
+            width:38px; height:38px; flex-shrink:0; border-radius:50%;
+            background:linear-gradient(135deg,#ff7f50,#e66a3a);
+            color:#0a0a0f; font-weight:800; font-size:15px;
+            display:flex; align-items:center; justify-content:center;
+            box-shadow:0 4px 14px rgba(255,127,80,0.35);
+        }
+        .sub-avatar-sm { width:28px; height:28px; font-size:12px; box-shadow:none; }
+        .sub-post-meta { flex:1; min-width:0; line-height:1.25; }
+        .sub-post-author { font-size:14px; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .sub-post-sub { display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--text-secondary); margin-top:2px; }
+        .sub-tag { font-weight:600; color:var(--primary); letter-spacing:0.02em; }
+        .sub-time { opacity:0.7; }
+        .sub-post-title { font-size:17px; font-weight:700; color:var(--text-primary); margin:4px 0 8px; line-height:1.35; }
+        .sub-post-body { font-size:14px; line-height:1.55; color:rgba(255,255,255,0.78); margin:0 0 12px; white-space:pre-wrap; word-break:break-word; }
+        .sub-post-listen {
+            display:inline-flex; align-items:center; gap:8px;
+            padding:9px 14px; background:rgba(255,127,80,0.12);
+            border:1px solid rgba(255,127,80,0.35); border-radius:12px;
+            color:var(--primary); font-size:13px; font-weight:600;
+            text-decoration:none; transition:background 0.2s, border-color 0.2s;
+            -webkit-tap-highlight-color:rgba(255,127,80,0.18); touch-action:manipulation;
+        }
+        .sub-post-listen:hover { background:rgba(255,127,80,0.22); border-color:rgba(255,127,80,0.55); }
+        .sub-post-listen .material-symbols-outlined { font-size:18px; }
+        .sub-post-comments { margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); }
+        .sub-comment-input-row { display:flex; gap:8px; align-items:center; }
+        .sub-comment-input {
+            flex:1; min-width:0;
+            background:rgba(255,255,255,0.05);
+            border:1.5px solid rgba(255,255,255,0.08);
+            border-radius:999px;
+            padding:10px 14px;
+            color:var(--text-primary);
+            font-size:14px; font-family:inherit;
+            outline:none; transition:border-color 0.2s, background 0.2s;
+        }
+        .sub-comment-input:focus { border-color:var(--primary); background:rgba(255,127,80,0.04); }
+        .sub-comment-btn {
+            flex-shrink:0; width:40px; height:40px; border-radius:50%; border:none;
+            background:linear-gradient(135deg,#ff7f50,#e66a3a); color:#0a0a0f;
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; transition:transform 0.15s, opacity 0.2s;
+            -webkit-tap-highlight-color:rgba(255,127,80,0.18); touch-action:manipulation;
+        }
+        .sub-comment-btn:hover { transform:scale(1.05); }
+        .sub-comment-btn:active { transform:scale(0.95); }
+        .sub-comment-btn .material-symbols-outlined { font-size:20px; }
+        .sub-comment-list { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+        .sub-comment { display:flex; gap:10px; align-items:flex-start; }
+        .sub-comment-body {
+            flex:1; min-width:0;
+            background:rgba(255,255,255,0.04);
+            border-radius:14px; padding:8px 12px 9px;
+        }
+        .sub-comment-meta { display:flex; align-items:baseline; gap:8px; margin-bottom:2px; }
+        .sub-comment-name { font-size:12.5px; font-weight:700; color:var(--text-primary); }
+        .sub-comment-time { font-size:10.5px; color:var(--text-secondary); opacity:0.7; }
+        .sub-comment-text { font-size:13.5px; line-height:1.5; color:rgba(255,255,255,0.82); word-break:break-word; }
+
+        @media (max-width: 640px) {
+            .sub-post { padding:14px; border-radius:16px; }
+            .sub-post-title { font-size:15.5px; }
+            .sub-post-body { font-size:13.5px; }
+            .sub-comment-input { font-size:16px; padding:11px 14px; } /* prevent iOS zoom */
+        }
     </style>
 </head>
 <body>
@@ -2420,16 +2503,6 @@ document.getElementById("subSongURL").value = "";
 };
 
 
-// Paper Plane
-window.sendPlaneToSub = function (sub, postId) {
-
-update(ref(database, "subAsteroids/" + sub + "/posts/" + postId), {
-    planes: increment(1)
-});
-
-};
-
-
 // Comment
 window.commentOnSub = async function (sub, postId) {
 
@@ -2467,6 +2540,43 @@ function _clearSubCommentListeners() {
     }
 }
 
+// Convert any stored identifier (raw email, sanitized emailKey like
+// "name_gmail_com", or already-clean nickname) into a readable display name.
+function subDisplayName(raw) {
+    let v = String(raw || "").trim();
+    if (!v) return "Anonymous";
+    // 1. Strip "@everything" if it's a real email.
+    const at = v.indexOf("@");
+    if (at > 0) v = v.slice(0, at);
+    // 2. Strip a trailing "_<domain>_<tld>" tail from sanitized emailKeys.
+    v = v.replace(/_(gmail|yahoo|outlook|hotmail|icloud|live|me|mac|protonmail|aol|msn)_(com|net|org|co|io|uk|us|de|fr|jp|ru)$/i, "");
+    return v || "Anonymous";
+}
+
+function subEsc(s) {
+    const d = document.createElement("div");
+    d.textContent = s == null ? "" : String(s);
+    return d.innerHTML;
+}
+
+function subTimeAgo(ts) {
+    if (!ts || typeof ts !== "number") return "";
+    const diff = Date.now() - ts;
+    if (diff < 60_000) return "just now";
+    const m = Math.floor(diff / 60_000);
+    if (m < 60) return m + "m ago";
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + "h ago";
+    const d = Math.floor(h / 24);
+    if (d < 7) return d + "d ago";
+    return new Date(ts).toLocaleDateString();
+}
+
+function subAvatar(name) {
+    const initial = String(name || "?").trim().charAt(0).toUpperCase() || "?";
+    return `<div class="sub-avatar">${subEsc(initial)}</div>`;
+}
+
 onValue(ref(database, "subAsteroids"), (snapshot) => {
 
 const data = snapshot.val();
@@ -2478,10 +2588,11 @@ _clearSubCommentListeners();
 feed.innerHTML = "";
 
 if (!data) {
-    feed.innerHTML = "<div class='loading'>No posts yet.</div>";
+    feed.innerHTML = '<div class="sub-empty">No posts yet — be the first to share something.</div>';
     return;
 }
 
+let postCount = 0;
 Object.keys(data).forEach(sub => {
 
     if (!data[sub].posts) return;
@@ -2493,40 +2604,50 @@ Object.keys(data).forEach(sub => {
         )
         .forEach(postId => {
 
+            postCount++;
             const post = data[sub].posts[postId];
+            const artistName = subDisplayName(post.artist);
 
-            const postDiv = document.createElement("div");
-            postDiv.className = "song-item";
+            const postDiv = document.createElement("article");
+            postDiv.className = "sub-post";
 
             postDiv.innerHTML = `
-                <div class="song-title">${post.title}</div>
-                <div class="song-plays">Sub: ${sub}</div>
-                <div class="song-plays">By: ${post.artist}</div>
-                <div style="margin:0.5rem 0;">${post.description || ""}</div>
-                <a href="${post.songURL}" target="_blank" style="color:var(--primary-color);">
-                    🎵 Listen to Song
-                </a>
-
-                <div style="margin-top:1rem;">
-                    ✈ ${post.planes || 0}
-                    <button class="btn btn-secondary"
-                        onclick="sendPlaneToSub('${sub}','${postId}')">
-                        Send Plane
-                    </button>
+                <header class="sub-post-head">
+                    ${subAvatar(artistName)}
+                    <div class="sub-post-meta">
+                        <div class="sub-post-author">${subEsc(artistName)}</div>
+                        <div class="sub-post-sub">
+                            <span class="sub-tag">/${subEsc(sub)}</span>
+                            <span class="sub-time">${subEsc(subTimeAgo(post.createdAt))}</span>
+                        </div>
+                    </div>
+                </header>
+                <h3 class="sub-post-title">${subEsc(post.title || "")}</h3>
+                ${post.description ? `<p class="sub-post-body">${subEsc(post.description)}</p>` : ""}
+                ${post.songURL ? `<a class="sub-post-listen" href="${subEsc(post.songURL)}" target="_blank" rel="noopener">
+                    <span class="material-symbols-outlined">music_note</span>
+                    <span>Listen on linked source</span>
+                </a>` : ""}
+                <div class="sub-post-comments">
+                    <div class="sub-comment-input-row">
+                        <input id="comment_${postId}" class="sub-comment-input" placeholder="Write a comment…" autocomplete="off">
+                        <button class="sub-comment-btn" type="button" onclick="commentOnSub('${sub}','${postId}')">
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
+                    </div>
+                    <div id="comments_${postId}" class="sub-comment-list"></div>
                 </div>
-
-                <div style="margin-top:1rem;">
-                    <input id="comment_${postId}" class="form-input" placeholder="Write comment">
-                    <button class="btn btn-secondary"
-                        onclick="commentOnSub('${sub}','${postId}')">
-                        Comment
-                    </button>
-                </div>
-
-                <div id="comments_${postId}" style="margin-top:0.5rem;"></div>
             `;
 
             feed.appendChild(postDiv);
+
+            // Submit comment on Enter for fast desktop input
+            const cInput = document.getElementById("comment_" + postId);
+            if (cInput) {
+                cInput.addEventListener("keydown", (ev) => {
+                    if (ev.key === "Enter") { ev.preventDefault(); window.commentOnSub(sub, postId); }
+                });
+            }
 
             // Load comments live
             const commentUnsub = onValue(
@@ -2542,10 +2663,23 @@ Object.keys(data).forEach(sub => {
 
                     if (!commentData) return;
 
-                    Object.values(commentData).forEach(c => {
-                        commentDiv.innerHTML +=
-                            `<div class="song-plays"><strong>${c.user}:</strong> ${c.text}</div>`;
-                    });
+                    Object.values(commentData)
+                        .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+                        .forEach(c => {
+                            const cName = subDisplayName(c.user);
+                            const cTime = subEsc(subTimeAgo(c.createdAt));
+                            commentDiv.innerHTML +=
+                                `<div class="sub-comment">
+                                    ${subAvatar(cName).replace('sub-avatar', 'sub-avatar sub-avatar-sm')}
+                                    <div class="sub-comment-body">
+                                        <div class="sub-comment-meta">
+                                            <span class="sub-comment-name">${subEsc(cName)}</span>
+                                            ${cTime ? `<span class="sub-comment-time">${cTime}</span>` : ""}
+                                        </div>
+                                        <div class="sub-comment-text">${subEsc(c.text || "")}</div>
+                                    </div>
+                                </div>`;
+                        });
 
                 }
             );
@@ -2554,6 +2688,10 @@ Object.keys(data).forEach(sub => {
         });
 
 });
+
+if (postCount === 0) {
+    feed.innerHTML = '<div class="sub-empty">No posts yet — be the first to share something.</div>';
+}
 
 });
 

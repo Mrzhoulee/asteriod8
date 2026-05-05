@@ -391,6 +391,24 @@
           keyVariants.add(sanitizeKeyPart(profileEmail));
           keyVariants.add(sanitizeKeyPart(profileEmail.toLowerCase()));
         }
+        // Build the set of names the profile actually identifies as. A song's
+        // song.artist must match one of these, otherwise the uploader email
+        // alone is NOT enough — uploaders sometimes upload tracks on behalf of
+        // someone else (e.g., admin uploading SwainWaves tracks under their
+        // own email). Without this guard those tracks wrongly land on the
+        // uploader's profile.
+        const nameVariants = new Set();
+        const addName = (s) => {
+          const v = String(s || '').trim().toLowerCase();
+          if (v) nameVariants.add(v);
+        };
+        if (profile) {
+          addName(profile.nickname);
+          addName(profile.profileNickname);
+          addName(profile.publicUsername);
+          addName(profile.fullName);
+          addName(profile.name);
+        }
         const matches = [];
         for (const titleKey in all) {
           for (const albumKey in all[titleKey]) {
@@ -401,8 +419,22 @@
               if (!uploaderRaw) continue;
               const uploaderKey = sanitizeKeyPart(uploaderRaw);
               const uploaderKeyLc = sanitizeKeyPart(uploaderRaw.toLowerCase());
-              if (keyVariants.has(uploaderRaw) || keyVariants.has(uploaderKey) || keyVariants.has(uploaderKeyLc)) {
-                matches.push({
+              const uploaderMatches = keyVariants.has(uploaderRaw) || keyVariants.has(uploaderKey) || keyVariants.has(uploaderKeyLc);
+              if (!uploaderMatches) continue;
+              // Second filter: song.artist must match one of the profile's display names.
+              // Skip this filter only when the profile has no name variants at all
+              // (extremely rare — empty profile). Keys/folder names like artistKeyInner
+              // also count as a match (some legacy tracks store the artist there).
+              const songArtistLc = String(s.artist || '').trim().toLowerCase();
+              const folderArtistLc = String(artistKeyInner || '').replace(/_/g, ' ').trim().toLowerCase();
+              if (nameVariants.size > 0) {
+                const artistMatches = (songArtistLc && nameVariants.has(songArtistLc))
+                  || (folderArtistLc && nameVariants.has(folderArtistLc))
+                  // Also accept partial matches where one contains the other (e.g., "Otto" vs "Otto Tan")
+                  || [...nameVariants].some(n => n && songArtistLc && (songArtistLc.includes(n) || n.includes(songArtistLc)));
+                if (!artistMatches) continue;
+              }
+              matches.push({
                   title: s.title || titleKey.replace(/_/g, ' '),
                   artist: s.artist || profile?.nickname || 'Unknown',
                   album: s.album || '',
