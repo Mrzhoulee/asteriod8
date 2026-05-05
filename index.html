@@ -7283,17 +7283,21 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               const gEmail = googleUser.email || (googleUser.providerData && googleUser.providerData[0]?.email) || "";
               const gUid = googleUser.uid || "";
               const ekKey = userKey || localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
+              // Set local flags first — they're what gates UI. The DB write fires
+              // in background via REST so a stalled WebSocket can't block sign-in.
+              localStorage.setItem("_googleLinked", "1");
+              localStorage.setItem("_googleEmail", gEmail);
               if (ekKey) {
-                try {
-                  await set(ref2(database, "GOOGLE_LINKED/" + ekKey), {
+                fetch("https://asteroid-cdc13-default-rtdb.firebaseio.com/GOOGLE_LINKED/" + encodeURIComponent(ekKey) + ".json", {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
                     googleEmail: gEmail,
                     googleUid: gUid,
                     linkedAt: Date.now(),
-                  });
-                } catch (e) { console.warn("[google-link] RTDB write failed:", e); }
+                  })
+                }).catch((e) => console.warn("[google-link] REST PUT:", e));
               }
-              localStorage.setItem("_googleLinked", "1");
-              localStorage.setItem("_googleEmail", gEmail);
             }
 
             if (isCapacitorNative()) {
@@ -7331,6 +7335,25 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             }
           };
 
+          // REST PATCH helper — bypasses the SDK WebSocket so the role switch
+          // doesn't hang waiting for a stalled realtime connection.
+          async function _restPatchProfileRole(key) {
+            const url = "https://asteroid-cdc13-default-rtdb.firebaseio.com/PROFILES/" + encodeURIComponent(key) + ".json";
+            const r = await fetch(url, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                profileType: "artist",
+                profileVisibility: "public",
+                publicProfile: true,
+                hideEmail: false,
+                role: "Artist",
+                profileRole: "Artist",
+              })
+            });
+            if (!r.ok) throw new Error("PATCH PROFILES HTTP " + r.status);
+          }
+
           window._switchToArtist = async function() {
             const statusEl = document.getElementById("roleSwitchStatus");
             const btn = document.getElementById("switchToArtistBtn");
@@ -7345,27 +7368,24 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             try {
               try { sessionStorage.setItem("_switchToArtistPending", "1"); } catch (_) {}
               await window._signInWithGoogleForArtist(key);
-              // Popup succeeded — clear the flag and update PROFILES role
+              // Popup succeeded — clear the flag.
               try { sessionStorage.removeItem("_switchToArtistPending"); } catch (_) {}
-              await update(ref2(database, "PROFILES/" + key), {
-                profileType: "artist",
-                profileVisibility: "public",
-                publicProfile: true,
-                hideEmail: false,
-                role: "Artist",
-                profileRole: "Artist",
-              });
+
+              // OPEN THE FORM IMMEDIATELY — don't make the user wait for the DB write.
+              // The PROFILES role write fires in the background. If it fails, the
+              // user can retry (the role flip on submit will overwrite anyway).
               localStorage.setItem("profileType", "artist");
               const aBtn = document.getElementById("switchToArtistBtn");
               const lBtn = document.getElementById("switchToListenerBtn");
               if (aBtn) aBtn.style.display = "none";
               if (lBtn) lBtn.style.display = "";
-              // Close the logout modal and open the profile form so they can fill in artist info
               closeLogoutModal();
               if (typeof openAppleOnboardingModal === "function") {
                 localStorage.removeItem("appleOnboardingDone");
                 openAppleOnboardingModal();
               }
+              // Fire the role write in the background via REST (resilient to WS stalls).
+              _restPatchProfileRole(key).catch((err) => console.warn("[switchToArtist] PATCH role:", err));
             } catch (e) {
               if (e && e.message === "redirect") return; // flow continues after redirect
               if (statusEl) { statusEl.style.color = "#ff6b6b"; statusEl.textContent = e.message || "Google sign-in failed."; }
@@ -8330,33 +8350,40 @@ document.getElementById("user-profile-button")?.addEventListener("click", () => 
                   sessionStorage.removeItem("_googleArtistRedirectPending");
                   const gEmail = result.user.email || "";
                   const ekKey = localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
+                  // Set locally first; fire REST PUT in background so we don't block on a stalled WS.
+                  localStorage.setItem("_googleLinked", "1");
+                  localStorage.setItem("_googleEmail", gEmail);
                   if (ekKey) {
-                    try {
-                      await set(ref2(database, "GOOGLE_LINKED/" + ekKey), {
+                    fetch("https://asteroid-cdc13-default-rtdb.firebaseio.com/GOOGLE_LINKED/" + encodeURIComponent(ekKey) + ".json", {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
                         googleEmail: gEmail,
                         googleUid: result.user.uid || "",
                         linkedAt: Date.now(),
-                      });
-                    } catch (e) { console.warn("[google-link] RTDB write:", e); }
+                      })
+                    }).catch((e) => console.warn("[google-link] REST PUT:", e));
                   }
-                  localStorage.setItem("_googleLinked", "1");
-                  localStorage.setItem("_googleEmail", gEmail);
                   // Role switch via redirect: update PROFILES to Artist
                   if (sessionStorage.getItem("_switchToArtistPending") === "1") {
                     sessionStorage.removeItem("_switchToArtistPending");
+                    // Flip local state + open the onboarding form FIRST so the user
+                    // sees the form immediately on resume. The DB write fires in
+                    // the background via REST so it can't block the UI.
+                    localStorage.setItem("profileType", "artist");
+                    localStorage.removeItem("appleOnboardingDone");
+                    if (typeof window.openAppleOnboardingModal === "function") window.openAppleOnboardingModal();
                     if (ekKey) {
-                      try {
-                        await update(ref2(database, "PROFILES/" + ekKey), {
+                      fetch("https://asteroid-cdc13-default-rtdb.firebaseio.com/PROFILES/" + encodeURIComponent(ekKey) + ".json", {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
                           profileType: "artist", profileVisibility: "public",
                           publicProfile: true, hideEmail: false,
                           role: "Artist", profileRole: "Artist",
-                        });
-                        localStorage.setItem("profileType", "artist");
-                        localStorage.removeItem("appleOnboardingDone");
-                      } catch (rErr) { console.warn("[google-link] role switch update:", rErr); }
+                        })
+                      }).catch((rErr) => console.warn("[google-link] REST role switch:", rErr));
                     }
-                    // Open onboarding form so they can fill in artist profile info
-                    if (typeof window.openAppleOnboardingModal === "function") window.openAppleOnboardingModal();
                     return;
                   }
                   // Resume pending artist profile if saved
