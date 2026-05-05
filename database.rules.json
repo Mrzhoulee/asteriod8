@@ -134,6 +134,16 @@
         }
       }
     },
+    "ARTIST_STORIES": {
+      "$artistKey": {
+        ".read": true,
+        ".write": true,
+        ".indexOn": "createdAt",
+        "$storyId": {
+          ".validate": "newData.hasChildren(['text','createdAt','expiresAt','ownerKey']) && newData.child('text').isString() && newData.child('text').val().length <= 280 && newData.child('createdAt').isNumber() && newData.child('expiresAt').isNumber() && newData.child('ownerKey').isString() && newData.child('ownerKey').val() == $artistKey && (!newData.hasChild('bg') || (newData.child('bg').isString() && newData.child('bg').val().length <= 200)) && (!newData.hasChild('textColor') || (newData.child('textColor').isString() && newData.child('textColor').val().length <= 32)) && (!newData.hasChild('fontStack') || (newData.child('fontStack').isString() && newData.child('fontStack').val().length <= 200)) && (!newData.hasChild('sticker') || (newData.child('sticker').isString() && newData.child('sticker').val().length <= 16)) && (!newData.hasChild('artistName') || (newData.child('artistName').isString() && newData.child('artistName').val().length <= 120)) && (!newData.hasChild('bgId') || (newData.child('bgId').isString() && newData.child('bgId').val().length <= 32))"
+        }
+      }
+    },
     "USERNAME_REGISTRY": {
       ".read": true,
       "$uname": {

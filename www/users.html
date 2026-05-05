@@ -192,6 +192,80 @@
     .mobile-nav-item.mobile-nav-active,
     .mobile-nav-item:hover { color: var(--coral); }
     .mobile-nav-item.mobile-nav-active { background: rgba(255,127,80,0.1); }
+
+    /* ============== STORY RING + VIEWER ============== */
+    .user-avatar { position: relative; transition: box-shadow 0.2s; }
+    .user-avatar.has-story-ring {
+      box-shadow: 0 0 0 3px var(--bg, #0a0a0f), 0 0 0 6px #ff7f50;
+      cursor: pointer;
+    }
+    .user-avatar.has-story-ring::after {
+      content: ''; position: absolute; inset: -6px; border-radius: 50%;
+      background: conic-gradient(from 0deg, #ff7f50, #ff4e2a, #ff7f50);
+      z-index: -1; opacity: 0.4; filter: blur(6px);
+    }
+
+    .story-viewer {
+      position: fixed; inset: 0; z-index: 99998; background: rgba(0,0,0,0.94);
+      display: none; align-items: center; justify-content: center; padding: 0;
+      opacity: 0; transition: opacity 0.2s;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    }
+    .story-viewer.open { display: flex; opacity: 1; }
+    .story-viewer-card {
+      width: 100%; max-width: 420px; aspect-ratio: 9/14;
+      overflow: hidden; position: relative;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    }
+    @media (min-width: 520px) { .story-viewer-card { border-radius: 24px; max-height: 90vh; } }
+    .story-viewer-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 36px; text-align: center; }
+    .story-viewer-text { font-size: 26px; font-weight: 700; line-height: 1.4; word-break: break-word; }
+    .story-viewer-sticker { position: absolute; bottom: 28px; right: 28px; font-size: 64px; opacity: 0.95; transform: rotate(-8deg); }
+    .story-viewer-meta {
+      position: absolute; top: 24px; left: 18px; right: 60px; z-index: 3;
+      display: flex; align-items: center; gap: 10px; color: #fff;
+    }
+    .story-viewer-meta-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, #ff7f50, #e66a3a); color: #0a0a0f;
+      font-weight: 800; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid #fff; flex-shrink: 0; overflow: hidden;
+    }
+    .story-viewer-meta-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .story-viewer-meta-name { font-weight: 700; font-size: 14px; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+    .story-viewer-meta-time { font-size: 11px; opacity: 0.75; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+    .story-viewer-progress {
+      position: absolute; top: 12px; left: 14px; right: 14px; z-index: 3;
+      display: flex; gap: 4px;
+    }
+    .story-viewer-progress-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
+    .story-viewer-progress-bar.done { background: rgba(255,255,255,0.85); }
+    .story-viewer-progress-bar.current { position: relative; }
+    .story-viewer-progress-bar.current::after {
+      content: ''; display: block; width: 0%; height: 100%; background: #fff;
+      animation: storyTickUsers 6s linear forwards;
+    }
+    @keyframes storyTickUsers { from { width: 0%; } to { width: 100%; } }
+    .story-viewer-close {
+      position: absolute; top: 14px; right: 14px; z-index: 4;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,0.5); border: none; color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+      -webkit-tap-highlight-color: rgba(255,255,255,0.18);
+    }
+    .story-viewer-nav {
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(0,0,0,0.5); border: none; color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: rgba(255,255,255,0.18); touch-action: manipulation;
+    }
+    .story-viewer-nav.prev { left: max(12px, env(safe-area-inset-left)); }
+    .story-viewer-nav.next { right: max(12px, env(safe-area-inset-right)); }
+    .story-viewer-nav:disabled { opacity: 0.25; cursor: default; }
+    .story-viewer-nav .material-symbols-outlined { font-size: 24px; }
+    .story-viewer-empty { color: #fff; text-align: center; padding: 32px; font-size: 14px; opacity: 0.85; }
   </style>
 </head>
 <body>
@@ -356,8 +430,8 @@
         const role = u.role;
         const initial = name.trim().charAt(0).toUpperCase() || 'U';
         const avatarHtml = u.avatar
-          ? `<div class="user-avatar"><img src="${escHtml(u.avatar)}" alt=""></div>`
-          : `<div class="user-avatar">${escHtml(initial)}</div>`;
+          ? `<div class="user-avatar" data-avatar-key="${escHtml(u.key || '')}"><img src="${escHtml(u.avatar)}" alt=""></div>`
+          : `<div class="user-avatar" data-avatar-key="${escHtml(u.key || '')}">${escHtml(initial)}</div>`;
         const bio = u.bio
           ? `<div class="user-bio">${escHtml(u.bio)}</div>`
           : '';
@@ -370,8 +444,49 @@
           </div>`;
       }).join('');
       gridEl.querySelectorAll('.user-card').forEach(c => {
-        c.addEventListener('click', () => openModal(list[Number(c.dataset.idx)]));
+        c.addEventListener('click', (ev) => {
+          // If the user clicked the avatar AND the avatar has the story ring,
+          // open the story viewer instead of the profile modal.
+          const av = ev.target.closest('.user-avatar');
+          if (av && av.classList.contains('has-story-ring')) {
+            ev.stopPropagation();
+            const k = av.dataset.avatarKey;
+            const u = list[Number(c.dataset.idx)];
+            if (k && window.openStoryViewer) {
+              window.openStoryViewer(k, u && u.name);
+              return;
+            }
+          }
+          openModal(list[Number(c.dataset.idx)]);
+        });
       });
+      // Asynchronously decorate avatars whose owners have active stories.
+      decorateAvatarsWithStoryRings(list);
+    }
+
+    // Fetch ARTIST_STORIES once via REST and add coral ring to active artists.
+    async function decorateAvatarsWithStoryRings(list) {
+      try {
+        const data = await restGet('ARTIST_STORIES').catch(() => null);
+        if (!data || typeof data !== 'object') return;
+        const now = Date.now();
+        const activeKeys = new Set();
+        Object.entries(data).forEach(([artistKey, stories]) => {
+          if (!stories || typeof stories !== 'object') return;
+          for (const sid in stories) {
+            const s = stories[sid];
+            if (s && typeof s === 'object' && Number(s.expiresAt) > now) {
+              activeKeys.add(artistKey);
+              break;
+            }
+          }
+        });
+        if (!activeKeys.size) return;
+        gridEl.querySelectorAll('.user-avatar[data-avatar-key]').forEach(av => {
+          const k = av.dataset.avatarKey;
+          if (k && activeKeys.has(k)) av.classList.add('has-story-ring');
+        });
+      } catch (e) { console.warn('[stories] decorate:', e); }
     }
 
     async function loadArtistSongs(artistKey, profile) {
@@ -709,6 +824,188 @@
     }
     loadUsers();
   </script>
+  <!-- Story viewer overlay (lazy-populated by openStoryViewer) -->
+  <div id="storyViewer" class="story-viewer" aria-hidden="true">
+    <button class="story-viewer-nav prev" id="storyViewerPrev" type="button" aria-label="Previous">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </button>
+    <div class="story-viewer-card" id="storyViewerCard">
+      <div class="story-viewer-progress" id="storyViewerProgress"></div>
+      <div class="story-viewer-meta" id="storyViewerMeta"></div>
+      <button class="story-viewer-close" id="storyViewerClose" type="button" aria-label="Close">×</button>
+      <div class="story-viewer-content" id="storyViewerContent"></div>
+    </div>
+    <button class="story-viewer-nav next" id="storyViewerNext" type="button" aria-label="Next">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+  </div>
+  <script>
+    (function () {
+      const STORY_RTDB = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+      const TICK_MS = 6000;
+      let _stories = [];     // [{id, ...}]
+      let _idx = 0;
+      let _artistKey = '';
+      let _artistName = '';
+      let _artistAvatar = '';
+      let _tickTimer = null;
+
+      function el(id) { return document.getElementById(id); }
+      function escH(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+      function timeAgo(ts) {
+        if (!ts) return '';
+        const diff = Date.now() - ts;
+        if (diff < 60_000) return 'just now';
+        const m = Math.floor(diff / 60_000);
+        if (m < 60) return m + 'm ago';
+        const h = Math.floor(m / 60);
+        if (h < 24) return h + 'h ago';
+        const d = Math.floor(h / 24);
+        return d + 'd ago';
+      }
+
+      function clearTick() { if (_tickTimer) { clearTimeout(_tickTimer); _tickTimer = null; } }
+
+      function renderProgress() {
+        const wrap = el('storyViewerProgress');
+        if (!wrap) return;
+        wrap.innerHTML = _stories.map((_, i) => {
+          let cls = '';
+          if (i < _idx) cls = 'done';
+          else if (i === _idx) cls = 'current';
+          return `<div class="story-viewer-progress-bar ${cls}"></div>`;
+        }).join('');
+      }
+
+      function renderMeta() {
+        const meta = el('storyViewerMeta');
+        if (!meta) return;
+        const initial = (_artistName || '?').trim().charAt(0).toUpperCase() || '?';
+        const inner = _artistAvatar
+          ? `<img src="${escH(_artistAvatar)}" alt="">`
+          : escH(initial);
+        const cur = _stories[_idx];
+        meta.innerHTML = `
+          <div class="story-viewer-meta-avatar">${inner}</div>
+          <div>
+            <div class="story-viewer-meta-name">${escH(_artistName || cur?.artistName || 'Artist')}</div>
+            <div class="story-viewer-meta-time">${escH(timeAgo(cur?.createdAt))}</div>
+          </div>
+        `;
+      }
+
+      function renderCurrent() {
+        const card = el('storyViewerCard');
+        const content = el('storyViewerContent');
+        if (!card || !content) return;
+        const s = _stories[_idx];
+        if (!s) {
+          content.innerHTML = '<div class="story-viewer-empty">No active stories.</div>';
+          card.style.background = '#1a1a22';
+          return;
+        }
+        card.style.background = s.bg || '#1a1a22';
+        const stickerHtml = s.sticker ? `<div class="story-viewer-sticker">${escH(s.sticker)}</div>` : '';
+        content.innerHTML = `<div class="story-viewer-text" style="color:${escH(s.textColor || '#fff')}; font-family:${escH(s.fontStack || 'inherit')}">${escH(s.text || '')}</div>${stickerHtml}`;
+        renderProgress();
+        renderMeta();
+        // Update prev/next disabled state
+        const prev = el('storyViewerPrev'); const next = el('storyViewerNext');
+        if (prev) prev.disabled = (_idx <= 0);
+        if (next) next.disabled = (_idx >= _stories.length - 1);
+        // Auto-advance
+        clearTick();
+        _tickTimer = setTimeout(() => goNext(true), TICK_MS);
+      }
+
+      function goNext(autoCloseAtEnd) {
+        if (_idx < _stories.length - 1) { _idx++; renderCurrent(); }
+        else if (autoCloseAtEnd) closeViewer();
+      }
+      function goPrev() {
+        if (_idx > 0) { _idx--; renderCurrent(); }
+      }
+
+      function closeViewer() {
+        clearTick();
+        const v = el('storyViewer');
+        if (v) { v.classList.remove('open'); v.setAttribute('aria-hidden', 'true'); }
+        _stories = []; _idx = 0;
+      }
+
+      async function openStoryViewer(artistKey, artistName, artistAvatar) {
+        _artistKey = artistKey || '';
+        _artistName = artistName || 'Artist';
+        _artistAvatar = artistAvatar || '';
+        const v = el('storyViewer');
+        if (!v) return;
+        v.classList.add('open');
+        v.setAttribute('aria-hidden', 'false');
+        const content = el('storyViewerContent');
+        if (content) content.innerHTML = '<div class="story-viewer-empty">Loading…</div>';
+        try {
+          const r = await fetch(STORY_RTDB + '/ARTIST_STORIES/' + encodeURIComponent(artistKey) + '.json', { cache: 'no-store' });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const data = await r.json();
+          const now = Date.now();
+          _stories = [];
+          if (data && typeof data === 'object') {
+            Object.entries(data).forEach(([id, s]) => {
+              if (!s || !s.expiresAt || s.expiresAt < now) return;
+              _stories.push({ id, ...s });
+            });
+            _stories.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+          }
+          if (!_stories.length) {
+            if (content) content.innerHTML = '<div class="story-viewer-empty">This artist has no active stories.</div>';
+            return;
+          }
+          _idx = 0;
+          renderCurrent();
+        } catch (e) {
+          console.warn('[stories] viewer fetch:', e);
+          if (content) content.innerHTML = '<div class="story-viewer-empty">Could not load stories.</div>';
+        }
+      }
+
+      window.openStoryViewer = openStoryViewer;
+      window.closeStoryViewer = closeViewer;
+
+      // Wire viewer controls
+      el('storyViewerPrev')?.addEventListener('click', (ev) => { ev.stopPropagation(); goPrev(); });
+      el('storyViewerNext')?.addEventListener('click', (ev) => { ev.stopPropagation(); goNext(false); });
+      el('storyViewerClose')?.addEventListener('click', closeViewer);
+      el('storyViewer')?.addEventListener('click', (ev) => {
+        // Tap on the dark backdrop closes; tap on the card itself advances.
+        if (ev.target.id === 'storyViewer') { closeViewer(); return; }
+        if (ev.target.closest('.story-viewer-card') && !ev.target.closest('.story-viewer-nav') && !ev.target.closest('.story-viewer-close')) {
+          // Tap on left half = prev, right half = next
+          const card = el('storyViewerCard');
+          if (!card) return;
+          const rect = card.getBoundingClientRect();
+          const x = (ev.clientX != null ? ev.clientX : (ev.touches && ev.touches[0]?.clientX) || 0) - rect.left;
+          if (x < rect.width / 2) goPrev(); else goNext(true);
+        }
+      });
+      // Keyboard
+      window.addEventListener('keydown', (ev) => {
+        const v = el('storyViewer');
+        if (!v || !v.classList.contains('open')) return;
+        if (ev.key === 'ArrowLeft') goPrev();
+        else if (ev.key === 'ArrowRight') goNext(false);
+        else if (ev.key === 'Escape') closeViewer();
+      });
+      // Touch swipe
+      let _touchStartX = 0;
+      el('storyViewer')?.addEventListener('touchstart', (ev) => { _touchStartX = ev.touches[0].clientX; }, { passive: true });
+      el('storyViewer')?.addEventListener('touchend', (ev) => {
+        const dx = (ev.changedTouches?.[0]?.clientX || 0) - _touchStartX;
+        if (Math.abs(dx) < 40) return;
+        if (dx > 0) goPrev(); else goNext(false);
+      });
+    })();
+  </script>
+
   <script src="js/miniplayer.js" defer></script>
 </body>
 </html>
