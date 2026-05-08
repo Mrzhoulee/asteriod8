@@ -10254,34 +10254,62 @@ console.log('1171')
   }
 
   /* ─── Rocks / Asteroids ─── */
-  function mkVerts(sides, roughness) {
+  /* Build an organic asteroid silhouette using two sine-frequency layers
+     so the outline has large lumps AND small bumps — no straight polygon edges */
+  function mkAsteroidVerts(numV, amp1, amp2, freq1, freq2, ph1, ph2) {
     const v = [];
-    for (let i = 0; i < sides; i++) {
-      const a = (i / sides) * Math.PI * 2;
-      const jitter = 1 - roughness * 0.5 + Math.random() * roughness;
-      v.push([Math.cos(a) * jitter, Math.sin(a) * jitter]);
+    for (let i = 0; i < numV; i++) {
+      const a = (i / numV) * Math.PI * 2;
+      const r = 1.0
+        + amp1 * Math.sin(a * freq1 + ph1)
+        + amp2 * Math.sin(a * freq2 + ph2)
+        + (Math.random() - 0.5) * 0.04;   // tiny micro-jitter
+      v.push([Math.cos(a) * Math.max(0.35, r), Math.sin(a) * Math.max(0.35, r)]);
     }
     return v;
   }
+
   function buildRocks() {
     rocks.length = 0;
     const mob = W < 768;
-    const count = mob ? 14 : 26;
+    const count = mob ? 12 : 22;
     for (let i = 0; i < count; i++) {
-      const size  = 5 + Math.random() * (mob ? 18 : 30);
+      const size  = 7 + Math.random() * (mob ? 20 : 34);
       const layer = Math.floor(Math.random() * 4);
-      const hue   = 20 + Math.floor(Math.random() * 30);
+      /* real asteroids: near-black charcoal with a faint warm/cool tint */
+      const hue = Math.random() > 0.5 ? 25 + Math.random() * 20   /* warm rocky */
+                                      : 200 + Math.random() * 40;  /* cool stony */
+      const sat = 4  + Math.random() * 6;
+      const baseLit = 10 + Math.random() * 8;   /* 10-18 % lightness — very dark */
+
+      /* organic silhouette: 18-26 verts, two-frequency bumps */
+      const numV  = 18 + Math.floor(Math.random() * 8);
+      const amp1  = 0.12 + Math.random() * 0.18;   /* large-scale lumps  */
+      const amp2  = 0.04 + Math.random() * 0.08;   /* small-scale bumps  */
+      const freq1 = 2   + Math.floor(Math.random() * 3);
+      const freq2 = 5   + Math.floor(Math.random() * 4);
+      const verts = mkAsteroidVerts(numV, amp1, amp2, freq1, freq2,
+                                    Math.random() * Math.PI * 2,
+                                    Math.random() * Math.PI * 2);
+
+      /* craters — only on larger rocks, placed randomly inside shape */
+      const numCraters = size > 12 ? 2 + Math.floor(Math.random() * 3) : 1;
+      const craters = [];
+      for (let c = 0; c < numCraters; c++) {
+        const ca = Math.random() * Math.PI * 2;
+        const cd = 0.10 + Math.random() * 0.36;
+        const cr = 0.07 + Math.random() * 0.14;
+        craters.push({ ox: Math.cos(ca) * cd, oy: Math.sin(ca) * cd, r: cr });
+      }
+
       rocks.push({
         x: Math.random() * W,
         y: Math.random() * H * 2.5,
-        size, layer,
+        size, layer, hue, sat, baseLit, verts, craters,
         angle:    Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.007,
-        driftX:   (Math.random() - 0.5) * 0.14,
-        driftY:   (Math.random() - 0.5) * 0.07,
-        verts:    mkVerts(7 + Math.floor(Math.random() * 4), 0.38),
-        darkCol:  `hsl(${hue},10%,${16+Math.floor(Math.random()*14)}%)`,
-        litCol:   `hsl(${hue},13%,${34+Math.floor(Math.random()*18)}%)`,
+        rotSpeed: (Math.random() - 0.5) * 0.006,
+        driftX:   (Math.random() - 0.5) * 0.13,
+        driftY:   (Math.random() - 0.5) * 0.06,
       });
     }
   }
@@ -10642,37 +10670,121 @@ console.log('1171')
     }
   }
 
-  function drawRocks(t) {
+  /* Draw the asteroid silhouette path using quadratic bezier midpoints
+     so the outline is smooth + organic rather than a sharp polygon */
+  function traceAsteroid(v, size) {
+    CX.beginPath();
+    for (let i = 0; i < v.length; i++) {
+      const cur  = v[i];
+      const next = v[(i + 1) % v.length];
+      const mx   = (cur[0] + next[0]) * 0.5 * size;
+      const my   = (cur[1] + next[1]) * 0.5 * size;
+      if (i === 0) CX.moveTo(mx, my);
+      CX.quadraticCurveTo(cur[0] * size, cur[1] * size, mx, my);
+    }
+    CX.closePath();
+  }
+
+  function drawRocks() {
     const totalH = H * 2.5;
-    CX.save();
     for (const rk of rocks) {
-      rk.angle  += rk.rotSpeed;
-      rk.x = ((rk.x + rk.driftX + W) % W);
-      rk.y = ((rk.y + rk.driftY + totalH) % totalH);
+      rk.angle += rk.rotSpeed;
+      rk.x = ((rk.x + rk.driftX + W)      % W)      ;
+      rk.y = ((rk.y + rk.driftY + totalH)  % totalH) ;
       const dy = -(scrollY * PAR[rk.layer]);
       const sy = ((rk.y + dy) % totalH + totalH) % totalH;
-      if (sy > H + rk.size * 2 || sy < -rk.size * 2) continue;
+      if (sy > H + rk.size * 2.5 || sy < -rk.size * 2.5) continue;
 
+      const S = rk.size;
       CX.save();
       CX.translate(rk.x, sy);
       CX.rotate(rk.angle);
-      /* rock body */
-      CX.beginPath();
-      const v = rk.verts;
-      CX.moveTo(v[0][0] * rk.size, v[0][1] * rk.size);
-      for (let i = 1; i < v.length; i++) CX.lineTo(v[i][0] * rk.size, v[i][1] * rk.size);
-      CX.closePath();
-      const rg = CX.createRadialGradient(-rk.size*0.28, -rk.size*0.28, 0, 0, 0, rk.size);
-      rg.addColorStop(0, rk.litCol); rg.addColorStop(1, rk.darkCol);
-      CX.fillStyle = rg; CX.fill();
-      /* subtle rim light */
-      CX.strokeStyle = 'rgba(180,160,140,0.18)';
-      CX.lineWidth   = 0.7;
+
+      /* ── 1. Clip everything to the organic silhouette ── */
+      traceAsteroid(rk.verts, S);
+      CX.save();
+      CX.clip();
+
+      /* ── 2. Flat dark base fill ── */
+      CX.fillStyle = `hsl(${rk.hue},${rk.sat}%,${rk.baseLit}%)`;
+      CX.fillRect(-S * 1.6, -S * 1.6, S * 3.2, S * 3.2);
+
+      /* ── 3. Diffuse lit side — directional light from upper-left ── */
+      const litG = CX.createRadialGradient(
+        -S * 0.38, -S * 0.38, 0,
+         S * 0.05,  S * 0.05, S * 1.45);
+      litG.addColorStop(0,    `hsl(${rk.hue},${rk.sat+4}%,${rk.baseLit + 26}%)`);
+      litG.addColorStop(0.30, `hsl(${rk.hue},${rk.sat+2}%,${rk.baseLit + 14}%)`);
+      litG.addColorStop(0.65, `hsl(${rk.hue},${rk.sat}%,  ${rk.baseLit +  4}%)`);
+      litG.addColorStop(1,    'rgba(0,0,0,0)');
+      CX.fillStyle = litG;
+      CX.fillRect(-S * 1.6, -S * 1.6, S * 3.2, S * 3.2);
+
+      /* ── 4. Shadow — deep darkness on lower-right ── */
+      const shG = CX.createRadialGradient(
+        S * 0.42, S * 0.22, 0,
+        S * 0.12, S * 0.06, S * 1.22);
+      shG.addColorStop(0,    'rgba(0,0,0,0.92)');
+      shG.addColorStop(0.22, 'rgba(0,0,0,0.72)');
+      shG.addColorStop(0.52, 'rgba(0,0,0,0.28)');
+      shG.addColorStop(0.80, 'rgba(0,0,0,0.05)');
+      shG.addColorStop(1,    'rgba(0,0,0,0)');
+      CX.fillStyle = shG;
+      CX.fillRect(-S * 1.6, -S * 1.6, S * 3.2, S * 3.2);
+
+      /* ── 5. Surface colour variation patches ── */
+      for (let p = 0; p < 4; p++) {
+        const px = Math.sin(p * 2.19 + rk.hue * 0.08) * S * 0.38;
+        const py = Math.cos(p * 1.73 + rk.sat * 0.12) * S * 0.32;
+        const pr = (0.14 + p * 0.07) * S;
+        const pG = CX.createRadialGradient(px, py, 0, px, py, pr);
+        const dl = p % 2 === 0 ? -5 : 3;
+        pG.addColorStop(0, `hsla(${rk.hue},${rk.sat}%,${rk.baseLit + dl}%,0.35)`);
+        pG.addColorStop(1, 'rgba(0,0,0,0)');
+        CX.fillStyle = pG;
+        CX.fillRect(-S * 1.6, -S * 1.6, S * 3.2, S * 3.2);
+      }
+
+      /* ── 6. Craters ── */
+      for (const cr of rk.craters) {
+        const dist = Math.sqrt(cr.ox * cr.ox + cr.oy * cr.oy);
+        if (dist + cr.r > 0.82) continue;   /* skip craters near the edge */
+        const cx2 = cr.ox * S, cy2 = cr.oy * S, cr2 = cr.r * S;
+
+        /* dark bowl */
+        const cG = CX.createRadialGradient(cx2, cy2, 0, cx2, cy2, cr2);
+        cG.addColorStop(0,    'rgba(0,0,0,0.80)');
+        cG.addColorStop(0.55, 'rgba(0,0,0,0.40)');
+        cG.addColorStop(0.85, 'rgba(0,0,0,0.10)');
+        cG.addColorStop(1,    'rgba(0,0,0,0)');
+        CX.fillStyle = cG;
+        CX.beginPath(); CX.arc(cx2, cy2, cr2, 0, Math.PI * 2); CX.fill();
+
+        /* lit rim arc (upper-left catches the light) */
+        CX.save();
+        CX.strokeStyle = `hsl(${rk.hue},${rk.sat+4}%,${rk.baseLit + 20}%)`;
+        CX.globalAlpha = 0.38;
+        CX.lineWidth   = cr2 * 0.20;
+        CX.lineCap     = 'round';
+        CX.beginPath();
+        CX.arc(cx2 - cr2 * 0.08, cy2 - cr2 * 0.08,
+               cr2 * 0.84, Math.PI * 1.05, Math.PI * 2.05);
+        CX.stroke();
+        CX.restore();
+      }
+
+      CX.restore(); /* end clip */
+
+      /* ── 7. Thin ambient rim on the shadow edge ── */
+      traceAsteroid(rk.verts, S);
+      CX.strokeStyle = `hsl(${rk.hue},${rk.sat}%,${rk.baseLit + 10}%)`;
+      CX.globalAlpha = 0.18;
+      CX.lineWidth   = S * 0.055;
       CX.stroke();
+      CX.globalAlpha = 1;
+
       CX.restore();
     }
-    CX.globalAlpha = 1;
-    CX.restore();
   }
 
   function drawComets(t) {
