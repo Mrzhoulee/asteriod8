@@ -200,6 +200,22 @@
         }
       }
     },
+    "FEATURE_REQUESTS": {
+      ".read": true,
+      "$rid": {
+        ".write": "!data.exists()",
+        ".validate": "newData.hasChildren(['title','createdAt']) && newData.child('title').isString() && newData.child('title').val().length >= 3 && newData.child('title').val().length <= 200 && newData.child('createdAt').isNumber() && (!newData.hasChild('description') || (newData.child('description').isString() && newData.child('description').val().length <= 800)) && (!newData.hasChild('category') || (newData.child('category').isString() && newData.child('category').val().length <= 32)) && (!newData.hasChild('authorName') || (newData.child('authorName').isString() && newData.child('authorName').val().length <= 120)) && (!newData.hasChild('authorKey') || (newData.child('authorKey').isString() && newData.child('authorKey').val().length <= 200))"
+      }
+    },
+    "FEATURE_VOTES": {
+      "$rid": {
+        ".read": true,
+        "$voterKey": {
+          ".write": true,
+          ".validate": "newData.isBoolean()"
+        }
+      }
+    },
     "CONTENT_REPORTS": {
       "$reportId": {
         ".read": false,
