@@ -10154,8 +10154,7 @@ console.log('1171')
 <script src="js/miniplayer.js" defer></script>
 
 <!-- ═══════════════════════════════════════════════════════════
-     SPACE BACKGROUND — stars, nebulae, planets, asteroids, comets
-     Fixed canvas, z-index -1, full parallax on scroll
+     SPACE BACKGROUND v2 — physically-based planets, stars, comets
      ═══════════════════════════════════════════════════════════ -->
 <script>
 (function () {
@@ -10168,7 +10167,7 @@ console.log('1171')
   let W = 0, H = 0, DPR = 1;
   let scrollY = 0;
   let time = 0;
-  let nextComet = 4000;
+  let nextComet = 5000;
   const comets = [];
 
   /* ─── parallax depth per layer (0=far … 3=near) ─── */
@@ -10220,16 +10219,14 @@ console.log('1171')
   /* ─── Nebulae ─── */
   function buildNebulae() {
     nebulae.length = 0;
+    /* Very dark, barely-visible wisps */
     const defs = [
-      { cx:0.78, cy:0.20, rx:W*0.48, ry:H*0.40, r:120, g:55,  b:240, op:0.060 },
-      { cx:0.12, cy:0.62, rx:W*0.42, ry:H*0.35, r: 30, g:80,  b:220, op:0.048 },
-      { cx:0.50, cy:0.88, rx:W*0.55, ry:H*0.38, r:220, g:50,  b:140, op:0.038 },
-      { cx:0.25, cy:0.12, rx:W*0.30, ry:H*0.25, r: 60, g:160, b:255, op:0.030 },
+      { cx:0.78, cy:0.20, rx:W*0.50, ry:H*0.42, r:130, R:100, G:45,  B:230, op:0.032 },
+      { cx:0.12, cy:0.60, rx:W*0.44, ry:H*0.36, r:120, R: 22, G:60,  B:200, op:0.026 },
+      { cx:0.50, cy:0.90, rx:W*0.55, ry:H*0.38, r:130, R:200, G:40,  B:120, op:0.020 },
+      { cx:0.26, cy:0.10, rx:W*0.32, ry:H*0.26, r:110, R: 45, G:140, B:255, op:0.018 },
     ];
-    defs.forEach(d => nebulae.push({
-      x: d.cx * W, y: d.cy * H, rx: d.rx, ry: d.ry,
-      r: d.r, g: d.g, b: d.b, op: d.op,
-    }));
+    defs.forEach(d => nebulae.push({ x: d.cx*W, y: d.cy*H, rx: d.rx, ry: d.ry, r: d.r, R: d.R, G: d.G, B: d.B, op: d.op }));
   }
 
   /* ─── Planets ─── */
@@ -10237,27 +10234,21 @@ console.log('1171')
     planets.length = 0;
     const mob = W < 768;
     planets.push(
-      /* ── Saturn-like ringed gas giant ── */
-      { x: W*0.84, y: H*0.26, r: mob?52:96,
-        type:'saturn',
-        bands:['#d4954a','#c87830','#e0a860','#b86820','#d89050','#c07838'],
-        atmColor:[255,160,80], atmAlpha:0.22,
-        ring:{ color:'rgba(210,160,80,0.45)', inner:1.55, outer:2.20, tiltX:0.28 },
-        driftX:0.010, driftY:0.005, phase:0, layer:1 },
-      /* ── Ice blue giant ── */
-      { x: W*0.11, y: H*0.40, r: mob?34:62,
-        type:'ice',
-        atmColor:[80,160,255], atmAlpha:0.25,
-        driftX:0.007, driftY:0.013, phase:1.6, layer:2 },
-      /* ── Mars-like rocky ── */
-      { x: W*0.70, y: H*0.72, r: mob?18:30,
-        type:'rocky',
-        atmColor:[220,90,50], atmAlpha:0.18,
+      /* ── Saturn: ringed gas giant (upper-right) ── */
+      { x: W*0.83, y: H*0.25, r: mob?54:100,
+        type: 'saturn', atmColor:[255,168,80], atmAlpha:0.18,
+        driftX:0.010, driftY:0.005, phase:0.0, layer:1 },
+      /* ── Neptune-like ice giant (left) ── */
+      { x: W*0.11, y: H*0.38, r: mob?36:66,
+        type: 'ice',   atmColor:[60,160,255],  atmAlpha:0.20,
+        driftX:0.007, driftY:0.012, phase:1.6, layer:2 },
+      /* ── Mars-like rocky (lower right) ── */
+      { x: W*0.72, y: H*0.74, r: mob?20:33,
+        type: 'rocky', atmColor:[220,90,50],   atmAlpha:0.14,
         driftX:0.016, driftY:-0.006, phase:3.0, layer:3 },
-      /* ── Distant purple mystic ── */
-      { x: W*0.36, y: H*0.08, r: mob?14:22,
-        type:'purple',
-        atmColor:[160,80,255], atmAlpha:0.20,
+      /* ── Alien exotic (small, upper-center) ── */
+      { x: W*0.38, y: H*0.07, r: mob?15:24,
+        type: 'alien', atmColor:[170,60,255],  atmAlpha:0.18,
         driftX:-0.009, driftY:0.004, phase:0.8, layer:0 },
     );
   }
@@ -10299,15 +10290,11 @@ console.log('1171')
      DRAW helpers
   ══════════════════════════════════════════════════ */
 
-  /* dark space gradient + nebulae */
+  /* Pitch-black space + barely-visible nebula wisps */
   function drawBackground() {
-    const bg = CX.createRadialGradient(W*0.5, H*0.25, 0, W*0.5, H*0.5, Math.max(W,H)*0.9);
-    bg.addColorStop(0,   '#0b0d28');
-    bg.addColorStop(0.4, '#070818');
-    bg.addColorStop(1,   '#050815');
-    CX.fillStyle = bg;
+    CX.fillStyle = '#00000a';
     CX.fillRect(0, 0, W, H);
-
+    /* Extremely faint nebula clouds */
     CX.save();
     CX.globalCompositeOperation = 'screen';
     for (const n of nebulae) {
@@ -10315,13 +10302,11 @@ console.log('1171')
       CX.translate(n.x, n.y);
       CX.scale(n.rx / n.r, n.ry / n.r);
       const g = CX.createRadialGradient(0, 0, 0, 0, 0, n.r);
-      g.addColorStop(0,   `rgba(${n.r},${n.g},${n.b},${n.op})`);
-      g.addColorStop(0.5, `rgba(${n.r},${n.g},${n.b},${n.op * 0.4})`);
-      g.addColorStop(1,   `rgba(${n.r},${n.g},${n.b},0)`);
+      g.addColorStop(0,   `rgba(${n.R},${n.G},${n.B},${n.op})`);
+      g.addColorStop(0.45,`rgba(${n.R},${n.G},${n.B},${n.op * 0.35})`);
+      g.addColorStop(1,   `rgba(${n.R},${n.G},${n.B},0)`);
       CX.fillStyle = g;
-      CX.beginPath();
-      CX.arc(0, 0, n.r, 0, Math.PI * 2);
-      CX.fill();
+      CX.beginPath(); CX.arc(0, 0, n.r, 0, Math.PI * 2); CX.fill();
       CX.restore();
     }
     CX.restore();
@@ -10332,138 +10317,329 @@ console.log('1171')
     CX.save();
     for (const s of stars) {
       const dy = -(scrollY * PAR[s.layer]);
-      let sy = ((s.y + dy) % totalH + totalH) % totalH;
+      const sy = ((s.y + dy) % totalH + totalH) % totalH;
       if (sy > H + 6) continue;
-      const tw  = 0.60 + Math.sin(s.twPhase + t * s.twSpeed) * 0.38;
+      const tw  = 0.62 + Math.sin(s.twPhase + t * s.twSpeed) * 0.36;
       const op  = Math.min(1, s.baseOp * tw);
       CX.globalAlpha = op;
       CX.fillStyle   = s.col;
-      CX.beginPath();
-      CX.arc(s.x, sy, s.r, 0, Math.PI * 2);
-      CX.fill();
-      /* cross-sparkle on large bright stars */
+      CX.beginPath(); CX.arc(s.x, sy, s.r, 0, Math.PI * 2); CX.fill();
       if (s.glow && op > 0.55) {
-        const len = s.r * (2.8 + tw * 1.4);
-        CX.globalAlpha = op * 0.45;
+        const len = s.r * (3.0 + tw * 1.6);
+        CX.globalAlpha = op * 0.42;
         CX.strokeStyle = s.col;
-        CX.lineWidth   = s.r * 0.5;
+        CX.lineWidth   = s.r * 0.48;
         CX.lineCap     = 'round';
-        CX.beginPath(); CX.moveTo(s.x - len, sy); CX.lineTo(s.x + len, sy); CX.stroke();
-        CX.beginPath(); CX.moveTo(s.x, sy - len); CX.lineTo(s.x, sy + len); CX.stroke();
-        CX.beginPath(); CX.moveTo(s.x - len*0.6, sy - len*0.6); CX.lineTo(s.x + len*0.6, sy + len*0.6); CX.stroke();
-        CX.beginPath(); CX.moveTo(s.x + len*0.6, sy - len*0.6); CX.lineTo(s.x - len*0.6, sy + len*0.6); CX.stroke();
+        CX.beginPath(); CX.moveTo(s.x-len, sy);       CX.lineTo(s.x+len, sy);       CX.stroke();
+        CX.beginPath(); CX.moveTo(s.x,     sy-len);   CX.lineTo(s.x,     sy+len);   CX.stroke();
+        CX.beginPath(); CX.moveTo(s.x-len*0.58, sy-len*0.58); CX.lineTo(s.x+len*0.58, sy+len*0.58); CX.stroke();
+        CX.beginPath(); CX.moveTo(s.x+len*0.58, sy-len*0.58); CX.lineTo(s.x-len*0.58, sy+len*0.58); CX.stroke();
       }
     }
     CX.globalAlpha = 1;
     CX.restore();
   }
 
-  /* draw a single planet by type */
-  function drawPlanet(p) {
-    const { x, y, r } = p;
+  /* ─────────────────────────────────────────────────
+     PLANET RENDERING — physically-based approach
+     Light source: upper-left  lx ≈ -0.55  ly ≈ -0.65
+  ───────────────────────────────────────────────── */
 
-    /* atmosphere glow ring */
-    const glowR = r * 1.7;
-    const atm = CX.createRadialGradient(x, y, r * 0.85, x, y, glowR);
-    atm.addColorStop(0,   `rgba(${p.atmColor[0]},${p.atmColor[1]},${p.atmColor[2]},${p.atmAlpha})`);
-    atm.addColorStop(0.5, `rgba(${p.atmColor[0]},${p.atmColor[1]},${p.atmColor[2]},${p.atmAlpha*0.35})`);
-    atm.addColorStop(1,   `rgba(${p.atmColor[0]},${p.atmColor[1]},${p.atmColor[2]},0)`);
-    CX.fillStyle = atm;
-    CX.beginPath(); CX.arc(x, y, glowR, 0, Math.PI * 2); CX.fill();
+  /* Apply sphere shading over any clipped base texture */
+  function applySphereShading(x, y, r) {
+    /* Shadow pass — large dark radial from shadow side */
+    const shX = x + r * 0.44, shY = y + r * 0.18;
+    const sh = CX.createRadialGradient(shX, shY, 0, shX - r*0.08, shY - r*0.08, r * 1.18);
+    sh.addColorStop(0,    'rgba(0,0,6,0.97)');
+    sh.addColorStop(0.22, 'rgba(0,0,4,0.82)');
+    sh.addColorStop(0.52, 'rgba(0,0,2,0.30)');
+    sh.addColorStop(0.78, 'rgba(0,0,0,0.05)');
+    sh.addColorStop(1,    'rgba(0,0,0,0)');
+    CX.fillStyle = sh; CX.fillRect(x-r, y-r, r*2, r*2);
 
-    /* ring behind planet (for Saturn) */
-    if (p.ring) drawRingBehind(p);
+    /* Specular highlight — small bright glint on lit side */
+    const spX = x - r*0.33, spY = y - r*0.33;
+    const sp = CX.createRadialGradient(spX, spY, 0, spX, spY, r * 0.52);
+    sp.addColorStop(0,   'rgba(255,255,255,0.19)');
+    sp.addColorStop(0.28,'rgba(255,255,255,0.06)');
+    sp.addColorStop(1,   'rgba(255,255,255,0)');
+    CX.fillStyle = sp; CX.fillRect(x-r, y-r, r*2, r*2);
+  }
 
-    /* planet sphere */
-    CX.save();
-    CX.beginPath(); CX.arc(x, y, r, 0, Math.PI * 2); CX.clip();
-    if (p.type === 'saturn') {
-      /* banded gas giant */
-      const bandH = r * 2 / p.bands.length;
-      p.bands.forEach((col, i) => {
-        CX.fillStyle = col;
-        CX.fillRect(x - r, y - r + i * bandH, r * 2, bandH + 1);
-      });
-      /* subtle cloud sheen */
-      const sheen = CX.createLinearGradient(x - r, y, x + r, y);
-      sheen.addColorStop(0, 'rgba(255,220,180,0.12)');
-      sheen.addColorStop(0.4, 'rgba(255,220,180,0.06)');
-      sheen.addColorStop(1, 'rgba(0,0,0,0)');
-      CX.fillStyle = sheen; CX.fillRect(x - r, y - r, r * 2, r * 2);
-    } else if (p.type === 'ice') {
-      const g = CX.createRadialGradient(x - r*0.28, y - r*0.28, 0, x, y, r);
-      g.addColorStop(0, '#a0c8ff'); g.addColorStop(0.4, '#4090e0'); g.addColorStop(1, '#0030a0');
-      CX.fillStyle = g; CX.fillRect(x-r, y-r, r*2, r*2);
-      /* cloud swirl overlay */
-      const s = CX.createLinearGradient(x-r, y-r*0.2, x+r, y+r*0.2);
-      s.addColorStop(0, 'rgba(180,220,255,0.18)'); s.addColorStop(0.5, 'rgba(120,180,255,0.08)'); s.addColorStop(1, 'rgba(80,140,220,0.12)');
-      CX.fillStyle = s; CX.fillRect(x-r, y-r, r*2, r*2);
-    } else if (p.type === 'rocky') {
-      const g = CX.createRadialGradient(x - r*0.30, y - r*0.30, 0, x, y, r);
-      g.addColorStop(0, '#d0704a'); g.addColorStop(0.45, '#a04428'); g.addColorStop(1, '#4a1808');
-      CX.fillStyle = g; CX.fillRect(x-r, y-r, r*2, r*2);
-    } else if (p.type === 'purple') {
-      const g = CX.createRadialGradient(x - r*0.25, y - r*0.25, 0, x, y, r);
-      g.addColorStop(0, '#c090ff'); g.addColorStop(0.45, '#7030c0'); g.addColorStop(1, '#200840');
-      CX.fillStyle = g; CX.fillRect(x-r, y-r, r*2, r*2);
+  /* Gas giant: turbulent animated bands + storm oval */
+  function drawGasGiant(x, y, r, t, cfg) {
+    /* Base warm dark tone */
+    const base = CX.createRadialGradient(x - r*0.2, y - r*0.2, 0, x, y, r);
+    base.addColorStop(0, cfg.baseLight);
+    base.addColorStop(1, cfg.baseDark);
+    CX.fillStyle = base; CX.fillRect(x-r, y-r, r*2, r*2);
+
+    /* Animated turbulent bands */
+    for (const band of cfg.bands) {
+      const cy = y + band.yf * r;
+      const bh = band.hf * r;
+      const ts = t * band.speed + band.off;
+      CX.beginPath();
+      /* top turbulent edge */
+      let first = true;
+      for (let px = x - r; px <= x + r + 2; px += 2) {
+        const ty = cy - bh + Math.sin(px * 0.055 + ts) * r * 0.022
+                           + Math.sin(px * 0.110 - ts * 0.6) * r * 0.011;
+        if (first) { CX.moveTo(px, ty); first = false; } else CX.lineTo(px, ty);
+      }
+      /* bottom turbulent edge (reverse) */
+      for (let px = x + r; px >= x - r - 2; px -= 2) {
+        const ty = cy + bh + Math.sin(px * 0.055 + ts + 1.4) * r * 0.018
+                           + Math.sin(px * 0.095 + ts * 0.5) * r * 0.009;
+        CX.lineTo(px, ty);
+      }
+      CX.closePath();
+      CX.fillStyle = band.col;
+      CX.globalAlpha = band.op || 1;
+      CX.fill();
     }
-    /* limb darkening */
-    const limb = CX.createRadialGradient(x - r*0.15, y - r*0.15, r*0.05, x, y, r);
-    limb.addColorStop(0,   'rgba(255,255,255,0.06)');
-    limb.addColorStop(0.7, 'rgba(0,0,0,0)');
-    limb.addColorStop(1,   'rgba(0,0,0,0.62)');
+    CX.globalAlpha = 1;
+
+    /* Storm oval (Great Spot) */
+    if (cfg.storm) {
+      const { sx, sy: syo, rw, rh, col } = cfg.storm;
+      CX.save();
+      CX.translate(x + sx * r, y + syo * r);
+      CX.scale(rw * r, rh * r);
+      const sg = CX.createRadialGradient(0, 0, 0, 0, 0, 1);
+      sg.addColorStop(0,   col[0]);
+      sg.addColorStop(0.45, col[1]);
+      sg.addColorStop(0.75, col[2]);
+      sg.addColorStop(1,   'rgba(0,0,0,0)');
+      CX.fillStyle = sg;
+      CX.beginPath(); CX.arc(0, 0, 1, 0, Math.PI*2); CX.fill();
+      CX.restore();
+    }
+  }
+
+  /* Ice giant: deep blue with methane shimmer + faint bands */
+  function drawIceGiant(x, y, r, t) {
+    const base = CX.createRadialGradient(x - r*0.22, y - r*0.22, r*0.05, x + r*0.1, y + r*0.1, r*1.05);
+    base.addColorStop(0,    '#8dd4f8');
+    base.addColorStop(0.18, '#3898e0');
+    base.addColorStop(0.50, '#1858b8');
+    base.addColorStop(0.82, '#0c3880');
+    base.addColorStop(1,    '#061838');
+    CX.fillStyle = base; CX.fillRect(x-r, y-r, r*2, r*2);
+    /* faint cloud bands */
+    const iceBands = [
+      { yf:-0.50, hf:0.08, col:'rgba(160,220,255,0.13)', speed:0.04, off:0.0 },
+      { yf:-0.15, hf:0.06, col:'rgba(100,180,255,0.10)', speed:0.03, off:1.2 },
+      { yf: 0.30, hf:0.07, col:'rgba(140,200,255,0.12)', speed:0.05, off:2.4 },
+    ];
+    for (const b of iceBands) {
+      const cy = y + b.yf * r, bh = b.hf * r, ts = t * b.speed + b.off;
+      CX.beginPath();
+      let f = true;
+      for (let px = x-r; px <= x+r+2; px += 2) {
+        const ty = cy - bh + Math.sin(px*0.05+ts)*r*0.015 + Math.sin(px*0.09-ts*0.7)*r*0.007;
+        if (f) { CX.moveTo(px,ty); f=false; } else CX.lineTo(px,ty);
+      }
+      for (let px = x+r; px >= x-r-2; px -= 2) {
+        CX.lineTo(px, cy + bh + Math.sin(px*0.05+ts+1.2)*r*0.012);
+      }
+      CX.closePath(); CX.fillStyle = b.col; CX.fill();
+    }
+    /* methane edge shimmer */
+    const limb = CX.createRadialGradient(x, y, r*0.78, x, y, r);
+    limb.addColorStop(0, 'rgba(0,0,0,0)');
+    limb.addColorStop(1, 'rgba(60,200,255,0.22)');
     CX.fillStyle = limb; CX.fillRect(x-r, y-r, r*2, r*2);
-    CX.restore();
-
-    /* ring in front of planet */
-    if (p.ring) drawRingFront(p);
-  }
-
-  function drawRingBehind(p) {
-    const { x, y, r, ring } = p;
+    /* dark storm spot */
     CX.save();
-    CX.translate(x, y);
-    CX.scale(1, ring.tiltX);
-    const ri = r * ring.inner, ro = r * ring.outer;
-    const rg = CX.createRadialGradient(0, 0, ri, 0, 0, ro);
-    rg.addColorStop(0,   'rgba(210,170,90,0.10)');
-    rg.addColorStop(0.35, ring.color);
-    rg.addColorStop(0.65, ring.color);
-    rg.addColorStop(1,   'rgba(180,140,60,0.06)');
-    CX.fillStyle = rg;
-    CX.beginPath(); CX.arc(0, 0, ro, Math.PI, Math.PI * 2); CX.arc(0, 0, ri, Math.PI * 2, Math.PI, true); CX.closePath();
-    CX.fill();
+    CX.translate(x + r*0.18, y - r*0.22);
+    CX.scale(r*0.14, r*0.09);
+    const dsg = CX.createRadialGradient(0,0,0,0,0,1);
+    dsg.addColorStop(0, 'rgba(5,10,40,0.80)');
+    dsg.addColorStop(0.5,'rgba(10,20,60,0.40)');
+    dsg.addColorStop(1,  'rgba(0,0,0,0)');
+    CX.fillStyle = dsg; CX.beginPath(); CX.arc(0,0,1,0,Math.PI*2); CX.fill();
     CX.restore();
   }
 
-  function drawRingFront(p) {
-    const { x, y, r, ring } = p;
+  /* Rocky planet: iron oxide surface + polar cap + craters */
+  function drawRocky(x, y, r) {
+    const base = CX.createRadialGradient(x - r*0.25, y - r*0.25, r*0.05, x + r*0.08, y + r*0.06, r);
+    base.addColorStop(0,    '#d86040');
+    base.addColorStop(0.30, '#b84828');
+    base.addColorStop(0.65, '#8c3018');
+    base.addColorStop(1,    '#3e100a');
+    CX.fillStyle = base; CX.fillRect(x-r, y-r, r*2, r*2);
+    /* terrain variation blobs */
+    const patches = [
+      {ox:-0.30, oy: 0.10, pr:0.32, col:'rgba(165,70,35,0.28)'},
+      {ox: 0.15, oy: 0.25, pr:0.26, col:'rgba(100,35,18,0.22)'},
+      {ox:-0.10, oy:-0.30, pr:0.22, col:'rgba(180,88,45,0.20)'},
+    ];
+    for (const p2 of patches) {
+      const pg = CX.createRadialGradient(x+p2.ox*r, y+p2.oy*r, 0, x+p2.ox*r, y+p2.oy*r, p2.pr*r);
+      pg.addColorStop(0, p2.col); pg.addColorStop(1,'rgba(0,0,0,0)');
+      CX.fillStyle = pg; CX.fillRect(x-r, y-r, r*2, r*2);
+    }
+    /* craters */
+    const craters = [
+      {ox:-0.25, oy: 0.20, cr:0.12},
+      {ox: 0.30, oy:-0.05, cr:0.09},
+      {ox:-0.05, oy: 0.38, cr:0.07},
+      {ox: 0.10, oy:-0.32, cr:0.11},
+    ];
+    for (const c of craters) {
+      const cx2 = x + c.ox*r, cy2 = y + c.oy*r, cr = c.cr*r;
+      /* dark floor */
+      const cf = CX.createRadialGradient(cx2, cy2, 0, cx2, cy2, cr);
+      cf.addColorStop(0,'rgba(20,6,4,0.72)'); cf.addColorStop(0.7,'rgba(40,12,8,0.35)'); cf.addColorStop(1,'rgba(0,0,0,0)');
+      CX.fillStyle = cf; CX.beginPath(); CX.arc(cx2, cy2, cr, 0, Math.PI*2); CX.fill();
+      /* rim highlight */
+      CX.strokeStyle = 'rgba(200,120,80,0.22)'; CX.lineWidth = cr * 0.18;
+      CX.beginPath(); CX.arc(cx2 - cr*0.06, cy2 - cr*0.06, cr * 0.92, 0, Math.PI*2); CX.stroke();
+    }
+    /* polar ice cap */
+    const ice = CX.createRadialGradient(x, y - r*0.72, 0, x, y - r*0.72, r*0.42);
+    ice.addColorStop(0,    'rgba(230,240,255,0.90)');
+    ice.addColorStop(0.45, 'rgba(200,220,255,0.45)');
+    ice.addColorStop(1,    'rgba(180,200,240,0)');
+    CX.fillStyle = ice; CX.fillRect(x-r, y-r, r*2, r*2);
+    /* thin atmosphere haze */
+    const atm = CX.createRadialGradient(x, y, r*0.82, x, y, r);
+    atm.addColorStop(0, 'rgba(0,0,0,0)');
+    atm.addColorStop(1, 'rgba(255,140,80,0.14)');
+    CX.fillStyle = atm; CX.fillRect(x-r, y-r, r*2, r*2);
+  }
+
+  /* Exotic alien planet: deep violet with aurora bands */
+  function drawAlien(x, y, r, t) {
+    const base = CX.createRadialGradient(x - r*0.22, y - r*0.22, 0, x + r*0.05, y + r*0.05, r);
+    base.addColorStop(0,    '#b060ff');
+    base.addColorStop(0.35, '#6820c0');
+    base.addColorStop(0.70, '#380880');
+    base.addColorStop(1,    '#100028');
+    CX.fillStyle = base; CX.fillRect(x-r, y-r, r*2, r*2);
+    /* aurora shimmer bands */
+    const aurBands = [
+      {yf:-0.30, hf:0.06, col:'rgba(160,100,255,0.22)', speed:0.06, off:0.0 },
+      {yf: 0.05, hf:0.05, col:'rgba(200,80,255,0.18)',  speed:0.05, off:1.8 },
+      {yf: 0.40, hf:0.05, col:'rgba(120,200,255,0.14)', speed:0.04, off:3.2 },
+    ];
+    for (const b of aurBands) {
+      const cy = y + b.yf * r, bh = b.hf * r, ts = t * b.speed + b.off;
+      CX.beginPath();
+      let f = true;
+      for (let px = x-r; px <= x+r+2; px += 2) {
+        const ty = cy - bh + Math.sin(px*0.07+ts)*r*0.018;
+        if (f) { CX.moveTo(px,ty); f=false; } else CX.lineTo(px,ty);
+      }
+      for (let px = x+r; px >= x-r-2; px -= 2) CX.lineTo(px, cy + bh + Math.sin(px*0.07+ts+1.0)*r*0.014);
+      CX.closePath(); CX.fillStyle = b.col; CX.fill();
+    }
+    /* edge glow */
+    const eg = CX.createRadialGradient(x, y, r*0.80, x, y, r);
+    eg.addColorStop(0,'rgba(0,0,0,0)'); eg.addColorStop(1,'rgba(180,60,255,0.28)');
+    CX.fillStyle = eg; CX.fillRect(x-r, y-r, r*2, r*2);
+  }
+
+  /* Saturn-style multi-layer rings */
+  function drawRingsHalf(x, y, r, tilt, topHalf) {
     CX.save();
     CX.translate(x, y);
-    CX.scale(1, ring.tiltX);
-    const ri = r * ring.inner, ro = r * ring.outer;
-    const rg = CX.createRadialGradient(0, 0, ri, 0, 0, ro);
-    rg.addColorStop(0,   'rgba(210,170,90,0.08)');
-    rg.addColorStop(0.35, ring.color);
-    rg.addColorStop(0.65, ring.color);
-    rg.addColorStop(1,   'rgba(180,140,60,0.05)');
-    CX.fillStyle = rg;
-    CX.beginPath(); CX.arc(0, 0, ro, 0, Math.PI); CX.arc(0, 0, ri, Math.PI, 0, true); CX.closePath();
-    CX.fill();
+    CX.scale(1, tilt);
+    /* ring layers: [inner_frac, outer_frac, R, G, B, opacity] */
+    const layers = [
+      [1.08, 1.24,  190, 160, 100,  0.20],   /* C ring */
+      [1.24, 1.62,  228, 200, 152,  0.72],   /* B ring */
+      [1.62, 1.65,    8,   8,  12,  0.90],   /* Cassini division */
+      [1.65, 1.92,  210, 182, 138,  0.58],   /* A ring */
+      [1.93, 2.02,  170, 148, 108,  0.22],   /* F ring */
+    ];
+    const startA = topHalf ? Math.PI : 0;
+    const endA   = topHalf ? Math.PI * 2 : Math.PI;
+    for (const [ri_f, ro_f, R, G, B, op] of layers) {
+      const ri = r * ri_f, ro = r * ro_f;
+      const rg = CX.createRadialGradient(0, 0, ri, 0, 0, ro);
+      rg.addColorStop(0,    `rgba(${R},${G},${B},0)`);
+      rg.addColorStop(0.12, `rgba(${R},${G},${B},${op * 0.75})`);
+      rg.addColorStop(0.50, `rgba(${R},${G},${B},${op})`);
+      rg.addColorStop(0.88, `rgba(${R},${G},${B},${op * 0.80})`);
+      rg.addColorStop(1,    `rgba(${R},${G},${B},0)`);
+      CX.fillStyle = rg;
+      CX.beginPath();
+      CX.arc(0, 0, ro, startA, endA);
+      CX.arc(0, 0, ri, endA, startA, true);
+      CX.closePath(); CX.fill();
+    }
     CX.restore();
+  }
+
+  /* Atmosphere glow halo outside planet disk */
+  function drawAtmGlow(x, y, r, R, G, B, alpha) {
+    const g = CX.createRadialGradient(x, y, r * 0.88, x, y, r * 1.75);
+    g.addColorStop(0,   `rgba(${R},${G},${B},${alpha})`);
+    g.addColorStop(0.45,`rgba(${R},${G},${B},${alpha * 0.30})`);
+    g.addColorStop(1,   `rgba(${R},${G},${B},0)`);
+    CX.fillStyle = g;
+    CX.beginPath(); CX.arc(x, y, r * 1.75, 0, Math.PI*2); CX.fill();
+  }
+
+  /* Draw one planet completely */
+  function drawPlanet(p, t) {
+    const { x, y, r, type } = p;
+
+    /* atm glow behind everything */
+    drawAtmGlow(x, y, r, p.atmColor[0], p.atmColor[1], p.atmColor[2], p.atmAlpha);
+
+    /* back rings */
+    if (type === 'saturn') drawRingsHalf(x, y, r, 0.22, false);
+
+    /* sphere */
+    CX.save();
+    CX.beginPath(); CX.arc(x, y, r, 0, Math.PI*2); CX.clip();
+
+    if (type === 'saturn') {
+      drawGasGiant(x, y, r, t, {
+        baseLight: '#e8b060', baseDark: '#3c1808',
+        bands: [
+          {yf:-0.82, hf:0.10, col:'#dda050', op:0.95, speed:0.025, off:0.0},
+          {yf:-0.62, hf:0.08, col:'#c07830', op:0.90, speed:0.030, off:1.1},
+          {yf:-0.46, hf:0.14, col:'#e8aa68', op:0.88, speed:0.022, off:2.2},
+          {yf:-0.28, hf:0.09, col:'#b86820', op:0.92, speed:0.035, off:0.7},
+          {yf:-0.12, hf:0.16, col:'#d49040', op:0.90, speed:0.020, off:3.0},
+          {yf: 0.10, hf:0.08, col:'#c07030', op:0.88, speed:0.028, off:1.5},
+          {yf: 0.25, hf:0.14, col:'#e0a050', op:0.86, speed:0.024, off:2.8},
+          {yf: 0.46, hf:0.10, col:'#b86028', op:0.90, speed:0.032, off:0.3},
+          {yf: 0.64, hf:0.12, col:'#cc8838', op:0.85, speed:0.026, off:1.9},
+          {yf: 0.82, hf:0.10, col:'#a05018', op:0.88, speed:0.030, off:3.5},
+        ],
+        storm: { sx:-0.18, sy:0.12, rw:0.22, rh:0.14,
+          col:['rgba(255,220,160,0.85)','rgba(230,160,80,0.55)','rgba(0,0,0,0)'] },
+      });
+    } else if (type === 'ice') {
+      drawIceGiant(x, y, r, t);
+    } else if (type === 'rocky') {
+      drawRocky(x, y, r);
+    } else if (type === 'alien') {
+      drawAlien(x, y, r, t);
+    }
+
+    applySphereShading(x, y, r);
+    CX.restore();
+
+    /* front rings */
+    if (type === 'saturn') drawRingsHalf(x, y, r, 0.22, true);
   }
 
   function drawPlanets(t) {
-    CX.save();
     for (const p of planets) {
       const dy = -(scrollY * PAR[p.layer]);
-      const drift = 22 + p.r * 0.18;
-      const px = p.x + Math.sin(p.phase + t * p.driftX) * drift * 0.6;
-      const py = p.y + dy + Math.cos(p.phase + t * p.driftY) * drift * 0.4;
+      const drift = 18 + p.r * 0.14;
+      const px = p.x + Math.sin(p.phase + t * p.driftX) * drift * 0.55;
+      const py = p.y + dy + Math.cos(p.phase + t * p.driftY) * drift * 0.35;
       if (py + p.r * 2.5 < 0 || py - p.r * 2.5 > H) continue;
-      drawPlanet({ ...p, x: px, y: py });
+      drawPlanet({ ...p, x: px, y: py }, t);
     }
-    CX.restore();
   }
 
   function drawRocks(t) {
