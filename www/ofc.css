@@ -35,7 +35,7 @@
 
 body {
   margin: 0;
-  background: var(--color-black);
+  background: #050815;
   color: var(--color-white);
   font-family: var(--font-body);
 }

@@ -33,14 +33,9 @@
   line-height: 1.35 !important;
 }
 
-html, body{
-    overflow-x: hidden !important;
-  max-width: 100% !important;
-}
-
 body {
   margin: 0;
-  background: var(--color-black);
+  background: #050815;
   color: var(--color-white);
   font-family: var(--font-body);
 }
@@ -548,11 +543,11 @@ h1, h2, h3, p {
 }
 
 @media (max-width: 768px) {
-  /* .header {
+  .header {
     flex-direction: column;
     gap: 16px;
     padding: 16px;
-  } */
+  }
   .player {
     flex-direction: column;
     height: auto;
@@ -586,7 +581,7 @@ h1, h2, h3, p {
   }
 }
 
-/* 
+
   .header {
     background: var(--color-black);
     border-bottom: 1px solid rgba(255, 127, 80, 0.2);
@@ -596,7 +591,7 @@ h1, h2, h3, p {
     padding: 14px 24px;
     flex-shrink: 0;
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
-  } */
+  }
   .logo-container {
     display: flex;
     align-items: center;
@@ -812,10 +807,7 @@ h1, h2, h3, p {
     display: flex;
     flex-direction: column;
     background: #0d0d0d;
-      overflow-x: hidden !important;
-  max-width: 100% !important
   }
-
   .content-section {
     display: flex;
     flex-direction: column;
@@ -833,9 +825,6 @@ h1, h2, h3, p {
     display: flex;
     gap: 24px;
     padding-bottom: 12px;
-      overflow-x: auto !important;
-  overflow-y: visible !important;
-
   }
   .artist-card, .track-card {
     display: flex;
