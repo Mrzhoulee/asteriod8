@@ -971,8 +971,8 @@
       // Navigation will follow; control rarely returns here.
     } catch (e) {
       signingIn = false;
-      setAuthLoading(btn, false);
-      try { sessionStorage.removeItem('joinPendingProvider'); } catch (_) {}
+      try { sessionStorage.removeItem('joinPendingProvider'); sessionStorage.removeItem('joinRole'); } catch (_) {}
+      resetAuthButtons();
       console.error('[join] sign-in error', e);
       showAuthErr(friendlyAuthErr(e));
     }
@@ -1113,28 +1113,27 @@
     document.getElementById('pageLoading').classList.add('hidden');
   }
 
-  // Restore role + pending-provider from a previous redirect attempt.
+  function resetAuthButtons() {
+    setAuthLoading(document.getElementById('btnGoogle'), false);
+    setAuthLoading(document.getElementById('btnApple'), false);
+  }
+
+  // Restore role from a previous redirect attempt (role is safe to restore;
+  // we do NOT restore button-disabled state — getRedirectResult handles that).
   try {
     const savedRole = sessionStorage.getItem('joinRole');
     if (savedRole && !selectedRole) selectedRole = savedRole;
-    const pending = sessionStorage.getItem('joinPendingProvider');
-    if (pending) {
-      // Show button loading state until getRedirectResult / onAuthStateChanged fires
-      signingIn = true;
-      const btnId = pending === 'apple' ? 'btnApple' : 'btnGoogle';
-      const btn = document.getElementById(btnId);
-      if (btn) setAuthLoading(btn, true);
-    }
   } catch (_) {}
 
   // Never block the page more than 4 seconds waiting for Firebase Auth
-  const loaderGuard = setTimeout(hideLoader, 4000);
+  const loaderGuard = setTimeout(() => { hideLoader(); resetAuthButtons(); }, 4000);
 
   getRedirectResult(auth).then(result => {
     try { sessionStorage.removeItem('joinPendingProvider'); } catch (_) {}
     signingIn = false;
+
     if (result && result.user) {
-      // If user picked a role pre-redirect, make step-1 UI reflect it before advancing.
+      // Restore artist-only fields if role was saved before redirect.
       if (selectedRole) {
         const bf = document.getElementById('bioField');
         const sf = document.getElementById('socialLinkField');
@@ -1143,10 +1142,14 @@
       }
       handleAuthSuccess(result.user);
       hideLoader();
+    } else {
+      // No redirect result — make sure buttons are never stuck in loading state.
+      resetAuthButtons();
     }
   }).catch(e => {
     try { sessionStorage.removeItem('joinPendingProvider'); } catch (_) {}
     signingIn = false;
+    resetAuthButtons();
     console.error('[join] getRedirectResult error', e);
     if (e && e.code) showAuthErr(friendlyAuthErr(e));
   });
