@@ -943,17 +943,25 @@
     goToStep(2);
   }
 
+  let signingIn = false;
+
   document.getElementById('btnGoogle').addEventListener('click', async () => {
     const btn = document.getElementById('btnGoogle');
     setAuthLoading(btn, true);
     showAuthErr('');
+    signingIn = true;
     try {
       const result = await signInWithPopup(auth, googleProvider);
       await handleAuthSuccess(result.user);
     } catch (e) {
+      if (e.code === 'auth/popup-blocked') {
+        try { await signInWithRedirect(auth, googleProvider); return; } catch (_) {}
+      }
       if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
         showAuthErr(friendlyAuthErr(e));
       }
+    } finally {
+      signingIn = false;
       setAuthLoading(btn, false);
     }
   });
@@ -962,16 +970,20 @@
     const btn = document.getElementById('btnApple');
     setAuthLoading(btn, true);
     showAuthErr('');
+    signingIn = true;
     try {
       const result = await signInWithPopup(auth, appleProvider);
-      // Apple only returns name on first sign-in
-      const cred = OAuthProvider.credentialFromResult(result);
       const nameHint = result.user.displayName || '';
       await handleAuthSuccess(result.user, nameHint);
     } catch (e) {
+      if (e.code === 'auth/popup-blocked') {
+        try { await signInWithRedirect(auth, appleProvider); return; } catch (_) {}
+      }
       if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
         showAuthErr(friendlyAuthErr(e));
       }
+    } finally {
+      signingIn = false;
       setAuthLoading(btn, false);
     }
   });
@@ -1112,30 +1124,40 @@
     clearTimeout(loaderGuard);
     if (!user) { hideLoader(); return; }
 
-    // Sign-in was handled by a button click — onAuthStateChanged fires too and
-    // would interfere with the step transition. Skip it; handleAuthSuccess already ran.
+    // A button-driven sign-in is in progress; let the click handler finish.
+    if (signingIn) { hideLoader(); return; }
+
+    // handleAuthSuccess already ran for this user
     if (authedUser) { hideLoader(); return; }
 
     // Page loaded with an existing Firebase Auth session — check their profile
     const accountId = getStableId(user);
     const emailKey = sanitizeKey(accountId);
     setLocalAuth(user, user.displayName || '');
+
+    let profile = null;
     try {
       const res = await fetch(`${RTDB}/PROFILES/${encodeURIComponent(emailKey)}.json`,
         { signal: AbortSignal.timeout(5000) });
-      const profile = await res.json();
-      if (profile && profile.nickname) {
-        document.querySelector('.success-screen .success-sub').textContent =
-          `Welcome back, ${profile.nickname}! Taking you to Asteroid…`;
-        goToStep(3);
-        hideLoader();
-        setTimeout(() => { location.href = 'index.html'; }, 1400);
-        return;
-      }
-      // Has auth but no complete profile — go to profile step via normal flow
-      selectedRole = (profile && profile.role) || 'fan';
-      await handleAuthSuccess(user);
-    } catch (_) {}
+      profile = await res.json();
+    } catch (_) { /* network/timeout — treat as no profile */ }
+
+    if (profile && profile.nickname) {
+      document.querySelector('.success-screen .success-sub').textContent =
+        `Welcome back, ${profile.nickname}! Taking you to Asteroid…`;
+      goToStep(3);
+      hideLoader();
+      setTimeout(() => { location.href = 'index.html'; }, 1400);
+      return;
+    }
+
+    // Has auth but no complete profile — preserve any role the user already picked
+    if (profile && profile.role) selectedRole = profile.role;
+    else if (!selectedRole) selectedRole = 'fan';
+    document.getElementById('bioField').style.display = selectedRole === 'artist' ? '' : 'none';
+    document.getElementById('socialLinkField').style.display = selectedRole === 'artist' ? '' : 'none';
+
+    await handleAuthSuccess(user);
     hideLoader();
   });
 </script>
