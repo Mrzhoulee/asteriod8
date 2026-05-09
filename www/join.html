@@ -808,7 +808,17 @@
     (async () => {
       let ip = '';
       try { const r = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(3000) }); ip = (await r.json()).ip || ''; } catch (_) {}
+      // Log full click record
       try { await fetch(RTDB + '/REFERRAL_CLICKS.json', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: refId, ts: Date.now(), ua: navigator.userAgent.slice(0, 300), ip }) }); } catch (_) {}
+      // Increment click counter for dashboard stats
+      try {
+        const cur = await fetch(`${RTDB}/referralCounts/${encodeURIComponent(refId)}/clicks.json`);
+        const n = (await cur.json()) || 0;
+        await fetch(`${RTDB}/referralCounts/${encodeURIComponent(refId)}/clicks.json`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(typeof n === 'number' ? n + 1 : 1)
+        });
+      } catch (_) {}
     })();
   }
 

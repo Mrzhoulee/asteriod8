@@ -1167,6 +1167,9 @@
             <button class="tab-btn" onclick="switchTab('stories', event)">
                 <i class="fas fa-bolt"></i> Stories
             </button>
+            <button class="tab-btn" onclick="switchTab('grow', event)">
+                <i class="fas fa-share-alt"></i> Grow
+            </button>
 
         </div>
 
@@ -1446,6 +1449,102 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             <div id="storyMyList" class="stories-grid">
                 <p class="stories-empty">No active stories. Tap <strong>New Story</strong> to design one.</p>
             </div>
+        </div>
+    </div>
+
+    <!-- Grow / Referral Tab -->
+    <div id="grow-tab" class="tab-content">
+        <div style="max-width:640px;margin:0 auto;padding-bottom:40px;">
+
+            <!-- Hero -->
+            <div class="ref-hero">
+                <div class="ref-hero-icon">🚀</div>
+                <h2 class="ref-hero-title">Invite artists to Asteroid</h2>
+                <p class="ref-hero-sub">Share your personal link. Every artist that joins through it counts toward your milestones.</p>
+            </div>
+
+            <!-- Link card -->
+            <div class="ref-link-card">
+                <div class="ref-link-label">Your invite link</div>
+                <div class="ref-link-row">
+                    <input class="ref-link-input" id="refLinkInput" type="text" readonly placeholder="Generating your link…">
+                    <button class="ref-copy-btn" id="refCopyBtn" type="button" title="Copy link">
+                        <i class="fas fa-copy"></i>
+                        <span id="refCopyLabel">Copy</span>
+                    </button>
+                </div>
+                <div class="ref-share-row">
+                    <a class="ref-share-btn ref-twitter" id="refShareTwitter" href="#" target="_blank" rel="noopener">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        Post on X
+                    </a>
+                    <a class="ref-share-btn ref-whatsapp" id="refShareWhatsapp" href="#" target="_blank" rel="noopener">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.533 5.855L0 24l6.335-1.512A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.367l-.36-.214-3.755.896.944-3.658-.234-.374A9.786 9.786 0 012.182 12c0-5.422 4.396-9.818 9.818-9.818 5.422 0 9.818 4.396 9.818 9.818 0 5.422-4.396 9.818-9.818 9.818z"/></svg>
+                        WhatsApp
+                    </a>
+                    <a class="ref-share-btn ref-email" id="refShareEmail" href="#" target="_blank" rel="noopener">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="ref-stats-row">
+                <div class="ref-stat-card">
+                    <div class="ref-stat-icon"><i class="fas fa-mouse-pointer"></i></div>
+                    <div class="ref-stat-val" id="refStatClicks">—</div>
+                    <div class="ref-stat-label">Link clicks</div>
+                </div>
+                <div class="ref-stat-card">
+                    <div class="ref-stat-icon"><i class="fas fa-user-plus"></i></div>
+                    <div class="ref-stat-val" id="refStatSignups">—</div>
+                    <div class="ref-stat-label">Artists joined</div>
+                </div>
+                <div class="ref-stat-card">
+                    <div class="ref-stat-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="ref-stat-val" id="refStatNext">—</div>
+                    <div class="ref-stat-label">Until next milestone</div>
+                </div>
+            </div>
+
+            <!-- Milestones -->
+            <div class="ref-milestones">
+                <div class="ref-milestones-title"><i class="fas fa-flag"></i> Milestones</div>
+                <div class="ref-milestone" id="ms1">
+                    <div class="ref-ms-icon" id="ms1icon">🌟</div>
+                    <div class="ref-ms-body">
+                        <div class="ref-ms-name">Early Adopter</div>
+                        <div class="ref-ms-desc">Invite your first artist to join Asteroid</div>
+                    </div>
+                    <div class="ref-ms-badge" id="ms1badge">1 artist</div>
+                </div>
+                <div class="ref-milestone" id="ms2">
+                    <div class="ref-ms-icon" id="ms2icon">🚀</div>
+                    <div class="ref-ms-body">
+                        <div class="ref-ms-name">Community Builder</div>
+                        <div class="ref-ms-desc">3 artists joined through your link</div>
+                    </div>
+                    <div class="ref-ms-badge" id="ms2badge">3 artists</div>
+                </div>
+                <div class="ref-milestone" id="ms3">
+                    <div class="ref-ms-icon" id="ms3icon">🎖️</div>
+                    <div class="ref-ms-body">
+                        <div class="ref-ms-name">Featured on Asteroid</div>
+                        <div class="ref-ms-desc">Your profile gets highlighted on the homepage</div>
+                    </div>
+                    <div class="ref-ms-badge" id="ms3badge">5 artists</div>
+                </div>
+                <div class="ref-milestone" id="ms4">
+                    <div class="ref-ms-icon" id="ms4icon">💎</div>
+                    <div class="ref-ms-body">
+                        <div class="ref-ms-name">Asteroid Pro</div>
+                        <div class="ref-ms-desc">Unlock Pro features — coming soon</div>
+                    </div>
+                    <div class="ref-ms-badge" id="ms4badge">10 artists</div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -3187,9 +3286,113 @@ if (_origSwitchTab2) {
     window.switchTab = function (tabName, evt) {
         _origSwitchTab2(tabName, evt);
         if (tabName === 'stories' && currentEmailKey) loadMyStories();
+        if (tabName === 'grow') loadGrowTab();
     };
 }
 
+// ── Grow / Referral tab ─────────────────────────────────────────────
+const RTDB_REF = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+const MILESTONES = [
+  { id: 'ms1', n: 1 }, { id: 'ms2', n: 3 },
+  { id: 'ms3', n: 5 }, { id: 'ms4', n: 10 }
+];
+
+function genCode(len = 6) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = '';
+  for (let i = 0; i < len; i++) c += chars[Math.floor(Math.random() * chars.length)];
+  return c;
+}
+
+let _refCode = '';
+let _growLoaded = false;
+
+async function loadGrowTab() {
+  if (_growLoaded) return;
+  const emailKey = (localStorage.getItem('emailKey') || '').trim();
+  if (!emailKey) return;
+
+  // 1. Get or create referral code
+  try {
+    const r = await fetch(`${RTDB_REF}/REFERRAL_CODES_BY_USER/${encodeURIComponent(emailKey)}.json`);
+    const existing = await r.json();
+    if (existing && typeof existing === 'string') {
+      _refCode = existing;
+    } else {
+      // Generate new unique code
+      let code, attempts = 0;
+      do {
+        code = genCode();
+        const check = await fetch(`${RTDB_REF}/REFERRAL_CODE_INDEX/${code}.json`);
+        const taken = await check.json();
+        if (!taken) break;
+      } while (++attempts < 5);
+      _refCode = code;
+      // Store in both index paths
+      await Promise.all([
+        fetch(`${RTDB_REF}/REFERRAL_CODES_BY_USER/${encodeURIComponent(emailKey)}.json`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(_refCode)
+        }),
+        fetch(`${RTDB_REF}/REFERRAL_CODE_INDEX/${_refCode}.json`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(emailKey)
+        })
+      ]);
+    }
+  } catch (_) {}
+
+  // 2. Display the link
+  const link = `https://asteroid8.net/join?ref=${_refCode}`;
+  const inp = document.getElementById('refLinkInput');
+  if (inp) inp.value = link;
+
+  // 3. Wire up copy button
+  const copyBtn = document.getElementById('refCopyBtn');
+  if (copyBtn) {
+    copyBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(link);
+        document.getElementById('refCopyLabel').textContent = 'Copied!';
+        setTimeout(() => { document.getElementById('refCopyLabel').textContent = 'Copy'; }, 2000);
+      } catch (_) {
+        inp.select(); document.execCommand('copy');
+      }
+    };
+  }
+
+  // 4. Wire up share buttons
+  const msg = encodeURIComponent(`Join me on Asteroid — upload your music, go live, and grow your fanbase 🪐\n${link}`);
+  const tw = document.getElementById('refShareTwitter');
+  const wa = document.getElementById('refShareWhatsapp');
+  const em = document.getElementById('refShareEmail');
+  if (tw) tw.href = `https://twitter.com/intent/tweet?text=${msg}`;
+  if (wa) wa.href = `https://wa.me/?text=${msg}`;
+  if (em) em.href = `mailto:?subject=${encodeURIComponent('Join me on Asteroid 🪐')}&body=${msg.replace(/%0A/g,'%0D%0A')}`;
+
+  // 5. Load stats
+  if (_refCode) {
+    try {
+      const sr = await fetch(`${RTDB_REF}/referralCounts/${encodeURIComponent(_refCode)}.json`);
+      const counts = await sr.json() || {};
+      const clicks = counts.clicks || 0;
+      const signups = counts.signups || 0;
+      const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+      el('refStatClicks', clicks);
+      el('refStatSignups', signups);
+      // Next milestone
+      const nextMs = MILESTONES.find(m => m.n > signups);
+      el('refStatNext', nextMs ? (nextMs.n - signups) : '🎉');
+      // Unlock milestones
+      MILESTONES.forEach(m => {
+        const el = document.getElementById(m.id);
+        if (el && signups >= m.n) el.classList.add('unlocked');
+      });
+    } catch (_) {}
+  }
+
+  _growLoaded = true;
+}
     </script>
 
 <nav class="mobile-nav">
@@ -3263,6 +3466,138 @@ if (_origSwitchTab2) {
 @media screen and (max-width: 3840px) {
   body { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
   .mobile-nav { display: flex !important; }
+}
+
+/* ── Grow / Referral tab ──────────────────────────────────────── */
+.ref-hero {
+  text-align: center;
+  padding: 32px 0 24px;
+}
+.ref-hero-icon { font-size: 3rem; margin-bottom: 12px; line-height: 1; }
+.ref-hero-title {
+  font-size: 1.5rem; font-weight: 700; margin: 0 0 8px;
+  color: var(--text-primary);
+}
+.ref-hero-sub {
+  font-size: 0.88rem; color: var(--text-secondary);
+  line-height: 1.55; max-width: 36ch; margin: 0 auto;
+}
+.ref-link-card {
+  background: rgba(255,127,80,0.06);
+  border: 1px solid rgba(255,127,80,0.25);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.ref-link-label {
+  font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-secondary); margin-bottom: 10px;
+}
+.ref-link-row {
+  display: flex; gap: 8px; align-items: stretch;
+  margin-bottom: 14px;
+}
+.ref-link-input {
+  flex: 1; min-width: 0;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.83rem;
+  color: var(--text-primary);
+  outline: none;
+}
+.ref-copy-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #ff7f50, #ff5c8a);
+  color: #fff;
+  font-weight: 700; font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.ref-copy-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.ref-share-row {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.ref-share-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem; font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  color: var(--text-primary);
+  transition: background 0.18s, border-color 0.18s;
+}
+.ref-share-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); }
+.ref-twitter:hover { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.2); }
+.ref-whatsapp:hover { background: rgba(37,211,102,0.15); border-color: rgba(37,211,102,0.3); }
+.ref-email:hover { background: rgba(255,127,80,0.12); border-color: rgba(255,127,80,0.3); }
+
+.ref-stats-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 20px;
+}
+.ref-stat-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 16px 12px;
+  text-align: center;
+}
+.ref-stat-icon { font-size: 1.1rem; color: #ff7f50; margin-bottom: 8px; }
+.ref-stat-val { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.ref-stat-label { font-size: 0.72rem; color: var(--text-secondary); }
+
+.ref-milestones {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 18px;
+  padding: 18px;
+}
+.ref-milestones-title {
+  font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-secondary); margin-bottom: 14px;
+}
+.ref-milestone {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  opacity: 0.45;
+  transition: opacity 0.3s;
+}
+.ref-milestone:last-child { border-bottom: none; padding-bottom: 0; }
+.ref-milestone.unlocked { opacity: 1; }
+.ref-ms-icon { font-size: 1.5rem; flex-shrink: 0; width: 36px; text-align: center; }
+.ref-ms-body { flex: 1; min-width: 0; }
+.ref-ms-name { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 2px; }
+.ref-ms-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+.ref-ms-badge {
+  font-size: 0.7rem; font-weight: 700;
+  padding: 4px 10px; border-radius: 999px;
+  background: rgba(255,255,255,0.07);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.ref-milestone.unlocked .ref-ms-badge {
+  background: rgba(74,222,128,0.15);
+  color: #4ade80;
+  border-color: rgba(74,222,128,0.3);
+}
+.ref-milestone.unlocked .ref-ms-badge::before { content: '✓ '; }
+
+@media (max-width: 480px) {
+  .ref-stats-row { grid-template-columns: 1fr 1fr; }
+  .ref-stats-row .ref-stat-card:last-child { grid-column: span 2; }
 }
 </style>
 </body>
