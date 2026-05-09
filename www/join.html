@@ -921,8 +921,10 @@
 
   function showAuthErr(msg) {
     const el = document.getElementById('authErr');
-    el.textContent = msg;
+    if (!el) return;
+    el.textContent = msg || '';
     el.classList.toggle('visible', !!msg);
+    if (msg) console.error('[join] auth error shown:', msg);
   }
 
   function handleAuthSuccess(user, nameHint) {
@@ -958,32 +960,55 @@
   // sign-in instead — page navigates to Google/Apple, then back to /join,
   // and getRedirectResult() picks up the user.
   async function doProviderSignIn(provider, btn, providerName) {
-    setAuthLoading(btn, true);
     showAuthErr('');
+    setAuthLoading(btn, true);
     signingIn = true;
-    try {
-      // Persist intent so we can restore UI after the redirect round-trip.
-      sessionStorage.setItem('joinPendingProvider', providerName);
-      if (selectedRole) sessionStorage.setItem('joinRole', selectedRole);
-    } catch (_) {}
+    try { sessionStorage.setItem('joinRole', selectedRole || 'fan'); } catch (_) {}
+
+    let redirectErr = null;
+    // If still on page after 2s, redirect silently failed — tell the user.
+    const redirectTimeout = setTimeout(() => {
+      signingIn = false;
+      resetAuthButtons();
+      showAuthErr('Sign-in redirect did not start. Check console for errors, or try a different browser.');
+    }, 2000);
+
     try {
       await signInWithRedirect(auth, provider);
-      // Navigation will follow; control rarely returns here.
-    } catch (e) {
+      // Promise resolved without navigating — unexpected.
+      clearTimeout(redirectTimeout);
       signingIn = false;
-      try { sessionStorage.removeItem('joinPendingProvider'); sessionStorage.removeItem('joinRole'); } catch (_) {}
       resetAuthButtons();
-      console.error('[join] sign-in error', e);
-      showAuthErr(friendlyAuthErr(e));
+      showAuthErr('Redirect did not start (resolved unexpectedly). Try again.');
+    } catch (e) {
+      redirectErr = e;
+      clearTimeout(redirectTimeout);
     }
+
+    if (redirectErr) {
+      signingIn = false;
+      resetAuthButtons();
+      const msg = redirectErr.code
+        ? 'Sign-in error: ' + redirectErr.code
+        : ('Sign-in failed: ' + (redirectErr.message || String(redirectErr)));
+      console.error('[join] signInWithRedirect error:', redirectErr);
+      showAuthErr(msg);
+    }
+    // If we get here and no error, the 2s timeout will show a message if no navigation.
   }
 
-  document.getElementById('btnGoogle').addEventListener('click', () => {
-    doProviderSignIn(googleProvider, document.getElementById('btnGoogle'), 'google');
+  document.getElementById('btnGoogle').addEventListener('click', function() {
+    console.log('[join] Google button clicked, calling doProviderSignIn');
+    doProviderSignIn(googleProvider, this, 'google').catch(err => {
+      console.error('[join] Unhandled doProviderSignIn error:', err);
+      showAuthErr('Unhandled error: ' + (err && err.message ? err.message : String(err)));
+      resetAuthButtons();
+    });
   });
 
-  document.getElementById('btnApple').addEventListener('click', () => {
-    doProviderSignIn(appleProvider, document.getElementById('btnApple'), 'apple');
+  document.getElementById('btnApple').addEventListener('click', function() {
+    console.log('[join] Apple button clicked, calling doProviderSignIn');
+    doProviderSignIn(appleProvider, this, 'apple');
   });
 
   function friendlyAuthErr(e) {
