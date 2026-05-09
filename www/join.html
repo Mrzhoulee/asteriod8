@@ -599,11 +599,13 @@
         btn.disabled = false;
         btnLabel.textContent = 'Create account';
 
-        let msg = 'Something went wrong. Please try again.';
+        let msg = 'Something went wrong — please try again.';
         if (err.code === 'auth/email-already-in-use') msg = 'An account with this email already exists. Try signing in instead.';
         else if (err.code === 'auth/invalid-email') msg = 'That email address doesn\'t look right.';
         else if (err.code === 'auth/weak-password') msg = 'Password is too weak — try adding numbers or symbols.';
         else if (err.code === 'auth/network-request-failed') msg = 'Network error — check your connection and try again.';
+        else if (err.code === 'auth/operation-not-allowed') msg = 'Email/password sign-up is not enabled yet. Contact the admin.';
+        else if (err.code) msg = 'Sign-up error: ' + err.code;
 
         globalErr.textContent = msg;
         globalErr.classList.add('visible');
@@ -611,11 +613,11 @@
     });
 
     // Clear field errors on input
+    const errMap = { artistName: 'nameErr', email: 'emailErr', password: 'pwErr', socialLink: 'linkErr' };
     ['artistName','email','password','socialLink'].forEach(id => {
       const el = document.getElementById(id);
       el.addEventListener('input', () => {
-        const errId = id === 'artistName' ? 'nameErr' : id === 'socialLink' ? 'linkErr' : id + 'Err';
-        showErr(errId, '');
+        showErr(errMap[id], '');
         el.classList.remove('err');
       });
     });
