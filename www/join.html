@@ -1097,29 +1097,42 @@
   });
 
   // ── Auth state: already signed in? ───────────────────────────────
-  // Check redirect result first (for redirect-based sign-in flows)
+  function hideLoader() {
+    document.getElementById('pageLoading').classList.add('hidden');
+  }
+
+  // Never block the page more than 4 seconds waiting for Firebase Auth
+  const loaderGuard = setTimeout(hideLoader, 4000);
+
   getRedirectResult(auth).then(result => {
     if (result && result.user) handleAuthSuccess(result.user);
   }).catch(() => {});
 
   onAuthStateChanged(auth, async user => {
-    if (!user) {
-      document.getElementById('pageLoading').classList.add('hidden');
-      return;
-    }
+    clearTimeout(loaderGuard);
+    if (!user) { hideLoader(); return; }
+
     // User already signed in — check if they have a profile
     const accountId = getStableId(user);
     const emailKey = sanitizeKey(accountId);
     setLocalAuth(user, user.displayName || '');
     try {
-      const res = await fetch(`${RTDB}/PROFILES/${encodeURIComponent(emailKey)}.json`);
+      const res = await fetch(`${RTDB}/PROFILES/${encodeURIComponent(emailKey)}.json`,
+        { signal: AbortSignal.timeout(5000) });
       const profile = await res.json();
       if (profile && profile.nickname) {
-        // Complete profile → go straight to app
-        location.href = 'index.html';
+        // Already set up — send them to the app
+        document.querySelector('.success-screen .success-sub').textContent =
+          `Welcome back, ${profile.nickname}! Taking you to Asteroid…`;
+        document.getElementById('stepRole').classList.remove('active');
+        document.getElementById('stepDone').classList.add('active');
+        document.getElementById('stepDots').style.display = 'none';
+        currentStep = 3;
+        hideLoader();
+        setTimeout(() => { location.href = 'index.html'; }, 1400);
         return;
       }
-      // Has account but no profile → show profile step (pick role first)
+      // Has auth but no profile → skip to profile step
       selectedRole = (profile && profile.role) || 'fan';
       authedUser = user;
       document.getElementById('bioField').style.display = selectedRole === 'artist' ? '' : 'none';
@@ -1133,7 +1146,6 @@
       } else {
         av.textContent = (displayName || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase() || '?';
       }
-      // Skip to step 3, hide dots for steps 0-1
       document.getElementById('dot0').className = 'step-dot done';
       document.getElementById('dot1').className = 'step-dot done';
       document.getElementById('dot2').className = 'step-dot active';
@@ -1141,7 +1153,7 @@
       document.getElementById('stepProfile').classList.add('active');
       currentStep = 2;
     } catch (_) {}
-    document.getElementById('pageLoading').classList.add('hidden');
+    hideLoader();
   });
 </script>
 </body>
