@@ -922,7 +922,7 @@
   }
 
   async function handleAuthSuccess(user, nameHint) {
-    authedUser = user;
+    authedUser = user; // set immediately so onAuthStateChanged guard triggers
     const displayName = nameHint || user.displayName || '';
     setLocalAuth(user, displayName);
 
@@ -1112,7 +1112,11 @@
     clearTimeout(loaderGuard);
     if (!user) { hideLoader(); return; }
 
-    // User already signed in — check if they have a profile
+    // Sign-in was handled by a button click — onAuthStateChanged fires too and
+    // would interfere with the step transition. Skip it; handleAuthSuccess already ran.
+    if (authedUser) { hideLoader(); return; }
+
+    // Page loaded with an existing Firebase Auth session — check their profile
     const accountId = getStableId(user);
     const emailKey = sanitizeKey(accountId);
     setLocalAuth(user, user.displayName || '');
@@ -1121,37 +1125,16 @@
         { signal: AbortSignal.timeout(5000) });
       const profile = await res.json();
       if (profile && profile.nickname) {
-        // Already set up — send them to the app
         document.querySelector('.success-screen .success-sub').textContent =
           `Welcome back, ${profile.nickname}! Taking you to Asteroid…`;
-        document.getElementById('stepRole').classList.remove('active');
-        document.getElementById('stepDone').classList.add('active');
-        document.getElementById('stepDots').style.display = 'none';
-        currentStep = 3;
+        goToStep(3);
         hideLoader();
         setTimeout(() => { location.href = 'index.html'; }, 1400);
         return;
       }
-      // Has auth but no profile → skip to profile step
+      // Has auth but no complete profile — go to profile step via normal flow
       selectedRole = (profile && profile.role) || 'fan';
-      authedUser = user;
-      document.getElementById('bioField').style.display = selectedRole === 'artist' ? '' : 'none';
-      document.getElementById('socialLinkField').style.display = selectedRole === 'artist' ? '' : 'none';
-      const displayName = user.displayName || '';
-      document.getElementById('profileName').value = displayName;
-      updateNameCount();
-      const av = document.getElementById('profileAvatar');
-      if (user.photoURL) {
-        av.innerHTML = `<img src="${user.photoURL}" alt="">`;
-      } else {
-        av.textContent = (displayName || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase() || '?';
-      }
-      document.getElementById('dot0').className = 'step-dot done';
-      document.getElementById('dot1').className = 'step-dot done';
-      document.getElementById('dot2').className = 'step-dot active';
-      document.getElementById('stepRole').classList.remove('active');
-      document.getElementById('stepProfile').classList.add('active');
-      currentStep = 2;
+      await handleAuthSuccess(user);
     } catch (_) {}
     hideLoader();
   });
