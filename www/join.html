@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Join Asteroid — Artist Signup</title>
+  <title>Join Asteroid</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet">
   <style>
     .material-symbols-outlined {
@@ -19,197 +19,457 @@
     }
     :root {
       --bg0: #07080d; --bg1: #12141c;
-      --card: rgba(255,255,255,0.06);
-      --border: rgba(255,127,80,0.3);
       --accent: #ff7f50; --accent2: #ff5c8a;
-      --text: #f4f4f8; --muted: rgba(244,244,248,0.55);
+      --text: #f4f4f8; --muted: rgba(244,244,248,0.5);
+      --card: rgba(255,255,255,0.05);
+      --border: rgba(255,255,255,0.09);
+      --border-accent: rgba(255,127,80,0.35);
       --err: #ff5c8a; --ok: #4ade80;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
     body {
       font-family: 'Montserrat', system-ui, sans-serif;
       color: var(--text);
-      min-height: 100vh;
       background:
-        radial-gradient(1200px 600px at 10% -10%, rgba(255,92,138,0.15), transparent 55%),
-        radial-gradient(900px 500px at 90% 20%, rgba(255,127,80,0.18), transparent 50%),
-        linear-gradient(165deg, var(--bg0), var(--bg1) 45%, #0a0c12);
+        radial-gradient(ellipse 120% 60% at 15% -5%, rgba(255,92,138,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse 90% 50% at 85% 15%, rgba(255,127,80,0.2) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 80% at 50% 100%, rgba(80,60,120,0.15) 0%, transparent 60%),
+        linear-gradient(160deg, #07080d 0%, #0d0f18 50%, #0a0c12 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 32px 20px;
+      justify-content: flex-start;
+      padding: 0;
     }
 
-    /* Logo / wordmark */
-    .join-logo {
+    /* ─── Shell ─────────────────────────────────────────────────────── */
+    .shell {
+      width: 100%;
+      max-width: 480px;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 0 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ─── Top bar ───────────────────────────────────────────────────── */
+    .topbar {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 32px;
+      justify-content: space-between;
+      padding: 20px 0 0;
+      flex-shrink: 0;
+    }
+    .logo-link {
+      display: flex; align-items: center; gap: 9px;
       text-decoration: none;
     }
-    .join-logo-icon {
-      width: 44px; height: 44px;
+    .logo-icon {
+      width: 36px; height: 36px;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
+      font-size: 18px; line-height: 1;
     }
-    .join-logo-name {
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: linear-gradient(120deg, #fff, rgba(255,200,180,0.9));
+    .logo-name {
+      font-size: 1.15rem; font-weight: 800;
+      background: linear-gradient(120deg, #fff 30%, rgba(255,200,180,0.9));
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
+    .step-dots {
+      display: flex; gap: 6px; align-items: center;
+    }
+    .step-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      transition: background 0.3s, width 0.3s;
+    }
+    .step-dot.active {
+      width: 20px; border-radius: 3px;
+      background: var(--accent);
+    }
+    .step-dot.done { background: rgba(255,127,80,0.4); }
 
-    /* Card */
-    .join-card {
-      width: 100%;
-      max-width: 420px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px;
-      padding: 36px 32px;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    /* ─── Steps viewport ─────────────────────────────────────────────── */
+    .steps-viewport {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .step {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 0 32px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      opacity: 0;
+      transform: translateX(60px);
+      pointer-events: none;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .step.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+    .step.exit-left {
+      opacity: 0;
+      transform: translateX(-60px);
     }
 
-    /* Referral banner */
-    .ref-banner {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      background: rgba(255,127,80,0.1);
-      border: 1px solid rgba(255,127,80,0.3);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 24px;
-      font-size: 0.82rem;
-      color: var(--accent);
-    }
-    .ref-banner.visible { display: flex; }
-    .ref-banner .material-symbols-outlined { font-size: 18px; flex-shrink: 0; }
-
-    .join-heading {
-      text-align: center;
+    /* ─── Step headings ─────────────────────────────────────────────── */
+    .step-heading {
       margin-bottom: 28px;
+      flex-shrink: 0;
     }
-    .join-heading h1 {
-      font-size: clamp(1.5rem, 4vw, 1.9rem);
-      font-weight: 700;
-      background: linear-gradient(120deg, #fff, rgba(255,200,180,0.9));
+    .step-heading h1 {
+      font-size: clamp(1.6rem, 5vw, 2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      background: linear-gradient(120deg, #fff 40%, rgba(255,200,180,0.85));
       -webkit-background-clip: text; background-clip: text; color: transparent;
       margin-bottom: 8px;
     }
-    .join-heading p {
+    .step-heading p {
       font-size: 0.88rem;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.55;
     }
 
-    /* Form */
-    .field { margin-bottom: 18px; }
-    .field label {
-      display: block;
+    /* ─── Role cards (Step 1) ───────────────────────────────────────── */
+    .role-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .role-card {
+      position: relative;
+      border-radius: 20px;
+      padding: 28px 18px 22px;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .role-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.2s;
+      border-radius: inherit;
+    }
+    .role-card.artist-card::before {
+      background: radial-gradient(circle at 50% 30%, rgba(255,127,80,0.25), transparent 70%);
+    }
+    .role-card.fan-card::before {
+      background: radial-gradient(circle at 50% 30%, rgba(120,100,255,0.25), transparent 70%);
+    }
+    .role-card:hover::before, .role-card:active::before { opacity: 1; }
+    .role-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+    .role-card.artist-card:hover { border-color: rgba(255,127,80,0.5); }
+    .role-card.fan-card:hover { border-color: rgba(120,100,255,0.5); }
+    .role-card:active { transform: scale(0.97); }
+
+    .role-icon {
+      width: 60px; height: 60px;
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 28px;
+    }
+    .artist-card .role-icon {
+      background: linear-gradient(135deg, rgba(255,127,80,0.2), rgba(255,92,138,0.2));
+      border: 1px solid rgba(255,127,80,0.3);
+    }
+    .artist-card .role-icon .material-symbols-outlined {
+      color: var(--accent);
+      font-size: 28px;
+      font-variation-settings: "FILL" 1;
+    }
+    .fan-card .role-icon {
+      background: linear-gradient(135deg, rgba(120,100,255,0.2), rgba(80,150,255,0.2));
+      border: 1px solid rgba(120,100,255,0.3);
+    }
+    .fan-card .role-icon .material-symbols-outlined {
+      color: #a78bfa;
+      font-size: 28px;
+      font-variation-settings: "FILL" 1;
+    }
+    .role-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .role-card p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .role-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    .artist-card .role-badge {
+      background: rgba(255,127,80,0.12);
+      color: var(--accent);
+      border: 1px solid rgba(255,127,80,0.25);
+    }
+    .fan-card .role-badge {
+      background: rgba(120,100,255,0.12);
+      color: #a78bfa;
+      border: 1px solid rgba(120,100,255,0.25);
+    }
+
+    .role-perks {
+      margin-top: 14px;
+      text-align: left;
+    }
+    .role-perk {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: rgba(244,244,248,0.6);
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+    .role-perk .material-symbols-outlined {
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 0px;
+      font-variation-settings: "FILL" 1;
+    }
+    .artist-card .role-perk .material-symbols-outlined { color: var(--accent); }
+    .fan-card .role-perk .material-symbols-outlined { color: #a78bfa; }
+
+    /* ─── Auth step (Step 2) ─────────────────────────────────────────── */
+    .auth-role-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
       font-size: 0.78rem;
       font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      margin-bottom: 24px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--card);
       color: var(--muted);
-      margin-bottom: 7px;
+      transition: color 0.2s, border-color 0.2s;
     }
-    .field-inner {
-      position: relative;
+    .auth-role-chip:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .auth-role-chip .material-symbols-outlined { font-size: 16px; }
+
+    .auth-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(255,127,80,0.07);
+      border: 1px solid rgba(255,127,80,0.2);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 24px;
+      font-size: 0.8rem;
+      color: rgba(255,200,160,0.85);
+      line-height: 1.5;
+    }
+    .auth-notice .material-symbols-outlined { font-size: 18px; color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+
+    .auth-btns { display: flex; flex-direction: column; gap: 12px; }
+
+    /* Apple button */
+    .btn-apple {
       display: flex;
       align-items: center;
-    }
-    .field-inner .material-symbols-outlined {
-      position: absolute;
-      left: 14px;
-      font-size: 20px;
-      color: var(--muted);
-      pointer-events: none;
-    }
-    .field input {
+      justify-content: center;
+      gap: 10px;
       width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 13px 16px 13px 44px;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.93rem;
-      color: var(--text);
-      transition: border-color 0.2s, background 0.2s;
-      -webkit-appearance: none;
-      outline: none;
-    }
-    .field input::placeholder { color: rgba(244,244,248,0.3); }
-    .field input:focus {
-      border-color: rgba(255,127,80,0.55);
-      background: rgba(255,127,80,0.05);
-    }
-    .field input.err { border-color: var(--err); }
-
-    .field-hint {
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-top: 5px;
-      padding-left: 2px;
-    }
-    .field-hint.err { color: var(--err); }
-
-    /* Password toggle */
-    .pw-toggle {
-      position: absolute;
-      right: 14px;
-      background: none;
+      padding: 15px 20px;
+      border-radius: 14px;
       border: none;
       cursor: pointer;
-      color: var(--muted);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: #fff;
+      color: #000;
+      transition: background 0.15s, transform 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-apple svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .btn-apple:hover { background: #f0f0f0; transform: translateY(-1px); }
+    .btn-apple:active { transform: scale(0.98); }
+
+    /* Google button */
+    .btn-google {
       display: flex;
       align-items: center;
-      padding: 4px;
-      transition: color 0.2s;
-    }
-    .pw-toggle:hover { color: var(--text); }
-    .pw-toggle .material-symbols-outlined { font-size: 20px; }
-
-    /* Password strength */
-    .pw-strength {
-      display: flex;
-      gap: 4px;
-      margin-top: 7px;
-    }
-    .pw-bar {
-      flex: 1; height: 3px;
-      border-radius: 2px;
-      background: rgba(255,255,255,0.08);
-      transition: background 0.3s;
-    }
-    .pw-bar.active-weak   { background: var(--err); }
-    .pw-bar.active-ok     { background: #facc15; }
-    .pw-bar.active-strong { background: var(--ok); }
-
-    /* Optional link field separator */
-    .optional-divider {
-      display: flex;
-      align-items: center;
+      justify-content: center;
       gap: 10px;
-      margin: 4px 0 18px;
-      color: var(--muted);
-      font-size: 0.75rem;
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
-    .optional-divider::before,
-    .optional-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(255,255,255,0.08);
+    .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .btn-google:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); transform: translateY(-1px); }
+    .btn-google:active { transform: scale(0.98); }
+    .btn-google:disabled, .btn-apple:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .auth-divider {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.75rem; color: var(--muted);
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08);
     }
 
-    /* Submit button */
-    .join-btn {
+    .auth-err {
+      display: none;
+      background: rgba(255,92,138,0.1);
+      border: 1px solid rgba(255,92,138,0.25);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: var(--err);
+      line-height: 1.45;
+      margin-top: 4px;
+    }
+    .auth-err.visible { display: block; }
+
+    /* ─── Profile step (Step 3) ─────────────────────────────────────── */
+    .profile-avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 2px solid rgba(255,127,80,0.3);
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .profile-field { margin-bottom: 16px; }
+    .profile-field label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .profile-field input,
+    .profile-field textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.92rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-appearance: none;
+    }
+    .profile-field textarea {
+      resize: none;
+      height: 80px;
+      line-height: 1.5;
+    }
+    .profile-field input::placeholder,
+    .profile-field textarea::placeholder { color: rgba(244,244,248,0.28); }
+    .profile-field input:focus,
+    .profile-field textarea:focus {
+      border-color: rgba(255,127,80,0.5);
+      background: rgba(255,127,80,0.04);
+    }
+    .field-count {
+      text-align: right;
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Genre chips */
+    .genre-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .genre-chip {
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 0.77rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.18s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .genre-chip.selected {
+      background: rgba(255,127,80,0.15);
+      border-color: rgba(255,127,80,0.5);
+      color: var(--accent);
+    }
+    .genre-chip:hover:not(.selected) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+    /* Color picker */
+    .color-swatches {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .color-swatch {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.selected { border-color: #fff; transform: scale(1.15); }
+
+    /* Finish button */
+    .finish-btn {
       width: 100%;
       padding: 15px;
       border: none;
@@ -221,23 +481,21 @@
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       color: #fff;
       transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 8px 24px rgba(255,127,80,0.3);
-      margin-top: 6px;
+      box-shadow: 0 8px 24px rgba(255,127,80,0.28);
+      margin-top: 20px;
+      flex-shrink: 0;
     }
-    .join-btn:hover:not(:disabled) {
+    .finish-btn:hover:not(:disabled) {
       transform: translateY(-1px);
-      box-shadow: 0 12px 32px rgba(255,127,80,0.4);
+      box-shadow: 0 12px 32px rgba(255,127,80,0.38);
     }
-    .join-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .finish-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
-    .join-btn-inner {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+    .finish-btn-inner {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .spinner {
-      width: 18px; height: 18px;
+      width: 17px; height: 17px;
       border: 2px solid rgba(255,255,255,0.3);
       border-top-color: #fff;
       border-radius: 50%;
@@ -246,381 +504,635 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Global error */
-    .global-err {
-      display: none;
-      background: rgba(255,92,138,0.1);
-      border: 1px solid rgba(255,92,138,0.3);
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 0.85rem;
-      color: var(--err);
-      margin-top: 16px;
-      line-height: 1.5;
-    }
-    .global-err.visible { display: block; }
-
-    /* Already have account */
-    .join-footer {
-      text-align: center;
-      margin-top: 24px;
-      font-size: 0.85rem;
+    .optional-label {
+      font-size: 0.68rem;
       color: var(--muted);
+      font-weight: 500;
+      margin-left: 4px;
+      text-transform: none;
+      letter-spacing: 0;
     }
-    .join-footer a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .join-footer a:hover { text-decoration: underline; }
 
-    /* Success state */
-    .success-overlay {
-      display: none;
+    /* ─── Sign-in already screen / success ──────────────────────────── */
+    .success-screen {
+      display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       text-align: center;
-      gap: 16px;
-      padding: 8px 0;
+      gap: 14px;
+      height: 100%;
+      padding-bottom: 40px;
     }
-    .success-overlay.visible { display: flex; }
-    .success-icon {
-      width: 64px; height: 64px;
-      background: rgba(74,222,128,0.12);
-      border: 2px solid rgba(74,222,128,0.4);
+    .success-ring {
+      width: 72px; height: 72px;
       border-radius: 50%;
+      background: rgba(74,222,128,0.1);
+      border: 2px solid rgba(74,222,128,0.35);
       display: flex; align-items: center; justify-content: center;
     }
-    .success-icon .material-symbols-outlined {
-      font-size: 32px;
-      color: var(--ok);
+    .success-ring .material-symbols-outlined {
+      font-size: 34px; color: var(--ok);
       font-variation-settings: "FILL" 1;
     }
-    .success-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--text);
+    .success-title { font-size: 1.4rem; font-weight: 800; }
+    .success-sub { font-size: 0.85rem; color: var(--muted); line-height: 1.55; max-width: 28ch; }
+
+    /* ─── Loading spinner (full page) ───────────────────────────────── */
+    .page-loading {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: #07080d;
+      z-index: 999;
+      transition: opacity 0.4s;
     }
-    .success-sub {
-      font-size: 0.88rem;
-      color: var(--muted);
-      line-height: 1.5;
+    .page-loading.hidden { opacity: 0; pointer-events: none; }
+    .page-loader {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(255,127,80,0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
 
-    @media (max-width: 480px) {
-      .join-card { padding: 28px 20px; border-radius: 20px; }
+    /* ─── Sign-in loading overlay on buttons ───────────────────────── */
+    .btn-loading {
+      position: relative;
+      pointer-events: none;
+    }
+    .btn-loading::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: rgba(0,0,0,0.25);
+    }
+
+    @media (max-height: 650px) {
+      .role-card { padding: 18px 14px 16px; }
+      .role-icon { width: 46px; height: 46px; margin-bottom: 10px; }
+      .role-perks { display: none; }
+      .step-heading { margin-bottom: 18px; }
     }
   </style>
 </head>
 <body>
-  <a class="join-logo" href="index.html">
-    <div class="join-logo-icon">🪐</div>
-    <span class="join-logo-name">Asteroid</span>
-  </a>
 
-  <div class="join-card">
-    <div id="refBanner" class="ref-banner">
-      <span class="material-symbols-outlined">card_giftcard</span>
-      <span id="refBannerText">You were invited to join Asteroid!</span>
-    </div>
+<div class="page-loading" id="pageLoading">
+  <div class="page-loader"></div>
+</div>
 
-    <div id="formWrap">
-      <div class="join-heading">
-        <h1>Start your artist journey</h1>
-        <p>Upload music, grow your fanbase, and go live — all in one place.</p>
-      </div>
-
-      <form id="joinForm" novalidate>
-        <div class="field">
-          <label for="artistName">Artist name</label>
-          <div class="field-inner">
-            <span class="material-symbols-outlined">person</span>
-            <input id="artistName" type="text" placeholder="Your stage name" autocomplete="name" required>
-          </div>
-          <div class="field-hint err" id="nameErr" style="display:none"></div>
-        </div>
-
-        <div class="field">
-          <label for="email">Email</label>
-          <div class="field-inner">
-            <span class="material-symbols-outlined">mail</span>
-            <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required>
-          </div>
-          <div class="field-hint err" id="emailErr" style="display:none"></div>
-        </div>
-
-        <div class="field">
-          <label for="password">Password</label>
-          <div class="field-inner">
-            <span class="material-symbols-outlined">lock</span>
-            <input id="password" type="password" placeholder="At least 8 characters" autocomplete="new-password" required>
-            <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">
-              <span class="material-symbols-outlined" id="pwEyeIcon">visibility</span>
-            </button>
-          </div>
-          <div class="pw-strength" id="pwStrength">
-            <div class="pw-bar" id="pb1"></div>
-            <div class="pw-bar" id="pb2"></div>
-            <div class="pw-bar" id="pb3"></div>
-          </div>
-          <div class="field-hint err" id="pwErr" style="display:none"></div>
-        </div>
-
-        <div class="optional-divider">Optional</div>
-
-        <div class="field">
-          <label for="socialLink">SoundCloud or Bandcamp link</label>
-          <div class="field-inner">
-            <span class="material-symbols-outlined">link</span>
-            <input id="socialLink" type="url" placeholder="https://soundcloud.com/you" autocomplete="url">
-          </div>
-          <div class="field-hint err" id="linkErr" style="display:none"></div>
-        </div>
-
-        <button type="submit" class="join-btn" id="joinBtn">
-          <div class="join-btn-inner">
-            <div class="spinner" id="spinner"></div>
-            <span id="btnLabel">Create account</span>
-          </div>
-        </button>
-
-        <div class="global-err" id="globalErr"></div>
-      </form>
-    </div>
-
-    <div class="success-overlay" id="successOverlay">
-      <div class="success-icon">
-        <span class="material-symbols-outlined">check_circle</span>
-      </div>
-      <div class="success-title">You're in! 🎉</div>
-      <div class="success-sub">Your artist account is ready.<br>Taking you to your dashboard…</div>
+<div class="shell">
+  <!-- Top bar -->
+  <div class="topbar">
+    <a class="logo-link" href="index.html">
+      <div class="logo-icon">🪐</div>
+      <span class="logo-name">Asteroid</span>
+    </a>
+    <div class="step-dots" id="stepDots">
+      <div class="step-dot active" id="dot0"></div>
+      <div class="step-dot" id="dot1"></div>
+      <div class="step-dot" id="dot2"></div>
     </div>
   </div>
 
-  <p class="join-footer">Already have an account? <a href="index.html">Sign in</a></p>
+  <!-- Steps viewport -->
+  <div class="steps-viewport">
 
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+    <!-- ── Step 1: Role ───────────────────────────────────────────── -->
+    <div class="step active" id="stepRole">
+      <div class="step-heading">
+        <h1>What brings you to Asteroid?</h1>
+        <p>Pick your role — you can always change it later.</p>
+      </div>
+      <div class="role-cards">
+        <div class="role-card artist-card" id="pickArtist" role="button" tabindex="0" aria-label="Join as Artist">
+          <div class="role-badge">Artist</div>
+          <div class="role-icon"><span class="material-symbols-outlined">mic</span></div>
+          <h3>I make music</h3>
+          <p>Share your art with the world</p>
+          <div class="role-perks">
+            <div class="role-perk">
+              <span class="material-symbols-outlined">upload</span>Upload &amp; stream tracks
+            </div>
+            <div class="role-perk">
+              <span class="material-symbols-outlined">live_tv</span>Go live with fans
+            </div>
+            <div class="role-perk">
+              <span class="material-symbols-outlined">bar_chart</span>Dashboard analytics
+            </div>
+          </div>
+        </div>
+        <div class="role-card fan-card" id="pickFan" role="button" tabindex="0" aria-label="Join as Listener">
+          <div class="role-badge" style="background:rgba(120,100,255,0.12);color:#a78bfa;border-color:rgba(120,100,255,0.25);">Listener</div>
+          <div class="role-icon"><span class="material-symbols-outlined">headphones</span></div>
+          <h3>I love music</h3>
+          <p>Discover your next favourite artist</p>
+          <div class="role-perks">
+            <div class="role-perk">
+              <span class="material-symbols-outlined" style="color:#a78bfa">queue_music</span>Build playlists
+            </div>
+            <div class="role-perk">
+              <span class="material-symbols-outlined" style="color:#a78bfa">favorite</span>Follow artists
+            </div>
+            <div class="role-perk">
+              <span class="material-symbols-outlined" style="color:#a78bfa">live_tv</span>Watch live shows
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    const FB_CFG = {
-      apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
-      authDomain: "asteroid-cdc13.firebaseapp.com",
-      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
-      projectId: "asteroid-cdc13",
-      storageBucket: "asteroid-cdc13.appspot.com",
-      messagingSenderId: "793353824502",
-      appId: "1:793353824502:web:3ac24821911d14773ba4d7"
-    };
-    const RTDB = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+    <!-- ── Step 2: Sign in ───────────────────────────────────────── -->
+    <div class="step" id="stepAuth">
+      <div class="step-heading">
+        <h1 id="authHeading">Sign in to continue</h1>
+        <p id="authSubheading">Choose how you'd like to join Asteroid.</p>
+      </div>
 
-    const app = initializeApp(FB_CFG);
-    const auth = getAuth(app);
+      <button class="auth-role-chip" id="changeRoleBtn" type="button">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <span id="roleChipLabel">Change role</span>
+      </button>
 
-    // ── Referral capture ──────────────────────────────────────────────
-    const params = new URLSearchParams(location.search);
-    const refId = params.get('ref') || '';
-    const storedRef = (() => {
-      try {
-        const raw = localStorage.getItem('asteroid_ref');
-        if (raw) {
-          const obj = JSON.parse(raw);
-          if (Date.now() - obj.ts < 30 * 24 * 60 * 60 * 1000) return obj.ref;
-        }
-      } catch (_) {}
-      return '';
-    })();
+      <div class="auth-notice" id="googleNotice" style="display:none">
+        <span class="material-symbols-outlined">info</span>
+        <span>Artists sign in with Google so your profile is verified and linked securely.</span>
+      </div>
 
-    const activeRef = refId || storedRef;
+      <div class="auth-btns" id="authBtns">
+        <!-- Apple button (hidden for artist) -->
+        <button class="btn-apple" id="btnApple" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+          Continue with Apple
+        </button>
 
+        <div class="auth-divider" id="authDivider">or</div>
+
+        <!-- Google button -->
+        <button class="btn-google" id="btnGoogle" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continue with Google
+        </button>
+
+        <div class="auth-err" id="authErr"></div>
+      </div>
+    </div>
+
+    <!-- ── Step 3: Profile ───────────────────────────────────────── -->
+    <div class="step" id="stepProfile">
+      <div class="step-heading">
+        <h1>Set up your profile</h1>
+        <p>Tell the Asteroid community a bit about yourself.</p>
+      </div>
+
+      <div class="profile-avatar" id="profileAvatar">?</div>
+
+      <div class="profile-field">
+        <label for="profileName">Display name</label>
+        <input type="text" id="profileName" placeholder="Your name or artist alias" maxlength="80" autocomplete="nickname">
+        <div class="field-count"><span id="nameCount">0</span>/80</div>
+      </div>
+
+      <div class="profile-field" id="bioField">
+        <label for="profileBio">Bio <span class="optional-label">· optional</span></label>
+        <textarea id="profileBio" placeholder="Tell fans a bit about your music…" maxlength="160"></textarea>
+        <div class="field-count"><span id="bioCount">0</span>/160</div>
+      </div>
+
+      <div class="profile-field">
+        <label>Genres <span class="optional-label">· pick up to 3</span></label>
+        <div class="genre-chips" id="genreChips">
+          <div class="genre-chip" data-g="Pop">Pop</div>
+          <div class="genre-chip" data-g="Hip-Hop">Hip-Hop</div>
+          <div class="genre-chip" data-g="R&B">R&amp;B</div>
+          <div class="genre-chip" data-g="Electronic">Electronic</div>
+          <div class="genre-chip" data-g="Rock">Rock</div>
+          <div class="genre-chip" data-g="Indie">Indie</div>
+          <div class="genre-chip" data-g="Jazz">Jazz</div>
+          <div class="genre-chip" data-g="Lo-fi">Lo-fi</div>
+          <div class="genre-chip" data-g="Soul">Soul</div>
+          <div class="genre-chip" data-g="Country">Country</div>
+          <div class="genre-chip" data-g="Metal">Metal</div>
+          <div class="genre-chip" data-g="Classical">Classical</div>
+          <div class="genre-chip" data-g="Reggae">Reggae</div>
+          <div class="genre-chip" data-g="Dance">Dance</div>
+          <div class="genre-chip" data-g="Alt">Alternative</div>
+        </div>
+      </div>
+
+      <div class="profile-field" id="socialLinkField">
+        <label for="profileLink">SoundCloud / Bandcamp <span class="optional-label">· optional</span></label>
+        <input type="url" id="profileLink" placeholder="https://soundcloud.com/you" autocomplete="url">
+      </div>
+
+      <div class="profile-field">
+        <label>Accent colour</label>
+        <div class="color-swatches" id="colorSwatches">
+          <div class="color-swatch selected" data-color="#ff7f50" style="background:#ff7f50" title="Coral"></div>
+          <div class="color-swatch" data-color="#ff5c8a" style="background:#ff5c8a" title="Pink"></div>
+          <div class="color-swatch" data-color="#a78bfa" style="background:#a78bfa" title="Purple"></div>
+          <div class="color-swatch" data-color="#38bdf8" style="background:#38bdf8" title="Sky"></div>
+          <div class="color-swatch" data-color="#4ade80" style="background:#4ade80" title="Green"></div>
+          <div class="color-swatch" data-color="#facc15" style="background:#facc15" title="Gold"></div>
+        </div>
+      </div>
+
+      <button class="finish-btn" id="finishBtn" type="button">
+        <div class="finish-btn-inner">
+          <div class="spinner" id="finishSpinner"></div>
+          <span id="finishLabel">Finish &amp; go to Asteroid</span>
+        </div>
+      </button>
+    </div>
+
+    <!-- ── Step 4: Success ───────────────────────────────────────── -->
+    <div class="step" id="stepDone">
+      <div class="success-screen">
+        <div class="success-ring">
+          <span class="material-symbols-outlined">check_circle</span>
+        </div>
+        <div class="success-title">You're in! 🎉</div>
+        <div class="success-sub" id="successMsg">Your account is ready. Taking you to Asteroid…</div>
+      </div>
+    </div>
+
+  </div><!-- /steps-viewport -->
+</div><!-- /shell -->
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
+  import {
+    getAuth, onAuthStateChanged,
+    signInWithPopup, signInWithRedirect, getRedirectResult,
+    GoogleAuthProvider, OAuthProvider
+  } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
+
+  const FB_CFG = {
+    apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+    authDomain: "asteroid-cdc13.firebaseapp.com",
+    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+    projectId: "asteroid-cdc13",
+    storageBucket: "asteroid-cdc13.appspot.com",
+    messagingSenderId: "793353824502",
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+  };
+  const RTDB = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+
+  const app = initializeApp(FB_CFG);
+  const auth = getAuth(app);
+
+  // ── Referral capture ──────────────────────────────────────────────
+  const params = new URLSearchParams(location.search);
+  const refId = params.get('ref') || '';
+  const activeRef = (() => {
     if (refId) {
       try { localStorage.setItem('asteroid_ref', JSON.stringify({ ref: refId, ts: Date.now() })); } catch (_) {}
+      return refId;
     }
+    try {
+      const raw = localStorage.getItem('asteroid_ref');
+      if (raw) { const o = JSON.parse(raw); if (Date.now() - o.ts < 30*24*60*60*1000) return o.ref; }
+    } catch (_) {}
+    return '';
+  })();
 
-    if (activeRef) {
-      document.getElementById('refBanner').classList.add('visible');
-      document.getElementById('refBannerText').textContent =
-        'You were invited to join Asteroid! (ref: ' + activeRef + ')';
-    }
+  if (refId) {
+    (async () => {
+      let ip = '';
+      try { const r = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(3000) }); ip = (await r.json()).ip || ''; } catch (_) {}
+      try { await fetch(RTDB + '/REFERRAL_CLICKS.json', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: refId, ts: Date.now(), ua: navigator.userAgent.slice(0, 300), ip }) }); } catch (_) {}
+    })();
+  }
 
-    // Log referral click asynchronously — best effort
-    if (refId) {
-      (async () => {
-        let ip = '';
-        try { const r = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(3000) }); ip = (await r.json()).ip || ''; } catch (_) {}
-        const payload = {
-          ref: refId,
-          ts: Date.now(),
-          ua: navigator.userAgent.slice(0, 300),
-          ip
-        };
-        try {
-          await fetch(RTDB + '/REFERRAL_CLICKS.json', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        } catch (_) {}
-      })();
-    }
+  // ── State ─────────────────────────────────────────────────────────
+  let currentStep = 0;
+  let selectedRole = '';
+  let authedUser = null;
+  let selectedColor = '#ff7f50';
+  const selectedGenres = new Set();
 
-    // ── Helpers ───────────────────────────────────────────────────────
-    function sanitizeKey(email) {
-      return email.toLowerCase().replace(/[.#$[\]]/g, '_');
-    }
+  // ── Helpers ───────────────────────────────────────────────────────
+  function sanitizeKey(s) { return String(s).replace(/[.#$[\]]/g, '_'); }
 
-    function pwScore(pw) {
-      let s = 0;
-      if (pw.length >= 8) s++;
-      if (/[A-Z]/.test(pw) || /[0-9]/.test(pw)) s++;
-      if (/[^A-Za-z0-9]/.test(pw) || pw.length >= 12) s++;
-      return s; // 0-3
-    }
+  function getStableId(user) {
+    const isApple = user.providerData && user.providerData.some(p => p && p.providerId === 'apple.com');
+    if (isApple) return (user.uid || user.email || '').trim();
+    return (user.email || user.providerData?.[0]?.email || user.uid || '').trim();
+  }
 
-    // ── Password strength UI ──────────────────────────────────────────
-    const pwInput = document.getElementById('password');
-    const bars = [document.getElementById('pb1'), document.getElementById('pb2'), document.getElementById('pb3')];
+  function setLocalAuth(user, nickname) {
+    const accountId = getStableId(user);
+    const emailKey = sanitizeKey(accountId);
+    localStorage.setItem('CurrentUser', accountId);
+    localStorage.setItem('emailKey', emailKey);
+    localStorage.setItem('email', user.email || accountId);
+    localStorage.setItem('fullName', nickname || user.displayName || '');
+    localStorage.setItem('asteroidSignedInBefore', 'true');
+    if (user.photoURL) localStorage.setItem('pfp', user.photoURL);
+    localStorage.removeItem('localAuthOnly');
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+  }
 
-    pwInput.addEventListener('input', () => {
-      const score = pwScore(pwInput.value);
-      const cls = score === 1 ? 'active-weak' : score === 2 ? 'active-ok' : score === 3 ? 'active-strong' : '';
-      bars.forEach((b, i) => {
-        b.className = 'pw-bar';
-        if (i < score && cls) b.classList.add(cls);
-      });
+  // ── Step transitions ──────────────────────────────────────────────
+  const stepIds = ['stepRole', 'stepAuth', 'stepProfile', 'stepDone'];
+  const dots = [0,1,2].map(i => document.getElementById('dot' + i));
+
+  function goToStep(n) {
+    const prev = document.getElementById(stepIds[currentStep]);
+    const next = document.getElementById(stepIds[n]);
+    prev.classList.remove('active');
+    prev.classList.add('exit-left');
+    setTimeout(() => { prev.classList.remove('exit-left'); }, 400);
+    next.classList.add('active');
+    dots.forEach((d, i) => {
+      d.className = 'step-dot' + (i === n ? ' active' : i < n ? ' done' : '');
     });
+    // hide dots on step 3 (done screen)
+    document.getElementById('stepDots').style.display = n === 3 ? 'none' : 'flex';
+    currentStep = n;
+  }
 
-    // ── Password visibility toggle ────────────────────────────────────
-    document.getElementById('pwToggle').addEventListener('click', () => {
-      const isHidden = pwInput.type === 'password';
-      pwInput.type = isHidden ? 'text' : 'password';
-      document.getElementById('pwEyeIcon').textContent = isHidden ? 'visibility_off' : 'visibility';
-    });
+  // ── Step 1: Role selection ────────────────────────────────────────
+  document.getElementById('pickArtist').addEventListener('click', () => selectRole('artist'));
+  document.getElementById('pickArtist').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') selectRole('artist'); });
+  document.getElementById('pickFan').addEventListener('click', () => selectRole('fan'));
+  document.getElementById('pickFan').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') selectRole('fan'); });
 
-    // ── Form validation ───────────────────────────────────────────────
-    function showErr(id, msg) {
-      const el = document.getElementById(id);
-      el.textContent = msg;
-      el.style.display = msg ? 'block' : 'none';
+  function selectRole(role) {
+    selectedRole = role;
+    const isArtist = role === 'artist';
+
+    document.getElementById('authHeading').textContent = isArtist ? 'Sign in with Google' : 'Sign in to continue';
+    document.getElementById('authSubheading').textContent = isArtist
+      ? 'A Google account is required to verify artist profiles.'
+      : 'Choose how you\'d like to join Asteroid.';
+    document.getElementById('roleChipLabel').textContent = isArtist ? 'Artist' : 'Listener';
+    document.getElementById('googleNotice').style.display = isArtist ? 'flex' : 'none';
+    document.getElementById('btnApple').style.display = isArtist ? 'none' : '';
+    document.getElementById('authDivider').style.display = isArtist ? 'none' : '';
+
+    // Show/hide artist-only profile fields
+    document.getElementById('bioField').style.display = isArtist ? '' : 'none';
+    document.getElementById('socialLinkField').style.display = isArtist ? '' : 'none';
+
+    goToStep(1);
+  }
+
+  document.getElementById('changeRoleBtn').addEventListener('click', () => goToStep(0));
+
+  // ── Step 2: Auth ──────────────────────────────────────────────────
+  const googleProvider = new GoogleAuthProvider();
+  googleProvider.addScope('email');
+  googleProvider.addScope('profile');
+
+  const appleProvider = new OAuthProvider('apple.com');
+  appleProvider.addScope('email');
+  appleProvider.addScope('name');
+
+  function setAuthLoading(btn, loading) {
+    btn.disabled = loading;
+    if (loading) btn.classList.add('btn-loading');
+    else btn.classList.remove('btn-loading');
+  }
+
+  function showAuthErr(msg) {
+    const el = document.getElementById('authErr');
+    el.textContent = msg;
+    el.classList.toggle('visible', !!msg);
+  }
+
+  async function handleAuthSuccess(user, nameHint) {
+    authedUser = user;
+    const displayName = nameHint || user.displayName || '';
+    setLocalAuth(user, displayName);
+
+    // Pre-fill profile form
+    const nameInput = document.getElementById('profileName');
+    nameInput.value = displayName;
+    updateNameCount();
+
+    // Avatar
+    const av = document.getElementById('profileAvatar');
+    if (user.photoURL) {
+      av.innerHTML = `<img src="${user.photoURL}" alt="">`;
+    } else {
+      const initials = (displayName || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+      av.textContent = initials || '?';
     }
 
-    function validateForm() {
-      let ok = true;
-      const name = document.getElementById('artistName').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const pw = document.getElementById('password').value;
-      const link = document.getElementById('socialLink').value.trim();
+    goToStep(2);
+  }
 
-      showErr('nameErr', '');
-      showErr('emailErr', '');
-      showErr('pwErr', '');
-      showErr('linkErr', '');
-
-      if (name.length < 1) { showErr('nameErr', 'Artist name is required.'); ok = false; }
-      else if (name.length > 80) { showErr('nameErr', 'Name must be ≤80 characters.'); ok = false; }
-
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('emailErr', 'Enter a valid email.'); ok = false; }
-
-      if (pw.length < 8) { showErr('pwErr', 'Password must be at least 8 characters.'); ok = false; }
-
-      if (link && !/^https?:\/\/.+\..+/.test(link)) { showErr('linkErr', 'Enter a full URL starting with https://'); ok = false; }
-
-      return ok;
-    }
-
-    // ── Submit ────────────────────────────────────────────────────────
-    document.getElementById('joinForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!validateForm()) return;
-
-      const artistName = document.getElementById('artistName').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const pw = document.getElementById('password').value;
-      const link = document.getElementById('socialLink').value.trim();
-
-      const btn = document.getElementById('joinBtn');
-      const spinner = document.getElementById('spinner');
-      const btnLabel = document.getElementById('btnLabel');
-      const globalErr = document.getElementById('globalErr');
-
-      btn.disabled = true;
-      spinner.style.display = 'block';
-      btnLabel.textContent = 'Creating account…';
-      globalErr.classList.remove('visible');
-
-      try {
-        // 1. Create Firebase Auth account
-        await createUserWithEmailAndPassword(auth, email, pw);
-
-        // 2. Build profile payload
-        const emailKey = sanitizeKey(email);
-        const profile = {
-          nickname: artistName,
-          email,
-          role: 'artist',
-          profileVisibility: 'public',
-          createdAt: Date.now(),
-          joinedViaMarketing: true
-        };
-        if (activeRef) profile.referredBy = activeRef;
-        if (link) {
-          if (link.includes('soundcloud.com')) profile.soundcloud = link;
-          else if (link.includes('bandcamp.com')) profile.bandcamp = link;
-          else profile.socialLink = link;
-        }
-
-        // 3. Save profile to RTDB
-        await fetch(`${RTDB}/PROFILES/${encodeURIComponent(emailKey)}.json`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(profile)
-        });
-
-        // 4. If referred, increment referral count
-        if (activeRef) {
-          try {
-            await fetch(`${RTDB}/referralCounts/${encodeURIComponent(activeRef)}/signups.json`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ '.sv': { 'increment': 1 } })
-            });
-          } catch (_) {}
-          try { localStorage.removeItem('asteroid_ref'); } catch (_) {}
-        }
-
-        // 5. Show success then redirect
-        document.getElementById('formWrap').style.display = 'none';
-        document.getElementById('successOverlay').classList.add('visible');
-
-        setTimeout(() => { location.href = 'ArtistDashboard.html'; }, 1800);
-
-      } catch (err) {
-        spinner.style.display = 'none';
-        btn.disabled = false;
-        btnLabel.textContent = 'Create account';
-
-        let msg = 'Something went wrong — please try again.';
-        if (err.code === 'auth/email-already-in-use') msg = 'An account with this email already exists. Try signing in instead.';
-        else if (err.code === 'auth/invalid-email') msg = 'That email address doesn\'t look right.';
-        else if (err.code === 'auth/weak-password') msg = 'Password is too weak — try adding numbers or symbols.';
-        else if (err.code === 'auth/network-request-failed') msg = 'Network error — check your connection and try again.';
-        else if (err.code === 'auth/operation-not-allowed') msg = 'Email/password sign-up is not enabled yet. Contact the admin.';
-        else if (err.code) msg = 'Sign-up error: ' + err.code;
-
-        globalErr.textContent = msg;
-        globalErr.classList.add('visible');
+  document.getElementById('btnGoogle').addEventListener('click', async () => {
+    const btn = document.getElementById('btnGoogle');
+    setAuthLoading(btn, true);
+    showAuthErr('');
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      await handleAuthSuccess(result.user);
+    } catch (e) {
+      if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+        showAuthErr(friendlyAuthErr(e));
       }
-    });
+      setAuthLoading(btn, false);
+    }
+  });
 
-    // Clear field errors on input
-    const errMap = { artistName: 'nameErr', email: 'emailErr', password: 'pwErr', socialLink: 'linkErr' };
-    ['artistName','email','password','socialLink'].forEach(id => {
-      const el = document.getElementById(id);
-      el.addEventListener('input', () => {
-        showErr(errMap[id], '');
-        el.classList.remove('err');
+  document.getElementById('btnApple').addEventListener('click', async () => {
+    const btn = document.getElementById('btnApple');
+    setAuthLoading(btn, true);
+    showAuthErr('');
+    try {
+      const result = await signInWithPopup(auth, appleProvider);
+      // Apple only returns name on first sign-in
+      const cred = OAuthProvider.credentialFromResult(result);
+      const nameHint = result.user.displayName || '';
+      await handleAuthSuccess(result.user, nameHint);
+    } catch (e) {
+      if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+        showAuthErr(friendlyAuthErr(e));
+      }
+      setAuthLoading(btn, false);
+    }
+  });
+
+  function friendlyAuthErr(e) {
+    if (!e) return 'Something went wrong. Try again.';
+    const c = e.code || '';
+    if (c === 'auth/popup-blocked') return 'Popup was blocked — please allow popups for this site.';
+    if (c === 'auth/network-request-failed') return 'Network error — check your connection.';
+    if (c === 'auth/operation-not-allowed') return 'This sign-in method isn\'t enabled yet. Contact support.';
+    if (c === 'auth/account-exists-with-different-credential') return 'An account already exists with this email using a different sign-in method.';
+    if (c) return 'Sign-in error: ' + c;
+    return 'Something went wrong. Try again.';
+  }
+
+  // ── Step 3: Profile ───────────────────────────────────────────────
+  function updateNameCount() {
+    document.getElementById('nameCount').textContent = document.getElementById('profileName').value.length;
+  }
+  document.getElementById('profileName').addEventListener('input', updateNameCount);
+  document.getElementById('profileBio').addEventListener('input', () => {
+    document.getElementById('bioCount').textContent = document.getElementById('profileBio').value.length;
+  });
+
+  // Genre chips (max 3)
+  document.getElementById('genreChips').addEventListener('click', e => {
+    const chip = e.target.closest('.genre-chip');
+    if (!chip) return;
+    const g = chip.dataset.g;
+    if (chip.classList.contains('selected')) {
+      selectedGenres.delete(g);
+      chip.classList.remove('selected');
+    } else {
+      if (selectedGenres.size >= 3) return;
+      selectedGenres.add(g);
+      chip.classList.add('selected');
+    }
+  });
+
+  // Color swatches
+  document.getElementById('colorSwatches').addEventListener('click', e => {
+    const sw = e.target.closest('.color-swatch');
+    if (!sw) return;
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+    sw.classList.add('selected');
+    selectedColor = sw.dataset.color;
+  });
+
+  // Finish
+  document.getElementById('finishBtn').addEventListener('click', async () => {
+    if (!authedUser) return;
+    const name = document.getElementById('profileName').value.trim();
+    if (!name) {
+      document.getElementById('profileName').focus();
+      document.getElementById('profileName').style.borderColor = 'var(--err)';
+      setTimeout(() => { document.getElementById('profileName').style.borderColor = ''; }, 1800);
+      return;
+    }
+
+    const btn = document.getElementById('finishBtn');
+    const spinner = document.getElementById('finishSpinner');
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    document.getElementById('finishLabel').textContent = 'Saving…';
+
+    const accountId = getStableId(authedUser);
+    const emailKey = sanitizeKey(accountId);
+    const link = document.getElementById('profileLink').value.trim();
+    const bio = document.getElementById('profileBio').value.trim();
+
+    const profile = {
+      nickname: name,
+      email: authedUser.email || accountId,
+      role: selectedRole === 'artist' ? 'artist' : 'fan',
+      profileVisibility: 'public',
+      accentColor: selectedColor,
+      createdAt: Date.now()
+    };
+    if (bio) profile.bio = bio;
+    if (selectedGenres.size) profile.genres = [...selectedGenres];
+    if (link) {
+      if (link.includes('soundcloud.com')) profile.soundcloud = link;
+      else if (link.includes('bandcamp.com')) profile.bandcamp = link;
+      else profile.socialLink = link;
+    }
+    if (activeRef) {
+      profile.referredBy = activeRef;
+      profile.joinedViaMarketing = true;
+    }
+    if (authedUser.photoURL) profile.pfp = authedUser.photoURL;
+
+    try {
+      await fetch(`${RTDB}/PROFILES/${encodeURIComponent(emailKey)}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profile)
       });
-    });
-  </script>
+      // Update localStorage with chosen nickname
+      setLocalAuth(authedUser, name);
+      localStorage.setItem('profileNickname', name);
+      if (selectedColor) localStorage.setItem('accentColor', selectedColor);
+      if (activeRef) {
+        try {
+          await fetch(`${RTDB}/referralCounts/${encodeURIComponent(activeRef)}/signups.json`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ '.sv': { 'increment': 1 } })
+          });
+          localStorage.removeItem('asteroid_ref');
+        } catch (_) {}
+      }
+
+      document.getElementById('successMsg').textContent =
+        `Welcome, ${name}! Taking you to Asteroid…`;
+      goToStep(3);
+      setTimeout(() => { location.href = 'index.html'; }, 1800);
+
+    } catch (err) {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      document.getElementById('finishLabel').textContent = 'Finish & go to Asteroid';
+      alert('Could not save profile — please check your connection and try again.');
+    }
+  });
+
+  // ── Auth state: already signed in? ───────────────────────────────
+  // Check redirect result first (for redirect-based sign-in flows)
+  getRedirectResult(auth).then(result => {
+    if (result && result.user) handleAuthSuccess(result.user);
+  }).catch(() => {});
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      document.getElementById('pageLoading').classList.add('hidden');
+      return;
+    }
+    // User already signed in — check if they have a profile
+    const accountId = getStableId(user);
+    const emailKey = sanitizeKey(accountId);
+    setLocalAuth(user, user.displayName || '');
+    try {
+      const res = await fetch(`${RTDB}/PROFILES/${encodeURIComponent(emailKey)}.json`);
+      const profile = await res.json();
+      if (profile && profile.nickname) {
+        // Complete profile → go straight to app
+        location.href = 'index.html';
+        return;
+      }
+      // Has account but no profile → show profile step (pick role first)
+      selectedRole = (profile && profile.role) || 'fan';
+      authedUser = user;
+      document.getElementById('bioField').style.display = selectedRole === 'artist' ? '' : 'none';
+      document.getElementById('socialLinkField').style.display = selectedRole === 'artist' ? '' : 'none';
+      const displayName = user.displayName || '';
+      document.getElementById('profileName').value = displayName;
+      updateNameCount();
+      const av = document.getElementById('profileAvatar');
+      if (user.photoURL) {
+        av.innerHTML = `<img src="${user.photoURL}" alt="">`;
+      } else {
+        av.textContent = (displayName || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase() || '?';
+      }
+      // Skip to step 3, hide dots for steps 0-1
+      document.getElementById('dot0').className = 'step-dot done';
+      document.getElementById('dot1').className = 'step-dot done';
+      document.getElementById('dot2').className = 'step-dot active';
+      document.getElementById('stepRole').classList.remove('active');
+      document.getElementById('stepProfile').classList.add('active');
+      currentStep = 2;
+    } catch (_) {}
+    document.getElementById('pageLoading').classList.add('hidden');
+  });
+</script>
 </body>
 </html>
