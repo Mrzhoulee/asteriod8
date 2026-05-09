@@ -858,17 +858,20 @@
   const dots = [0,1,2].map(i => document.getElementById('dot' + i));
 
   function goToStep(n) {
+    if (currentStep === n) return;
     const prev = document.getElementById(stepIds[currentStep]);
     const next = document.getElementById(stepIds[n]);
-    prev.classList.remove('active');
-    prev.classList.add('exit-left');
-    setTimeout(() => { prev.classList.remove('exit-left'); }, 400);
-    next.classList.add('active');
+    if (prev) {
+      prev.classList.remove('active');
+      prev.classList.add('exit-left');
+      setTimeout(() => { prev.classList.remove('exit-left'); }, 400);
+    }
+    if (next) next.classList.add('active');
     dots.forEach((d, i) => {
-      d.className = 'step-dot' + (i === n ? ' active' : i < n ? ' done' : '');
+      if (d) d.className = 'step-dot' + (i === n ? ' active' : i < n ? ' done' : '');
     });
-    // hide dots on step 3 (done screen)
-    document.getElementById('stepDots').style.display = n === 3 ? 'none' : 'flex';
+    const sd = document.getElementById('stepDots');
+    if (sd) sd.style.display = n === 3 ? 'none' : 'flex';
     currentStep = n;
   }
 
@@ -921,71 +924,72 @@
     el.classList.toggle('visible', !!msg);
   }
 
-  async function handleAuthSuccess(user, nameHint) {
-    authedUser = user; // set immediately so onAuthStateChanged guard triggers
-    const displayName = nameHint || user.displayName || '';
-    setLocalAuth(user, displayName);
+  function handleAuthSuccess(user, nameHint) {
+    try {
+      authedUser = user;
+      const displayName = nameHint || (user && user.displayName) || '';
+      setLocalAuth(user, displayName);
 
-    // Pre-fill profile form
-    const nameInput = document.getElementById('profileName');
-    nameInput.value = displayName;
-    updateNameCount();
+      const nameInput = document.getElementById('profileName');
+      if (nameInput) nameInput.value = displayName;
+      try { updateNameCount(); } catch (_) {}
 
-    // Avatar
-    const av = document.getElementById('profileAvatar');
-    if (user.photoURL) {
-      av.innerHTML = `<img src="${user.photoURL}" alt="">`;
-    } else {
-      const initials = (displayName || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
-      av.textContent = initials || '?';
+      const av = document.getElementById('profileAvatar');
+      if (av) {
+        if (user && user.photoURL) {
+          av.innerHTML = `<img src="${user.photoURL}" alt="">`;
+        } else {
+          const initials = (displayName || '?').split(' ').map(w => w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
+          av.textContent = initials || '?';
+        }
+      }
+    } catch (err) {
+      console.error('[join] handleAuthSuccess error', err);
     }
-
-    goToStep(2);
+    // Always advance — step transition must not be blocked by anything above.
+    try { goToStep(2); } catch (err) { console.error('[join] goToStep error', err); }
   }
 
   let signingIn = false;
 
-  document.getElementById('btnGoogle').addEventListener('click', async () => {
-    const btn = document.getElementById('btnGoogle');
+  async function doProviderSignIn(provider, btn) {
     setAuthLoading(btn, true);
     showAuthErr('');
     signingIn = true;
+    let result = null;
+    let popupErr = null;
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      await handleAuthSuccess(result.user);
+      result = await signInWithPopup(auth, provider);
     } catch (e) {
-      if (e.code === 'auth/popup-blocked') {
-        try { await signInWithRedirect(auth, googleProvider); return; } catch (_) {}
-      }
-      if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
-        showAuthErr(friendlyAuthErr(e));
-      }
-    } finally {
+      popupErr = e;
+    }
+
+    if (result && result.user) {
+      handleAuthSuccess(result.user);
       signingIn = false;
       setAuthLoading(btn, false);
+      return;
     }
+
+    // No user from popup — handle the error path.
+    signingIn = false;
+    setAuthLoading(btn, false);
+    if (!popupErr) return;
+    const code = popupErr.code || '';
+    if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return;
+    if (code === 'auth/popup-blocked') {
+      try { await signInWithRedirect(auth, provider); return; } catch (_) {}
+    }
+    console.error('[join] sign-in error', popupErr);
+    showAuthErr(friendlyAuthErr(popupErr));
+  }
+
+  document.getElementById('btnGoogle').addEventListener('click', () => {
+    doProviderSignIn(googleProvider, document.getElementById('btnGoogle'));
   });
 
-  document.getElementById('btnApple').addEventListener('click', async () => {
-    const btn = document.getElementById('btnApple');
-    setAuthLoading(btn, true);
-    showAuthErr('');
-    signingIn = true;
-    try {
-      const result = await signInWithPopup(auth, appleProvider);
-      const nameHint = result.user.displayName || '';
-      await handleAuthSuccess(result.user, nameHint);
-    } catch (e) {
-      if (e.code === 'auth/popup-blocked') {
-        try { await signInWithRedirect(auth, appleProvider); return; } catch (_) {}
-      }
-      if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
-        showAuthErr(friendlyAuthErr(e));
-      }
-    } finally {
-      signingIn = false;
-      setAuthLoading(btn, false);
-    }
+  document.getElementById('btnApple').addEventListener('click', () => {
+    doProviderSignIn(appleProvider, document.getElementById('btnApple'));
   });
 
   function friendlyAuthErr(e) {
@@ -1122,15 +1126,21 @@
 
   onAuthStateChanged(auth, async user => {
     clearTimeout(loaderGuard);
-    if (!user) { hideLoader(); return; }
+    hideLoader();
+    if (!user) return;
 
-    // A button-driven sign-in is in progress; let the click handler finish.
-    if (signingIn) { hideLoader(); return; }
+    // Already finished handling this user.
+    if (authedUser && authedUser.uid === user.uid) return;
 
-    // handleAuthSuccess already ran for this user
-    if (authedUser) { hideLoader(); return; }
+    // If a button-driven sign-in is happening, just advance — popup may be
+    // hung/delayed and we already have the user. Skip the profile fetch so we
+    // don't race the click handler.
+    if (signingIn) {
+      handleAuthSuccess(user);
+      return;
+    }
 
-    // Page loaded with an existing Firebase Auth session — check their profile
+    // Page loaded with an existing Firebase Auth session — check their profile.
     const accountId = getStableId(user);
     const emailKey = sanitizeKey(accountId);
     setLocalAuth(user, user.displayName || '');
@@ -1143,22 +1153,21 @@
     } catch (_) { /* network/timeout — treat as no profile */ }
 
     if (profile && profile.nickname) {
-      document.querySelector('.success-screen .success-sub').textContent =
-        `Welcome back, ${profile.nickname}! Taking you to Asteroid…`;
+      const sub = document.querySelector('.success-screen .success-sub');
+      if (sub) sub.textContent = `Welcome back, ${profile.nickname}! Taking you to Asteroid…`;
       goToStep(3);
-      hideLoader();
       setTimeout(() => { location.href = 'index.html'; }, 1400);
       return;
     }
 
-    // Has auth but no complete profile — preserve any role the user already picked
     if (profile && profile.role) selectedRole = profile.role;
     else if (!selectedRole) selectedRole = 'fan';
-    document.getElementById('bioField').style.display = selectedRole === 'artist' ? '' : 'none';
-    document.getElementById('socialLinkField').style.display = selectedRole === 'artist' ? '' : 'none';
+    const bf = document.getElementById('bioField');
+    const sf = document.getElementById('socialLinkField');
+    if (bf) bf.style.display = selectedRole === 'artist' ? '' : 'none';
+    if (sf) sf.style.display = selectedRole === 'artist' ? '' : 'none';
 
-    await handleAuthSuccess(user);
-    hideLoader();
+    handleAuthSuccess(user);
   });
 </script>
 </body>
