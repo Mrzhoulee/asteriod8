@@ -770,8 +770,9 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
   import {
-    getAuth, onAuthStateChanged,
-    signInWithPopup, signInWithRedirect, getRedirectResult,
+    initializeAuth, onAuthStateChanged,
+    signInWithRedirect, getRedirectResult,
+    browserLocalPersistence, browserPopupRedirectResolver,
     GoogleAuthProvider, OAuthProvider
   } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
 
@@ -787,7 +788,14 @@
   const RTDB = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
 
   const app = initializeApp(FB_CFG);
-  const auth = getAuth(app);
+  // Use localStorage persistence (not IndexedDB) to avoid deadlock with the
+  // Firebase Messaging service worker, which holds an open IndexedDB connection
+  // and blocks the auth SDK's own IndexedDB writes, causing signInWithRedirect
+  // to hang indefinitely.
+  const auth = initializeAuth(app, {
+    persistence: browserLocalPersistence,
+    popupRedirectResolver: browserPopupRedirectResolver
+  });
 
   // ── Referral capture ──────────────────────────────────────────────
   const params = new URLSearchParams(location.search);
@@ -966,20 +974,20 @@
     try { sessionStorage.setItem('joinRole', selectedRole || 'fan'); } catch (_) {}
 
     let redirectErr = null;
-    // If still on page after 2s, redirect silently failed — tell the user.
+    // If still on page after 8s with no navigation, something is badly wrong.
     const redirectTimeout = setTimeout(() => {
       signingIn = false;
       resetAuthButtons();
-      showAuthErr('Sign-in redirect did not start. Check console for errors, or try a different browser.');
-    }, 2000);
+      showAuthErr('Sign-in redirect timed out. Please try again or use a different browser.');
+    }, 8000);
 
     try {
-      await signInWithRedirect(auth, provider);
-      // Promise resolved without navigating — unexpected.
+      await signInWithRedirect(auth, provider, browserPopupRedirectResolver);
+      // Resolved without navigating — clear timeout and show error.
       clearTimeout(redirectTimeout);
       signingIn = false;
       resetAuthButtons();
-      showAuthErr('Redirect did not start (resolved unexpectedly). Try again.');
+      showAuthErr('Redirect resolved unexpectedly. Please try again.');
     } catch (e) {
       redirectErr = e;
       clearTimeout(redirectTimeout);
@@ -994,7 +1002,6 @@
       console.error('[join] signInWithRedirect error:', redirectErr);
       showAuthErr(msg);
     }
-    // If we get here and no error, the 2s timeout will show a message if no navigation.
   }
 
   document.getElementById('btnGoogle').addEventListener('click', function() {
@@ -1153,7 +1160,7 @@
   // Never block the page more than 4 seconds waiting for Firebase Auth
   const loaderGuard = setTimeout(() => { hideLoader(); resetAuthButtons(); }, 4000);
 
-  getRedirectResult(auth).then(result => {
+  getRedirectResult(auth, browserPopupRedirectResolver).then(result => {
     try { sessionStorage.removeItem('joinPendingProvider'); } catch (_) {}
     signingIn = false;
 
