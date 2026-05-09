@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Join Asteroid — Artist Signup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined {
+      font-family: "Material Symbols Outlined";
+      font-weight: normal; font-style: normal; font-size: 24px;
+      line-height: 1; letter-spacing: normal; text-transform: none;
+      display: inline-block; white-space: nowrap;
+      direction: ltr; -webkit-font-smoothing: antialiased;
+      font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    }
+    :root {
+      --bg0: #07080d; --bg1: #12141c;
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,127,80,0.3);
+      --accent: #ff7f50; --accent2: #ff5c8a;
+      --text: #f4f4f8; --muted: rgba(244,244,248,0.55);
+      --err: #ff5c8a; --ok: #4ade80;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Montserrat', system-ui, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(255,92,138,0.15), transparent 55%),
+        radial-gradient(900px 500px at 90% 20%, rgba(255,127,80,0.18), transparent 50%),
+        linear-gradient(165deg, var(--bg0), var(--bg1) 45%, #0a0c12);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+
+    /* Logo / wordmark */
+    .join-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+      text-decoration: none;
+    }
+    .join-logo-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .join-logo-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(120deg, #fff, rgba(255,200,180,0.9));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    /* Card */
+    .join-card {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 36px 32px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+
+    /* Referral banner */
+    .ref-banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,127,80,0.1);
+      border: 1px solid rgba(255,127,80,0.3);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 0.82rem;
+      color: var(--accent);
+    }
+    .ref-banner.visible { display: flex; }
+    .ref-banner .material-symbols-outlined { font-size: 18px; flex-shrink: 0; }
+
+    .join-heading {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .join-heading h1 {
+      font-size: clamp(1.5rem, 4vw, 1.9rem);
+      font-weight: 700;
+      background: linear-gradient(120deg, #fff, rgba(255,200,180,0.9));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      margin-bottom: 8px;
+    }
+    .join-heading p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Form */
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+    .field-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .field-inner .material-symbols-outlined {
+      position: absolute;
+      left: 14px;
+      font-size: 20px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .field input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 13px 16px 13px 44px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.93rem;
+      color: var(--text);
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-appearance: none;
+      outline: none;
+    }
+    .field input::placeholder { color: rgba(244,244,248,0.3); }
+    .field input:focus {
+      border-color: rgba(255,127,80,0.55);
+      background: rgba(255,127,80,0.05);
+    }
+    .field input.err { border-color: var(--err); }
+
+    .field-hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 5px;
+      padding-left: 2px;
+    }
+    .field-hint.err { color: var(--err); }
+
+    /* Password toggle */
+    .pw-toggle {
+      position: absolute;
+      right: 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .pw-toggle:hover { color: var(--text); }
+    .pw-toggle .material-symbols-outlined { font-size: 20px; }
+
+    /* Password strength */
+    .pw-strength {
+      display: flex;
+      gap: 4px;
+      margin-top: 7px;
+    }
+    .pw-bar {
+      flex: 1; height: 3px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.08);
+      transition: background 0.3s;
+    }
+    .pw-bar.active-weak   { background: var(--err); }
+    .pw-bar.active-ok     { background: #facc15; }
+    .pw-bar.active-strong { background: var(--ok); }
+
+    /* Optional link field separator */
+    .optional-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 4px 0 18px;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+    .optional-divider::before,
+    .optional-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* Submit button */
+    .join-btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 8px 24px rgba(255,127,80,0.3);
+      margin-top: 6px;
+    }
+    .join-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 32px rgba(255,127,80,0.4);
+    }
+    .join-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .join-btn-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Global error */
+    .global-err {
+      display: none;
+      background: rgba(255,92,138,0.1);
+      border: 1px solid rgba(255,92,138,0.3);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: var(--err);
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+    .global-err.visible { display: block; }
+
+    /* Already have account */
+    .join-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .join-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .join-footer a:hover { text-decoration: underline; }
+
+    /* Success state */
+    .success-overlay {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+      padding: 8px 0;
+    }
+    .success-overlay.visible { display: flex; }
+    .success-icon {
+      width: 64px; height: 64px;
+      background: rgba(74,222,128,0.12);
+      border: 2px solid rgba(74,222,128,0.4);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .success-icon .material-symbols-outlined {
+      font-size: 32px;
+      color: var(--ok);
+      font-variation-settings: "FILL" 1;
+    }
+    .success-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .success-sub {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 480px) {
+      .join-card { padding: 28px 20px; border-radius: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="join-logo" href="index.html">
+    <div class="join-logo-icon">🪐</div>
+    <span class="join-logo-name">Asteroid</span>
+  </a>
+
+  <div class="join-card">
+    <div id="refBanner" class="ref-banner">
+      <span class="material-symbols-outlined">card_giftcard</span>
+      <span id="refBannerText">You were invited to join Asteroid!</span>
+    </div>
+
+    <div id="formWrap">
+      <div class="join-heading">
+        <h1>Start your artist journey</h1>
+        <p>Upload music, grow your fanbase, and go live — all in one place.</p>
+      </div>
+
+      <form id="joinForm" novalidate>
+        <div class="field">
+          <label for="artistName">Artist name</label>
+          <div class="field-inner">
+            <span class="material-symbols-outlined">person</span>
+            <input id="artistName" type="text" placeholder="Your stage name" autocomplete="name" required>
+          </div>
+          <div class="field-hint err" id="nameErr" style="display:none"></div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="field-inner">
+            <span class="material-symbols-outlined">mail</span>
+            <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+          </div>
+          <div class="field-hint err" id="emailErr" style="display:none"></div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="field-inner">
+            <span class="material-symbols-outlined">lock</span>
+            <input id="password" type="password" placeholder="At least 8 characters" autocomplete="new-password" required>
+            <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">
+              <span class="material-symbols-outlined" id="pwEyeIcon">visibility</span>
+            </button>
+          </div>
+          <div class="pw-strength" id="pwStrength">
+            <div class="pw-bar" id="pb1"></div>
+            <div class="pw-bar" id="pb2"></div>
+            <div class="pw-bar" id="pb3"></div>
+          </div>
+          <div class="field-hint err" id="pwErr" style="display:none"></div>
+        </div>
+
+        <div class="optional-divider">Optional</div>
+
+        <div class="field">
+          <label for="socialLink">SoundCloud or Bandcamp link</label>
+          <div class="field-inner">
+            <span class="material-symbols-outlined">link</span>
+            <input id="socialLink" type="url" placeholder="https://soundcloud.com/you" autocomplete="url">
+          </div>
+          <div class="field-hint err" id="linkErr" style="display:none"></div>
+        </div>
+
+        <button type="submit" class="join-btn" id="joinBtn">
+          <div class="join-btn-inner">
+            <div class="spinner" id="spinner"></div>
+            <span id="btnLabel">Create account</span>
+          </div>
+        </button>
+
+        <div class="global-err" id="globalErr"></div>
+      </form>
+    </div>
+
+    <div class="success-overlay" id="successOverlay">
+      <div class="success-icon">
+        <span class="material-symbols-outlined">check_circle</span>
+      </div>
+      <div class="success-title">You're in! 🎉</div>
+      <div class="success-sub">Your artist account is ready.<br>Taking you to your dashboard…</div>
+    </div>
+  </div>
+
+  <p class="join-footer">Already have an account? <a href="index.html">Sign in</a></p>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+    const FB_CFG = {
+      apiKey: "AIzaSyDMoJDFQBVMPBVxSyNQMmXIfpKfTrBnrVY",
+      authDomain: "asteroid-cdc13.firebaseapp.com",
+      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+      projectId: "asteroid-cdc13",
+      storageBucket: "asteroid-cdc13.appspot.com",
+      messagingSenderId: "450881315394",
+      appId: "1:450881315394:web:6e3c6888571cbcc7eb2d11"
+    };
+    const RTDB = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+
+    const app = initializeApp(FB_CFG);
+    const auth = getAuth(app);
+
+    // ── Referral capture ──────────────────────────────────────────────
+    const params = new URLSearchParams(location.search);
+    const refId = params.get('ref') || '';
+    const storedRef = (() => {
+      try {
+        const raw = localStorage.getItem('asteroid_ref');
+        if (raw) {
+          const obj = JSON.parse(raw);
+          if (Date.now() - obj.ts < 30 * 24 * 60 * 60 * 1000) return obj.ref;
+        }
+      } catch (_) {}
+      return '';
+    })();
+
+    const activeRef = refId || storedRef;
+
+    if (refId) {
+      try { localStorage.setItem('asteroid_ref', JSON.stringify({ ref: refId, ts: Date.now() })); } catch (_) {}
+    }
+
+    if (activeRef) {
+      document.getElementById('refBanner').classList.add('visible');
+      document.getElementById('refBannerText').textContent =
+        'You were invited to join Asteroid! (ref: ' + activeRef + ')';
+    }
+
+    // Log referral click asynchronously — best effort
+    if (refId) {
+      (async () => {
+        let ip = '';
+        try { const r = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(3000) }); ip = (await r.json()).ip || ''; } catch (_) {}
+        const payload = {
+          ref: refId,
+          ts: Date.now(),
+          ua: navigator.userAgent.slice(0, 300),
+          ip
+        };
+        try {
+          await fetch(RTDB + '/REFERRAL_CLICKS.json', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } catch (_) {}
+      })();
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────
+    function sanitizeKey(email) {
+      return email.toLowerCase().replace(/[.#$[\]]/g, '_');
+    }
+
+    function pwScore(pw) {
+      let s = 0;
+      if (pw.length >= 8) s++;
+      if (/[A-Z]/.test(pw) || /[0-9]/.test(pw)) s++;
+      if (/[^A-Za-z0-9]/.test(pw) || pw.length >= 12) s++;
+      return s; // 0-3
+    }
+
+    // ── Password strength UI ──────────────────────────────────────────
+    const pwInput = document.getElementById('password');
+    const bars = [document.getElementById('pb1'), document.getElementById('pb2'), document.getElementById('pb3')];
+
+    pwInput.addEventListener('input', () => {
+      const score = pwScore(pwInput.value);
+      const cls = score === 1 ? 'active-weak' : score === 2 ? 'active-ok' : score === 3 ? 'active-strong' : '';
+      bars.forEach((b, i) => {
+        b.className = 'pw-bar';
+        if (i < score && cls) b.classList.add(cls);
+      });
+    });
+
+    // ── Password visibility toggle ────────────────────────────────────
+    document.getElementById('pwToggle').addEventListener('click', () => {
+      const isHidden = pwInput.type === 'password';
+      pwInput.type = isHidden ? 'text' : 'password';
+      document.getElementById('pwEyeIcon').textContent = isHidden ? 'visibility_off' : 'visibility';
+    });
+
+    // ── Form validation ───────────────────────────────────────────────
+    function showErr(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.style.display = msg ? 'block' : 'none';
+    }
+
+    function validateForm() {
+      let ok = true;
+      const name = document.getElementById('artistName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const pw = document.getElementById('password').value;
+      const link = document.getElementById('socialLink').value.trim();
+
+      showErr('nameErr', '');
+      showErr('emailErr', '');
+      showErr('pwErr', '');
+      showErr('linkErr', '');
+
+      if (name.length < 1) { showErr('nameErr', 'Artist name is required.'); ok = false; }
+      else if (name.length > 80) { showErr('nameErr', 'Name must be ≤80 characters.'); ok = false; }
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('emailErr', 'Enter a valid email.'); ok = false; }
+
+      if (pw.length < 8) { showErr('pwErr', 'Password must be at least 8 characters.'); ok = false; }
+
+      if (link && !/^https?:\/\/.+\..+/.test(link)) { showErr('linkErr', 'Enter a full URL starting with https://'); ok = false; }
+
+      return ok;
+    }
+
+    // ── Submit ────────────────────────────────────────────────────────
+    document.getElementById('joinForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validateForm()) return;
+
+      const artistName = document.getElementById('artistName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const pw = document.getElementById('password').value;
+      const link = document.getElementById('socialLink').value.trim();
+
+      const btn = document.getElementById('joinBtn');
+      const spinner = document.getElementById('spinner');
+      const btnLabel = document.getElementById('btnLabel');
+      const globalErr = document.getElementById('globalErr');
+
+      btn.disabled = true;
+      spinner.style.display = 'block';
+      btnLabel.textContent = 'Creating account…';
+      globalErr.classList.remove('visible');
+
+      try {
+        // 1. Create Firebase Auth account
+        await createUserWithEmailAndPassword(auth, email, pw);
+
+        // 2. Build profile payload
+        const emailKey = sanitizeKey(email);
+        const profile = {
+          nickname: artistName,
+          email,
+          role: 'artist',
+          profileVisibility: 'public',
+          createdAt: Date.now(),
+          joinedViaMarketing: true
+        };
+        if (activeRef) profile.referredBy = activeRef;
+        if (link) {
+          if (link.includes('soundcloud.com')) profile.soundcloud = link;
+          else if (link.includes('bandcamp.com')) profile.bandcamp = link;
+          else profile.socialLink = link;
+        }
+
+        // 3. Save profile to RTDB
+        await fetch(`${RTDB}/PROFILES/${encodeURIComponent(emailKey)}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(profile)
+        });
+
+        // 4. If referred, increment referral count
+        if (activeRef) {
+          try {
+            await fetch(`${RTDB}/referralCounts/${encodeURIComponent(activeRef)}/signups.json`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ '.sv': { 'increment': 1 } })
+            });
+          } catch (_) {}
+          try { localStorage.removeItem('asteroid_ref'); } catch (_) {}
+        }
+
+        // 5. Show success then redirect
+        document.getElementById('formWrap').style.display = 'none';
+        document.getElementById('successOverlay').classList.add('visible');
+
+        setTimeout(() => { location.href = 'ArtistDashboard.html'; }, 1800);
+
+      } catch (err) {
+        spinner.style.display = 'none';
+        btn.disabled = false;
+        btnLabel.textContent = 'Create account';
+
+        let msg = 'Something went wrong. Please try again.';
+        if (err.code === 'auth/email-already-in-use') msg = 'An account with this email already exists. Try signing in instead.';
+        else if (err.code === 'auth/invalid-email') msg = 'That email address doesn\'t look right.';
+        else if (err.code === 'auth/weak-password') msg = 'Password is too weak — try adding numbers or symbols.';
+        else if (err.code === 'auth/network-request-failed') msg = 'Network error — check your connection and try again.';
+
+        globalErr.textContent = msg;
+        globalErr.classList.add('visible');
+      }
+    });
+
+    // Clear field errors on input
+    ['artistName','email','password','socialLink'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => {
+        const errId = id === 'artistName' ? 'nameErr' : id === 'socialLink' ? 'linkErr' : id + 'Err';
+        showErr(errId, '');
+        el.classList.remove('err');
+      });
+    });
+  </script>
+</body>
+</html>

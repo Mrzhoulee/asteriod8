@@ -216,6 +216,13 @@
         }
       }
     },
+    "REFERRAL_CLICKS": {
+      ".read": false,
+      "$clickId": {
+        ".write": "!data.exists()",
+        ".validate": "newData.hasChildren(['ref','ts']) && newData.child('ref').isString() && newData.child('ref').val().length <= 200 && newData.child('ts').isNumber() && (!newData.hasChild('ua') || (newData.child('ua').isString() && newData.child('ua').val().length <= 400)) && (!newData.hasChild('ip') || (newData.child('ip').isString() && newData.child('ip').val().length <= 64))"
+      }
+    },
     "CONTENT_REPORTS": {
       "$reportId": {
         ".read": false,
