@@ -883,6 +883,7 @@
 
   function selectRole(role) {
     selectedRole = role;
+    try { sessionStorage.setItem('joinRole', role); } catch (_) {}
     const isArtist = role === 'artist';
 
     document.getElementById('authHeading').textContent = isArtist ? 'Sign in with Google' : 'Sign in to continue';
@@ -952,44 +953,37 @@
 
   let signingIn = false;
 
-  async function doProviderSignIn(provider, btn) {
+  // GitHub Pages serves a Cross-Origin-Opener-Policy header that breaks
+  // signInWithPopup (Firebase can't poll window.closed). Use redirect-based
+  // sign-in instead — page navigates to Google/Apple, then back to /join,
+  // and getRedirectResult() picks up the user.
+  async function doProviderSignIn(provider, btn, providerName) {
     setAuthLoading(btn, true);
     showAuthErr('');
     signingIn = true;
-    let result = null;
-    let popupErr = null;
     try {
-      result = await signInWithPopup(auth, provider);
+      // Persist intent so we can restore UI after the redirect round-trip.
+      sessionStorage.setItem('joinPendingProvider', providerName);
+      if (selectedRole) sessionStorage.setItem('joinRole', selectedRole);
+    } catch (_) {}
+    try {
+      await signInWithRedirect(auth, provider);
+      // Navigation will follow; control rarely returns here.
     } catch (e) {
-      popupErr = e;
-    }
-
-    if (result && result.user) {
-      handleAuthSuccess(result.user);
       signingIn = false;
       setAuthLoading(btn, false);
-      return;
+      try { sessionStorage.removeItem('joinPendingProvider'); } catch (_) {}
+      console.error('[join] sign-in error', e);
+      showAuthErr(friendlyAuthErr(e));
     }
-
-    // No user from popup — handle the error path.
-    signingIn = false;
-    setAuthLoading(btn, false);
-    if (!popupErr) return;
-    const code = popupErr.code || '';
-    if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return;
-    if (code === 'auth/popup-blocked') {
-      try { await signInWithRedirect(auth, provider); return; } catch (_) {}
-    }
-    console.error('[join] sign-in error', popupErr);
-    showAuthErr(friendlyAuthErr(popupErr));
   }
 
   document.getElementById('btnGoogle').addEventListener('click', () => {
-    doProviderSignIn(googleProvider, document.getElementById('btnGoogle'));
+    doProviderSignIn(googleProvider, document.getElementById('btnGoogle'), 'google');
   });
 
   document.getElementById('btnApple').addEventListener('click', () => {
-    doProviderSignIn(appleProvider, document.getElementById('btnApple'));
+    doProviderSignIn(appleProvider, document.getElementById('btnApple'), 'apple');
   });
 
   function friendlyAuthErr(e) {
@@ -1099,6 +1093,8 @@
         } catch (_) {}
       }
 
+      try { sessionStorage.removeItem('joinRole'); sessionStorage.removeItem('joinPendingProvider'); } catch (_) {}
+
       document.getElementById('successMsg').textContent =
         `Welcome, ${name}! Taking you to Asteroid…`;
       goToStep(3);
@@ -1117,12 +1113,43 @@
     document.getElementById('pageLoading').classList.add('hidden');
   }
 
+  // Restore role + pending-provider from a previous redirect attempt.
+  try {
+    const savedRole = sessionStorage.getItem('joinRole');
+    if (savedRole && !selectedRole) selectedRole = savedRole;
+    const pending = sessionStorage.getItem('joinPendingProvider');
+    if (pending) {
+      // Show button loading state until getRedirectResult / onAuthStateChanged fires
+      signingIn = true;
+      const btnId = pending === 'apple' ? 'btnApple' : 'btnGoogle';
+      const btn = document.getElementById(btnId);
+      if (btn) setAuthLoading(btn, true);
+    }
+  } catch (_) {}
+
   // Never block the page more than 4 seconds waiting for Firebase Auth
   const loaderGuard = setTimeout(hideLoader, 4000);
 
   getRedirectResult(auth).then(result => {
-    if (result && result.user) handleAuthSuccess(result.user);
-  }).catch(() => {});
+    try { sessionStorage.removeItem('joinPendingProvider'); } catch (_) {}
+    signingIn = false;
+    if (result && result.user) {
+      // If user picked a role pre-redirect, make step-1 UI reflect it before advancing.
+      if (selectedRole) {
+        const bf = document.getElementById('bioField');
+        const sf = document.getElementById('socialLinkField');
+        if (bf) bf.style.display = selectedRole === 'artist' ? '' : 'none';
+        if (sf) sf.style.display = selectedRole === 'artist' ? '' : 'none';
+      }
+      handleAuthSuccess(result.user);
+      hideLoader();
+    }
+  }).catch(e => {
+    try { sessionStorage.removeItem('joinPendingProvider'); } catch (_) {}
+    signingIn = false;
+    console.error('[join] getRedirectResult error', e);
+    if (e && e.code) showAuthErr(friendlyAuthErr(e));
+  });
 
   onAuthStateChanged(auth, async user => {
     clearTimeout(loaderGuard);
