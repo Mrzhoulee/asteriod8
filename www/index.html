@@ -226,8 +226,10 @@ body.has-ios-banner #header { margin-top: 0; }
   var DISMISS_DAYS  = 7;
 
   /* ── helpers ── */
-  var isIOS = /iP(hone|od|ad)/.test(navigator.userAgent) && !window.MSStream;
-  if (!isIOS) return;   /* nothing to do on non-iOS */
+  var isIOS  = /iP(hone|od|ad)/.test(navigator.userAgent) && !window.MSStream;
+  var isMac  = /Macintosh/.test(navigator.userAgent) && !isIOS;
+  var isApple = isIOS || isMac;
+  if (!isApple) return;   /* only show on Apple devices */
 
   var DISMISS_KEY = 'asteroid_ios_banner_dismissed';
   var banner      = document.getElementById('ios-app-banner');
@@ -284,15 +286,22 @@ body.has-ios-banner #header { margin-top: 0; }
 
   if (isDismissed()) return;
 
+  /* Mac: no URL scheme — just link straight to the App Store */
+  if (isMac) {
+    var subEl = document.getElementById('ios-banner-sub');
+    if (subEl) subEl.textContent = 'Free · Available on the App Store';
+    actionBtn.href = APP_STORE_URL;
+    showBanner('Download');
+    return;
+  }
+
+  /* iOS: try to open the installed app first, fall back to App Store */
   if (!alreadyTriedThisSession()) {
     markTried();
-    /* Try opening the app. If the page goes hidden the app launched. */
     var appOpened = false;
     var visHandler = function () { if (document.hidden) appOpened = true; };
     document.addEventListener('visibilitychange', visHandler);
 
-    /* Use a hidden iframe — avoids showing "Cannot open" dialog in Safari
-       when the URL scheme is unknown. Falls back to showing banner. */
     var tryFrame = document.createElement('iframe');
     tryFrame.style.cssText = 'display:none;width:1px;height:1px;border:0;position:absolute;top:-9999px';
     tryFrame.src = APP_SCHEME;
@@ -302,15 +311,12 @@ body.has-ios-banner #header { margin-top: 0; }
       document.removeEventListener('visibilitychange', visHandler);
       try { document.body.removeChild(tryFrame); } catch(e) {}
       if (!appOpened) {
-        /* App not installed — offer the App Store */
         actionBtn.href = APP_STORE_URL;
         showBanner('Get');
       }
-      /* if appOpened === true, the app launched; nothing more needed */
     }, 1400);
 
   } else {
-    /* Already tried this session — just show the banner with "Open" */
     actionBtn.href = APP_SCHEME;
     showBanner('Open');
   }
