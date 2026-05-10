@@ -28,7 +28,7 @@ import { initializeAuth, getAuth, onAuthStateChanged, browserLocalPersistence } 
 // Must match the main app (index.html / studio.html) so Storage/Auth use one project.
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
-  authDomain: "asteroid-cdc13.firebaseapp.com",
+  authDomain: "asteroid8.net", // changed: custom domain avoids Safe Browsing warning on firebaseapp.com
   databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
   projectId: "asteroid-cdc13",
   storageBucket: "asteroid-cdc13.appspot.com",
