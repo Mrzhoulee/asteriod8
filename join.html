@@ -771,8 +771,8 @@
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
   import {
     initializeAuth, onAuthStateChanged,
-    signInWithRedirect, getRedirectResult,
-    browserLocalPersistence, browserPopupRedirectResolver,
+    signInWithCredential,
+    browserLocalPersistence,
     GoogleAuthProvider, OAuthProvider
   } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
 
@@ -788,13 +788,11 @@
   const RTDB = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
 
   const app = initializeApp(FB_CFG);
-  // Use localStorage persistence (not IndexedDB) to avoid deadlock with the
-  // Firebase Messaging service worker, which holds an open IndexedDB connection
-  // and blocks the auth SDK's own IndexedDB writes, causing signInWithRedirect
-  // to hang indefinitely.
+  // Use browserLocalPersistence (localStorage) to avoid IndexedDB deadlock with
+  // the Firebase Messaging service worker. No popupRedirectResolver needed —
+  // we use the Identity Toolkit REST API for OAuth instead of the SDK's redirect.
   const auth = initializeAuth(app, {
-    persistence: browserLocalPersistence,
-    popupRedirectResolver: browserPopupRedirectResolver
+    persistence: browserLocalPersistence
   });
 
   // ── Referral capture ──────────────────────────────────────────────
@@ -913,14 +911,6 @@
   document.getElementById('changeRoleBtn').addEventListener('click', () => goToStep(0));
 
   // ── Step 2: Auth ──────────────────────────────────────────────────
-  const googleProvider = new GoogleAuthProvider();
-  googleProvider.addScope('email');
-  googleProvider.addScope('profile');
-
-  const appleProvider = new OAuthProvider('apple.com');
-  appleProvider.addScope('email');
-  appleProvider.addScope('name');
-
   function setAuthLoading(btn, loading) {
     btn.disabled = loading;
     if (loading) btn.classList.add('btn-loading');
@@ -963,59 +953,111 @@
 
   let signingIn = false;
 
-  // GitHub Pages serves a Cross-Origin-Opener-Policy header that breaks
-  // signInWithPopup (Firebase can't poll window.closed). Use redirect-based
-  // sign-in instead — page navigates to Google/Apple, then back to /join,
-  // and getRedirectResult() picks up the user.
-  async function doProviderSignIn(provider, btn, providerName) {
+  // ── Google sign-in via Firebase Identity Toolkit REST API ─────────────────
+  // Firebase's SDK redirect (signInWithRedirect/getRedirectResult) uses a hidden
+  // iframe at firebaseapp.com to write the result back to this origin. That iframe
+  // is blocked by firebaseapp.com's own COOP header. We bypass the SDK entirely:
+  // createAuthUri → Google OAuth → returns id_token directly in URL hash →
+  // signInWithIdp exchanges it for Firebase credentials → signInWithCredential.
+  async function startGoogleSignIn(btn) {
     showAuthErr('');
     setAuthLoading(btn, true);
     signingIn = true;
     try { sessionStorage.setItem('joinRole', selectedRole || 'fan'); } catch (_) {}
 
-    let redirectErr = null;
-    // If still on page after 8s with no navigation, something is badly wrong.
-    const redirectTimeout = setTimeout(() => {
+    try {
+      // Get the Google OAuth URL for this origin (no firebaseapp.com involved).
+      const continueUri = location.origin + location.pathname; // https://www.asteroid8.net/join.html
+      const res = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:createAuthUri?key=${FB_CFG.apiKey}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ continueUri, providerId: 'google.com' }) }
+      );
+      const data = await res.json();
+      if (!data.authUri) throw new Error(data.error?.message || 'No authUri returned');
+
+      sessionStorage.setItem('googleOAuth', JSON.stringify({ sessionId: data.sessionId }));
+      window.location.href = data.authUri; // Full-page navigation to Google — no iframes/popups
+    } catch (err) {
       signingIn = false;
       resetAuthButtons();
-      showAuthErr('Sign-in redirect timed out. Please try again or use a different browser.');
-    }, 8000);
+      showAuthErr('Could not start Google sign-in: ' + (err.message || String(err)));
+    }
+  }
+
+  // Called on page load when Google redirects back with id_token in URL hash.
+  async function finishGoogleSignIn() {
+    const raw = sessionStorage.getItem('googleOAuth');
+    if (!raw) return false;
+
+    const hashParams = new URLSearchParams(location.hash.slice(1));
+    const queryParams = new URLSearchParams(location.search);
+    const hasToken = hashParams.has('id_token') || hashParams.has('access_token')
+                  || queryParams.has('code')    || queryParams.has('id_token');
+    if (!hasToken) { sessionStorage.removeItem('googleOAuth'); return false; }
+
+    const { sessionId } = JSON.parse(raw);
+    sessionStorage.removeItem('googleOAuth');
+
+    // Restore role chosen before the redirect
+    try {
+      const savedRole = sessionStorage.getItem('joinRole');
+      if (savedRole && !selectedRole) { selectedRole = savedRole; sessionStorage.removeItem('joinRole'); }
+    } catch (_) {}
+
+    // Clean OAuth params from the URL bar (cosmetic, doesn't affect functionality)
+    try { history.replaceState({}, '', location.pathname + location.search.replace(/[&?](state|code|id_token|access_token|token_type|expires_in|scope|authuser|prompt|session_state)[^&]*/g, '')); } catch (_) {}
 
     try {
-      await signInWithRedirect(auth, provider, browserPopupRedirectResolver);
-      // Resolved without navigating — clear timeout and show error.
-      clearTimeout(redirectTimeout);
-      signingIn = false;
-      resetAuthButtons();
-      showAuthErr('Redirect resolved unexpectedly. Please try again.');
-    } catch (e) {
-      redirectErr = e;
-      clearTimeout(redirectTimeout);
-    }
+      // Exchange the full redirect URL + sessionId for Firebase credentials.
+      const res = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key=${FB_CFG.apiKey}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ requestUri: location.href, sessionId, returnSecureToken: true, returnIdpCredential: true }) }
+      );
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
 
-    if (redirectErr) {
-      signingIn = false;
+      // Sign in to Firebase Auth SDK using the Google ID token from the response.
+      const googleIdToken = data.oauthIdToken;
+      const credential = GoogleAuthProvider.credential(googleIdToken);
+      const result = await signInWithCredential(auth, credential);
+      handleAuthSuccess(result.user);
+      hideLoader();
+      return true;
+    } catch (err) {
+      showAuthErr('Google sign-in failed: ' + (err.message || String(err)));
       resetAuthButtons();
-      const msg = redirectErr.code
-        ? 'Sign-in error: ' + redirectErr.code
-        : ('Sign-in failed: ' + (redirectErr.message || String(redirectErr)));
-      console.error('[join] signInWithRedirect error:', redirectErr);
-      showAuthErr(msg);
+      return false;
     }
   }
 
   document.getElementById('btnGoogle').addEventListener('click', function() {
-    console.log('[join] Google button clicked, calling doProviderSignIn');
-    doProviderSignIn(googleProvider, this, 'google').catch(err => {
-      console.error('[join] Unhandled doProviderSignIn error:', err);
-      showAuthErr('Unhandled error: ' + (err && err.message ? err.message : String(err)));
-      resetAuthButtons();
-    });
+    startGoogleSignIn(this);
   });
 
-  document.getElementById('btnApple').addEventListener('click', function() {
-    console.log('[join] Apple button clicked, calling doProviderSignIn');
-    doProviderSignIn(appleProvider, this, 'apple');
+  document.getElementById('btnApple').addEventListener('click', async function() {
+    const btn = this;
+    showAuthErr('');
+    setAuthLoading(btn, true);
+    signingIn = true;
+    const { signInWithPopup, browserPopupRedirectResolver } = await import(
+      'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js'
+    );
+    const appleProvider = new OAuthProvider('apple.com');
+    appleProvider.addScope('email');
+    appleProvider.addScope('name');
+    try {
+      const result = await signInWithPopup(auth, appleProvider, browserPopupRedirectResolver);
+      handleAuthSuccess(result.user);
+    } catch (e) {
+      if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+        showAuthErr(e.code ? 'Sign-in error: ' + e.code : 'Apple sign-in failed. Try again.');
+      }
+    } finally {
+      signingIn = false;
+      setAuthLoading(btn, false);
+    }
   });
 
   function friendlyAuthErr(e) {
@@ -1150,40 +1192,12 @@
     setAuthLoading(document.getElementById('btnApple'), false);
   }
 
-  // Restore role from a previous redirect attempt (role is safe to restore;
-  // we do NOT restore button-disabled state — getRedirectResult handles that).
-  try {
-    const savedRole = sessionStorage.getItem('joinRole');
-    if (savedRole && !selectedRole) selectedRole = savedRole;
-  } catch (_) {}
-
   // Never block the page more than 4 seconds waiting for Firebase Auth
   const loaderGuard = setTimeout(() => { hideLoader(); resetAuthButtons(); }, 4000);
 
-  getRedirectResult(auth, browserPopupRedirectResolver).then(result => {
-    try { sessionStorage.removeItem('joinPendingProvider'); } catch (_) {}
-    signingIn = false;
-
-    if (result && result.user) {
-      // Restore artist-only fields if role was saved before redirect.
-      if (selectedRole) {
-        const bf = document.getElementById('bioField');
-        const sf = document.getElementById('socialLinkField');
-        if (bf) bf.style.display = selectedRole === 'artist' ? '' : 'none';
-        if (sf) sf.style.display = selectedRole === 'artist' ? '' : 'none';
-      }
-      handleAuthSuccess(result.user);
-      hideLoader();
-    } else {
-      // No redirect result — make sure buttons are never stuck in loading state.
-      resetAuthButtons();
-    }
-  }).catch(e => {
-    try { sessionStorage.removeItem('joinPendingProvider'); } catch (_) {}
-    signingIn = false;
-    resetAuthButtons();
-    console.error('[join] getRedirectResult error', e);
-    if (e && e.code) showAuthErr(friendlyAuthErr(e));
+  // Check if we're returning from Google OAuth (id_token in URL hash).
+  finishGoogleSignIn().then(handled => {
+    if (!handled) resetAuthButtons(); // Not a Google return — buttons should be ready
   });
 
   onAuthStateChanged(auth, async user => {
