@@ -94,3 +94,14 @@ exports.referralRedirect    = referrals.referralRedirect;
 exports.signupAttribute     = referrals.signupAttribute;
 exports.badgePng            = referrals.badgePng;
 exports.scheduledMilestones = referrals.scheduledMilestones;
+
+const artistProfile = require('./artist-profile');
+exports.artistProfile = artistProfile.artistProfile;
+
+const migrate = require('./migrate-referrals');
+exports.migrateReferralCountsRtdbToFirestore = migrate.migrateReferralCountsRtdbToFirestore;
+
+// Phase 2 — Public track preview pages
+const preview = require('./preview');
+exports.trackPreview = preview.trackPreview;
+exports.previewAudio = preview.previewAudio;

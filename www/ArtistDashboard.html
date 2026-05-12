@@ -3599,6 +3599,109 @@ async function loadGrowTab() {
   .ref-stats-row { grid-template-columns: 1fr 1fr; }
   .ref-stats-row .ref-stat-card:last-child { grid-column: span 2; }
 }
+
+/* Phase 1 — Invite link card */
+#inviteLinkCard{background:linear-gradient(135deg,rgba(255,127,80,.12),rgba(255,127,80,.04));border:1px solid rgba(255,127,80,.3);border-radius:16px;padding:1.25rem;margin:1rem 0 2rem;display:none}
+#inviteLinkCard.show{display:block}
+#inviteLinkCard h3{font-size:1.1rem;margin-bottom:.25rem;color:#ff7f50}
+#inviteLinkCard .sub{color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:.75rem}
+#inviteLinkCard .row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+#inviteLinkCard input{flex:1 1 260px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);color:#fff;padding:.6rem .75rem;border-radius:8px;font-family:monospace;font-size:.85rem}
+#inviteLinkCard button{background:#ff7f50;color:#000;border:none;padding:.6rem 1rem;border-radius:8px;font-weight:700;cursor:pointer}
+#inviteLinkCard button.ok{background:#10b981;color:#fff}
+#inviteLinkCard a.more{color:#ff7f50;text-decoration:none;font-size:.9rem;margin-left:auto}
 </style>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, initializeAuth, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  const FB_CFG = {
+    apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+    authDomain: "asteroid8.net",
+    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+    projectId: "asteroid-cdc13",
+    storageBucket: "asteroid-cdc13.appspot.com",
+    messagingSenderId: "793353824502",
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+  };
+  const _ilApp = getApps().length ? getApp() : initializeApp(FB_CFG);
+  const _ilDb = getFirestore(_ilApp);
+  let _ilAuth;
+  try { _ilAuth = initializeAuth(_ilApp, { persistence: browserLocalPersistence }); }
+  catch (_) { _ilAuth = getAuth(_ilApp); }
+
+  function _ilSlugify(name){
+    return String(name||'').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').substring(0,40) || 'artist';
+  }
+  async function _ilChooseUniqueSlug(baseRaw){
+    const base = _ilSlugify(baseRaw);
+    for (let n = 1; n < 200; n++){
+      const candidate = n === 1 ? base : `${base}-${n}`;
+      const s = await getDocs(query(collection(_ilDb,'users'), where('slug','==',candidate), limit(1)));
+      if (s.empty) return candidate;
+    }
+    return base + '-' + Date.now().toString(36);
+  }
+  function _ilBuildCard(){
+    const c = document.createElement('div');
+    c.id = 'inviteLinkCard';
+    c.innerHTML = `
+      <h3><i class="fa-solid fa-link"></i> Your invite link</h3>
+      <div class="sub" id="ilSub">Share this with fans — they auto-follow you on signup and you climb the supporter chart.</div>
+      <div class="row">
+        <input id="ilInput" readonly value="—">
+        <button id="ilCopy">Copy link</button>
+        <a class="more" href="/artist-referrals">View referrals →</a>
+      </div>`;
+    return c;
+  }
+  function _ilEnsureMounted(){
+    let host = document.getElementById('inviteLinkCard');
+    if (host) return host;
+    host = _ilBuildCard();
+    const container = document.querySelector('.dashboard-container') || document.body;
+    const headerEl = container.querySelector('.dashboard-header') || container.firstElementChild;
+    if (headerEl && headerEl.nextSibling) container.insertBefore(host, headerEl.nextSibling);
+    else container.prepend(host);
+    return host;
+  }
+
+  onAuthStateChanged(_ilAuth, async (user) => {
+    if (!user) return;
+    const card = _ilEnsureMounted();
+    const userRef = doc(_ilDb,'users',user.uid);
+
+    onSnapshot(userRef, async (snap) => {
+      const d = snap.data() || {};
+      card.classList.add('show');
+      if (d.slug && d.is_referral_eligible){
+        document.getElementById('ilInput').value = `https://www.asteroid8.net/r/${d.slug}`;
+        document.getElementById('ilSub').textContent =
+          `Share this with fans — they auto-follow you on signup. ${d.referral_count || 0} supporters so far.`;
+      } else {
+        document.getElementById('ilInput').value = '—';
+        document.getElementById('ilSub').innerHTML =
+          'Enable referrals to get your invite link. <button id="ilEnable" style="margin-left:.5rem;background:#10b981;color:#fff;border:none;padding:.4rem .8rem;border-radius:6px;cursor:pointer">Enable</button>';
+        document.getElementById('ilEnable').addEventListener('click', async () => {
+          const cur = (await getDoc(userRef)).data() || {};
+          const slug = cur.slug || await _ilChooseUniqueSlug(cur.username || user.displayName || user.email || 'artist');
+          await updateDoc(userRef, { slug, is_referral_eligible: true });
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (e.target.id !== 'ilCopy') return;
+      const v = document.getElementById('ilInput').value;
+      if (!v || v === '—') return;
+      navigator.clipboard.writeText(v).then(() => {
+        const b = e.target; b.classList.add('ok'); b.textContent = 'Copied!';
+        setTimeout(() => { b.classList.remove('ok'); b.textContent = 'Copy link'; }, 1500);
+      });
+    });
+  });
+</script>
 </body>
 </html>

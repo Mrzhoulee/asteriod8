@@ -7,6 +7,30 @@
         { "fieldPath": "vipStatus", "order": "ASCENDING" },
         { "fieldPath": "referralCount", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "is_referral_eligible", "order": "ASCENDING" },
+        { "fieldPath": "referral_count", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "founding_supporters",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "artist_id", "order": "ASCENDING" },
+        { "fieldPath": "signup_order", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "referral_clicks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "artist_id", "order": "ASCENDING" },
+        { "fieldPath": "clicked_at", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

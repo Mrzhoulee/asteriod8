@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Artist — Asteroid</title>
+<meta name="description" content="Listen on Asteroid.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+<style>
+  :root{--primary:#ff7f50;--bg:#0a0a0f;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--text:#fff;--muted:rgba(255,255,255,.7)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .wrap{max-width:960px;margin:0 auto;padding:2rem 1rem}
+  .hdr{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:2rem 0}
+  .pfp{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid var(--primary)}
+  h1{font-size:2rem;background:linear-gradient(135deg,#ff7f50,#ff6347);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .bio{color:var(--muted);text-align:center;max-width:560px}
+  .stats{display:flex;gap:2rem;margin-top:.5rem}
+  .stats .n{font-size:1.5rem;font-weight:700;color:var(--primary)}
+  .stats .l{color:var(--muted);font-size:.9rem}
+  .section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-top:2rem}
+  .section h2{font-size:1.25rem;margin-bottom:1rem;color:var(--primary)}
+  .cta{display:inline-block;background:var(--primary);color:#000;font-weight:700;padding:.8rem 1.5rem;border-radius:10px;text-decoration:none;margin-top:1rem}
+  .skeleton{color:var(--muted);text-align:center;padding:2rem 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <img id="pfp" class="pfp" src="astei.png" alt="">
+    <h1 id="name">Loading…</h1>
+    <p id="bio" class="bio"></p>
+    <div class="stats">
+      <div><div class="n" id="refCount">0</div><div class="l">supporters</div></div>
+      <div><div class="n" id="tier">founder</div><div class="l">tier</div></div>
+    </div>
+    <a id="invite" class="cta" style="display:none">Join via this artist</a>
+  </div>
+
+  <div class="section">
+    <h2>Founding Supporters</h2>
+    <div id="supporterWall" data-supporter-wall data-artist-id=""><p class="skeleton">Loading…</p></div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getFirestore, collection, doc, getDoc, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  import { mountSupporterWall } from "./js/supporter-wall.js";
+
+  const FB_CFG = {
+    apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+    authDomain: "asteroid8.net",
+    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+    projectId: "asteroid-cdc13",
+    storageBucket: "asteroid-cdc13.appspot.com",
+    messagingSenderId: "793353824502",
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+  };
+  const app = getApps().length ? getApp() : initializeApp(FB_CFG);
+  const db = getFirestore(app);
+
+  const params = new URLSearchParams(location.search);
+  const username = params.get('u');
+  if (!username) {
+    document.getElementById('name').textContent = 'No artist specified';
+    document.getElementById('supporterWall').innerHTML = '<p class="skeleton">Add ?u=username to the URL.</p>';
+  } else {
+    (async () => {
+      const q = query(collection(db, 'users'), where('username', '==', username), limit(1));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        document.getElementById('name').textContent = 'Artist not found';
+        return;
+      }
+      const a = snap.docs[0].data();
+      const artistId = snap.docs[0].id;
+      document.getElementById('name').textContent = a.username || 'Artist';
+      if (a.pfp) document.getElementById('pfp').src = a.pfp;
+      if (a.bio) document.getElementById('bio').textContent = a.bio;
+      document.getElementById('refCount').textContent = a.referral_count || 0;
+      document.getElementById('tier').textContent = a.tier || 'founder';
+      if (a.slug) {
+        const cta = document.getElementById('invite');
+        cta.href = '/r/' + encodeURIComponent(a.slug);
+        cta.style.display = 'inline-block';
+      }
+      const host = document.getElementById('supporterWall');
+      host.dataset.artistId = artistId;
+      mountSupporterWall(host);
+    })();
+  }
+</script>
+</body>
+</html>

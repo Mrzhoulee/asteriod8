@@ -1157,15 +1157,22 @@
       setLocalAuth(authedUser, name);
       localStorage.setItem('profileNickname', name);
       if (selectedColor) localStorage.setItem('accentColor', selectedColor);
-      if (activeRef) {
-        try {
-          await fetch(`${RTDB}/referralCounts/${encodeURIComponent(activeRef)}/signups.json`, {
-            method: 'PUT', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ '.sv': { 'increment': 1 } })
-          });
+      // Phase 1 attribution: the httpOnly `referrer_artist_id` cookie set by /r/{slug}
+      // is read server-side. We just need to POST to /api/signup/attribute with the
+      // user's Firebase ID token; the function does the transaction + auto-follow + milestone.
+      try {
+        const idToken = await authedUser.getIdToken(/* forceRefresh */ false);
+        const resp = await fetch('/api/signup/attribute', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Authorization': 'Bearer ' + idToken, 'Content-Type': 'application/json' },
+          body: '{}',
+        });
+        const body = await resp.json().catch(() => ({}));
+        if (body && body.attributed) {
           localStorage.removeItem('asteroid_ref');
-        } catch (_) {}
-      }
+        }
+      } catch (_) { /* attribution is best-effort */ }
 
       try { sessionStorage.removeItem('joinRole'); sessionStorage.removeItem('joinPendingProvider'); } catch (_) {}
 

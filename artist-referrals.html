@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Referrals — Artist Dashboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+<style>
+  :root{--primary:#ff7f50;--bg:#0a0a0f;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--text:#fff;--muted:rgba(255,255,255,.7);--success:#10b981}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .wrap{max-width:1000px;margin:0 auto;padding:1.5rem}
+  h1{font-size:1.75rem;margin-bottom:1.5rem;background:linear-gradient(135deg,#ff7f50,#ff6347);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+  @media(max-width:640px){.row{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.25rem}
+  .card h2{font-size:1rem;color:var(--muted);font-weight:500;margin-bottom:.5rem}
+  .num{font-size:2.5rem;font-weight:800;color:var(--primary)}
+  .sub{color:var(--muted);font-size:.9rem;margin-top:.25rem}
+  .link-card input{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);color:var(--text);padding:.65rem .8rem;border-radius:8px;font-family:monospace;font-size:.85rem;margin:.5rem 0}
+  .link-card button{background:var(--primary);color:#000;border:none;padding:.6rem 1.1rem;border-radius:8px;font-weight:700;cursor:pointer}
+  .link-card button.ok{background:var(--success);color:#fff}
+  .progress{height:10px;background:rgba(0,0,0,.3);border-radius:5px;overflow:hidden;margin:.75rem 0 .25rem}
+  .progress .fill{height:100%;background:linear-gradient(90deg,#ff7f50,#ff6347);transition:width .4s}
+  .supporters{margin-top:1rem;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.25rem}
+  .supporters table{width:100%;border-collapse:collapse}
+  .supporters th,.supporters td{text-align:left;padding:.6rem .5rem;border-bottom:1px solid var(--border);font-size:.9rem}
+  .supporters th{color:var(--muted);font-weight:500}
+  .supporters img.av{width:32px;height:32px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:.5rem}
+  .empty{color:var(--muted);text-align:center;padding:1.5rem 0}
+  .pager{display:flex;gap:.5rem;justify-content:center;margin-top:1rem}
+  .pager button{background:transparent;border:1px solid var(--border);color:var(--text);padding:.4rem .75rem;border-radius:6px;cursor:pointer}
+  .pager button:disabled{opacity:.4;cursor:not-allowed}
+  .login{padding:3rem 1rem;text-align:center;color:var(--muted)}
+  .login a{color:var(--primary)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Referrals</h1>
+
+  <div id="loginGate" class="login" style="display:none">
+    Please <a href="login.html">sign in</a> to view your referrals.
+  </div>
+
+  <div id="dashboard" style="display:none">
+    <div class="row">
+      <div class="card">
+        <h2>Current count</h2>
+        <div class="num" id="count">0</div>
+        <div class="sub" id="tier">Tier: founder</div>
+      </div>
+      <div class="card">
+        <h2>Next milestone</h2>
+        <div class="num" id="next">5</div>
+        <div class="progress"><div class="fill" id="fill" style="width:0%"></div></div>
+        <div class="sub" id="nextSub">5 more to reach 5</div>
+      </div>
+    </div>
+
+    <div class="card link-card">
+      <h2>Your invite link</h2>
+      <div id="notEligible" style="display:none;color:var(--muted);font-size:.9rem;margin-bottom:.5rem">
+        Enable referrals on your profile to get an invite link.
+        <button id="enableBtn" style="margin-left:.5rem">Enable referrals</button>
+      </div>
+      <input id="linkInput" readonly value="—">
+      <button id="copyBtn">Copy link</button>
+    </div>
+
+    <div class="supporters">
+      <h2 style="font-size:1rem;color:var(--muted);font-weight:500;margin-bottom:.75rem">Supporters</h2>
+      <div id="supTable"><div class="empty">Loading…</div></div>
+      <div class="pager">
+        <button id="prev" disabled>Prev</button>
+        <span id="pageInfo" style="color:var(--muted);font-size:.85rem;padding:.4rem 0">—</span>
+        <button id="next-page" disabled>Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, initializeAuth, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, startAfter } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  const FB_CFG = {
+    apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+    authDomain: "asteroid8.net",
+    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+    projectId: "asteroid-cdc13",
+    storageBucket: "asteroid-cdc13.appspot.com",
+    messagingSenderId: "793353824502",
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+  };
+  const app = getApps().length ? getApp() : initializeApp(FB_CFG);
+  const db = getFirestore(app);
+  let auth;
+  try { auth = initializeAuth(app, { persistence: browserLocalPersistence }); }
+  catch (_) { auth = getAuth(app); }
+
+  const THRESHOLDS = [5,10,25,50,100];
+  const TIER_AT = { 0:'founder',5:'supporter',10:'trailblazer',25:'featured',50:'partner',100:'equity_eligible' };
+
+  function tierFor(count){
+    let t='founder'; for(const k of [5,10,25,50,100]){ if(count>=k) t=TIER_AT[k]; }
+    return t;
+  }
+  function slugify(name){
+    return String(name||'').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').substring(0,40) || 'artist';
+  }
+  async function chooseUniqueSlug(baseRaw){
+    const base = slugify(baseRaw);
+    for(let n=1; n<200; n++){
+      const candidate = n===1 ? base : (base + '-' + n);
+      const q = query(collection(db,'users'), where('slug','==',candidate), limit(1));
+      const s = await getDocs(q);
+      if (s.empty) return candidate;
+    }
+    return base + '-' + Date.now().toString(36);
+  }
+
+  const PAGE_SIZE = 20;
+  let lastDoc = null, firstDocStack = [], currentArtistId = null;
+
+  function renderHeader(d){
+    const count = d.referral_count || 0;
+    const tier  = d.tier || tierFor(count);
+    document.getElementById('count').textContent = count;
+    document.getElementById('tier').textContent  = 'Tier: ' + tier;
+
+    const next = THRESHOLDS.find((t) => count < t) || 100;
+    document.getElementById('next').textContent = next;
+    const prev = [...THRESHOLDS].reverse().find((t) => count >= t) || 0;
+    const pct  = Math.min(100, Math.round(((count - prev) / (next - prev)) * 100));
+    document.getElementById('fill').style.width  = pct + '%';
+    document.getElementById('nextSub').textContent = (next - count) + ' more to reach ' + next;
+
+    const eligible = !!d.is_referral_eligible && !!d.slug;
+    document.getElementById('notEligible').style.display = eligible ? 'none' : 'block';
+    document.getElementById('linkInput').value = eligible
+      ? `https://www.asteroid8.net/r/${d.slug}`
+      : '—';
+  }
+
+  async function loadPage(uid, direction){
+    const constraints = [where('artist_id','==',uid), orderBy('signup_order','asc'), limit(PAGE_SIZE)];
+    if (direction === 'next' && lastDoc) constraints.push(startAfter(lastDoc));
+    const q = query(collection(db,'founding_supporters'), ...constraints);
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      document.getElementById('supTable').innerHTML = '<div class="empty">No supporters yet.</div>';
+      document.getElementById('pageInfo').textContent = '—';
+      return;
+    }
+    if (direction === 'next') firstDocStack.push(lastDoc);
+    lastDoc = snap.docs[snap.docs.length - 1];
+
+    const ids = snap.docs.map((d) => d.data().user_id);
+    const profs = await Promise.all(ids.map((id) => getDoc(doc(db,'users',id)).then((s)=>s.data()||{}).catch(()=>({}))));
+
+    const rows = snap.docs.map((d, i) => {
+      const p = profs[i]; const ts = d.data().created_at?.toDate?.();
+      return `<tr>
+        <td>#${d.data().signup_order}</td>
+        <td><img class="av" src="${(p.pfp||'astei.png')}" alt="">${p.username||p.email||'(unknown)'}</td>
+        <td>${ts ? ts.toLocaleDateString() : ''}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('supTable').innerHTML =
+      `<table><thead><tr><th>#</th><th>Supporter</th><th>Joined</th></tr></thead><tbody>${rows}</tbody></table>`;
+
+    document.getElementById('prev').disabled      = firstDocStack.length === 0;
+    document.getElementById('next-page').disabled = snap.docs.length < PAGE_SIZE;
+    document.getElementById('pageInfo').textContent = `Showing 1–${snap.docs.length}`;
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    const v = document.getElementById('linkInput').value;
+    if (!v || v === '—') return;
+    navigator.clipboard.writeText(v).then(() => {
+      const b = document.getElementById('copyBtn');
+      b.classList.add('ok'); b.textContent = 'Copied!';
+      setTimeout(() => { b.classList.remove('ok'); b.textContent = 'Copy link'; }, 1500);
+    });
+  });
+
+  document.getElementById('enableBtn').addEventListener('click', async () => {
+    const user = auth.currentUser; if (!user) return;
+    const userDoc = await getDoc(doc(db,'users',user.uid));
+    const data = userDoc.data() || {};
+    if (data.slug && data.is_referral_eligible) return;
+    const slug = data.slug || await chooseUniqueSlug(data.username || user.displayName || user.email || 'artist');
+    await updateDoc(doc(db,'users',user.uid), { slug, is_referral_eligible: true });
+  });
+
+  document.getElementById('prev').addEventListener('click', () => {
+    lastDoc = firstDocStack.pop() || null;
+    loadPage(currentArtistId, 'prev');
+  });
+  document.getElementById('next-page').addEventListener('click', () => loadPage(currentArtistId, 'next'));
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      document.getElementById('loginGate').style.display = 'block';
+      document.getElementById('dashboard').style.display = 'none';
+      return;
+    }
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    currentArtistId = user.uid;
+
+    onSnapshot(doc(db,'users',user.uid), (snap) => {
+      if (snap.exists()) renderHeader(snap.data() || {});
+    });
+    loadPage(user.uid, 'first');
+    setInterval(() => loadPage(currentArtistId, 'first'), 60000);
+  });
+</script>
+</body>
+</html>

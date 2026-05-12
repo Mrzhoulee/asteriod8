@@ -9,23 +9,27 @@
     ],
     "cleanUrls": true,
     "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
+      { "source": "/r/**",                       "function": "referralRedirect" },
+      { "source": "/u/**",                       "function": "artistProfile" },
+      { "source": "/t/**",                       "function": "trackPreview" },
+      { "source": "/api/signup/attribute",       "function": "signupAttribute" },
+      { "source": "/api/badge/**",               "function": "badgePng" },
+      { "source": "/api/preview-audio/**",       "function": "previewAudio" },
+      { "source": "/api/migrate/referral-counts","function": "migrateReferralCountsRtdbToFirestore" },
+      { "source": "**", "destination": "/index.html" }
     ],
     "headers": [
       {
         "source": "/__/auth/**",
-        "headers": [
-          { "key": "Cache-Control", "value": "no-store" }
-        ]
+        "headers": [{ "key": "Cache-Control", "value": "no-store" }]
       },
       {
         "source": "**/firebase-messaging-sw.js",
-        "headers": [
-          { "key": "Service-Worker-Allowed", "value": "/" }
-        ]
+        "headers": [{ "key": "Service-Worker-Allowed", "value": "/" }]
+      },
+      {
+        "source": "/.well-known/apple-app-site-association",
+        "headers": [{ "key": "Content-Type", "value": "application/json" }]
       }
     ]
   },
@@ -68,6 +72,10 @@
       ]
     }
   ],
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
   "database": {
     "rules": "database.rules.json"
   }
