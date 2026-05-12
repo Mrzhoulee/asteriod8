@@ -87,3 +87,10 @@ exports.notifyQAAnswer = functions.database
     }
     return null;
   });
+
+// Phase 1 — Artist invite links + supporter wall
+const referrals = require('./referrals');
+exports.referralRedirect    = referrals.referralRedirect;
+exports.signupAttribute     = referrals.signupAttribute;
+exports.badgePng            = referrals.badgePng;
+exports.scheduledMilestones = referrals.scheduledMilestones;
