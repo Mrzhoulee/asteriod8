@@ -22,6 +22,12 @@
   .section h2{font-size:1.25rem;margin-bottom:1rem;color:var(--primary)}
   .cta{display:inline-block;background:var(--primary);color:#000;font-weight:700;padding:.8rem 1.5rem;border-radius:10px;text-decoration:none;margin-top:1rem}
   .skeleton{color:var(--muted);text-align:center;padding:2rem 0}
+  .featured{display:flex;flex-direction:column;align-items:center;gap:1rem}
+  .featured #featuredVinyl{--vinyl-size:min(70vw,300px);cursor:pointer}
+  .featured .ft-meta{text-align:center}
+  .featured .ft-title{font-size:1.1rem;font-weight:700}
+  .featured .ft-hint{color:var(--muted);font-size:.85rem;margin-top:.25rem}
+  .featured audio{display:none}
 </style>
 </head>
 <body>
@@ -37,6 +43,16 @@
     <a id="invite" class="cta" style="display:none">Join via this artist</a>
   </div>
 
+  <div class="section featured" id="featuredSection" style="display:none">
+    <h2 style="font-size:1.25rem;color:var(--primary);margin-bottom:.5rem">Latest track</h2>
+    <div id="featuredVinyl"></div>
+    <div class="ft-meta">
+      <div class="ft-title" id="ftTitle">—</div>
+      <div class="ft-hint" id="ftHint">Tap to play a 30s preview</div>
+    </div>
+    <audio id="ftAudio" preload="metadata"></audio>
+  </div>
+
   <div class="section">
     <h2>Founding Supporters</h2>
     <div id="supporterWall" data-supporter-wall data-artist-id=""><p class="skeleton">Loading…</p></div>
@@ -45,8 +61,9 @@
 
 <script type="module">
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getFirestore, collection, doc, getDoc, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  import { getFirestore, collection, doc, getDoc, query, where, orderBy, getDocs, limit } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
   import { mountSupporterWall } from "./js/supporter-wall.js";
+  import { mountVinylPlayer } from "./js/vinyl-player.js";
 
   const FB_CFG = {
     apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
@@ -88,6 +105,41 @@
       const host = document.getElementById('supporterWall');
       host.dataset.artistId = artistId;
       mountSupporterWall(host);
+
+      // Featured track — most recent Firestore song doc for this artist
+      try {
+        const songSnap = await getDocs(query(
+          collection(db, 'songs'),
+          where('ownerUid', '==', artistId),
+          orderBy('uploadDate', 'desc'),
+          limit(1)
+        ));
+        if (!songSnap.empty) {
+          const song = songSnap.docs[0].data();
+          const audioUrl = song.fileInp || song.audioUrl || song.downloadUrl;
+          if (audioUrl) {
+            const ftAudio = document.getElementById('ftAudio');
+            ftAudio.src = audioUrl;
+            document.getElementById('ftTitle').textContent = song.title || 'Untitled';
+            document.getElementById('featuredSection').style.display = '';
+            const ctrl = mountVinylPlayer(document.getElementById('featuredVinyl'), {
+              size: 'lg',
+              labelImage: a.pfp || null,
+              labelText: song.title || '',
+              audio: ftAudio,
+              onTogglePlay: () => { if (ftAudio.paused) ftAudio.play(); else ftAudio.pause(); },
+            });
+            // 30s preview cap on artist profile
+            ftAudio.addEventListener('timeupdate', () => {
+              if (ftAudio.currentTime >= 30) {
+                try { ftAudio.pause(); ftAudio.currentTime = 0; } catch (_) {}
+                ctrl.stopHard();
+                document.getElementById('ftHint').textContent = '30s preview — sign up for the full track';
+              }
+            });
+          }
+        }
+      } catch (e) { console.warn('[artist.html] featured track', e); }
     })();
   }
 </script>

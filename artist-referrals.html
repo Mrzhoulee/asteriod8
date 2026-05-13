@@ -10,7 +10,8 @@
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
   .wrap{max-width:1000px;margin:0 auto;padding:1.5rem}
-  h1{font-size:1.75rem;margin-bottom:1.5rem;background:linear-gradient(135deg,#ff7f50,#ff6347);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  h1{font-size:1.75rem;background:linear-gradient(135deg,#ff7f50,#ff6347);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  #ambientVinyl{--vinyl-size:64px;flex-shrink:0}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
   @media(max-width:640px){.row{grid-template-columns:1fr}}
   .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.25rem}
@@ -37,7 +38,10 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Referrals</h1>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem">
+    <h1 style="margin:0">Referrals</h1>
+    <div id="ambientVinyl" data-vinyl data-size="xs" data-idle="true" data-idle-speed="0.18" data-label-color="#ff7f50"></div>
+  </div>
 
   <div id="loginGate" class="login" style="display:none">
     Please <a href="login.html">sign in</a> to view your referrals.
@@ -84,6 +88,7 @@
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
   import { getAuth, initializeAuth, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, startAfter } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  import "./js/vinyl-player.js";
 
   const FB_CFG = {
     apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",

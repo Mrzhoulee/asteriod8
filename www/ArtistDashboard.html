@@ -3626,6 +3626,11 @@ async function loadGrowTab() {
 .ibBody{font-size:.8rem;color:rgba(255,255,255,.6)}
 .ibTime{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:.25rem}
 .ibEmpty{padding:1rem;text-align:center;color:rgba(255,255,255,.5);font-size:.85rem}
+
+/* Floating vinyl — appears at bottom-right when any audio plays on the page */
+#pageVinylDock{position:fixed;bottom:1rem;right:1rem;z-index:999;opacity:0;transform:translateY(8px) scale(.9);transition:opacity .35s,transform .35s;pointer-events:none}
+#pageVinylDock.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+#pageVinylDock #pageVinyl{--vinyl-size:100px;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5))}
 </style>
 
 <script type="module">
@@ -3633,6 +3638,7 @@ async function loadGrowTab() {
   import { getAuth, initializeAuth, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
   import { getDatabase, ref as dbRef, onValue, update as dbUpdate } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  import { mountVinylPlayer, bindVinylToPageAudio } from "./js/vinyl-player.js";
 
   const FB_CFG = {
     apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
@@ -3754,8 +3760,30 @@ async function loadGrowTab() {
       if (!panel.contains(e.target) && e.target !== bell) panel.classList.remove('show');
     });
   }
+  // Floating vinyl that follows whatever audio plays on the dashboard.
+  let _pageVinylCtrl = null;
+  function _ilEnsureVinylDock(){
+    if (document.getElementById('pageVinylDock')) return;
+    const dock = document.createElement('div');
+    dock.id = 'pageVinylDock';
+    dock.innerHTML = '<div id="pageVinyl"></div>';
+    document.body.appendChild(dock);
+    _pageVinylCtrl = mountVinylPlayer(document.getElementById('pageVinyl'), {
+      size: 'sm', labelColor: '#ff7f50',
+    });
+    // Wrap setPlaying to also toggle dock visibility
+    const inner = _pageVinylCtrl.setPlaying.bind(_pageVinylCtrl);
+    _pageVinylCtrl.setPlaying = (p) => {
+      inner(p);
+      dock.classList.toggle('show', !!p);
+      if (!p) setTimeout(() => { if (!dock.classList.contains('show')) {} }, 1500);
+    };
+    bindVinylToPageAudio(_pageVinylCtrl);
+  }
+
   function mountInbox(uid){
     _ilEnsureInboxUI();
+    _ilEnsureVinylDock();
     const rtdb = getDatabase(_ilApp);
     const key = _ilSanitizeKey(uid);
     const inboxRef = dbRef(rtdb, 'artistInbox/' + key);

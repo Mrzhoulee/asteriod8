@@ -91,7 +91,8 @@ exports.trackPreview = onRequest(
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:radial-gradient(ellipse at top,#1a0b2e 0%,var(--bg) 60%);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem}
   .card{width:100%;max-width:480px;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:1.5rem;backdrop-filter:blur(20px)}
-  .art{width:100%;aspect-ratio:1;border-radius:16px;object-fit:cover;background:#222}
+  .vinyl-wrap{display:flex;justify-content:center;padding:1rem 0 .5rem}
+  #vinyl{--vinyl-size:min(78vw,360px)}
   h1{font-size:1.5rem;margin:1rem 0 .25rem;line-height:1.2}
   .artist{color:var(--muted);margin-bottom:1rem}
   .player{width:100%;margin:1rem 0}
@@ -108,7 +109,12 @@ exports.trackPreview = onRequest(
 </head>
 <body>
 <div class="card">
-  <img class="art" src="${esc(artwork)}" alt="${esc(song.title || '')}">
+  <div class="vinyl-wrap">
+    <div id="vinyl"
+         data-size="lg"
+         data-label-image="${esc(artwork)}"
+         data-label-color="#ff7f50"></div>
+  </div>
   <h1>${esc(song.title || 'Untitled')}</h1>
   <div class="artist">${esc(artist.username || 'Artist')}</div>
 
@@ -125,6 +131,17 @@ exports.trackPreview = onRequest(
 
 <footer>Asteroid — <a href="/">asteroid8.net</a></footer>
 
+<script type="module">
+  import { mountVinylPlayer } from '/js/vinyl-player.js';
+  const audio = document.getElementById('audio');
+  const vinyl = mountVinylPlayer(document.getElementById('vinyl'), {
+    size: 'lg',
+    labelImage: ${JSON.stringify(artwork)},
+    audio,
+    onTogglePlay: () => { if (audio.paused) audio.play(); else audio.pause(); },
+  });
+  window.__vinyl = vinyl;
+</script>
 <script>
   // PostHog — best-effort
   (function(){
@@ -155,6 +172,7 @@ exports.trackPreview = onRequest(
       audio.pause();
       try{ audio.currentTime = 30; }catch(e){}
       wall.classList.add('show');
+      try{ window.__vinyl && window.__vinyl.stopHard(); }catch(e){}
       posthog.capture('preview_completed', { track_id: trackId });
     }
   });
