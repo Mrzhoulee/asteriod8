@@ -105,3 +105,7 @@ exports.migrateReferralCountsRtdbToFirestore = migrate.migrateReferralCountsRtdb
 const preview = require('./preview');
 exports.trackPreview = preview.trackPreview;
 exports.previewAudio = preview.previewAudio;
+
+// Public client config (PostHog key, etc.)
+const config = require('./config');
+exports.publicConfig = config.publicConfig;

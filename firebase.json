@@ -15,6 +15,7 @@
       { "source": "/api/signup/attribute",       "function": "signupAttribute" },
       { "source": "/api/badge/**",               "function": "badgePng" },
       { "source": "/api/preview-audio/**",       "function": "previewAudio" },
+      { "source": "/api/config",                 "function": "publicConfig" },
       { "source": "/api/migrate/referral-counts","function": "migrateReferralCountsRtdbToFirestore" },
       { "source": "**", "destination": "/index.html" }
     ],

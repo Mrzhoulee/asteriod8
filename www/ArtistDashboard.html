@@ -3610,12 +3610,29 @@ async function loadGrowTab() {
 #inviteLinkCard button{background:#ff7f50;color:#000;border:none;padding:.6rem 1rem;border-radius:8px;font-weight:700;cursor:pointer}
 #inviteLinkCard button.ok{background:#10b981;color:#fff}
 #inviteLinkCard a.more{color:#ff7f50;text-decoration:none;font-size:.9rem;margin-left:auto}
+
+/* Phase 1 — Artist inbox (milestone notifications) */
+#inboxBell{position:fixed;top:1rem;right:1rem;width:44px;height:44px;border-radius:50%;background:rgba(255,127,80,.18);border:1px solid rgba(255,127,80,.4);color:#ff7f50;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;font-size:20px;backdrop-filter:blur(10px)}
+#inboxBell:hover{background:rgba(255,127,80,.25)}
+#inboxBell .ibBadge{position:absolute;top:-2px;right:-2px;background:#ff5c8a;color:#fff;font-size:.7rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+#inboxBell.empty .ibBadge{display:none}
+#inboxPanel{position:fixed;top:4rem;right:1rem;width:min(360px,calc(100vw - 2rem));max-height:60vh;overflow-y:auto;background:rgba(15,15,22,.95);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.75rem;backdrop-filter:blur(20px);z-index:1000;display:none;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+#inboxPanel.show{display:block}
+#inboxPanel h4{font-size:.85rem;color:rgba(255,255,255,.7);font-weight:500;margin:0 0 .5rem;padding:0 .25rem}
+.ibItem{padding:.6rem .65rem;border-radius:8px;margin-bottom:.25rem;cursor:pointer;border-left:3px solid transparent;transition:background .15s}
+.ibItem.unread{background:rgba(255,127,80,.08);border-left-color:#ff7f50}
+.ibItem:hover{background:rgba(255,255,255,.05)}
+.ibTitle{font-size:.9rem;font-weight:600;margin-bottom:.2rem}
+.ibBody{font-size:.8rem;color:rgba(255,255,255,.6)}
+.ibTime{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:.25rem}
+.ibEmpty{padding:1rem;text-align:center;color:rgba(255,255,255,.5);font-size:.85rem}
 </style>
 
 <script type="module">
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
   import { getAuth, initializeAuth, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  import { getDatabase, ref as dbRef, onValue, update as dbUpdate } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
   const FB_CFG = {
     apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
@@ -3701,7 +3718,77 @@ async function loadGrowTab() {
         setTimeout(() => { b.classList.remove('ok'); b.textContent = 'Copy link'; }, 1500);
       });
     });
+
+    // ─── Inbox UI (milestones + future notifications) ──────────────
+    mountInbox(user.uid);
   });
+
+  function _ilSanitizeKey(s){ return String(s||'').replace(/[.#$[\]]/g,'_'); }
+  function _ilFormatTime(ts){
+    if(!ts) return '';
+    const d = new Date(ts), now = Date.now(), diff = now - d.getTime();
+    if (diff < 60000) return 'just now';
+    if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+    return d.toLocaleDateString();
+  }
+  function _ilEnsureInboxUI(){
+    if (document.getElementById('inboxBell')) return;
+    const bell = document.createElement('button');
+    bell.id = 'inboxBell';
+    bell.className = 'empty';
+    bell.setAttribute('aria-label', 'Notifications');
+    bell.innerHTML = '<i class="fa-regular fa-bell"></i><span class="ibBadge">0</span>';
+    document.body.appendChild(bell);
+
+    const panel = document.createElement('div');
+    panel.id = 'inboxPanel';
+    panel.innerHTML = '<h4>Notifications</h4><div id="inboxList"><div class="ibEmpty">Nothing yet.</div></div>';
+    document.body.appendChild(panel);
+
+    bell.addEventListener('click', (e) => {
+      e.stopPropagation();
+      panel.classList.toggle('show');
+    });
+    document.addEventListener('click', (e) => {
+      if (!panel.contains(e.target) && e.target !== bell) panel.classList.remove('show');
+    });
+  }
+  function mountInbox(uid){
+    _ilEnsureInboxUI();
+    const rtdb = getDatabase(_ilApp);
+    const key = _ilSanitizeKey(uid);
+    const inboxRef = dbRef(rtdb, 'artistInbox/' + key);
+
+    onValue(inboxRef, (snap) => {
+      const data = snap.val() || {};
+      const items = Object.entries(data).map(([id, m]) => ({ id, ...m }))
+        .sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+      const unread = items.filter(m => !m.read).length;
+      const bell = document.getElementById('inboxBell');
+      const badge = bell.querySelector('.ibBadge');
+      badge.textContent = unread;
+      bell.classList.toggle('empty', unread === 0);
+
+      const list = document.getElementById('inboxList');
+      if (!items.length){
+        list.innerHTML = '<div class="ibEmpty">Nothing yet. Reach a milestone to get notified here.</div>';
+        return;
+      }
+      list.innerHTML = items.slice(0, 20).map(m => `
+        <div class="ibItem ${m.read ? '' : 'unread'}" data-id="${m.id}">
+          <div class="ibTitle">${(m.title || '').replace(/</g,'&lt;')}</div>
+          <div class="ibBody">${(m.body || '').replace(/</g,'&lt;')}</div>
+          <div class="ibTime">${_ilFormatTime(m.created_at)}</div>
+        </div>`).join('');
+
+      list.querySelectorAll('.ibItem.unread').forEach(el => {
+        el.addEventListener('click', () => {
+          dbUpdate(dbRef(rtdb, 'artistInbox/' + key + '/' + el.dataset.id), { read: true });
+        });
+      });
+    });
+  }
 </script>
 </body>
 </html>

@@ -374,6 +374,15 @@ exports.badgePng = onRequest(
 );
 
 // ─────────────────────────────────────────────────────────────
+// Exposed for tests
+// ─────────────────────────────────────────────────────────────
+exports.checkMilestones = checkMilestones;
+exports.MILESTONES = MILESTONES;
+exports.sanitizeKey = sanitizeKey;
+exports.milestoneTitle = milestoneTitle;
+exports.milestoneBody = milestoneBody;
+
+// ─────────────────────────────────────────────────────────────
 // Nightly safety net
 // ─────────────────────────────────────────────────────────────
 exports.scheduledMilestones = onSchedule(

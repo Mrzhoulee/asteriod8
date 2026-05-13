@@ -197,8 +197,11 @@ exports.previewAudio = onRequest(
         // Lazy transcode on first hit
         const songSnap = await admin.firestore().collection('songs').doc(trackId).get();
         if (!songSnap.exists) return res.status(404).send('track not found');
-        const audioUrl = songSnap.data().audioUrl;
-        const audioStoragePath = songSnap.data().audioStoragePath;
+        // studio.html writes the download URL to `fileInp`. We support audioUrl /
+        // audioStoragePath / downloadUrl as fallbacks for future schema variations.
+        const s = songSnap.data() || {};
+        const audioUrl = s.fileInp || s.audioUrl || s.downloadUrl;
+        const audioStoragePath = s.audioStoragePath;
         if (!audioUrl && !audioStoragePath) {
           return res.status(404).send('no audio source');
         }

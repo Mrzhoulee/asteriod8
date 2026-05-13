@@ -925,11 +925,53 @@
     if (msg) console.error('[join] auth error shown:', msg);
   }
 
+  // PostHog — lazy init via /api/config (project key is public-safe by design)
+  let _phLoaded = null;
+  async function _ensurePostHog() {
+    if (_phLoaded) return _phLoaded;
+    _phLoaded = (async () => {
+      try {
+        const cfg = await fetch('/api/config', { cache: 'force-cache' }).then(r => r.json());
+        if (!cfg.posthogKey) return null;
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.async = true;
+          s.src = (cfg.posthogHost || 'https://us.i.posthog.com') + '/static/array.js';
+          s.onload = resolve; s.onerror = reject;
+          document.head.appendChild(s);
+        });
+        window.posthog = window.posthog || [];
+        window.posthog.init(cfg.posthogKey, {
+          api_host: cfg.posthogHost || 'https://us.i.posthog.com',
+          person_profiles: 'identified_only',
+          capture_pageview: false,
+        });
+        return window.posthog;
+      } catch (_) { return null; }
+    })();
+    return _phLoaded;
+  }
+  function _parseTrackFrom() {
+    const from = new URLSearchParams(location.search).get('from') || '';
+    const m = from.match(/^t\/(.+)$/);
+    return m ? m[1] : null;
+  }
+  async function _firePreviewSignupCompleted(user) {
+    const trackId = _parseTrackFrom();
+    if (!trackId) return;
+    const ph = await _ensurePostHog();
+    if (!ph) return;
+    try { ph.identify(user.uid, { email: user.email || undefined }); } catch (_) {}
+    try { ph.capture('preview_signup_completed', { track_id: trackId, user_id: user.uid }); } catch (_) {}
+  }
+
   function handleAuthSuccess(user, nameHint) {
     try {
       authedUser = user;
       const displayName = nameHint || (user && user.displayName) || '';
       setLocalAuth(user, displayName);
+      // Fire PostHog preview_signup_completed if we landed here from /t/{id}
+      _firePreviewSignupCompleted(user).catch(() => {});
 
       const nameInput = document.getElementById('profileName');
       if (nameInput) nameInput.value = displayName;

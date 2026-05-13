@@ -63,4 +63,40 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             notifyCapacitorURL(url)
         }
     }
+
+    // Universal links (https://www.asteroid8.net/r/*, /t/*, /u/*) arrive via
+    // NSUserActivity.browsingWeb. Route the WKWebView to the matching in-app path.
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+              let url = userActivity.webpageURL else { return }
+        routeUniversalLink(url)
+    }
+
+    private func routeUniversalLink(_ url: URL) {
+        guard let host = url.host, host.hasSuffix("asteroid8.net") else {
+            notifyCapacitorURL(url)
+            return
+        }
+        let path = url.path
+        let known = ["/r/", "/t/", "/u/"]
+        guard known.contains(where: { path.hasPrefix($0) }) else {
+            notifyCapacitorURL(url)
+            return
+        }
+        // Hand to Capacitor — the web layer will navigate via its router or
+        // by calling window.location with the same URL.
+        if let webView = Self.findWKWebView(in: window?.rootViewController?.view) {
+            let request = URLRequest(url: url)
+            webView.load(request)
+        } else {
+            // WKWebView not yet attached — buffer until launch finishes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                if let webView = Self.findWKWebView(in: self?.window?.rootViewController?.view) {
+                    webView.load(URLRequest(url: url))
+                } else {
+                    self?.notifyCapacitorURL(url)
+                }
+            }
+        }
+    }
 }
