@@ -304,6 +304,10 @@
       <a id="modalQALink" href="#" style="display:none;margin-top:12px;padding:11px;text-align:center;background:rgba(255,122,89,0.1);border:1px solid rgba(255,122,89,0.25);border-radius:12px;color:#ff7a59;font-weight:700;font-size:13px;text-decoration:none;font-family:Montserrat,sans-serif;">
         <span style="vertical-align:middle;margin-right:6px;">💬</span> Ask a question
       </a>
+      <div class="user-songs" id="modalStoriesSection" style="display:none;">
+        <div class="user-songs-title">Stories</div>
+        <div id="modalStoriesList" style="display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px;-webkit-overflow-scrolling:touch;"></div>
+      </div>
       <div class="user-songs" id="modalSongsSection" style="display:none;">
         <div class="user-songs-title">Songs</div>
         <div id="modalSongsList"><p class="user-songs-empty">Loading tracks…</p></div>
@@ -700,6 +704,7 @@
       }
 
       document.getElementById('modalSongsSection').style.display = 'none';
+      document.getElementById('modalStoriesSection').style.display = 'none';
       document.getElementById('modalFollowWrap').style.display = 'none';
       const qaLink = document.getElementById('modalQALink');
       if (qaLink) {
@@ -708,9 +713,49 @@
       }
       if (u.key) {
         void loadArtistSongs(u.key, u.profile || {});
+        void loadArtistStoriesIntoModal(u.key, u.name, u.avatar);
         void wireFollowButton(u);
       }
       modal.classList.add('active');
+    }
+
+    // Fetch this artist's ARTIST_STORIES and render a thumbnail strip in the modal.
+    // Tapping a thumb closes the modal and opens the full-screen storyViewer.
+    async function loadArtistStoriesIntoModal(artistKey, artistName, artistAvatar) {
+      const section = document.getElementById('modalStoriesSection');
+      const list = document.getElementById('modalStoriesList');
+      if (!section || !list || !artistKey) return;
+      list.innerHTML = '';
+      try {
+        const data = await restGet('ARTIST_STORIES/' + encodeURIComponent(artistKey));
+        if (!data || typeof data !== 'object') return;
+        const now = Date.now();
+        const active = Object.entries(data)
+          .map(([id, s]) => (s && typeof s === 'object') ? { id, ...s } : null)
+          .filter(s => s && Number(s.expiresAt) > now)
+          .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        if (!active.length) return;
+        section.style.display = '';
+        list.innerHTML = active.map(s => {
+          const safeText = String(s.text || '').replace(/[<>"']/g, c => ({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+          return `<button type="button" class="modal-story-thumb" data-id="${escHtml(s.id)}"
+            style="flex:0 0 88px;height:128px;border-radius:14px;border:2px solid rgba(255,127,80,.45);
+            background:${s.bg || '#1a1a22'};color:${s.textColor || '#fff'};
+            font-family:${s.fontStack || 'inherit'};font-size:11px;line-height:1.25;font-weight:600;
+            padding:8px;text-align:left;overflow:hidden;cursor:pointer;position:relative;display:block;">
+            <span style="display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;">${safeText}</span>
+            ${s.sticker ? `<span style="position:absolute;bottom:6px;right:6px;font-size:20px;">${s.sticker}</span>` : ''}
+          </button>`;
+        }).join('');
+        list.querySelectorAll('.modal-story-thumb').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.getElementById('userModal').classList.remove('active');
+            if (window.openStoryViewer) window.openStoryViewer(artistKey, artistName, artistAvatar);
+          });
+        });
+      } catch (e) {
+        console.warn('[users] modal stories load failed:', e);
+      }
     }
     document.getElementById('modalCloseBtn').addEventListener('click', () => {
       document.getElementById('userModal').classList.remove('active');
