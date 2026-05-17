@@ -771,7 +771,7 @@
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
   import {
     initializeAuth, onAuthStateChanged,
-    signInWithCredential,
+    signInWithPopup, browserPopupRedirectResolver,
     browserLocalPersistence,
     GoogleAuthProvider, OAuthProvider
   } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
@@ -995,82 +995,26 @@
 
   let signingIn = false;
 
-  // ── Google sign-in via Firebase Identity Toolkit REST API ─────────────────
-  // Firebase's SDK redirect (signInWithRedirect/getRedirectResult) uses a hidden
-  // iframe at firebaseapp.com to write the result back to this origin. That iframe
-  // is blocked by firebaseapp.com's own COOP header. We bypass the SDK entirely:
-  // createAuthUri → Google OAuth → returns id_token directly in URL hash →
-  // signInWithIdp exchanges it for Firebase credentials → signInWithCredential.
+  // Google sign-in — standard Firebase SDK popup. The /__/auth/handler endpoint
+  // is served by Firebase Hosting on asteroid8.net, so the popup → opener
+  // postMessage works without the COOP issues firebaseapp.com had.
   async function startGoogleSignIn(btn) {
     showAuthErr('');
     setAuthLoading(btn, true);
     signingIn = true;
-    try { sessionStorage.setItem('joinRole', selectedRole || 'fan'); } catch (_) {}
-
     try {
-      // Get the Google OAuth URL for this origin (no firebaseapp.com involved).
-      const continueUri = location.origin + location.pathname; // https://www.asteroid8.net/join.html
-      const res = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:createAuthUri?key=${FB_CFG.apiKey}`,
-        { method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ continueUri, providerId: 'google.com' }) }
-      );
-      const data = await res.json();
-      if (!data.authUri) throw new Error(data.error?.message || 'No authUri returned');
-
-      sessionStorage.setItem('googleOAuth', JSON.stringify({ sessionId: data.sessionId }));
-      window.location.href = data.authUri; // Full-page navigation to Google — no iframes/popups
-    } catch (err) {
-      signingIn = false;
-      resetAuthButtons();
-      showAuthErr('Could not start Google sign-in: ' + (err.message || String(err)));
-    }
-  }
-
-  // Called on page load when Google redirects back with id_token in URL hash.
-  async function finishGoogleSignIn() {
-    const raw = sessionStorage.getItem('googleOAuth');
-    if (!raw) return false;
-
-    const hashParams = new URLSearchParams(location.hash.slice(1));
-    const queryParams = new URLSearchParams(location.search);
-    const hasToken = hashParams.has('id_token') || hashParams.has('access_token')
-                  || queryParams.has('code')    || queryParams.has('id_token');
-    if (!hasToken) { sessionStorage.removeItem('googleOAuth'); return false; }
-
-    const { sessionId } = JSON.parse(raw);
-    sessionStorage.removeItem('googleOAuth');
-
-    // Restore role chosen before the redirect
-    try {
-      const savedRole = sessionStorage.getItem('joinRole');
-      if (savedRole && !selectedRole) { selectedRole = savedRole; sessionStorage.removeItem('joinRole'); }
-    } catch (_) {}
-
-    // Clean OAuth params from the URL bar (cosmetic, doesn't affect functionality)
-    try { history.replaceState({}, '', location.pathname + location.search.replace(/[&?](state|code|id_token|access_token|token_type|expires_in|scope|authuser|prompt|session_state)[^&]*/g, '')); } catch (_) {}
-
-    try {
-      // Exchange the full redirect URL + sessionId for Firebase credentials.
-      const res = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key=${FB_CFG.apiKey}`,
-        { method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ requestUri: location.href, sessionId, returnSecureToken: true, returnIdpCredential: true }) }
-      );
-      const data = await res.json();
-      if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-
-      // Sign in to Firebase Auth SDK using the Google ID token from the response.
-      const googleIdToken = data.oauthIdToken;
-      const credential = GoogleAuthProvider.credential(googleIdToken);
-      const result = await signInWithCredential(auth, credential);
+      const googleProvider = new GoogleAuthProvider();
+      googleProvider.addScope('email');
+      googleProvider.addScope('profile');
+      const result = await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
       handleAuthSuccess(result.user);
-      hideLoader();
-      return true;
-    } catch (err) {
-      showAuthErr('Google sign-in failed: ' + (err.message || String(err)));
-      resetAuthButtons();
-      return false;
+    } catch (e) {
+      if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+        showAuthErr(e.code ? 'Google sign-in error: ' + e.code : 'Google sign-in failed. Try again.');
+      }
+    } finally {
+      signingIn = false;
+      setAuthLoading(btn, false);
     }
   }
 
@@ -1244,10 +1188,9 @@
   // Never block the page more than 4 seconds waiting for Firebase Auth
   const loaderGuard = setTimeout(() => { hideLoader(); resetAuthButtons(); }, 4000);
 
-  // Check if we're returning from Google OAuth (id_token in URL hash).
-  finishGoogleSignIn().then(handled => {
-    if (!handled) resetAuthButtons(); // Not a Google return — buttons should be ready
-  });
+  // Buttons are ready as soon as the page loads (popup-based Google sign-in,
+  // no redirect-return handling needed).
+  resetAuthButtons();
 
   onAuthStateChanged(auth, async user => {
     clearTimeout(loaderGuard);
