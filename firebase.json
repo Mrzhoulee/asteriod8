@@ -1,6 +1,5 @@
 {
   "hosting": {
-    "site": "asteroid8",
     "public": "www",
     "ignore": [
       "firebase.json",
