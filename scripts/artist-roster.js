@@ -150,19 +150,39 @@ function activeStories(s) {
   // Build cross-cut indexes
   console.log('Building indexes…');
 
-  // Songs per uploader (RTDB SONGS is a deep tree)
-  const songsBy = new Map();
+  // Songs per uploader (RTDB SONGS is a deep tree) — collect both count + titles
+  const songsBy = new Map();           // emailKey -> [{title, album, artist, createdAt, fileInp}]
   deepWalkSongs(songs, (s) => {
     const key = sanitize(s.uploaderOwnerKey || s.uploader);
-    if (key) songsBy.set(key, (songsBy.get(key) || 0) + 1);
+    if (!key) return;
+    if (!songsBy.has(key)) songsBy.set(key, []);
+    songsBy.get(key).push({
+      title: s.title || '(untitled)',
+      album: s.album || '',
+      artist: s.artist || '',
+      createdAt: s.createdAt || '',
+      fileInp: s.fileInp || '',
+      explicit: !!s.isExplicit,
+      source: 'rtdb',
+    });
   });
 
   // Boost songs per uploader
-  const boostsBy = new Map();
+  const boostsBy = new Map();           // emailKey -> [{title, artist, album, createdAt, status}]
   if (boostSongs) {
-    for (const b of Object.values(boostSongs)) {
+    for (const [bid, b] of Object.entries(boostSongs)) {
       const key = sanitize((b && b.uploader) || '');
-      if (key) boostsBy.set(key, (boostsBy.get(key) || 0) + 1);
+      if (!key) continue;
+      if (!boostsBy.has(key)) boostsBy.set(key, []);
+      boostsBy.get(key).push({
+        title: (b && (b.BoostTitle || b.title)) || '(untitled)',
+        album: (b && (b.BoostAlbum || b.album)) || '',
+        artist: (b && (b.BoostArtist || b.artist)) || '',
+        createdAt: b && b.createdAt,
+        status: b && b.status,
+        boostId: bid,
+        source: 'rtdb-boost',
+      });
     }
   }
 
@@ -174,11 +194,19 @@ function activeStories(s) {
     if (u.data.email) fsByEmailKey.set(sanitize(u.data.email), u.data);
   }
 
-  // Firestore songs per ownerUid
-  const fsSongsByUid = new Map();
+  // Firestore songs per ownerUid — collect titles too
+  const fsSongsByUid = new Map();   // uid -> [{title, plays, likes, uploadDate}]
   for (const s of fsSongs) {
     const uid = s.data.ownerUid;
-    if (uid) fsSongsByUid.set(uid, (fsSongsByUid.get(uid) || 0) + 1);
+    if (!uid) continue;
+    if (!fsSongsByUid.has(uid)) fsSongsByUid.set(uid, []);
+    fsSongsByUid.get(uid).push({
+      title: s.data.title || '(untitled)',
+      plays: s.data.plays || 0,
+      likes: s.data.likes || 0,
+      uploadDate: s.data.uploadDate || '',
+      source: 'firestore',
+    });
   }
 
   // Founding supporters per artist (artist_id is a Firebase UID)
@@ -197,7 +225,8 @@ function activeStories(s) {
     'website', 'socialLink',
     'referredBy', 'rtdbReferralCode',
     // Cross-cut RTDB counts
-    'followers', 'following', 'songs', 'boostSongs',
+    'followers', 'following', 'songs', 'songTitles',
+    'boostSongs', 'boostSongTitles',
     'storiesTotal', 'storiesActive', 'qaQuestions', 'notices', 'artistJourneys',
     'fanEngagementEvents', 'profileStickies', 'agreementsAccepted',
     'referralClicks', 'referralSignups',
@@ -208,7 +237,8 @@ function activeStories(s) {
     'fsReferralCount', 'fsSongCount', 'fsEligibleForFeature',
     'fsTier', 'fsPartnerStatus', 'fsEquityEligible',
     'fsIsReferralEligible', 'fsSlug',
-    'fsSongsInFirestore', 'fsFoundingSupportersCount',
+    'fsSongsInFirestore', 'fsSongTitlesInFirestore',
+    'fsFoundingSupportersCount',
   ];
   const rows = [header];
 
@@ -248,8 +278,10 @@ function activeStories(s) {
       p.referredBy || '', (refCodesByUser && refCodesByUser[emailKey]) || '',
       countKeys(follows?.[emailKey]),
       countKeys(following?.[emailKey]),
-      songsBy.get(emailKey) || 0,
-      boostsBy.get(emailKey) || 0,
+      (songsBy.get(emailKey) || []).length,
+      (songsBy.get(emailKey) || []).map((s) => s.title).join(' | '),
+      (boostsBy.get(emailKey) || []).length,
+      (boostsBy.get(emailKey) || []).map((b) => b.title).join(' | '),
       countKeys(stories?.[emailKey]),
       activeStories(stories?.[emailKey]),
       countKeys(qa?.[emailKey]),
@@ -278,10 +310,38 @@ function activeStories(s) {
       fsU.equityEligible ? 'yes' : '',
       fsU.is_referral_eligible ? 'yes' : '',
       fsU.slug || '',
-      fsSongsByUid.get(fsUid) || 0,
+      (fsSongsByUid.get(fsUid) || []).length,
+      (fsSongsByUid.get(fsUid) || []).map((s) => s.title).join(' | '),
       supportersByUid.get(fsUid) || 0,
     ]);
   }
+
+  // ─── Write long-format artist-songs.csv (one row per song) ───────────
+  const songRows = [['emailKey', 'fsUid', 'nickname', 'source', 'title', 'album', 'artist',
+                     'createdAt', 'plays', 'likes', 'status', 'isExplicit', 'fileInp']];
+  for (const [emailKey, raw] of profileEntries) {
+    const p = raw || {};
+    const nick = p.nickname || p.fullName || p.displayName || '';
+    let fsUid = '';
+    for (const u of fsUsers) {
+      if (u.data.email && sanitize(u.data.email) === emailKey) { fsUid = u.id; break; }
+    }
+    for (const s of (songsBy.get(emailKey) || [])) {
+      songRows.push([emailKey, fsUid, nick, 'rtdb', s.title, s.album, s.artist,
+                     s.createdAt, '', '', '', s.explicit ? 'yes' : '', s.fileInp]);
+    }
+    for (const b of (boostsBy.get(emailKey) || [])) {
+      songRows.push([emailKey, fsUid, nick, 'rtdb-boost', b.title, b.album, b.artist,
+                     b.createdAt, '', '', b.status || '', '', '']);
+    }
+    for (const fs of (fsSongsByUid.get(fsUid) || [])) {
+      songRows.push([emailKey, fsUid, nick, 'firestore', fs.title, '', '',
+                     fs.uploadDate, fs.plays, fs.likes, '', '', '']);
+    }
+  }
+  const songsCsvPath = path.resolve(process.cwd(), 'artist-songs.csv');
+  fs.writeFileSync(songsCsvPath, songRows.map((r) => r.map(csvEscape).join(',')).join('\n'));
+  console.log(`✔ Wrote ${songsCsvPath} (${songRows.length - 1} song rows across all sources)`);
 
   // Write CSV
   const csvPath = path.resolve(process.cwd(), 'artist-roster.csv');
