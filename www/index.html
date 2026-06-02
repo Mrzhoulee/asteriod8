@@ -4389,6 +4389,7 @@ setInterval(flySanta, 10000);
     onended="if(window.handleKKK)window.handleKKK()">
   </audio>
   <div class="lol-main-row">
+    <div id="miniVinyl" data-vinyl data-size="xs" data-audio="#gaga_global" data-label-color="#ff7f50" style="--vinyl-size:46px;flex-shrink:0;margin-right:12px;"></div>
     <div class="lol-now-wrap">
       <div id="tata" style="display: flex; align-items: center; justify-content: center; color: #ff7f50; font-weight: 600; flex-wrap: wrap; text-align: center;">SELECT A SONG</div>
       <p class="lol-load-hint" role="note">Songs might take a while to load on different areas of the world</p>
@@ -4407,6 +4408,7 @@ setInterval(flySanta, 10000);
     </div>
   </div>
 </div>
+<script type="module">import "./js/vinyl-player.js";</script>
 <script>
 (function () {
   let queueOpen = false;

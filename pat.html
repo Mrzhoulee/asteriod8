@@ -225,6 +225,7 @@
     </a>
     <div class="topbar-title">My <span>Playlist</span></div>
     <div class="topbar-count" id="songCount"></div>
+    <div id="patVinyl" style="--vinyl-size:40px;flex-shrink:0;"></div>
   </div>
 
   <div class="page">
@@ -331,6 +332,11 @@
     var currentAudio = null;
     var currentRow = null;
 
+    /** Spin/stop the topbar vinyl (mounted by the module script at the bottom). */
+    function patSetVinyl(on) {
+      if (window.__patVinyl) window.__patVinyl.setPlaying(!!on);
+    }
+
     function playSong(row, src, title, artist) {
       // Prefer global player from index.html if available
       if (window.playRecommendedSong) {
@@ -338,18 +344,20 @@
         if (currentRow) currentRow.classList.remove('playing');
         currentRow = row;
         row.classList.add('playing');
+        patSetVinyl(true);
         return;
       }
       // Fallback: local audio
       if (currentAudio) { currentAudio.pause(); currentAudio = null; }
       if (currentRow) currentRow.classList.remove('playing');
-      if (currentRow === row) { currentRow = null; return; }
+      if (currentRow === row) { currentRow = null; patSetVinyl(false); return; }
       var audio = new Audio(src);
       audio.play().catch(function() {});
-      audio.onended = function() { row.classList.remove('playing'); currentAudio = null; currentRow = null; };
+      audio.onended = function() { row.classList.remove('playing'); currentAudio = null; currentRow = null; patSetVinyl(false); };
       currentAudio = audio;
       currentRow = row;
       row.classList.add('playing');
+      patSetVinyl(true);
     }
 
     function deleteSong(index) {
@@ -432,6 +440,11 @@
       // Pull any songs the user added on another device — runs in parallel with the local render.
       syncPlaylistFromFirebase();
     });
+  </script>
+  <script type="module">
+    import { mountVinylPlayer } from "./js/vinyl-player.js";
+    const el = document.getElementById('patVinyl');
+    if (el) window.__patVinyl = mountVinylPlayer(el, { size: 'xs', labelColor: '#ff7f50' });
   </script>
 </body>
 </html>
