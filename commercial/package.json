@@ -1,0 +1,29 @@
+{
+  "name": "asteroid-commercial",
+  "version": "1.0.0",
+  "private": true,
+  "description": "20-second promotional commercial for Asteroid (asteroid8.net) — the anti-algorithm music platform. Built with Remotion.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "remotion studio",
+    "studio": "remotion studio",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "render": "npm run render:vertical && npm run render:horizontal",
+    "render:vertical": "remotion render src/index.ts AsteroidVertical out/asteroid-vertical.mp4",
+    "render:horizontal": "remotion render src/index.ts AsteroidHorizontal out/asteroid-horizontal.mp4",
+    "upgrade": "remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.471",
+    "@remotion/google-fonts": "4.0.471",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.471"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "typescript": "5.6.3"
+  }
+}
