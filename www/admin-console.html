@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asteroid — Admin Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050810;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.09);
+  --accent: #ff7a59;
+  --accent-dim: rgba(255,122,89,0.15);
+  --text: #fff;
+  --muted: rgba(255,255,255,0.5);
+  --faint: rgba(255,255,255,0.25);
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --red: #f87171;
+  --blue: #7dd3fc;
+  --sidebar-w: 224px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-serif; min-height: 100vh; }
+
+/* ─── Login ─── */
+#loginScreen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+.login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 40px 32px; width: 100%; max-width: 360px; }
+.login-logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+.login-logo span { color: var(--accent); }
+.login-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+.field input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 10px; color: #fff; font-size: 14px; padding: 10px 14px; font-family: inherit; outline: none; transition: border-color 0.15s; }
+.field input:focus { border-color: var(--accent); }
+.btn-primary { width: 100%; background: linear-gradient(135deg,#ff7a59,#ff4e2a); color: #fff; border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.login-err { font-size: 12px; color: var(--red); margin-top: 10px; min-height: 18px; text-align: center; }
+
+/* ─── Layout ─── */
+#adminApp { display: none; }
+.app-wrap { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+
+/* ─── Sidebar ─── */
+#sidebar {
+  background: rgba(0,0,0,0.25);
+  border-right: 1px solid var(--border);
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto; display: flex; flex-direction: column;
+  padding: 16px 10px 20px;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+.sb-logo { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; padding: 4px 8px 18px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+.sb-logo span { color: var(--accent); }
+.sb-head { font-size: 10px; font-weight: 700; color: var(--faint); letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 8px 4px; }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 9px; cursor: pointer; font-size: 13px; color: var(--muted); transition: all 0.12s; user-select: none; }
+.nav-item:hover { background: var(--surface-hover); color: var(--text); }
+.nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 600; }
+.nav-item .ni { font-size: 14px; width: 18px; flex-shrink: 0; }
+.sb-bottom { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+.signout-btn { display: flex; align-items: center; gap: 8px; width: 100%; background: none; border: none; color: var(--muted); font-family: inherit; font-size: 12px; cursor: pointer; padding: 8px 10px; border-radius: 8px; transition: all 0.12s; }
+.signout-btn:hover { background: rgba(248,113,113,0.1); color: var(--red); }
+
+/* ─── Content ─── */
+#mainContent { padding: 32px 28px 60px; overflow-y: auto; max-height: 100vh; }
+.ph { margin-bottom: 24px; }
+.ph-title { font-size: 22px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 3px; }
+.ph-sub { font-size: 13px; color: var(--muted); }
+
+/* ─── Stat Grid ─── */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+.stat-lbl { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.stat-val { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+.accent { color: var(--accent); }
+.green { color: var(--green); }
+.yellow { color: var(--yellow); }
+.red { color: var(--red); }
+
+/* ─── Cards ─── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+.card-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+
+/* ─── Table ─── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { text-align: left; padding: 10px 14px; font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); white-space: nowrap; }
+tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
+tbody tr:hover { background: var(--surface-hover); }
+tbody td { padding: 9px 14px; vertical-align: middle; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+
+/* ─── Buttons ─── */
+.btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.12s; border: none; display: inline-flex; align-items: center; gap: 5px; }
+.btn-sm { padding: 5px 10px; font-size: 11px; border-radius: 6px; }
+.btn-xs { padding: 3px 8px; font-size: 10px; border-radius: 5px; }
+.btn-accent { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(255,122,89,0.3); }
+.btn-accent:hover { background: rgba(255,122,89,0.25); }
+.btn-green { background: rgba(16,185,129,0.12); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+.btn-green:hover { background: rgba(16,185,129,0.22); }
+.btn-red { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.25); }
+.btn-red:hover { background: rgba(248,113,113,0.2); }
+.btn-ghost { background: none; color: var(--muted); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface-hover); color: var(--text); }
+.btn-yellow { background: rgba(245,158,11,0.1); color: var(--yellow); border: 1px solid rgba(245,158,11,0.25); }
+.btn-yellow:hover { background: rgba(245,158,11,0.2); }
+
+/* ─── Form Elements ─── */
+.form-row { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+.fi { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 9px; color: #fff; font-size: 13px; padding: 9px 13px; font-family: inherit; outline: none; transition: border-color 0.15s; }
+.fi:focus { border-color: var(--accent); }
+.fi.wide { flex: 1; min-width: 0; }
+.fi-mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.fi-ta { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 9px; color: #fff; font-size: 12px; padding: 10px 13px; font-family: 'JetBrains Mono', monospace; outline: none; resize: vertical; min-height: 130px; width: 100%; transition: border-color 0.15s; }
+.fi-ta:focus { border-color: var(--accent); }
+.fi-label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* ─── Path Navigator ─── */
+.path-nav { display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 9px; padding: 7px 12px; margin-bottom: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; flex-wrap: wrap; min-height: 36px; }
+.ps { color: var(--muted); cursor: pointer; padding: 1px 4px; border-radius: 4px; }
+.ps:hover { background: var(--surface-hover); color: var(--text); }
+.ps.cur { color: var(--text); font-weight: 600; }
+.ps-sep { color: var(--faint); }
+
+/* ─── Tree ─── */
+.tree-root { }
+.tree-children { border-left: 1px solid var(--border); margin-left: 16px; padding-left: 10px; }
+.tree-row { display: flex; align-items: flex-start; gap: 5px; padding: 2px 0; min-height: 26px; }
+.tree-toggle { width: 14px; height: 22px; flex-shrink: 0; cursor: pointer; color: var(--faint); font-size: 9px; display: flex; align-items: center; justify-content: center; margin-top: 0; }
+.tree-key { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--blue); cursor: pointer; padding: 2px 4px; border-radius: 4px; white-space: nowrap; }
+.tree-key:hover { background: rgba(125,211,252,0.1); }
+.tree-colon { color: var(--faint); font-size: 12px; margin: 2px 0; }
+.tree-val-s { color: #86efac; font-family: 'JetBrains Mono', monospace; font-size: 12px; word-break: break-all; }
+.tree-val-n { color: #fbbf24; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.tree-val-b { color: #f472b6; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.tree-val-null { color: var(--faint); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-style: italic; }
+.tree-val-obj { color: var(--faint); font-family: 'JetBrains Mono', monospace; font-size: 11px; cursor: pointer; }
+.tree-acts { display: flex; gap: 3px; margin-left: 8px; opacity: 0; transition: opacity 0.1s; flex-shrink: 0; }
+.tree-row:hover .tree-acts { opacity: 1; }
+.tree-act { background: none; border: none; cursor: pointer; color: var(--faint); font-size: 12px; padding: 1px 5px; border-radius: 4px; transition: all 0.1s; line-height: 1; }
+.tree-act:hover { background: var(--surface-hover); color: var(--text); }
+.tree-act.del:hover { background: rgba(248,113,113,0.1); color: var(--red); }
+.tree-more { font-size: 11px; color: var(--muted); padding: 4px 0 2px; }
+.tree-add { margin-top: 4px; }
+
+/* ─── Filter Tabs ─── */
+.ftabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+.ftab { padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: none; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.12s; }
+.ftab.active, .ftab:hover { background: var(--accent-dim); border-color: rgba(255,122,89,0.4); color: var(--accent); }
+
+/* ─── Party Cards ─── */
+.p-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; }
+.p-card.pending { border-left: 3px solid var(--yellow); }
+.p-card.approved { border-left: 3px solid var(--green); }
+.p-card.rejected { border-left: 3px solid var(--red); opacity: 0.6; }
+.p-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.p-meta { font-size: 12px; color: var(--muted); line-height: 1.7; }
+.p-acts { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+.badge-pending { background: rgba(245,158,11,0.12); color: var(--yellow); }
+.badge-approved { background: rgba(16,185,129,0.12); color: var(--green); }
+.badge-rejected { background: rgba(248,113,113,0.12); color: var(--red); }
+
+/* ─── Modal ─── */
+#modalOvl { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+#modalOvl.open { display: flex; }
+.modal-box { background: #0d1117; border: 1px solid var(--border); border-radius: 18px; padding: 28px; width: 100%; max-width: 540px; max-height: 85vh; overflow-y: auto; }
+.modal-title { font-size: 16px; font-weight: 800; margin-bottom: 16px; }
+.modal-acts { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* ─── Toast ─── */
+#toastWrap { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { background: #1a1f2e; border: 1px solid var(--border); border-radius: 10px; padding: 11px 18px; font-size: 13px; min-width: 220px; animation: slideIn 0.2s ease; pointer-events: auto; }
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--accent); }
+@keyframes slideIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ─── Misc ─── */
+.loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 40px; color: var(--muted); font-size: 14px; }
+.spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 14px; }
+.err-msg { color: var(--red); font-size: 13px; padding: 12px; }
+hr.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* ─── Scrollbars ─── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+/* ─── Mobile ─── */
+#mobileBar { display: none; }
+@media (max-width: 800px) {
+  .app-wrap { grid-template-columns: 1fr; }
+  #sidebar { position: fixed; left: -240px; z-index: 200; transition: left 0.22s; width: 224px; }
+  #sidebar.open { left: 0; box-shadow: 4px 0 24px rgba(0,0,0,0.5); }
+  #mainContent { padding: 16px 14px 60px; }
+  #mobileBar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  #mobileOverlay { display: none; position: fixed; inset: 0; z-index: 150; }
+  #mobileOverlay.open { display: block; }
+}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">ASTEROID<span>★</span> ADMIN</div>
+    <div class="login-sub">Firebase Admin Console — sign in to continue</div>
+    <div class="field"><label>Email</label><input type="email" id="lEmail" placeholder="admin@example.com" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input type="password" id="lPw" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn-primary" id="lBtn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="lErr"></div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="adminApp">
+  <!-- Mobile bar -->
+  <div id="mobileBar">
+    <div style="font-size:14px;font-weight:800">ASTEROID<span style="color:var(--accent)">★</span></div>
+    <button class="btn btn-ghost btn-sm" onclick="toggleSidebar()">☰ Menu</button>
+  </div>
+  <div id="mobileOverlay" onclick="toggleSidebar()"></div>
+
+  <div class="app-wrap">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sb-logo">ASTEROID<span>★</span> ADMIN</div>
+
+      <div class="nav-item active" data-s="dashboard"><span class="ni">⊞</span> Dashboard</div>
+
+      <div class="sb-head">Realtime Database</div>
+      <div class="nav-item" data-s="db-explorer"><span class="ni">🔭</span> DB Explorer</div>
+      <div class="nav-item" data-s="profiles"><span class="ni">👤</span> Profiles</div>
+      <div class="nav-item" data-s="rtdb-songs"><span class="ni">🎵</span> Songs</div>
+      <div class="nav-item" data-s="parties"><span class="ni">🎉</span> Parties</div>
+      <div class="nav-item" data-s="feature-req"><span class="ni">💡</span> Feature Requests</div>
+      <div class="nav-item" data-s="subastroids"><span class="ni">🪐</span> SubAsteroids</div>
+      <div class="nav-item" data-s="live-rooms"><span class="ni">🎙</span> Live Rooms</div>
+      <div class="nav-item" data-s="polls"><span class="ni">📊</span> Polls</div>
+
+      <div class="sb-head">Firestore</div>
+      <div class="nav-item" data-s="fs-users"><span class="ni">👥</span> Users</div>
+      <div class="nav-item" data-s="fs-songs"><span class="ni">🎼</span> Songs (FS)</div>
+      <div class="nav-item" data-s="fs-featurequeue"><span class="ni">📋</span> Feature Queue</div>
+      <div class="nav-item" data-s="fs-founding"><span class="ni">⭐</span> Founding Supporters</div>
+
+      <div class="sb-bottom">
+        <div style="font-size:11px;color:var(--faint);padding:0 8px 8px" id="sbUser"></div>
+        <button class="signout-btn" onclick="doSignOut()">⎋ Sign Out</button>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main id="mainContent">
+      <div class="loading"><div class="spinner"></div> Loading…</div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modalOvl">
+  <div class="modal-box">
+    <div class="modal-title" id="mTitle"></div>
+    <div id="mBody"></div>
+    <div class="modal-acts" id="mActs"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toastWrap"></div>
+
+<script type="module">
+import { initializeApp, getApps, getApp }
+  from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { getDatabase, ref, get, set, remove, update, query, limitToFirst, orderByKey }
+  from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+import {
+  getFirestore, collection, getDocs, doc, getDoc, setDoc, deleteDoc,
+  query as fq, limit, orderBy, startAfter
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+// ─── Firebase ───────────────────────────────────────────────
+const FB = {
+  apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+  authDomain: "asteroid-cdc13.firebaseapp.com",
+  databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+  projectId: "asteroid-cdc13",
+  storageBucket: "asteroid-cdc13.appspot.com",
+  messagingSenderId: "793353824502",
+  appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+};
+const app = getApps().length ? getApp() : initializeApp(FB);
+const auth = getAuth(app);
+const rtdb = getDatabase(app);
+const fs   = getFirestore(app);
+
+// ─── State ──────────────────────────────────────────────────
+let me = null;
+let curSection = 'dashboard';
+let dbPath = '';
+let partyFilter = 'all';
+let fsCursor = null;
+let fsCurCol = null;
+
+// ─── Auth ────────────────────────────────────────────────────
+onAuthStateChanged(auth, user => {
+  me = user;
+  if (user) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    const sbUser = document.getElementById('sbUser');
+    if (sbUser) sbUser.textContent = user.email;
+    go('dashboard');
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminApp').style.display = 'none';
+  }
+});
+
+window.doLogin = async () => {
+  const email = document.getElementById('lEmail').value.trim();
+  const pw = document.getElementById('lPw').value;
+  const btn = document.getElementById('lBtn');
+  const err = document.getElementById('lErr');
+  err.textContent = '';
+  if (!email || !pw) { err.textContent = 'Enter email and password.'; return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    await signInWithEmailAndPassword(auth, email, pw);
+  } catch(e) {
+    err.textContent = e.message.replace('Firebase: ','').replace(/ \(auth\/[^)]+\)/,'');
+    btn.disabled = false; btn.textContent = 'Sign In';
+  }
+};
+
+window.doSignOut = () => signOut(auth);
+
+document.getElementById('lEmail').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('lPw').focus(); });
+document.getElementById('lPw').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+
+// ─── Nav ─────────────────────────────────────────────────────
+window.go = function(section, params={}) {
+  curSection = section;
+  document.querySelectorAll('.nav-item[data-s]').forEach(el => {
+    el.classList.toggle('active', el.dataset.s === section);
+  });
+  closeSidebar();
+  switch(section) {
+    case 'dashboard':   return renderDash();
+    case 'db-explorer': return renderDbExplorer(params.path ?? dbPath ?? '');
+    case 'profiles':    return renderProfiles('');
+    case 'rtdb-songs':  return renderRtdbSongs('');
+    case 'parties':     return renderParties();
+    case 'feature-req': return renderFR();
+    case 'subastroids': return renderSubA();
+    case 'live-rooms':  return renderLiveRooms();
+    case 'polls':       return renderPolls();
+    case 'fs-users':    return renderFs('users');
+    case 'fs-songs':    return renderFs('songs');
+    case 'fs-featurequeue': return renderFs('featureQueue');
+    case 'fs-founding': return renderFs('founding_supporters');
+    default: renderDash();
+  }
+};
+
+document.querySelectorAll('.nav-item[data-s]').forEach(el =>
+  el.addEventListener('click', () => go(el.dataset.s))
+);
+
+window.toggleSidebar = () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+};
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('open');
+}
+
+// ─── Helpers ─────────────────────────────────────────────────
+function setHTML(html) { document.getElementById('mainContent').innerHTML = html; }
+function escH(s) {
+  const d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+function safePath(p) { return String(p).replace(/'/g, "\\'"); }
+function fmtTs(ts) {
+  if (!ts) return '—';
+  return new Date(typeof ts === 'number' && ts < 1e10 ? ts*1000 : ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+window.toast = function(msg, type='info') {
+  const w = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  w.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+};
+
+// ─── Modal ────────────────────────────────────────────────────
+function openModal(title, body, onOk, okLabel='Confirm', okCls='btn-accent') {
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mBody').innerHTML = body;
+  document.getElementById('mActs').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn ${okCls}" id="modalOkBtn">${okLabel}</button>
+  `;
+  document.getElementById('modalOkBtn').onclick = onOk;
+  document.getElementById('modalOvl').classList.add('open');
+}
+
+window.closeModal = () => document.getElementById('modalOvl').classList.remove('open');
+document.getElementById('modalOvl').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOvl')) window.closeModal();
+});
+
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════════
+async function renderDash() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Dashboard</div><div class="ph-sub">Asteroid Firebase overview</div></div>
+    <div class="stat-grid" id="sGrid"><div class="loading"><div class="spinner"></div></div></div>
+    <div class="card">
+      <div class="card-title">Quick Actions</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <button class="btn btn-accent" onclick="go('parties')">🎉 Manage Parties</button>
+        <button class="btn btn-ghost" onclick="go('profiles')">👤 Browse Profiles</button>
+        <button class="btn btn-ghost" onclick="go('db-explorer')">🔭 DB Explorer</button>
+        <button class="btn btn-ghost" onclick="go('rtdb-songs')">🎵 Songs</button>
+        <button class="btn btn-ghost" onclick="go('fs-users')">👥 Firestore Users</button>
+        <button class="btn btn-ghost" onclick="go('feature-req')">💡 Feature Requests</button>
+      </div>
+    </div>
+  `);
+  try {
+    const [profSnap, songSnap, partySnap, frSnap] = await Promise.all([
+      get(query(ref(rtdb,'PROFILES'), limitToFirst(9999))),
+      get(query(ref(rtdb,'SONGS'), limitToFirst(9999))),
+      get(ref(rtdb,'ASTEROID_PARTIES')),
+      get(query(ref(rtdb,'FEATURE_REQUESTS'), limitToFirst(9999)))
+    ]);
+    const parties = partySnap.val() || {};
+    const pending = Object.values(parties).filter(p => !p.status || p.status==='pending').length;
+    document.getElementById('sGrid').innerHTML = `
+      <div class="stat-card"><div class="stat-lbl">Profiles</div><div class="stat-val accent">${Object.keys(profSnap.val()||{}).length}</div></div>
+      <div class="stat-card"><div class="stat-lbl">Songs (RTDB)</div><div class="stat-val">${Object.keys(songSnap.val()||{}).length}</div></div>
+      <div class="stat-card"><div class="stat-lbl">Total Parties</div><div class="stat-val">${Object.keys(parties).length}</div></div>
+      <div class="stat-card"><div class="stat-lbl">Pending Parties</div><div class="stat-val yellow">${pending}</div></div>
+      <div class="stat-card"><div class="stat-lbl">Feature Requests</div><div class="stat-val green">${Object.keys(frSnap.val()||{}).length}</div></div>
+    `;
+  } catch(e) {
+    document.getElementById('sGrid').innerHTML = `<div class="err-msg">Stats error: ${escH(e.message)}</div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// DB EXPLORER
+// ══════════════════════════════════════════════════════════════
+const TOP_PATHS = ['PROFILES','SONGS','PREMIUM','ASTEROID_PARTIES','FEATURE_REQUESTS',
+  'ARTIST_POLLS','FOLLOWS','FOLLOWING','PLAYLISTS','subAsteroids','LiveRooms','ARTIST_QA',
+  'ARTIST_STORIES','ARTIST_NOTICES','CONCERT_CHATS','USERNAME_REGISTRY','LISTEN_JOURNEYS',
+  'FAN_ENGAGEMENT','FEATURED_ARTIST_SONG','REFERRAL_CODE_INDEX','boostSongs'];
+
+async function renderDbExplorer(path) {
+  dbPath = path || '';
+  const segs = path ? path.split('/').filter(Boolean) : [];
+
+  let bread = `<span class="ps" onclick="goDb('')">root</span>`;
+  segs.forEach((s, i) => {
+    const partial = segs.slice(0,i+1).join('/');
+    bread += `<span class="ps-sep">/</span><span class="ps ${i===segs.length-1?'cur':''}" onclick="goDb('${safePath(partial)}')">${escH(s)}</span>`;
+  });
+
+  const quickBtns = TOP_PATHS.map(p =>
+    `<button class="btn btn-xs btn-ghost" onclick="goDb('${p}')">${p}</button>`
+  ).join('');
+
+  setHTML(`
+    <div class="ph"><div class="ph-title">DB Explorer</div><div class="ph-sub">Browse & edit any Realtime Database path</div></div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">Common Paths</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">${quickBtns}</div>
+    </div>
+    <div class="form-row">
+      <input class="fi fi-mono wide" id="pathInp" value="${escH(path)}" placeholder="e.g. PROFILES/userId123" onkeydown="if(event.key==='Enter')goDb(this.value.trim())">
+      <button class="btn btn-accent" onclick="goDb(document.getElementById('pathInp').value.trim())">Go →</button>
+      ${segs.length ? `<button class="btn btn-ghost" onclick="goDb('${safePath(segs.slice(0,-1).join('/'))}')" title="Go up">↑ Up</button>` : ''}
+      ${path ? `<button class="btn btn-ghost" onclick="addDbKey('${safePath(path)}')">+ Add Key</button>` : ''}
+    </div>
+    <div class="path-nav" id="pathNav">${bread}</div>
+    <div class="card" id="treeWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+
+  if (!path) {
+    document.getElementById('treeWrap').innerHTML = `<div class="empty">Select or type a path above to explore</div>`;
+    return;
+  }
+
+  try {
+    // Use limitToFirst for top-level collections to avoid loading massive datasets
+    const depth = segs.length;
+    let snap;
+    if (depth <= 1) {
+      snap = await get(query(ref(rtdb, path), limitToFirst(80)));
+    } else {
+      snap = await get(ref(rtdb, path));
+    }
+    const data = snap.val();
+    if (data === null) {
+      document.getElementById('treeWrap').innerHTML = `<div class="empty">No data at <code style="font-size:12px">${escH(path)}</code></div>`;
+      return;
+    }
+    document.getElementById('treeWrap').innerHTML = buildTree(data, path, 0);
+  } catch(e) {
+    document.getElementById('treeWrap').innerHTML = `<div class="err-msg">Error: ${escH(e.message)}</div>`;
+  }
+}
+
+window.goDb = function(path) {
+  dbPath = path.trim();
+  go('db-explorer', { path: dbPath });
+};
+
+function buildTree(data, path, depth) {
+  if (data === null || data === undefined) return `<span class="tree-val-null">null</span>`;
+  const t = typeof data;
+  if (t !== 'object') return valSpan(data) + actionBtns(path, false);
+
+  const entries = Object.entries(data);
+  if (!entries.length) return `<span class="tree-val-null">{empty}</span>`;
+
+  const MAX = depth === 0 ? 80 : 50;
+  const shown = entries.slice(0, MAX);
+  const extra = entries.length - shown.length;
+
+  let html = `<div class="${depth===0?'tree-root':'tree-children'}">`;
+  for (const [k, v] of shown) {
+    const cp = path ? `${path}/${k}` : k;
+    const isObj = v !== null && typeof v === 'object';
+    const nid = 'n' + Math.random().toString(36).slice(2,8);
+    const objCount = isObj ? Object.keys(v).length : 0;
+
+    html += `<div class="tree-row">
+      <span class="tree-toggle" onclick="toggleNode('${nid}')">${isObj ? '▶' : ' '}</span>
+      <span class="tree-key" onclick="${isObj ? `toggleNode('${nid}')` : `editDb('${safePath(cp)}', '${escH(JSON.stringify(v))}')`}">${escH(k)}</span>
+      <span class="tree-colon">:</span>
+      ${isObj
+        ? `<span class="tree-val-obj" id="${nid}_sum" onclick="toggleNode('${nid}')">{${objCount} key${objCount!==1?'s':''}}</span>`
+        : valSpan(v)
+      }
+      <div class="tree-acts">
+        ${!isObj ? `<button class="tree-act" title="Edit" onclick="editDb('${safePath(cp)}','${escH(JSON.stringify(v))}')">✎</button>` : ''}
+        <button class="tree-act" title="Open path" onclick="goDb('${safePath(cp)}')">↗</button>
+        <button class="tree-act del" title="Delete" onclick="delDb('${safePath(cp)}')">✕</button>
+      </div>
+    </div>`;
+
+    if (isObj) {
+      if (depth < 2) {
+        html += `<div id="${nid}" style="display:none">${buildTree(v, cp, depth+1)}</div>`;
+      } else {
+        html += `<div id="${nid}" style="display:none"><div style="padding:6px 0 2px 12px"><button class="btn btn-xs btn-ghost" onclick="goDb('${safePath(cp)}')">→ Open in explorer</button></div></div>`;
+      }
+    }
+  }
+
+  if (extra > 0) {
+    html += `<div class="tree-more">…${extra} more keys not shown. <button class="btn btn-xs btn-ghost" onclick="goDb('${safePath(path)}')">Open full path</button></div>`;
+  }
+
+  html += `<div class="tree-add"><button class="btn btn-xs btn-ghost" onclick="addDbKey('${safePath(path)}')">+ Add key</button></div>`;
+  html += '</div>';
+  return html;
+}
+
+function valSpan(v) {
+  if (v === null) return `<span class="tree-val-null">null</span>`;
+  if (typeof v === 'string') {
+    const d = v.length > 90 ? v.slice(0,90)+'…' : v;
+    return `<span class="tree-val-s">"${escH(d)}"</span>`;
+  }
+  if (typeof v === 'number') return `<span class="tree-val-n">${v}</span>`;
+  if (typeof v === 'boolean') return `<span class="tree-val-b">${v}</span>`;
+  return `<span class="tree-val-null">null</span>`;
+}
+
+function actionBtns(path, isObj) {
+  return `<div class="tree-acts" style="opacity:1">
+    ${!isObj ? `<button class="tree-act" onclick="editDb('${safePath(path)}','${escH(JSON.stringify(null))}')">✎</button>` : ''}
+    <button class="tree-act del" onclick="delDb('${safePath(path)}')">✕</button>
+  </div>`;
+}
+
+window.toggleNode = function(nid) {
+  const el = document.getElementById(nid);
+  if (!el) return;
+  const hidden = el.style.display === 'none';
+  el.style.display = hidden ? 'block' : 'none';
+  const row = el.previousElementSibling;
+  if (row) {
+    const tog = row.querySelector('.tree-toggle');
+    if (tog) tog.textContent = hidden ? '▼' : '▶';
+    const sum = document.getElementById(nid + '_sum');
+    if (sum) sum.style.display = hidden ? 'none' : '';
+  }
+};
+
+window.editDb = function(path, curJson) {
+  let cur;
+  try { cur = JSON.parse(curJson); } catch { cur = curJson; }
+  const isStr = typeof cur === 'string';
+  openModal(`Edit: ${path.split('/').pop()}`, `
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:10px">📍 ${escH(path)}</div>
+    <label class="fi-label">New Value</label>
+    <textarea class="fi-ta" id="editTA">${escH(isStr ? cur : JSON.stringify(cur, null, 2))}</textarea>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px">Strings: plain text. Numbers/booleans/objects: valid JSON.</div>
+  `, async () => {
+    const raw = document.getElementById('editTA').value;
+    let val;
+    try { val = JSON.parse(raw); } catch { val = raw; }
+    try {
+      await set(ref(rtdb, path), val);
+      toast('Saved ✓', 'success');
+      window.closeModal();
+      go('db-explorer', { path: dbPath });
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Save');
+};
+
+window.delDb = function(path) {
+  openModal('Delete Node', `
+    <p style="color:var(--muted);font-size:14px">Delete everything at:</p>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:13px;margin:12px 0;padding:10px;background:rgba(248,113,113,0.07);border-radius:8px;color:var(--red)">${escH(path)}</p>
+    <p style="color:var(--muted);font-size:13px">Cannot be undone.</p>
+  `, async () => {
+    try {
+      await remove(ref(rtdb, path));
+      toast('Deleted', 'success');
+      window.closeModal();
+      go('db-explorer', { path: dbPath });
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Delete', 'btn-red');
+};
+
+window.addDbKey = function(parent) {
+  openModal('Add Key', `
+    <div style="margin-bottom:14px">
+      <label class="fi-label">Key Name</label>
+      <input class="fi fi-mono" id="newK" placeholder="keyName" style="width:100%">
+    </div>
+    <div>
+      <label class="fi-label">Value (string, number, JSON…)</label>
+      <textarea class="fi-ta" id="newV" placeholder='"hello"  or  42  or  true  or  {"nested":true}'></textarea>
+    </div>
+  `, async () => {
+    const k = document.getElementById('newK').value.trim();
+    const raw = document.getElementById('newV').value.trim();
+    if (!k) { toast('Key required', 'error'); return; }
+    let val;
+    try { val = JSON.parse(raw); } catch { val = raw; }
+    const fullPath = parent ? `${parent}/${k}` : k;
+    try {
+      await set(ref(rtdb, fullPath), val);
+      toast('Key added ✓', 'success');
+      window.closeModal();
+      go('db-explorer', { path: dbPath });
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Add');
+};
+
+// ══════════════════════════════════════════════════════════════
+// PROFILES
+// ══════════════════════════════════════════════════════════════
+async function renderProfiles(search) {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Profiles</div><div class="ph-sub">RTDB / PROFILES</div></div>
+    <div class="form-row">
+      <input class="fi wide" id="profSrch" placeholder="Search by username, email, or UID…" value="${escH(search)}" onkeydown="if(event.key==='Enter')searchProfiles(this.value)">
+      <button class="btn btn-accent" onclick="searchProfiles(document.getElementById('profSrch').value)">Search</button>
+      <button class="btn btn-ghost" onclick="goDb('PROFILES')">Open in DB Explorer</button>
+    </div>
+    <div id="profWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(query(ref(rtdb,'PROFILES'), limitToFirst(60)));
+    showProfiles(snap.val()||{}, search);
+  } catch(e) {
+    document.getElementById('profWrap').innerHTML = `<div class="err-msg">${escH(e.message)}</div>`;
+  }
+}
+
+window.searchProfiles = async function(term) {
+  document.getElementById('profWrap').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  try {
+    const snap = await get(ref(rtdb,'PROFILES'));
+    showProfiles(snap.val()||{}, term);
+  } catch(e) { document.getElementById('profWrap').innerHTML = `<div class="err-msg">${escH(e.message)}</div>`; }
+};
+
+function showProfiles(data, search) {
+  let entries = Object.entries(data);
+  if (search) {
+    const q = search.toLowerCase();
+    entries = entries.filter(([k,v]) =>
+      k.toLowerCase().includes(q) ||
+      String(v?.username||'').toLowerCase().includes(q) ||
+      String(v?.displayName||'').toLowerCase().includes(q) ||
+      String(v?.email||'').toLowerCase().includes(q)
+    );
+  }
+  if (!entries.length) { document.getElementById('profWrap').innerHTML='<div class="empty">No profiles found</div>'; return; }
+  const rows = entries.slice(0,100).map(([k,v]) => `<tr>
+    <td class="mono">${escH(k.slice(0,20))}${k.length>20?'…':''}</td>
+    <td>${escH(v?.username||v?.displayName||'—')}</td>
+    <td>${escH(v?.email||'—')}</td>
+    <td>${v?.isArtist ? '<span class="badge badge-approved">Artist</span>' : '<span style="color:var(--muted);font-size:11px">Fan</span>'}</td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-xs btn-ghost" onclick="goDb('PROFILES/${safePath(k)}')">Edit</button>
+      <button class="btn btn-xs btn-red" onclick="delDb('PROFILES/${safePath(k)}')">Del</button>
+    </td>
+  </tr>`).join('');
+  document.getElementById('profWrap').innerHTML = `
+    <div class="table-wrap"><table>
+      <thead><tr><th>UID</th><th>Username</th><th>Email</th><th>Type</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    ${entries.length>100?`<div style="font-size:12px;color:var(--muted);padding:10px">Showing 100 of ${entries.length}</div>`:''}
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════
+// SONGS (RTDB)
+// ══════════════════════════════════════════════════════════════
+async function renderRtdbSongs(search) {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Songs</div><div class="ph-sub">RTDB / SONGS</div></div>
+    <div class="form-row">
+      <input class="fi wide" id="songSrch" placeholder="Search by title or artist…" value="${escH(search)}" onkeydown="if(event.key==='Enter')searchSongs(this.value)">
+      <button class="btn btn-accent" onclick="searchSongs(document.getElementById('songSrch').value)">Search</button>
+      <button class="btn btn-ghost" onclick="goDb('SONGS')">Open in DB Explorer</button>
+    </div>
+    <div id="songWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(query(ref(rtdb,'SONGS'), limitToFirst(100)));
+    showSongs(snap.val()||{}, search);
+  } catch(e) {
+    document.getElementById('songWrap').innerHTML = `<div class="err-msg">${escH(e.message)}</div>`;
+  }
+}
+
+window.searchSongs = async function(term) {
+  document.getElementById('songWrap').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  const snap = await get(ref(rtdb,'SONGS'));
+  showSongs(snap.val()||{}, term);
+};
+
+function showSongs(data, search) {
+  let entries = Object.entries(data);
+  if (search) {
+    const q = search.toLowerCase();
+    entries = entries.filter(([k,v]) =>
+      (v?.title||'').toLowerCase().includes(q) ||
+      (v?.artist||v?.artistName||'').toLowerCase().includes(q) ||
+      k.toLowerCase().includes(q)
+    );
+  }
+  if (!entries.length) { document.getElementById('songWrap').innerHTML='<div class="empty">No songs found</div>'; return; }
+  const rows = entries.slice(0,100).map(([k,v]) => `<tr>
+    <td class="mono">${escH(k.slice(0,14))}${k.length>14?'…':''}</td>
+    <td>${escH(v?.title||'—')}</td>
+    <td>${escH(v?.artist||v?.artistName||'—')}</td>
+    <td>${v?.plays||v?.playCount||0}</td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-xs btn-ghost" onclick="goDb('SONGS/${safePath(k)}')">Edit</button>
+      <button class="btn btn-xs btn-red" onclick="delDb('SONGS/${safePath(k)}')">Del</button>
+    </td>
+  </tr>`).join('');
+  document.getElementById('songWrap').innerHTML = `
+    <div class="table-wrap"><table>
+      <thead><tr><th>Key</th><th>Title</th><th>Artist</th><th>Plays</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════
+// PARTIES
+// ══════════════════════════════════════════════════════════════
+async function renderParties() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Parties</div><div class="ph-sub">ASTEROID_PARTIES submissions</div></div>
+    <div class="ftabs">
+      <button class="ftab ${partyFilter==='all'?'active':''}" onclick="setPartyF('all')">All</button>
+      <button class="ftab ${partyFilter==='pending'?'active':''}" onclick="setPartyF('pending')">⏳ Pending</button>
+      <button class="ftab ${partyFilter==='approved'?'active':''}" onclick="setPartyF('approved')">✓ Approved</button>
+      <button class="ftab ${partyFilter==='rejected'?'active':''}" onclick="setPartyF('rejected')">✕ Rejected</button>
+    </div>
+    <div id="partyWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(ref(rtdb,'ASTEROID_PARTIES'));
+    showParties(snap.val()||{});
+  } catch(e) {
+    document.getElementById('partyWrap').innerHTML = `<div class="err-msg">${escH(e.message)}</div>`;
+  }
+}
+
+window.setPartyF = function(f) { partyFilter = f; renderParties(); };
+
+function showParties(data) {
+  let entries = Object.entries(data).sort((a,b) => (b[1].submittedAt||0)-(a[1].submittedAt||0));
+  if (partyFilter !== 'all') entries = entries.filter(([,v]) => (v.status||'pending') === partyFilter);
+  if (!entries.length) { document.getElementById('partyWrap').innerHTML='<div class="empty">No parties match filter</div>'; return; }
+
+  const cards = entries.map(([k,v]) => {
+    const st = v.status||'pending';
+    return `<div class="p-card ${st}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div class="p-name">${escH(v.venueName||v.partyName||v.name||'Unnamed Party')}</div>
+          <div class="p-meta">
+            ${v.city||v.location ? `📍 ${escH(v.city||v.location)}` : ''}
+            ${v.eventDate ? ` · 📅 ${escH(fmtTs(v.eventDate))}` : ''}
+            ${v.contactEmail ? ` · ✉ ${escH(v.contactEmail)}` : ''}
+            ${v.contactPhone ? ` · 📞 ${escH(v.contactPhone)}` : ''}
+            ${v.submittedAt ? ` · Submitted: ${fmtTs(v.submittedAt)}` : ''}
+          </div>
+          ${v.description ? `<div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5">${escH(v.description.slice(0,200))}${v.description.length>200?'…':''}</div>` : ''}
+        </div>
+        <span class="badge badge-${st}">${st}</span>
+      </div>
+      <div class="p-acts">
+        ${st!=='approved' ? `<button class="btn btn-sm btn-green" onclick="setPS('${k}','approved')">✓ Approve</button>` : ''}
+        ${st!=='rejected' ? `<button class="btn btn-sm btn-red" onclick="setPS('${k}','rejected')">✕ Reject</button>` : ''}
+        ${st!=='pending' ? `<button class="btn btn-sm btn-yellow" onclick="setPS('${k}','pending')">↺ Reset</button>` : ''}
+        <button class="btn btn-sm btn-ghost" onclick="goDb('ASTEROID_PARTIES/${k}')">View Raw</button>
+        <button class="btn btn-sm btn-red" onclick="delDb('ASTEROID_PARTIES/${k}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('partyWrap').innerHTML = cards;
+}
+
+window.setPS = async function(k, status) {
+  try {
+    await update(ref(rtdb,`ASTEROID_PARTIES/${k}`), { status, reviewedAt: Date.now() });
+    toast(`Party ${status} ✓`, 'success');
+    renderParties();
+  } catch(e) { toast('Error: '+e.message, 'error'); }
+};
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE REQUESTS
+// ══════════════════════════════════════════════════════════════
+async function renderFR() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Feature Requests</div><div class="ph-sub">RTDB / FEATURE_REQUESTS</div></div>
+    <div style="margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" onclick="goDb('FEATURE_REQUESTS')">Open in DB Explorer</button>
+    </div>
+    <div id="frWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(ref(rtdb,'FEATURE_REQUESTS'));
+    const data = snap.val()||{};
+    const entries = Object.entries(data).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+    if (!entries.length) { document.getElementById('frWrap').innerHTML='<div class="empty">No feature requests</div>'; return; }
+    const rows = entries.map(([k,v]) => `<tr>
+      <td style="max-width:220px;white-space:normal">${escH((v.title||'—').slice(0,80))}</td>
+      <td>${escH(v.category||'—')}</td>
+      <td>${escH(v.authorName||'—')}</td>
+      <td style="max-width:200px;white-space:normal;font-size:12px;color:var(--muted)">${escH((v.description||'').slice(0,80))}${(v.description||'').length>80?'…':''}</td>
+      <td class="mono">${fmtTs(v.createdAt)}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-xs btn-ghost" onclick="goDb('FEATURE_REQUESTS/${safePath(k)}')">Edit</button>
+        <button class="btn btn-xs btn-red" onclick="delDb('FEATURE_REQUESTS/${safePath(k)}')">Del</button>
+      </td>
+    </tr>`).join('');
+    document.getElementById('frWrap').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Description</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  } catch(e) { document.getElementById('frWrap').innerHTML=`<div class="err-msg">${escH(e.message)}</div>`; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// SUBASTROIDS
+// ══════════════════════════════════════════════════════════════
+async function renderSubA() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">SubAsteroids</div><div class="ph-sub">Community posts & comments</div></div>
+    <div style="margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" onclick="goDb('subAsteroids')">Open in DB Explorer</button>
+    </div>
+    <div id="subWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(ref(rtdb,'subAsteroids'));
+    const data = snap.val()||{};
+    let posts = [];
+    for (const [sub, sd] of Object.entries(data)) {
+      if (sd?.posts) {
+        for (const [pid, p] of Object.entries(sd.posts)) {
+          posts.push({ sub, pid, ...p, comments: p.comments ? Object.keys(p.comments).length : 0 });
+        }
+      }
+    }
+    posts.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    if (!posts.length) { document.getElementById('subWrap').innerHTML='<div class="empty">No posts</div>'; return; }
+    const rows = posts.slice(0,100).map(p => `<tr>
+      <td>${escH(p.sub)}</td>
+      <td style="max-width:200px;white-space:normal">${escH((p.title||'—').slice(0,60))}</td>
+      <td>${escH(p.artist||'—')}</td>
+      <td>${p.comments}</td>
+      <td class="mono">${fmtTs(p.createdAt)}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-xs btn-ghost" onclick="goDb('subAsteroids/${p.sub}/posts/${safePath(p.pid)}')">Edit</button>
+        <button class="btn btn-xs btn-red" onclick="delDb('subAsteroids/${p.sub}/posts/${safePath(p.pid)}')">Del</button>
+      </td>
+    </tr>`).join('');
+    document.getElementById('subWrap').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Sub</th><th>Title</th><th>Artist</th><th>Comments</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  } catch(e) { document.getElementById('subWrap').innerHTML=`<div class="err-msg">${escH(e.message)}</div>`; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// LIVE ROOMS
+// ══════════════════════════════════════════════════════════════
+async function renderLiveRooms() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Live Rooms</div><div class="ph-sub">RTDB / LiveRooms</div></div>
+    <div style="margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" onclick="goDb('LiveRooms')">Open in DB Explorer</button>
+    </div>
+    <div id="lrWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(ref(rtdb,'LiveRooms'));
+    const data = snap.val()||{};
+    const entries = Object.entries(data);
+    if (!entries.length) { document.getElementById('lrWrap').innerHTML='<div class="empty">No live rooms</div>'; return; }
+    const rows = entries.map(([k,v]) => `<tr>
+      <td class="mono">${escH(k)}</td>
+      <td>${escH(v?.name||v?.title||'—')}</td>
+      <td>${escH(v?.host||v?.artistKey||'—')}</td>
+      <td>${escH(v?.isLive ? '🔴 Live' : '—')}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-xs btn-ghost" onclick="goDb('LiveRooms/${safePath(k)}')">Edit</button>
+        <button class="btn btn-xs btn-red" onclick="delDb('LiveRooms/${safePath(k)}')">Del</button>
+      </td>
+    </tr>`).join('');
+    document.getElementById('lrWrap').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Key</th><th>Name</th><th>Host</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  } catch(e) { document.getElementById('lrWrap').innerHTML=`<div class="err-msg">${escH(e.message)}</div>`; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// POLLS
+// ══════════════════════════════════════════════════════════════
+async function renderPolls() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Artist Polls</div><div class="ph-sub">RTDB / ARTIST_POLLS</div></div>
+    <div style="margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" onclick="goDb('ARTIST_POLLS')">Open in DB Explorer</button>
+    </div>
+    <div id="pollWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(query(ref(rtdb,'ARTIST_POLLS'), limitToFirst(60)));
+    const data = snap.val()||{};
+    const entries = Object.entries(data);
+    if (!entries.length) { document.getElementById('pollWrap').innerHTML='<div class="empty">No polls</div>'; return; }
+    const rows = entries.map(([k,v]) => {
+      const votes = v?.votes ? Object.keys(v.votes).length : 0;
+      return `<tr>
+        <td style="max-width:180px;white-space:normal">${escH((v?.question||v?.title||k).slice(0,80))}</td>
+        <td>${escH(v?.artistKey||'—')}</td>
+        <td>${votes}</td>
+        <td class="mono">${fmtTs(v?.createdAt||v?.ts)}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-xs btn-ghost" onclick="goDb('ARTIST_POLLS/${safePath(k)}')">Edit</button>
+          <button class="btn btn-xs btn-red" onclick="delDb('ARTIST_POLLS/${safePath(k)}')">Del</button>
+        </td>
+      </tr>`;
+    }).join('');
+    document.getElementById('pollWrap').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Question</th><th>Artist</th><th>Votes</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  } catch(e) { document.getElementById('pollWrap').innerHTML=`<div class="err-msg">${escH(e.message)}</div>`; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// FIRESTORE BROWSER
+// ══════════════════════════════════════════════════════════════
+const FS_LABELS = {
+  users: 'Users',
+  songs: 'Songs',
+  featureQueue: 'Feature Queue',
+  founding_supporters: 'Founding Supporters'
+};
+const FS_NOTES = {
+  users: 'Note: fields like <code>tier</code>, <code>partnerStatus</code>, <code>referral_count</code> are write-protected by Firestore rules. Use Firebase Console to edit those.',
+  founding_supporters: 'Read-only collection (write-protected by Firestore rules).'
+};
+
+async function renderFs(colName, cursor) {
+  fsCurCol = colName;
+  if (!cursor) fsCursor = null;
+
+  setHTML(`
+    <div class="ph"><div class="ph-title">Firestore: ${FS_LABELS[colName]||colName}</div><div class="ph-sub">Collection: ${colName}</div></div>
+    ${FS_NOTES[colName] ? `<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--yellow);margin-bottom:16px">${FS_NOTES[colName]}</div>` : ''}
+    <div style="margin-bottom:14px;display:flex;gap:8px">
+      <button class="btn btn-accent btn-sm" onclick="addFsDoc('${colName}')">+ Add Document</button>
+    </div>
+    <div id="fsWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+
+  try {
+    const colRef = collection(fs, colName);
+    const q = cursor
+      ? fq(colRef, orderBy('__name__'), startAfter(cursor), limit(25))
+      : fq(colRef, orderBy('__name__'), limit(25));
+    const snap = await getDocs(q);
+    const docs = snap.docs;
+    fsCursor = docs.length === 25 ? docs[docs.length-1] : null;
+
+    if (!docs.length && !cursor) {
+      document.getElementById('fsWrap').innerHTML = '<div class="empty">No documents found</div>';
+      return;
+    }
+
+    const rows = docs.map(d => {
+      const data = d.data();
+      const preview = Object.entries(data).slice(0,4).map(([k,v]) => {
+        const disp = v === null ? 'null' : typeof v === 'object' ? '{…}' : String(v).slice(0,35);
+        return `<span style="color:var(--muted);font-size:11px">${escH(k)}</span><span style="color:var(--faint);font-size:11px">: </span><span style="font-size:11px">${escH(disp)}</span>`;
+      }).join('<span style="color:var(--faint);font-size:11px;margin:0 6px">·</span>');
+      return `<tr>
+        <td class="mono">${escH(d.id)}</td>
+        <td style="max-width:480px;white-space:normal;line-height:1.8">${preview}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-xs btn-ghost" onclick="editFsDoc('${colName}','${d.id}')">Edit</button>
+          <button class="btn btn-xs btn-red" onclick="delFsDoc('${colName}','${d.id}')">Del</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('fsWrap').innerHTML = `
+      <div class="table-wrap"><table>
+        <thead><tr><th>Document ID</th><th>Preview</th><th>Actions</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+      ${fsCursor ? `<div style="text-align:center;padding:16px"><button class="btn btn-ghost" onclick="loadMoreFs('${colName}')">Load More</button></div>` : ''}
+    `;
+  } catch(e) {
+    document.getElementById('fsWrap').innerHTML = `<div class="err-msg">Error: ${escH(e.message)}</div>`;
+  }
+}
+
+window.loadMoreFs = async function(colName) {
+  if (!fsCursor) return;
+  const q = fq(collection(fs,colName), orderBy('__name__'), startAfter(fsCursor), limit(25));
+  const snap = await getDocs(q);
+  const docs = snap.docs;
+  fsCursor = docs.length===25 ? docs[docs.length-1] : null;
+  const tbody = document.querySelector('#fsWrap tbody');
+  if (!tbody) return;
+  docs.forEach(d => {
+    const data = d.data();
+    const preview = Object.entries(data).slice(0,4).map(([k,v]) => {
+      const disp = v===null?'null':typeof v==='object'?'{…}':String(v).slice(0,35);
+      return `<span style="color:var(--muted);font-size:11px">${escH(k)}</span>: <span style="font-size:11px">${escH(disp)}</span>`;
+    }).join(' · ');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="mono">${escH(d.id)}</td><td style="max-width:480px;white-space:normal">${preview}</td><td style="white-space:nowrap"><button class="btn btn-xs btn-ghost" onclick="editFsDoc('${colName}','${d.id}')">Edit</button><button class="btn btn-xs btn-red" onclick="delFsDoc('${colName}','${d.id}')">Del</button></td>`;
+    tbody.appendChild(tr);
+  });
+  if (!fsCursor) {
+    const btn = document.querySelector('#fsWrap .btn-ghost[onclick*="loadMoreFs"]');
+    if (btn) btn.parentElement.remove();
+  }
+};
+
+window.editFsDoc = async function(colName, docId) {
+  const snap = await getDoc(doc(fs, colName, docId));
+  if (!snap.exists()) { toast('Document not found', 'error'); return; }
+  const data = snap.data();
+  openModal(`Edit: ${docId}`, `
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:10px">📁 ${colName} / ${docId}</div>
+    <label class="fi-label">Document JSON</label>
+    <textarea class="fi-ta" id="fsDocTA" style="min-height:320px">${escH(JSON.stringify(data, null, 2))}</textarea>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px">⚠ Full overwrite (setDoc). Some fields may be restricted by Firestore rules.</div>
+  `, async () => {
+    let newData;
+    try { newData = JSON.parse(document.getElementById('fsDocTA').value); }
+    catch { toast('Invalid JSON', 'error'); return; }
+    try {
+      await setDoc(doc(fs, colName, docId), newData);
+      toast('Document saved ✓', 'success');
+      window.closeModal();
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Save');
+};
+
+window.delFsDoc = function(colName, docId) {
+  openModal('Delete Document', `
+    <p style="color:var(--muted);font-size:14px">Permanently delete:</p>
+    <p style="font-family:'JetBrains Mono',monospace;padding:10px;margin:12px 0;background:rgba(248,113,113,0.07);border-radius:8px;color:var(--red)">${colName} / ${docId}</p>
+    <p style="color:var(--muted);font-size:13px">Cannot be undone.</p>
+  `, async () => {
+    try {
+      await deleteDoc(doc(fs, colName, docId));
+      toast('Document deleted', 'success');
+      window.closeModal();
+      renderFs(colName, null);
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Delete', 'btn-red');
+};
+
+window.addFsDoc = function(colName) {
+  openModal('Add Document', `
+    <div style="margin-bottom:14px">
+      <label class="fi-label">Document ID (blank = auto)</label>
+      <input class="fi fi-mono" id="newFsId" placeholder="auto-generated" style="width:100%">
+    </div>
+    <div>
+      <label class="fi-label">Data (JSON)</label>
+      <textarea class="fi-ta" id="newFsData" style="min-height:180px" placeholder='{\n  "field": "value"\n}'></textarea>
+    </div>
+  `, async () => {
+    let data;
+    try { data = JSON.parse(document.getElementById('newFsData').value); }
+    catch { toast('Invalid JSON', 'error'); return; }
+    const id = document.getElementById('newFsId').value.trim();
+    try {
+      const colRef = collection(fs, colName);
+      const docRef = id ? doc(colRef, id) : doc(colRef);
+      await setDoc(docRef, data);
+      toast('Document created ✓', 'success');
+      window.closeModal();
+      renderFs(colName, null);
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Create');
+};
+
+</script>
+</body>
+</html>
