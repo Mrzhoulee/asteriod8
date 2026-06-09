@@ -1,1 +1,1188 @@
-PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEiPgo8dGl0bGU+QXN0ZXJvaWQg4oCUIEFkbWluIENvbnNvbGU8L3RpdGxlPgo8bGluayByZWw9InByZWNvbm5lY3QiIGhyZWY9Imh0dHBzOi8vZm9udHMuZ29vZ2xlYXBpcy5jb20iPgo8bGluayBocmVmPSJodHRwczovL2ZvbnRzLmdvb2dsZWFwaXMuY29tL2NzczI/ZmFtaWx5PVBvcHBpbnM6d2dodEA0MDA7NTAwOzYwMDs3MDA7ODAwJmZhbWlseT1KZXRCcmFpbnMrTW9ubzp3Z2h0QDQwMDs2MDAmZGlzcGxheT1zd2FwIiByZWw9InN0eWxlc2hlZXQiPgo8c3R5bGU+Cjpyb290IHsKICAtLWJnOiAjMDUwODEwOwogIC0tc3VyZmFjZTogcmdiYSgyNTUsMjU1LDI1NSwwLjA0KTsKICAtLXN1cmZhY2UtaG92ZXI6IHJnYmEoMjU1LDI1NSwyNTUsMC4wNyk7CiAgLS1ib3JkZXI6IHJnYmEoMjU1LDI1NSwyNTUsMC4wOSk7CiAgLS1hY2NlbnQ6ICNmZjdhNTk7CiAgLS1hY2NlbnQtZGltOiByZ2JhKDI1NSwxMjIsODksMC4xNSk7CiAgLS10ZXh0OiAjZmZmOwogIC0tbXV0ZWQ6IHJnYmEoMjU1LDI1NSwyNTUsMC41KTsKICAtLWZhaW50OiByZ2JhKDI1NSwyNTUsMjU1LDAuMjUpOwogIC0tZ3JlZW46ICMxMGI5ODE7CiAgLS15ZWxsb3c6ICNmNTllMGI7CiAgLS1yZWQ6ICNmODcxNzE7CiAgLS1ibHVlOiAjN2RkM2ZjOwogIC0tc2lkZWJhci13OiAyMjRweDsKfQoqLCAqOjpiZWZvcmUsICo6OmFmdGVyIHsgYm94LXNpemluZzogYm9yZGVyLWJveDsgbWFyZ2luOiAwOyBwYWRkaW5nOiAwOyB9CmJvZHkgeyBiYWNrZ3JvdW5kOiB2YXIoLS1iZyk7IGNvbG9yOiB2YXIoLS10ZXh0KTsgZm9udC1mYW1pbHk6ICdQb3BwaW5zJywgc2Fucy1zZXJpZjsgbWluLWhlaWdodDogMTAwdmg7IH0KCi8qIOKUgOKUgOKUgCBMb2dpbiDilIDilIDilIAgKi8KI2xvZ2luU2NyZWVuIHsgZGlzcGxheTogZmxleDsgYWxpZ24taXRlbXM6IGNlbnRlcjsganVzdGlmeS1jb250ZW50OiBjZW50ZXI7IG1pbi1oZWlnaHQ6IDEwMHZoOyBwYWRkaW5nOiAyMHB4OyB9Ci5sb2dpbi1jYXJkIHsgYmFja2dyb3VuZDogdmFyKC0tc3VyZmFjZSk7IGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWJvcmRlcik7IGJvcmRlci1yYWRpdXM6IDIwcHg7IHBhZGRpbmc6IDQwcHggMzJweDsgd2lkdGg6IDEwMCU7IG1heC13aWR0aDogMzYwcHg7IH0KLmxvZ2luLWxvZ28geyBmb250LXNpemU6IDIwcHg7IGZvbnQtd2VpZ2h0OiA4MDA7IGxldHRlci1zcGFjaW5nOiAtMC41cHg7IG1hcmdpbi1ib3R0b206IDRweDsgfQoubG9naW4tbG9nbyBzcGFuIHsgY29sb3I6IHZhcigtLWFjY2VudCk7IH0KLmxvZ2luLXN1YiB7IGZvbnQtc2l6ZTogMTNweDsgY29sb3I6IHZhcigtLW11dGVkKTsgbWFyZ2luLWJvdHRvbTogMjhweDsgfQouZmllbGQgeyBtYXJnaW4tYm90dG9tOiAxNHB4OyB9Ci5maWVsZCBsYWJlbCB7IGRpc3BsYXk6IGJsb2NrOyBmb250LXNpemU6IDExcHg7IGZvbnQtd2VpZ2h0OiA2MDA7IGNvbG9yOiB2YXIoLS1tdXRlZCk7IG1hcmdpbi1ib3R0b206IDZweDsgbGV0dGVyLXNwYWNpbmc6IDAuMDVlbTsgdGV4dC10cmFuc2Zvcm06IHVwcGVyY2FzZTsgfQouZmllbGQgaW5wdXQgeyB3aWR0aDogMTAwJTsgYmFja2dyb3VuZDogcmdiYSgyNTUsMjU1LDI1NSwwLjA2KTsgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tYm9yZGVyKTsgYm9yZGVyLXJhZGl1czogMTBweDsgY29sb3I6ICNmZmY7IGZvbnQtc2l6ZTogMTRweDsgcGFkZGluZzogMTBweCAxNHB4OyBmb250LWZhbWlseTogaW5oZXJpdDsgb3V0bGluZTogbm9uZTsgdHJhbnNpdGlvbjogYm9yZGVyLWNvbG9yIDAuMTVzOyB9Ci5maWVsZCBpbnB1dDpmb2N1cyB7IGJvcmRlci1jb2xvcjogdmFyKC0tYWNjZW50KTsgfQouYnRuLXByaW1hcnkgeyB3aWR0aDogMTAwJTsgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywjZmY3YTU5LCNmZjRlMmEpOyBjb2xvcjogI2ZmZjsgYm9yZGVyOiBub25lOyBib3JkZXItcmFkaXVzOiAxMHB4OyBwYWRkaW5nOiAxMnB4OyBmb250LXNpemU6IDE0cHg7IGZvbnQtd2VpZ2h0OiA3MDA7IGN1cnNvcjogcG9pbnRlcjsgZm9udC1mYW1pbHk6IGluaGVyaXQ7IHRyYW5zaXRpb246IG9wYWNpdHkgMC4xNXM7IH0KLmJ0bi1wcmltYXJ5OmhvdmVyIHsgb3BhY2l0eTogMC44ODsgfQouYnRuLXByaW1hcnk6ZGlzYWJsZWQgeyBvcGFjaXR5OiAwLjQ1OyBjdXJzb3I6IG5vdC1hbGxvd2VkOyB9Ci5sb2dpbi1lcnIgeyBmb250LXNpemU6IDEycHg7IGNvbG9yOiB2YXIoLS1yZWQpOyBtYXJnaW4tdG9wOiAxMHB4OyBtaW4taGVpZ2h0OiAxOHB4OyB0ZXh0LWFsaWduOiBjZW50ZXI7IH0KCi8qIOKUgOKUgOKUgCBMYXlvdXQg4pSA4pSA4pSAICovCiNhZG1pbkFwcCB7IGRpc3BsYXk6IG5vbmU7IH0KLmFwcC13cmFwIHsgZGlzcGxheTogZ3JpZDsgZ3JpZC10ZW1wbGF0ZS1jb2x1bW5zOiB2YXIoLS1zaWRlYmFyLXcpIDFmcjsgbWluLWhlaWdodDogMTAwdmg7IH0KCi8qIOKUgOKUgOKUgCBTaWRlYmFyIOKUgOKUgOKUgCAqLwojc2lkZWJhciB7CiAgYmFja2dyb3VuZDogcmdiYSgwLDAsMCwwLjI1KTsKICBib3JkZXItcmlnaHQ6IDFweCBzb2xpZCB2YXIoLS1ib3JkZXIpOwogIHBvc2l0aW9uOiBzdGlja3k7IHRvcDogMDsgaGVpZ2h0OiAxMDB2aDsKICBvdmVyZmxvdy15OiBhdXRvOyBkaXNwbGF5OiBmbGV4OyBmbGV4LWRpcmVjdGlvbjogY29sdW1uOwogIHBhZGRpbmc6IDE2cHggMTBweCAyMHB4OwogIHNjcm9sbGJhci13aWR0aDogdGhpbjsgc2Nyb2xsYmFyLWNvbG9yOiByZ2JhKDI1NSwyNTUsMjU1LDAuMDgpIHRyYW5zcGFyZW50Owp9Ci5zYi1sb2dvIHsgZm9udC1zaXplOiAxNXB4OyBmb250LXdlaWdodDogODAwOyBsZXR0ZXItc3BhY2luZzogLTAuM3B4OyBwYWRkaW5nOiA0cHggOHB4IDE4cHg7IGJvcmRlci1ib3R0b206IDFweCBzb2xpZCB2YXIoLS1ib3JkZXIpOyBtYXJnaW4tYm90dG9tOiAxMHB4OyB9Ci5zYi1sb2dvIHNwYW4geyBjb2xvcjogdmFyKC0tYWNjZW50KTsgfQouc2ItaGVhZCB7IGZvbnQtc2l6ZTogMTBweDsgZm9udC13ZWlnaHQ6IDcwMDsgY29sb3I6IHZhcigtLWZhaW50KTsgbGV0dGVyLXNwYWNpbmc6IDAuMWVtOyB0ZXh0LXRyYW5zZm9ybTogdXBwZXJjYXNlOyBwYWRkaW5nOiA4cHggOHB4IDRweDsgfQoubmF2LWl0ZW0geyBkaXNwbGF5OiBmbGV4OyBhbGlnbi1pdGVtczogY2VudGVyOyBnYXA6IDhweDsgcGFkZGluZzogOHB4IDEwcHg7IGJvcmRlci1yYWRpdXM6IDlweDsgY3Vyc29yOiBwb2ludGVyOyBmb250LXNpemU6IDEzcHg7IGNvbG9yOiB2YXIoLS1tdXRlZCk7IHRyYW5zaXRpb246IGFsbCAwLjEyczsgdXNlci1zZWxlY3Q6IG5vbmU7IH0KLm5hdi1pdGVtOmhvdmVyIHsgYmFja2dyb3VuZDogdmFyKC0tc3VyZmFjZS1ob3Zlcik7IGNvbG9yOiB2YXIoLS10ZXh0KTsgfQoubmF2LWl0ZW0uYWN0aXZlIHsgYmFja2dyb3VuZDogdmFyKC0tYWNjZW50LWRpbSk7IGNvbG9yOiB2YXIoLS1hY2NlbnQpOyBmb250LXdlaWdodDogNjAwOyB9Ci5uYXYtaXRlbSAubmkgeyBmb250LXNpemU6IDE0cHg7IHdpZHRoOiAxOHB4OyBmbGV4LXNocmluazogMDsgfQouc2ItYm90dG9tIHsgbWFyZ2luLXRvcDogYXV0bzsgcGFkZGluZy10b3A6IDEycHg7IGJvcmRlci10b3A6IDFweCBzb2xpZCB2YXIoLS1ib3JkZXIpOyB9Ci5zaWdub3V0LWJ0biB7IGRpc3BsYXk6IGZsZXg7IGFsaWduLWl0ZW1zOiBjZW50ZXI7IGdhcDogOHB4OyB3aWR0aDogMTAwJTsgYmFja2dyb3VuZDogbm9uZTsgYm9yZGVyOiBub25lOyBjb2xvcjogdmFyKC0tbXV0ZWQpOyBmb250LWZhbWlseTogaW5oZXJpdDsgZm9udC1zaXplOiAxMnB4OyBjdXJzb3I6IHBvaW50ZXI7IHBhZGRpbmc6IDhweCAxMHB4OyBib3JkZXItcmFkaXVzOiA4cHg7IHRyYW5zaXRpb246IGFsbCAwLjEyczsgfQouc2lnbm91dC1idG46aG92ZXIgeyBiYWNrZ3JvdW5kOiByZ2JhKDI0OCwxMTMsMTEzLDAuMSk7IGNvbG9yOiB2YXIoLS1yZWQpOyB9CgovKiDilIDilIDilIAgQ29udGVudCDilIDilIDilIAgKi8KI21haW5Db250ZW50IHsgcGFkZGluZzogMzJweCAyOHB4IDYwcHg7IG92ZXJmbG93LXk6IGF1dG87IG1heC1oZWlnaHQ6IDEwMHZoOyB9Ci5waCB7IG1hcmdpbi1ib3R0b206IDI0cHg7IH0KLnBoLXRpdGxlIHsgZm9udC1zaXplOiAyMnB4OyBmb250LXdlaWdodDogODAwOyBsZXR0ZXItc3BhY2luZzogLTAuNHB4OyBtYXJnaW4tYm90dG9tOiAzcHg7IH0KLnBoLXN1YiB7IGZvbnQtc2l6ZTogMTNweDsgY29sb3I6IHZhcigtLW11dGVkKTsgfQoKLyog4pSA4pSA4pSAIFN0YXQgR3JpZCDilIDilIDilIAgKi8KLnN0YXQtZ3JpZCB7IGRpc3BsYXk6IGdyaWQ7IGdyaWQtdGVtcGxhdGUtY29sdW1uczogcmVwZWF0KGF1dG8tZmlsbCwgbWlubWF4KDE2MHB4LDFmcikpOyBnYXA6IDEycHg7IG1hcmdpbi1ib3R0b206IDI0cHg7IH0KLnN0YXQtY2FyZCB7IGJhY2tncm91bmQ6IHZhcigtLXN1cmZhY2UpOyBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1ib3JkZXIpOyBib3JkZXItcmFkaXVzOiAxNHB4OyBwYWRkaW5nOiAxOHB4OyB9Ci5zdGF0LWxibCB7IGZvbnQtc2l6ZTogMTFweDsgZm9udC13ZWlnaHQ6IDYwMDsgY29sb3I6IHZhcigtLW11dGVkKTsgdGV4dC10cmFuc2Zvcm06IHVwcGVyY2FzZTsgbGV0dGVyLXNwYWNpbmc6IDAuMDZlbTsgbWFyZ2luLWJvdHRvbTogNnB4OyB9Ci5zdGF0LXZhbCB7IGZvbnQtc2l6ZTogMjhweDsgZm9udC13ZWlnaHQ6IDgwMDsgbGV0dGVyLXNwYWNpbmc6IC0wLjVweDsgfQouYWNjZW50IHsgY29sb3I6IHZhcigtLWFjY2VudCk7IH0KLmdyZWVuIHsgY29sb3I6IHZhcigtLWdyZWVuKTsgfQoueWVsbG93IHsgY29sb3I6IHZhcigtLXllbGxvdyk7IH0KLnJlZCB7IGNvbG9yOiB2YXIoLS1yZWQpOyB9CgovKiDilIDilIDilIAgQ2FyZHMg4pSA4pSA4pSAICovCi5jYXJkIHsgYmFja2dyb3VuZDogdmFyKC0tc3VyZmFjZSk7IGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWJvcmRlcik7IGJvcmRlci1yYWRpdXM6IDE2cHg7IHBhZGRpbmc6IDIwcHg7IG1hcmdpbi1ib3R0b206IDE2cHg7IH0KLmNhcmQtdGl0bGUgeyBmb250LXNpemU6IDExcHg7IGZvbnQtd2VpZ2h0OiA3MDA7IGNvbG9yOiB2YXIoLS1tdXRlZCk7IHRleHQtdHJhbnNmb3JtOiB1cHBlcmNhc2U7IGxldHRlci1zcGFjaW5nOiAwLjA2ZW07IG1hcmdpbi1ib3R0b206IDE0cHg7IH0KCi8qIOKUgOKUgOKUgCBUYWJsZSDilIDilIDilIAgKi8KLnRhYmxlLXdyYXAgeyBvdmVyZmxvdy14OiBhdXRvOyB9CnRhYmxlIHsgd2lkdGg6IDEwMCU7IGJvcmRlci1jb2xsYXBzZTogY29sbGFwc2U7IGZvbnQtc2l6ZTogMTNweDsgfQp0aGVhZCB0aCB7IHRleHQtYWxpZ246IGxlZnQ7IHBhZGRpbmc6IDEwcHggMTRweDsgZm9udC1zaXplOiAxMHB4OyBmb250LXdlaWdodDogNzAwOyBjb2xvcjogdmFyKC0tbXV0ZWQpOyB0ZXh0LXRyYW5zZm9ybTogdXBwZXJjYXNlOyBsZXR0ZXItc3BhY2luZzogMC4wNmVtOyBib3JkZXItYm90dG9tOiAxcHggc29saWQgdmFyKC0tYm9yZGVyKTsgd2hpdGUtc3BhY2U6IG5vd3JhcDsgfQp0Ym9keSB0ciB7IGJvcmRlci1ib3R0b206IDFweCBzb2xpZCByZ2JhKDI1NSwyNTUsMjU1LDAuMDQpOyB0cmFuc2l0aW9uOiBiYWNrZ3JvdW5kIDAuMXM7IH0KdGJvZHkgdHI6aG92ZXIgeyBiYWNrZ3JvdW5kOiB2YXIoLS1zdXJmYWNlLWhvdmVyKTsgfQp0Ym9keSB0ZCB7IHBhZGRpbmc6IDlweCAxNHB4OyB2ZXJ0aWNhbC1hbGlnbjogbWlkZGxlOyBtYXgtd2lkdGg6IDI0MHB4OyBvdmVyZmxvdzogaGlkZGVuOyB0ZXh0LW92ZXJmbG93OiBlbGxpcHNpczsgd2hpdGUtc3BhY2U6IG5vd3JhcDsgfQoubW9ubyB7IGZvbnQtZmFtaWx5OiAnSmV0QnJhaW5zIE1vbm8nLCBtb25vc3BhY2U7IGZvbnQtc2l6ZTogMTFweDsgY29sb3I6IHZhcigtLW11dGVkKTsgfQoKLyog4pSA4pSA4pSAIEJ1dHRvbnMg4pSA4pSA4pSAICovCi5idG4geyBwYWRkaW5nOiA3cHggMTRweDsgYm9yZGVyLXJhZGl1czogOHB4OyBmb250LXNpemU6IDEycHg7IGZvbnQtd2VpZ2h0OiA2MDA7IGN1cnNvcjogcG9pbnRlcjsgZm9udC1mYW1pbHk6IGluaGVyaXQ7IHRyYW5zaXRpb246IGFsbCAwLjEyczsgYm9yZGVyOiBub25lOyBkaXNwbGF5OiBpbmxpbmUtZmxleDsgYWxpZ24taXRlbXM6IGNlbnRlcjsgZ2FwOiA1cHg7IH0KLmJ0bi1zbSB7IHBhZGRpbmc6IDVweCAxMHB4OyBmb250LXNpemU6IDExcHg7IGJvcmRlci1yYWRpdXM6IDZweDsgfQouYnRuLXhzIHsgcGFkZGluZzogM3B4IDhweDsgZm9udC1zaXplOiAxMHB4OyBib3JkZXItcmFkaXVzOiA1cHg7IH0KLmJ0bi1hY2NlbnQgeyBiYWNrZ3JvdW5kOiB2YXIoLS1hY2NlbnQtZGltKTsgY29sb3I6IHZhcigtLWFjY2VudCk7IGJvcmRlcjogMXB4IHNvbGlkIHJnYmEoMjU1LDEyMiw4OSwwLjMpOyB9Ci5idG4tYWNjZW50OmhvdmVyIHsgYmFja2dyb3VuZDogcmdiYSgyNTUsMTIyLDg5LDAuMjUpOyB9Ci5idG4tZ3JlZW4geyBiYWNrZ3JvdW5kOiByZ2JhKDE2LDE4NSwxMjksMC4xMik7IGNvbG9yOiB2YXIoLS1ncmVlbik7IGJvcmRlcjogMXB4IHNvbGlkIHJnYmEoMTYsMTg1LDEyOSwwLjMpOyB9Ci5idG4tZ3JlZW46aG92ZXIgeyBiYWNrZ3JvdW5kOiByZ2JhKDE2LDE4NSwxMjksMC4yMik7IH0KLmJ0bi1yZWQgeyBiYWNrZ3JvdW5kOiByZ2JhKDI0OCwxMTMsMTEzLDAuMSk7IGNvbG9yOiB2YXIoLS1yZWQpOyBib3JkZXI6IDFweCBzb2xpZCByZ2JhKDI0OCwxMTMsMTEzLDAuMjUpOyB9Ci5idG4tcmVkOmhvdmVyIHsgYmFja2dyb3VuZDogcmdiYSgyNDgsMTEzLDExMywwLjIpOyB9Ci5idG4tZ2hvc3QgeyBiYWNrZ3JvdW5kOiBub25lOyBjb2xvcjogdmFyKC0tbXV0ZWQpOyBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1ib3JkZXIpOyB9Ci5idG4tZ2hvc3Q6aG92ZXIgeyBiYWNrZ3JvdW5kOiB2YXIoLS1zdXJmYWNlLWhvdmVyKTsgY29sb3I6IHZhcigtLXRleHQpOyB9Ci5idG4teWVsbG93IHsgYmFja2dyb3VuZDogcmdiYSgyNDUsMTU4LDExLDAuMSk7IGNvbG9yOiB2YXIoLS15ZWxsb3cpOyBib3JkZXI6IDFweCBzb2xpZCByZ2JhKDI0NSwxNTgsMTEsMC4yNSk7IH0KLmJ0bi15ZWxsb3c6aG92ZXIgeyBiYWNrZ3JvdW5kOiByZ2JhKDI0NSwxNTgsMTEsMC4yKTsgfQoKLyog4pSA4pSA4pSAIEZvcm0gRWxlbWVudHMg4pSA4pSA4pSAICovCi5mb3JtLXJvdyB7IGRpc3BsYXk6IGZsZXg7IGdhcDogMTBweDsgbWFyZ2luLWJvdHRvbTogMTZweDsgYWxpZ24taXRlbXM6IGNlbnRlcjsgZmxleC13cmFwOiB3cmFwOyB9Ci5maSB7IGJhY2tncm91bmQ6IHJnYmEoMjU1LDI1NSwyNTUsMC4wNik7IGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWJvcmRlcik7IGJvcmRlci1yYWRpdXM6IDlweDsgY29sb3I6ICNmZmY7IGZvbnQtc2l6ZTogMTNweDsgcGFkZGluZzogOXB4IDEzcHg7IGZvbnQtZmFtaWx5OiBpbmhlcml0OyBvdXRsaW5lOiBub25lOyB0cmFuc2l0aW9uOiBib3JkZXItY29sb3IgMC4xNXM7IH0KLmZpOmZvY3VzIHsgYm9yZGVyLWNvbG9yOiB2YXIoLS1hY2NlbnQpOyB9Ci5maS53aWRlIHsgZmxleDogMTsgbWluLXdpZHRoOiAwOyB9Ci5maS1tb25vIHsgZm9udC1mYW1pbHk6ICdKZXRCcmFpbnMgTW9ubycsIG1vbm9zcGFjZTsgZm9udC1zaXplOiAxMnB4OyB9Ci5maS10YSB7IGJhY2tncm91bmQ6IHJnYmEoMjU1LDI1NSwyNTUsMC4wNik7IGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWJvcmRlcik7IGJvcmRlci1yYWRpdXM6IDlweDsgY29sb3I6ICNmZmY7IGZvbnQtc2l6ZTogMTJweDsgcGFkZGluZzogMTBweCAxM3B4OyBmb250LWZhbWlseTogJ0pldEJyYWlucyBNb25vJywgbW9ub3NwYWNlOyBvdXRsaW5lOiBub25lOyByZXNpemU6IHZlcnRpY2FsOyBtaW4taGVpZ2h0OiAxMzBweDsgd2lkdGg6IDEwMCU7IHRyYW5zaXRpb246IGJvcmRlci1jb2xvciAwLjE1czsgfQouZmktdGE6Zm9jdXMgeyBib3JkZXItY29sb3I6IHZhcigtLWFjY2VudCk7IH0KLmZpLWxhYmVsIHsgZGlzcGxheTogYmxvY2s7IGZvbnQtc2l6ZTogMTFweDsgZm9udC13ZWlnaHQ6IDYwMDsgY29sb3I6IHZhcigtLW11dGVkKTsgbWFyZ2luLWJvdHRvbTogNnB4OyBsZXR0ZXItc3BhY2luZzogMC4wNWVtOyB0ZXh0LXRyYW5zZm9ybTogdXBwZXJjYXNlOyB9CgovKiDilIDilIDilIAgUGF0aCBOYXZpZ2F0b3Ig4pSA4pSA4pSAICovCi5wYXRoLW5hdiB7IGRpc3BsYXk6IGZsZXg7IGFsaWduLWl0ZW1zOiBjZW50ZXI7IGdhcDogNHB4OyBiYWNrZ3JvdW5kOiByZ2JhKDI1NSwyNTUsMjU1LDAuMDMpOyBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1ib3JkZXIpOyBib3JkZXItcmFkaXVzOiA5cHg7IHBhZGRpbmc6IDdweCAxMnB4OyBtYXJnaW4tYm90dG9tOiAxNHB4OyBmb250LWZhbWlseTogJ0pldEJyYWlucyBNb25vJywgbW9ub3NwYWNlOyBmb250LXNpemU6IDEycHg7IGZsZXgtd3JhcDogd3JhcDsgbWluLWhlaWdodDogMzZweDsgfQoucHMgeyBjb2xvcjogdmFyKC0tbXV0ZWQpOyBjdXJzb3I6IHBvaW50ZXI7IHBhZGRpbmc6IDFweCA0cHg7IGJvcmRlci1yYWRpdXM6IDRweDsgfQoucHM6aG92ZXIgeyBiYWNrZ3JvdW5kOiB2YXIoLS1zdXJmYWNlLWhvdmVyKTsgY29sb3I6IHZhcigtLXRleHQpOyB9CilwHs5jdXIgeyBjb2xvcjogdmFyKC0tdGV4dCk7IGZvbnQtd2VpZ2h0OiA2MDA7IH0KLnBzLXNlcCB7IGNvbG9yOiB2YXIoLS1mYWludCk7IH0KCi8qIOKUgOKUgOKUgCBUcmVlIOKUgOKUgOKUgCAqLwoudHJlZS1yb290IHsgfQoudHJlZS1jaGlsZHJlbiB7IGJvcmRlci1sZWZ0OiAxcHggc29saWQgdmFyKC0tYm9yZGVyKTsgbWFyZ2luLWxlZnQ6IDE2cHg7IHBhZGRpbmctbGVmdDogMTBweDsgfQoudHJlZS1yb3cgeyBkaXNwbGF5OiBmbGV4OyBhbGlnbi1pdGVtczogZmxleC1zdGFydDsgZ2FwOiA1cHg7IHBhZGRpbmc6IDJweCAwOyBtaW4taGVpZ2h0OiAyNnB4OyB9Ci50cmVlLXRvZ2dsZSB7IHdpZHRoOiAxNHB4OyBoZWlnaHQ6IDIycHg7IGZsZXgtc2hyaW5rOiAwOyBjdXJzb3I6IHBvaW50ZXI7IGNvbG9yOiB2YXIoLS1mYWludCk7IGZvbnQtc2l6ZTogOXB4OyBkaXNwbGF5OiBmbGV4OyBhbGlnbi1pdGVtczogY2VudGVyOyBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjsgbWFyZ2luLXRvcDogMDsgfQoudHJlZS1rZXkgeyBmb250LWZhbWlseTogJ0pldEJyYWlucyBNb25vJywgbW9ub3NwYWNlOyBmb250LXNpemU6IDEycHg7IGNvbG9yOiB2YXIoLS1ibHVlKTsgY3Vyc29yOiBwb2ludGVyOyBwYWRkaW5nOiAycHggNHB4OyBib3JkZXItcmFkaXVzOiA0cHg7IHdoaXRlLXNwYWNlOiBub3dyYXA7IH0KLnRyZWUta2V5OmhvdmVyIHsgYmFja2dyb3VuZDogcmdiYSgxMjUsMjExLDI1MiwwLjEpOyB9Ci50cmVlLWNvbG9uIHsgY29sb3I6IHZhcigtLWZhaW50KTsgZm9udC1zaXplOiAxMnB4OyBtYXJnaW46IDJweCAwOyB9Ci50cmVlLXZhbC1zIHsgY29sb3I6ICM4NmVmYWM7IGZvbnQtZmFtaWx5OiAnSmV0QnJhaW5zIE1vbm8nLCBtb25vc3BhY2U7IGZvbnQtc2l6ZTogMTJweDsgd29yZC1icmVhazogYnJlYWstYWxsOyB9Ci50cmVlLXZhbC1uIHsgY29sb3I6ICNmYmJmMjQ7IGZvbnQtZmFtaWx5OiAnSmV0QnJhaW5zIE1vbm8nLCBtb25vc3BhY2U7IGZvbnQtc2l6ZTogMTJweDsgfQoudHJlZS12YWwtYiB7IGNvbG9yOiAjZjQ3MmI2OyBmb250LWZhbWlseTogJ0pldEJyYWlucyBNb25vJywgbW9ub3NwYWNlOyBmb250LXNpemU6IDEycHg7IH0KLnRyZWUtdmFsLW51bGwgeyBjb2xvcjogdmFyKC0tZmFpbnQpOyBmb250LWZhbWlseTogJ0pldEJyYWlucyBNb25vJywgbW9ub3NwYWNlOyBmb250LXNpemU6IDEycHg7IGZvbnQtc3R5bGU6IGl0YWxpYzsgfQoudHJlZS12YWwtb2JqIHsgY29sb3I6IHZhcigtLWZhaW50KTsgZm9udC1mYW1pbHk6ICdKZXRCcmFpbnMgTW9ubycsIG1vbm9zcGFjZTsgZm9udC1zaXplOiAxMXB4OyBjdXJzb3I6IHBvaW50ZXI7IH0KLnRyZWUtYWN0cyB7IGRpc3BsYXk6IGZsZXg7IGdhcDogM3B4OyBtYXJnaW4tbGVmdDogOHB4OyBvcGFjaXR5OiAwOyB0cmFuc2l0aW9uOiBvcGFjaXR5IDAuMXM7IGZsZXgtc2hyaW5rOiAwOyB9Ci50cmVlLXJvdzpob3ZlciAudHJlZS1hY3RzIHsgb3BhY2l0eTogMTsgfQoudHJlZS1hY3QgeyBiYWNrZ3JvdW5kOiBub25lOyBib3JkZXI6IG5vbmU7IGN1cnNvcjogcG9pbnRlcjsgY29sb3I6IHZhcigtLWZhaW50KTsgZm9udC1zaXplOiAxMnB4OyBwYWRkaW5nOiAxcHggNXB4OyBib3JkZXItcmFkaXVzOiA0cHg7IHRyYW5zaXRpb246IGFsbCAwLjFzOyBsaW5lLWhlaWdodDogMTsgfQoudHJlZS1hY3Q6aG92ZXIgeyBiYWNrZ3JvdW5kOiB2YXIoLS1zdXJmYWNlLWhvdmVyKTsgY29sb3I6IHZhcigtLXRleHQpOyB9Ci50cmVlLWFjdC5kZWw6aG92ZXIgeyBiYWNrZ3JvdW5kOiByZ2JhKDI0OCwxMTMsMTEzLDAuMSk7IGNvbG9yOiB2YXIoLS1yZWQpOyB9Ci50cmVlLW1vcmUgeyBmb250LXNpemU6IDExcHg7IGNvbG9yOiB2YXIoLS1tdXRlZCk7IHBhZGRpbmc6IDRweCAwIDJweDsgfQoudHJlZS1hZGQgeyBtYXJnaW4tdG9wOiA0cHg7IH0KCi8qIOKUgOKUgOKUgCBGaWx0ZXIgVGFicyDilIDilIDilIAgKi8KLmZ0YWJzIHsgZGlzcGxheTogZmxleDsgZ2FwOiA2cHg7IG1hcmdpbi1ib3R0b206IDE4cHg7IGZsZXgtd3JhcDogd3JhcDsgfQouZnRhYiB7IHBhZGRpbmc6IDZweCAxNnB4OyBib3JkZXItcmFkaXVzOiAyMHB4OyBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1ib3JkZXIpOyBiYWNrZ3JvdW5kOiBub25lOyBjb2xvcjogdmFyKC0tbXV0ZWQpOyBmb250LXNpemU6IDEycHg7IGZvbnQtd2VpZ2h0OiA2MDA7IGN1cnNvcjogcG9pbnRlcjsgZm9udC1mYW1pbHk6IGluaGVyaXQ7IHRyYW5zaXRpb246IGFsbCAwLjEyczsgfQouZnRhYi5hY3RpdmUsIC5mdGFiOmhvdmVyIHsgYmFja2dyb3VuZDogdmFyKC0tYWNjZW50LWRpbSk7IGJvcmRlci1jb2xvcjogcmdiYSgyNTUsMTIyLDg5LDAuNCk7IGNvbG9yOiB2YXIoLS1hY2NlbnQpOyB9CgovKiDilIDilIDilIAgUGFydHkgQ2FyZHMg4pSA4pSA4pSAICovCi5wLWNhcmQgeyBiYWNrZ3JvdW5kOiB2YXIoLS1zdXJmYWNlKTsgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tYm9yZGVyKTsgYm9yZGVyLXJhZGl1czogMTRweDsgcGFkZGluZzogMThweCAyMHB4OyBtYXJnaW4tYm90dG9tOiAxMnB4OyB9Ci5wLWNhcmQucGVuZGluZyB7IGJvcmRlci1sZWZ0OiAzcHggc29saWQgdmFyKC0teWVsbG93KTsgfQoucC1jYXJkLmFwcHJvdmVkIHsgYm9yZGVyLWxlZnQ6IDNweCBzb2xpZCB2YXIoLS1ncmVlbik7IH0KLnAtY2FyZC5yZWplY3RlZCB7IGJvcmRlci1sZWZ0OiAzcHggc29saWQgdmFyKC0tcmVkKTsgb3BhY2l0eTogMC42OyB9Ci5wLW5hbWUgeyBmb250LXNpemU6IDE1cHg7IGZvbnQtd2VpZ2h0OiA3MDA7IG1hcmdpbi1ib3R0b206IDRweDsgfQoucC1tZXRhIHsgZm9udC1zaXplOiAxMnB4OyBjb2xvcjogdmFyKC0tbXV0ZWQpOyBsaW5lLWhlaWdodDogMS43OyB9Ci5wLWFjdHMgeyBkaXNwbGF5OiBmbGV4OyBnYXA6IDhweDsgbWFyZ2luLXRvcDogMTJweDsgZmxleC13cmFwOiB3cmFwOyB9Ci5iYWRnZSB7IGRpc3BsYXk6IGlubGluZS1mbGV4OyBhbGlnbi1pdGVtczogY2VudGVyOyBmb250LXNpemU6IDEwcHg7IGZvbnQtd2VpZ2h0OiA3MDA7IHBhZGRpbmc6IDNweCA5cHg7IGJvcmRlci1yYWRpdXM6IDIwcHg7IH0KLmJhZGdlLXBlbmRpbmcgeyBiYWNrZ3JvdW5kOiByZ2JhKDI0NSwxNTgsMTEsMC4xMik7IGNvbG9yOiB2YXIoLS15ZWxsb3cpOyB9Ci5iYWRnZS1hcHByb3ZlZCB7IGJhY2tncm91bmQ6IHJnYmEoMTYsMTg1LDEyOSwwLjEyKTsgY29sb3I6IHZhcigtLWdyZWVuKTsgfQouYmFkZ2UtcmVqZWN0ZWQgeyBiYWNrZ3JvdW5kOiByZ2JhKDI0OCwxMTMsMTEzLDAuMTIpOyBjb2xvcjogdmFyKC0tcmVkKTsgfQoKLyog4pSA4pSA4pSAIE1vZGFsIOKUgOKUgOKUgCAqLwojbW9kYWxPdmwgeyBwb3NpdGlvbjogZml4ZWQ7IGluc2V0OiAwOyBiYWNrZ3JvdW5kOiByZ2JhKDAsMCwwLDAuNjUpOyBiYWNrZHJvcC1maWx0ZXI6IGJsdXIoNHB4KTsgei1pbmRleDogMTAwMDsgZGlzcGxheTogbm9uZTsgYWxpZ24taXRlbXM6IGNlbnRlcjsganVzdGlmeS1jb250ZW50OiBjZW50ZXI7IHBhZGRpbmc6IDIwcHg7IH0KI21vZGFsT3ZsLm9wZW4geyBkaXNwbGF5OiBmbGV4OyB9Ci5tb2RhbC1ib3ggeyBiYWNrZ3JvdW5kOiAjMGQxMTE3OyBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1ib3JkZXIpOyBib3JkZXItcmFkaXVzOiAxOHB4OyBwYWRkaW5nOiAyOHB4OyB3aWR0aDogMTAwJTsgbWF4LXdpZHRoOiA1NDBweDsgbWF4LWhlaWdodDogODV2aDsgb3ZlcmZsb3cteTogYXV0bzsgfQoubW9kYWwtdGl0bGUgeyBmb250LXNpemU6IDE2cHg7IGZvbnQtd2VpZ2h0OiA4MDA7IG1hcmdpbi1ib3R0b206IDE2cHg7IH0KLm1vZGFsLWFjdHMgeyBkaXNwbGF5OiBmbGV4OyBnYXA6IDEwcHg7IGp1c3RpZnktY29udGVudDogZmxleC1lbmQ7IG1hcmdpbi10b3A6IDIwcHg7IH0KCi8qIOKUgOKUgOKUgCBUb2FzdCDilIDilIDilIAgKi8KI3RvYXN0V3JhcCB7IHBvc2l0aW9uOiBmaXhlZDsgYm90dG9tOiAyNHB4OyByaWdodDogMjRweDsgei1pbmRleDogMjAwMDsgZGlzcGxheTogZmxleDsgZmxleC1kaXJlY3Rpb246IGNvbHVtbjsgZ2FwOiA4cHg7IHBvaW50ZXItZXZlbnRzOiBub25lOyB9Ci50b2FzdCB7IGJhY2tncm91bmQ6ICMxYTFmMmU7IGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWJvcmRlcik7IGJvcmRlci1yYWRpdXM6IDEwcHg7IHBhZGRpbmc6IDExcHggMThweDsgZm9udC1zaXplOiAxM3B4OyBtaW4td2lkdGg6IDIyMHB4OyBhbmltYXRpb246IHNsaWRlSW4gMC4ycyBlYXNlOyBwb2ludGVyLWV2ZW50czogYXV0bzsgfQoudG9hc3Quc3VjY2VzcyB7IGJvcmRlci1sZWZ0OiAzcHggc29saWQgdmFyKC0tZ3JlZW4pOyB9Ci50b2FzdC5lcnJvciB7IGJvcmRlci1sZWZ0OiAzcHggc29saWQgdmFyKC0tcmVkKTsgfQoudG9hc3QuaW5mbyB7IGJvcmRlci1sZWZ0OiAzcHggc29saWQgdmFyKC0tYWNjZW50KTsgfQpAa2V5ZnJhbWVzIHNsaWRlSW4geyBmcm9tIHsgb3BhY2l0eTogMDsgdHJhbnNmb3JtOiB0cmFuc2xhdGVYKDE2cHgpOyB9IHRvIHsgb3BhY2l0eTogMTsgdHJhbnNmb3JtOiB0cmFuc2xhdGVYKDApOyB9IH0KCi8qIOKUgOKUgOKUgCBNaXNjIOKUgOKUgOKUgCAqLwousb2FkaW5nIHsgZGlzcGxheTogZmxleDsgYWxpZ24taXRlbXM6IGNlbnRlcjsganVzdGlmeS1jb250ZW50OiBjZW50ZXI7IGdhcDogMTBweDsgcGFkZGluZzogNDBweDsgY29sb3I6IHZhcigtLW11dGVkKTsgZm9udC1zaXplOiAxNHB4OyB9Ci5zcGlubmVyIHsgd2lkdGg6IDE4cHg7IGhlaWdodDogMThweDsgYm9yZGVyOiAycHggc29saWQgcmdiYSgyNTUsMjU1LDI1NSwwLjEpOyBib3JkZXItdG9wLWNvbG9yOiB2YXIoLS1hY2NlbnQpOyBib3JkZXItcmFkaXVzOiA1MCU7IGFuaW1hdGlvbjogc3BpbiAwLjdzIGxpbmVhciBpbmZpbml0ZTsgZmxleC1zaHJpbms6IDA7IH0KQGtleWZyYW1lcyBzcGluIHsgdG8geyB0cmFuc2Zvcm06IHJvdGF0ZSgzNjBkZWcpOyB9IH0KLmVtcHR5IHsgdGV4dC1hbGlnbjogY2VudGVyOyBwYWRkaW5nOiA1MHB4IDIwcHg7IGNvbG9yOiB2YXIoLS1tdXRlZCk7IGZvbnQtc2l6ZTogMTRweDsgfQouZXJyLW1zZyB7IGNvbG9yOiB2YXIoLS1yZWQpOyBmb250LXNpemU6IDEzcHg7IHBhZGRpbmc6IDEycHg7IH0KaHIuZGl2aWRlciB7IGJvcmRlcjogbm9uZTsgYm9yZGVyLXRvcDogMXB4IHNvbGlkIHZhcigtLWJvcmRlcik7IG1hcmdpbjogMTZweCAwOyB9CgovKiDilIDilIDilIAgU2Nyb2xsYmFycyDilIDilIDilIAgKi8KOjotd2Via2l0LXNjcm9sbGJhciB7IHdpZHRoOiA1cHg7IGhlaWdodDogNXB4OyB9Cjotd2Via2l0LXNjcm9sbGJhci10cmFjayB7IGJhY2tncm91bmQ6IHRyYW5zcGFyZW50OyB9Cjotd2Via2l0LXNjcm9sbGJhci10aHVtYiB7IGJhY2tncm91bmQ6IHJnYmEoMjU1LDI1NSwyNTUsMC4wOCk7IGJvcmRlci1yYWRpdXM6IDNweDsgfQo6Oi13ZWJraXQtc2Nyb2xsYmFyLXRodW1iOmhvdmVyIHsgYmFja2dyb3VuZDogcmdiYSgyNTUsMjU1LDI1NSwwLjE1KTsgfQoKLyog4pSA4pSA4pSAIE1vYmlsZSDilIDilIDilIAgKi8KI21vYmlsZUJhciB7IGRpc3BsYXk6IG5vbmU7IH0KQG1lZGlhIChtYXgtd2lkdGg6IDgwMHB4KSB7CiAgLmFwcC13cmFwIHsgZ3JpZC10ZW1wbGF0ZS1jb2x1bW5zOiAxZnI7IH0KICAjc2lkZWJhciB7IHBvc2l0aW9uOiBmaXhlZDsgbGVmdDogLTI0MHB4OyB6LWluZGV4OiAyMDA7IHRyYW5zaXRpb246IGxlZnQgMC4yMnM7IHdpZHRoOiAyMjRweDsgfQogICNzaWRlYmFyLm9wZW4geyBsZWZ0OiAwOyBib3gtc2hhZG93OiA0cHggMCAyNHB4IHJnYmEoMCwwLDAsMC41KTsgfQogICNtYWluQ29udGVudCB7IHBhZGRpbmc6IDE2cHggMTRweCA2MHB4OyB9CiAgI21vYmlsZUJhciB7IGRpc3BsYXk6IGZsZXg7IGFsaWduLWl0ZW1zOiBjZW50ZXI7IGp1c3RpZnktY29udGVudDogc3BhY2UtYmV0d2Vlbk TsgcGFkZGluZzogMTJweCAxNnB4OyBiYWNrZ3JvdW5kOiByZ2JhKDAsMCwwLDAuMyk7IGJvcmRlci1ib3R0b206IDFweCBzb2xpZCB2YXIoLS1ib3JkZXIpOyBwb3NpdGlvbjogc3RpY2t5OyB0b3A6IDA7IHotaW5kZXg6IDEwMDsgfQogICNtb2JpbGVPdmVybGF5IHsgZGlzcGxheTogbm9uZTsgcG9zaXRpb246IGZpeGVkOyBpbnNldDogMDsgei1pbmRleDogMTUwOyB9CiAgI21vYmlsZU92ZXJsYXkub3BlbiB7IGRpc3BsYXk6IGJsb2NrOyB9Cn0KPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT4KCjwhLS0gTG9naW4gLS0+CjxkaXYgaWQ9ImxvZ2luU2NyZWVuIj4KICA8ZGl2IGNsYXNzPSJsb2dpbi1jYXJkIj4KICAgIDxkaXYgY2xhc3M9ImxvZ2luLWxvZ28iPkFTVEVST0lEPHNwYW4+4piXPC9zcGFuPiBBRE1JTjwvZGl2PgogICAgPGRpdiBjbGFzcz0ibG9naW4tc3ViIj5Bc3Rlcm9pZCBBZG1pbiBDb25zb2xlPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJmaWVsZCI+PGxhYmVsPlVzZXJuYW1lPC9sYWJlbD48aW5wdXQgdHlwZT0idGV4dCIgaWQ9Imx VbmFtZSIgcGxhY2Vob2xkZXI9IlVzZXJuYW1lIiBhdXRvY29tcGxldGU9InVzZXJuYW1lIiBzcGVsbGNoZWNrPSJmYWxzZSI+PC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJmaWVsZCI+PGxhYmVsPlBhc3N3b3JkPC9sYWJlbD48aW5wdXQgdHlwZT0icGFzc3dvcmQiIGlkPSJsUHciIHBsYWNlaG9sZGVyPSLigKLigKLigKLigKLigKLigKLigKLigKIiIgYXV0b2NvbXBsZXRlPSJjdXJyZW50LXBhc3N3b3JkIj48L2Rpdj4KICAgIDxidXR0b24gY2xhc3M9ImJ0bi1wcmltYXJ5IiBpZD0ibEJ0biIgb25jbGljaz0iZG9Mb2dpbigpIj5TaWduIEluPC9idXR0b24+CiAgICA8ZGl2IGNsYXNzPSJsb2dpbi1lcnIiIGlkPSJsRXJyIj48L2Rpdj4KICA8L2Rpdj4KPC9kaXY+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asteroid — Admin Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050810;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.09);
+  --accent: #ff7a59;
+  --accent-dim: rgba(255,122,89,0.15);
+  --text: #fff;
+  --muted: rgba(255,255,255,0.5);
+  --faint: rgba(255,255,255,0.25);
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --red: #f87171;
+  --blue: #7dd3fc;
+  --sidebar-w: 224px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-serif; min-height: 100vh; }
+
+/* ─── Login ─── */
+#loginScreen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+.login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 40px 32px; width: 100%; max-width: 360px; }
+.login-logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+.login-logo span { color: var(--accent); }
+.login-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+.field input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 10px; color: #fff; font-size: 14px; padding: 10px 14px; font-family: inherit; outline: none; transition: border-color 0.15s; }
+.field input:focus { border-color: var(--accent); }
+.btn-primary { width: 100%; background: linear-gradient(135deg,#ff7a59,#ff4e2a); color: #fff; border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.login-err { font-size: 12px; color: var(--red); margin-top: 10px; min-height: 18px; text-align: center; }
+
+/* ─── Layout ─── */
+#adminApp { display: none; }
+.app-wrap { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+
+/* ─── Sidebar ─── */
+#sidebar {
+  background: rgba(0,0,0,0.25);
+  border-right: 1px solid var(--border);
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto; display: flex; flex-direction: column;
+  padding: 16px 10px 20px;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+.sb-logo { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; padding: 4px 8px 18px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+.sb-logo span { color: var(--accent); }
+.sb-head { font-size: 10px; font-weight: 700; color: var(--faint); letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 8px 4px; }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 9px; cursor: pointer; font-size: 13px; color: var(--muted); transition: all 0.12s; user-select: none; }
+.nav-item:hover { background: var(--surface-hover); color: var(--text); }
+.nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 600; }
+.nav-item .ni { font-size: 14px; width: 18px; flex-shrink: 0; }
+.sb-bottom { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+.signout-btn { display: flex; align-items: center; gap: 8px; width: 100%; background: none; border: none; color: var(--muted); font-family: inherit; font-size: 12px; cursor: pointer; padding: 8px 10px; border-radius: 8px; transition: all 0.12s; }
+.signout-btn:hover { background: rgba(248,113,113,0.1); color: var(--red); }
+
+/* ─── Content ─── */
+#mainContent { padding: 32px 28px 60px; overflow-y: auto; max-height: 100vh; }
+.ph { margin-bottom: 24px; }
+.ph-title { font-size: 22px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 3px; }
+.ph-sub { font-size: 13px; color: var(--muted); }
+
+/* ─── Stat Grid ─── */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+.stat-lbl { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.stat-val { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+.accent { color: var(--accent); }
+.green { color: var(--green); }
+.yellow { color: var(--yellow); }
+.red { color: var(--red); }
+
+/* ─── Cards ─── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+.card-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+
+/* ─── Table ─── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { text-align: left; padding: 10px 14px; font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); white-space: nowrap; }
+tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
+tbody tr:hover { background: var(--surface-hover); }
+tbody td { padding: 9px 14px; vertical-align: middle; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+
+/* ─── Buttons ─── */
+.btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.12s; border: none; display: inline-flex; align-items: center; gap: 5px; }
+.btn-sm { padding: 5px 10px; font-size: 11px; border-radius: 6px; }
+.btn-xs { padding: 3px 8px; font-size: 10px; border-radius: 5px; }
+.btn-accent { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(255,122,89,0.3); }
+.btn-accent:hover { background: rgba(255,122,89,0.25); }
+.btn-green { background: rgba(16,185,129,0.12); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+.btn-green:hover { background: rgba(16,185,129,0.22); }
+.btn-red { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.25); }
+.btn-red:hover { background: rgba(248,113,113,0.2); }
+.btn-ghost { background: none; color: var(--muted); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface-hover); color: var(--text); }
+.btn-yellow { background: rgba(245,158,11,0.1); color: var(--yellow); border: 1px solid rgba(245,158,11,0.25); }
+.btn-yellow:hover { background: rgba(245,158,11,0.2); }
+
+/* ─── Form Elements ─── */
+.form-row { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+.fi { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 9px; color: #fff; font-size: 13px; padding: 9px 13px; font-family: inherit; outline: none; transition: border-color 0.15s; }
+.fi:focus { border-color: var(--accent); }
+.fi.wide { flex: 1; min-width: 0; }
+.fi-mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.fi-ta { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 9px; color: #fff; font-size: 12px; padding: 10px 13px; font-family: 'JetBrains Mono', monospace; outline: none; resize: vertical; min-height: 130px; width: 100%; transition: border-color 0.15s; }
+.fi-ta:focus { border-color: var(--accent); }
+.fi-label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* ─── Path Navigator ─── */
+.path-nav { display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 9px; padding: 7px 12px; margin-bottom: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; flex-wrap: wrap; min-height: 36px; }
+.ps { color: var(--muted); cursor: pointer; padding: 1px 4px; border-radius: 4px; }
+.ps:hover { background: var(--surface-hover); color: var(--text); }
+.ps.cur { color: var(--text); font-weight: 600; }
+.ps-sep { color: var(--faint); }
+
+/* ─── Tree ─── */
+.tree-root { }
+.tree-children { border-left: 1px solid var(--border); margin-left: 16px; padding-left: 10px; }
+.tree-row { display: flex; align-items: flex-start; gap: 5px; padding: 2px 0; min-height: 26px; }
+.tree-toggle { width: 14px; height: 22px; flex-shrink: 0; cursor: pointer; color: var(--faint); font-size: 9px; display: flex; align-items: center; justify-content: center; margin-top: 0; }
+.tree-key { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--blue); cursor: pointer; padding: 2px 4px; border-radius: 4px; white-space: nowrap; }
+.tree-key:hover { background: rgba(125,211,252,0.1); }
+.tree-colon { color: var(--faint); font-size: 12px; margin: 2px 0; }
+.tree-val-s { color: #86efac; font-family: 'JetBrains Mono', monospace; font-size: 12px; word-break: break-all; }
+.tree-val-n { color: #fbbf24; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.tree-val-b { color: #f472b6; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.tree-val-null { color: var(--faint); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-style: italic; }
+.tree-val-obj { color: var(--faint); font-family: 'JetBrains Mono', monospace; font-size: 11px; cursor: pointer; }
+.tree-acts { display: flex; gap: 3px; margin-left: 8px; opacity: 0; transition: opacity 0.1s; flex-shrink: 0; }
+.tree-row:hover .tree-acts { opacity: 1; }
+.tree-act { background: none; border: none; cursor: pointer; color: var(--faint); font-size: 12px; padding: 1px 5px; border-radius: 4px; transition: all 0.1s; line-height: 1; }
+.tree-act:hover { background: var(--surface-hover); color: var(--text); }
+.tree-act.del:hover { background: rgba(248,113,113,0.1); color: var(--red); }
+.tree-more { font-size: 11px; color: var(--muted); padding: 4px 0 2px; }
+.tree-add { margin-top: 4px; }
+
+/* ─── Filter Tabs ─── */
+.ftabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+.ftab { padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: none; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.12s; }
+.ftab.active, .ftab:hover { background: var(--accent-dim); border-color: rgba(255,122,89,0.4); color: var(--accent); }
+
+/* ─── Party Cards ─── */
+.p-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; }
+.p-card.pending { border-left: 3px solid var(--yellow); }
+.p-card.approved { border-left: 3px solid var(--green); }
+.p-card.rejected { border-left: 3px solid var(--red); opacity: 0.6; }
+.p-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.p-meta { font-size: 12px; color: var(--muted); line-height: 1.7; }
+.p-acts { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+.badge-pending { background: rgba(245,158,11,0.12); color: var(--yellow); }
+.badge-approved { background: rgba(16,185,129,0.12); color: var(--green); }
+.badge-rejected { background: rgba(248,113,113,0.12); color: var(--red); }
+
+/* ─── Modal ─── */
+#modalOvl { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+#modalOvl.open { display: flex; }
+.modal-box { background: #0d1117; border: 1px solid var(--border); border-radius: 18px; padding: 28px; width: 100%; max-width: 540px; max-height: 85vh; overflow-y: auto; }
+.modal-title { font-size: 16px; font-weight: 800; margin-bottom: 16px; }
+.modal-acts { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* ─── Toast ─── */
+#toastWrap { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { background: #1a1f2e; border: 1px solid var(--border); border-radius: 10px; padding: 11px 18px; font-size: 13px; min-width: 220px; animation: slideIn 0.2s ease; pointer-events: auto; }
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--accent); }
+@keyframes slideIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ─── Misc ─── */
+.loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 40px; color: var(--muted); font-size: 14px; }
+.spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 14px; }
+.err-msg { color: var(--red); font-size: 13px; padding: 12px; }
+hr.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* ─── Scrollbars ─── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+/* ─── Mobile ─── */
+#mobileBar { display: none; }
+@media (max-width: 800px) {
+  .app-wrap { grid-template-columns: 1fr; }
+  #sidebar { position: fixed; left: -240px; z-index: 200; transition: left 0.22s; width: 224px; }
+  #sidebar.open { left: 0; box-shadow: 4px 0 24px rgba(0,0,0,0.5); }
+  #mainContent { padding: 16px 14px 60px; }
+  #mobileBar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  #mobileOverlay { display: none; position: fixed; inset: 0; z-index: 150; }
+  #mobileOverlay.open { display: block; }
+}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">ASTEROID<span>★</span> ADMIN</div>
+    <div class="login-sub">Asteroid Admin Console</div>
+    <div class="field"><label>Username</label><input type="text" id="lUname" placeholder="Username" autocomplete="username" spellcheck="false"></div>
+    <div class="field"><label>Password</label><input type="password" id="lPw" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn-primary" id="lBtn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="lErr"></div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="adminApp">
+  <!-- Mobile bar -->
+  <div id="mobileBar">
+    <div style="font-size:14px;font-weight:800">ASTEROID<span style="color:var(--accent)">★</span></div>
+    <button class="btn btn-ghost btn-sm" onclick="toggleSidebar()">☰ Menu</button>
+  </div>
+  <div id="mobileOverlay" onclick="toggleSidebar()"></div>
+
+  <div class="app-wrap">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sb-logo">ASTEROID<span>★</span> ADMIN</div>
+
+      <div class="nav-item active" data-s="dashboard"><span class="ni">⊞</span> Dashboard</div>
+
+      <div class="sb-head">Realtime Database</div>
+      <div class="nav-item" data-s="db-explorer"><span class="ni">🔭</span> DB Explorer</div>
+      <div class="nav-item" data-s="profiles"><span class="ni">👤</span> Profiles</div>
+      <div class="nav-item" data-s="rtdb-songs"><span class="ni">🎵</span> Songs</div>
+      <div class="nav-item" data-s="parties"><span class="ni">🎉</span> Parties</div>
+      <div class="nav-item" data-s="feature-req"><span class="ni">💡</span> Feature Requests</div>
+      <div class="nav-item" data-s="subastroids"><span class="ni">🪐</span> SubAsteroids</div>
+      <div class="nav-item" data-s="live-rooms"><span class="ni">🎙</span> Live Rooms</div>
+      <div class="nav-item" data-s="polls"><span class="ni">📊</span> Polls</div>
+
+      <div class="sb-head">Firestore</div>
+      <div class="nav-item" data-s="fs-users"><span class="ni">👥</span> Users</div>
+      <div class="nav-item" data-s="fs-songs"><span class="ni">🎼</span> Songs (FS)</div>
+      <div class="nav-item" data-s="fs-featurequeue"><span class="ni">📋</span> Feature Queue</div>
+      <div class="nav-item" data-s="fs-founding"><span class="ni">⭐</span> Founding Supporters</div>
+
+      <div class="sb-bottom">
+        <div style="font-size:11px;color:var(--faint);padding:0 8px 8px" id="sbUser"></div>
+        <button class="signout-btn" onclick="doSignOut()">⎋ Sign Out</button>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main id="mainContent">
+      <div class="loading"><div class="spinner"></div> Loading…</div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modalOvl">
+  <div class="modal-box">
+    <div class="modal-title" id="mTitle"></div>
+    <div id="mBody"></div>
+    <div class="modal-acts" id="mActs"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toastWrap"></div>
+
+<script type="module">
+import { initializeApp, getApps, getApp }
+  from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { getDatabase, ref, get, set, remove, update, query, limitToFirst, orderByKey }
+  from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+import {
+  getFirestore, collection, getDocs, doc, getDoc, setDoc, deleteDoc,
+  query as fq, limit, orderBy, startAfter
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+// ─── Firebase ───────────────────────────────────────────────
+const FB = {
+  apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+  authDomain: "asteroid-cdc13.firebaseapp.com",
+  databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+  projectId: "asteroid-cdc13",
+  storageBucket: "asteroid-cdc13.appspot.com",
+  messagingSenderId: "793353824502",
+  appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+};
+const app = getApps().length ? getApp() : initializeApp(FB);
+const auth = getAuth(app);
+const rtdb = getDatabase(app);
+const fs   = getFirestore(app);
+
+// ─── State ──────────────────────────────────────────────────
+let me = null;
+let curSection = 'dashboard';
+let dbPath = '';
+let partyFilter = 'all';
+let fsCursor = null;
+let fsCurCol = null;
+let _pendingUname = null;
+
+// ─── Auth ────────────────────────────────────────────────────
+// Admin account email — not sensitive (just a Firebase Auth identifier).
+// Credentials (username + password) are stored only in Firebase Auth.
+const _ACCT = 'console.admin@asteroid8.net';
+
+onAuthStateChanged(auth, async user => {
+  me = user;
+  if (user) {
+    // On a fresh login verify the entered username matches the stored displayName.
+    if (_pendingUname !== null) {
+      if (user.displayName !== _pendingUname) {
+        _pendingUname = null;
+        await signOut(auth);
+        const err = document.getElementById('lErr');
+        if (err) err.textContent = 'Invalid credentials.';
+        const btn = document.getElementById('lBtn');
+        if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
+        return;
+      }
+      _pendingUname = null;
+    }
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    const sbUser = document.getElementById('sbUser');
+    if (sbUser) sbUser.textContent = user.displayName || user.email;
+    go('dashboard');
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminApp').style.display = 'none';
+  }
+});
+
+window.doLogin = async () => {
+  const uname = document.getElementById('lUname').value.trim();
+  const pw = document.getElementById('lPw').value;
+  const btn = document.getElementById('lBtn');
+  const err = document.getElementById('lErr');
+  err.textContent = '';
+  if (!uname || !pw) { err.textContent = 'Enter username and password.'; return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  _pendingUname = uname;
+  try {
+    await signInWithEmailAndPassword(auth, _ACCT, pw);
+  } catch(e) {
+    _pendingUname = null;
+    err.textContent = 'Invalid credentials.';
+    btn.disabled = false; btn.textContent = 'Sign In';
+  }
+};
+
+window.doSignOut = () => signOut(auth);
+
+document.getElementById('lUname').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('lPw').focus(); });
+document.getElementById('lPw').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+
+// ─── Nav ─────────────────────────────────────────────────────
+window.go = function(section, params={}) {
+  curSection = section;
+  document.querySelectorAll('.nav-item[data-s]').forEach(el => {
+    el.classList.toggle('active', el.dataset.s === section);
+  });
+  closeSidebar();
+  switch(section) {
+    case 'dashboard':   return renderDash();
+    case 'db-explorer': return renderDbExplorer(params.path ?? dbPath ?? '');
+    case 'profiles':    return renderProfiles('');
+    case 'rtdb-songs':  return renderRtdbSongs('');
+    case 'parties':     return renderParties();
+    case 'feature-req': return renderFR();
+    case 'subastroids': return renderSubA();
+    case 'live-rooms':  return renderLiveRooms();
+    case 'polls':       return renderPolls();
+    case 'fs-users':    return renderFs('users');
+    case 'fs-songs':    return renderFs('songs');
+    case 'fs-featurequeue': return renderFs('featureQueue');
+    case 'fs-founding': return renderFs('founding_supporters');
+    default: renderDash();
+  }
+};
+
+document.querySelectorAll('.nav-item[data-s]').forEach(el =>
+  el.addEventListener('click', () => go(el.dataset.s))
+);
+
+window.toggleSidebar = () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+};
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('open');
+}
+
+// ─── Helpers ─────────────────────────────────────────────────
+function setHTML(html) { document.getElementById('mainContent').innerHTML = html; }
+function escH(s) {
+  const d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+function safePath(p) { return String(p).replace(/'/g, "\\'"); }
+function fmtTs(ts) {
+  if (!ts) return '—';
+  return new Date(typeof ts === 'number' && ts < 1e10 ? ts*1000 : ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+window.toast = function(msg, type='info') {
+  const w = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  w.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+};
+
+// ─── Modal ────────────────────────────────────────────────────
+function openModal(title, body, onOk, okLabel='Confirm', okCls='btn-accent') {
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mBody').innerHTML = body;
+  document.getElementById('mActs').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn ${okCls}" id="modalOkBtn">${okLabel}</button>
+  `;
+  document.getElementById('modalOkBtn').onclick = onOk;
+  document.getElementById('modalOvl').classList.add('open');
+}
+
+window.closeModal = () => document.getElementById('modalOvl').classList.remove('open');
+document.getElementById('modalOvl').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOvl')) window.closeModal();
+});
+
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════════
+async function renderDash() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Dashboard</div><div class="ph-sub">Asteroid Firebase overview</div></div>
+    <div class="stat-grid" id="sGrid"><div class="loading"><div class="spinner"></div></div></div>
+    <div class="card">
+      <div class="card-title">Quick Actions</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <button class="btn btn-accent" onclick="go('parties')">🎉 Manage Parties</button>
+        <button class="btn btn-ghost" onclick="go('profiles')">👤 Browse Profiles</button>
+        <button class="btn btn-ghost" onclick="go('db-explorer')">🔭 DB Explorer</button>
+        <button class="btn btn-ghost" onclick="go('rtdb-songs')">🎵 Songs</button>
+        <button class="btn btn-ghost" onclick="go('fs-users')">👥 Firestore Users</button>
+        <button class="btn btn-ghost" onclick="go('feature-req')">💡 Feature Requests</button>
+      </div>
+    </div>
+  `);
+  try {
+    const [profSnap, songSnap, partySnap, frSnap] = await Promise.all([
+      get(query(ref(rtdb,'PROFILES'), limitToFirst(9999))),
+      get(query(ref(rtdb,'SONGS'), limitToFirst(9999))),
+      get(ref(rtdb,'ASTEROID_PARTIES')),
+      get(query(ref(rtdb,'FEATURE_REQUESTS'), limitToFirst(9999)))
+    ]);
+    const parties = partySnap.val() || {};
+    const pending = Object.values(parties).filter(p => !p.status || p.status==='pending').length;
+    document.getElementById('sGrid').innerHTML = `
+      <div class="stat-card"><div class="stat-lbl">Profiles</div><div class="stat-val accent">${Object.keys(profSnap.val()||{}).length}</div></div>
+      <div class="stat-card"><div class="stat-lbl">Songs (RTDB)</div><div class="stat-val">${Object.keys(songSnap.val()||{}).length}</div></div>
+      <div class="stat-card"><div class="stat-lbl">Total Parties</div><div class="stat-val">${Object.keys(parties).length}</div></div>
+      <div class="stat-card"><div class="stat-lbl">Pending Parties</div><div class="stat-val yellow">${pending}</div></div>
+      <div class="stat-card"><div class="stat-lbl">Feature Requests</div><div class="stat-val green">${Object.keys(frSnap.val()||{}).length}</div></div>
+    `;
+  } catch(e) {
+    document.getElementById('sGrid').innerHTML = `<div class="err-msg">Stats error: ${escH(e.message)}</div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// DB EXPLORER
+// ══════════════════════════════════════════════════════════════
+const TOP_PATHS = ['PROFILES','SONGS','PREMIUM','ASTEROID_PARTIES','FEATURE_REQUESTS',
+  'ARTIST_POLLS','FOLLOWS','FOLLOWING','PLAYLISTS','subAsteroids','LiveRooms','ARTIST_QA',
+  'ARTIST_STORIES','ARTIST_NOTICES','CONCERT_CHATS','USERNAME_REGISTRY','LISTEN_JOURNEYS',
+  'FAN_ENGAGEMENT','FEATURED_ARTIST_SONG','REFERRAL_CODE_INDEX','boostSongs'];
+
+async function renderDbExplorer(path) {
+  dbPath = path || '';
+  const segs = path ? path.split('/').filter(Boolean) : [];
+
+  let bread = `<span class="ps" onclick="goDb('')">root</span>`;
+  segs.forEach((s, i) => {
+    const partial = segs.slice(0,i+1).join('/');
+    bread += `<span class="ps-sep">/</span><span class="ps ${i===segs.length-1?'cur':''}" onclick="goDb('${safePath(partial)}')">${escH(s)}</span>`;
+  });
+
+  const quickBtns = TOP_PATHS.map(p =>
+    `<button class="btn btn-xs btn-ghost" onclick="goDb('${p}')">${p}</button>`
+  ).join('');
+
+  setHTML(`
+    <div class="ph"><div class="ph-title">DB Explorer</div><div class="ph-sub">Browse & edit any Realtime Database path</div></div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">Common Paths</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">${quickBtns}</div>
+    </div>
+    <div class="form-row">
+      <input class="fi fi-mono wide" id="pathInp" value="${escH(path)}" placeholder="e.g. PROFILES/userId123" onkeydown="if(event.key==='Enter')goDb(this.value.trim())">
+      <button class="btn btn-accent" onclick="goDb(document.getElementById('pathInp').value.trim())">Go →</button>
+      ${segs.length ? `<button class="btn btn-ghost" onclick="goDb('${safePath(segs.slice(0,-1).join('/'))}')" title="Go up">↑ Up</button>` : ''}
+      ${path ? `<button class="btn btn-ghost" onclick="addDbKey('${safePath(path)}')">+ Add Key</button>` : ''}
+    </div>
+    <div class="path-nav" id="pathNav">${bread}</div>
+    <div class="card" id="treeWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+
+  if (!path) {
+    document.getElementById('treeWrap').innerHTML = `<div class="empty">Select or type a path above to explore</div>`;
+    return;
+  }
+
+  try {
+    // Use limitToFirst for top-level collections to avoid loading massive datasets
+    const depth = segs.length;
+    let snap;
+    if (depth <= 1) {
+      snap = await get(query(ref(rtdb, path), limitToFirst(80)));
+    } else {
+      snap = await get(ref(rtdb, path));
+    }
+    const data = snap.val();
+    if (data === null) {
+      document.getElementById('treeWrap').innerHTML = `<div class="empty">No data at <code style="font-size:12px">${escH(path)}</code></div>`;
+      return;
+    }
+    document.getElementById('treeWrap').innerHTML = buildTree(data, path, 0);
+  } catch(e) {
+    document.getElementById('treeWrap').innerHTML = `<div class="err-msg">Error: ${escH(e.message)}</div>`;
+  }
+}
+
+window.goDb = function(path) {
+  dbPath = path.trim();
+  go('db-explorer', { path: dbPath });
+};
+
+function buildTree(data, path, depth) {
+  if (data === null || data === undefined) return `<span class="tree-val-null">null</span>`;
+  const t = typeof data;
+  if (t !== 'object') return valSpan(data) + actionBtns(path, false);
+
+  const entries = Object.entries(data);
+  if (!entries.length) return `<span class="tree-val-null">{empty}</span>`;
+
+  const MAX = depth === 0 ? 80 : 50;
+  const shown = entries.slice(0, MAX);
+  const extra = entries.length - shown.length;
+
+  let html = `<div class="${depth===0?'tree-root':'tree-children'}">`;
+  for (const [k, v] of shown) {
+    const cp = path ? `${path}/${k}` : k;
+    const isObj = v !== null && typeof v === 'object';
+    const nid = 'n' + Math.random().toString(36).slice(2,8);
+    const objCount = isObj ? Object.keys(v).length : 0;
+
+    html += `<div class="tree-row">
+      <span class="tree-toggle" onclick="toggleNode('${nid}')">${isObj ? '▶' : ' '}</span>
+      <span class="tree-key" onclick="${isObj ? `toggleNode('${nid}')` : `editDb('${safePath(cp)}', '${escH(JSON.stringify(v))}')`}">${escH(k)}</span>
+      <span class="tree-colon">:</span>
+      ${isObj
+        ? `<span class="tree-val-obj" id="${nid}_sum" onclick="toggleNode('${nid}')">{${objCount} key${objCount!==1?'s':''}}</span>`
+        : valSpan(v)
+      }
+      <div class="tree-acts">
+        ${!isObj ? `<button class="tree-act" title="Edit" onclick="editDb('${safePath(cp)}','${escH(JSON.stringify(v))}')">✎</button>` : ''}
+        <button class="tree-act" title="Open path" onclick="goDb('${safePath(cp)}')">↗</button>
+        <button class="tree-act del" title="Delete" onclick="delDb('${safePath(cp)}')">✕</button>
+      </div>
+    </div>`;
+
+    if (isObj) {
+      if (depth < 2) {
+        html += `<div id="${nid}" style="display:none">${buildTree(v, cp, depth+1)}</div>`;
+      } else {
+        html += `<div id="${nid}" style="display:none"><div style="padding:6px 0 2px 12px"><button class="btn btn-xs btn-ghost" onclick="goDb('${safePath(cp)}')">→ Open in explorer</button></div></div>`;
+      }
+    }
+  }
+
+  if (extra > 0) {
+    html += `<div class="tree-more">…${extra} more keys not shown. <button class="btn btn-xs btn-ghost" onclick="goDb('${safePath(path)}')">Open full path</button></div>`;
+  }
+
+  html += `<div class="tree-add"><button class="btn btn-xs btn-ghost" onclick="addDbKey('${safePath(path)}')">+ Add key</button></div>`;
+  html += '</div>';
+  return html;
+}
+
+function valSpan(v) {
+  if (v === null) return `<span class="tree-val-null">null</span>`;
+  if (typeof v === 'string') {
+    const d = v.length > 90 ? v.slice(0,90)+'…' : v;
+    return `<span class="tree-val-s">"${escH(d)}"</span>`;
+  }
+  if (typeof v === 'number') return `<span class="tree-val-n">${v}</span>`;
+  if (typeof v === 'boolean') return `<span class="tree-val-b">${v}</span>`;
+  return `<span class="tree-val-null">null</span>`;
+}
+
+function actionBtns(path, isObj) {
+  return `<div class="tree-acts" style="opacity:1">
+    ${!isObj ? `<button class="tree-act" onclick="editDb('${safePath(path)}','${escH(JSON.stringify(null))}')">✎</button>` : ''}
+    <button class="tree-act del" onclick="delDb('${safePath(path)}')">✕</button>
+  </div>`;
+}
+
+window.toggleNode = function(nid) {
+  const el = document.getElementById(nid);
+  if (!el) return;
+  const hidden = el.style.display === 'none';
+  el.style.display = hidden ? 'block' : 'none';
+  const row = el.previousElementSibling;
+  if (row) {
+    const tog = row.querySelector('.tree-toggle');
+    if (tog) tog.textContent = hidden ? '▼' : '▶';
+    const sum = document.getElementById(nid + '_sum');
+    if (sum) sum.style.display = hidden ? 'none' : '';
+  }
+};
+
+window.editDb = function(path, curJson) {
+  let cur;
+  try { cur = JSON.parse(curJson); } catch { cur = curJson; }
+  const isStr = typeof cur === 'string';
+  openModal(`Edit: ${path.split('/').pop()}`, `
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:10px">📍 ${escH(path)}</div>
+    <label class="fi-label">New Value</label>
+    <textarea class="fi-ta" id="editTA">${escH(isStr ? cur : JSON.stringify(cur, null, 2))}</textarea>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px">Strings: plain text. Numbers/booleans/objects: valid JSON.</div>
+  `, async () => {
+    const raw = document.getElementById('editTA').value;
+    let val;
+    try { val = JSON.parse(raw); } catch { val = raw; }
+    try {
+      await set(ref(rtdb, path), val);
+      toast('Saved ✓', 'success');
+      window.closeModal();
+      go('db-explorer', { path: dbPath });
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Save');
+};
+
+window.delDb = function(path) {
+  openModal('Delete Node', `
+    <p style="color:var(--muted);font-size:14px">Delete everything at:</p>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:13px;margin:12px 0;padding:10px;background:rgba(248,113,113,0.07);border-radius:8px;color:var(--red)">${escH(path)}</p>
+    <p style="color:var(--muted);font-size:13px">Cannot be undone.</p>
+  `, async () => {
+    try {
+      await remove(ref(rtdb, path));
+      toast('Deleted', 'success');
+      window.closeModal();
+      go('db-explorer', { path: dbPath });
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Delete', 'btn-red');
+};
+
+window.addDbKey = function(parent) {
+  openModal('Add Key', `
+    <div style="margin-bottom:14px">
+      <label class="fi-label">Key Name</label>
+      <input class="fi fi-mono" id="newK" placeholder="keyName" style="width:100%">
+    </div>
+    <div>
+      <label class="fi-label">Value (string, number, JSON…)</label>
+      <textarea class="fi-ta" id="newV" placeholder='"hello"  or  42  or  true  or  {"nested":true}'></textarea>
+    </div>
+  `, async () => {
+    const k = document.getElementById('newK').value.trim();
+    const raw = document.getElementById('newV').value.trim();
+    if (!k) { toast('Key required', 'error'); return; }
+    let val;
+    try { val = JSON.parse(raw); } catch { val = raw; }
+    const fullPath = parent ? `${parent}/${k}` : k;
+    try {
+      await set(ref(rtdb, fullPath), val);
+      toast('Key added ✓', 'success');
+      window.closeModal();
+      go('db-explorer', { path: dbPath });
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Add');
+};
+
+// ══════════════════════════════════════════════════════════════
+// PROFILES
+// ══════════════════════════════════════════════════════════════
+async function renderProfiles(search) {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Profiles</div><div class="ph-sub">RTDB / PROFILES</div></div>
+    <div class="form-row">
+      <input class="fi wide" id="profSrch" placeholder="Search by username, email, or UID…" value="${escH(search)}" onkeydown="if(event.key==='Enter')searchProfiles(this.value)">
+      <button class="btn btn-accent" onclick="searchProfiles(document.getElementById('profSrch').value)">Search</button>
+      <button class="btn btn-ghost" onclick="goDb('PROFILES')">Open in DB Explorer</button>
+    </div>
+    <div id="profWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(query(ref(rtdb,'PROFILES'), limitToFirst(60)));
+    showProfiles(snap.val()||{}, search);
+  } catch(e) {
+    document.getElementById('profWrap').innerHTML = `<div class="err-msg">${escH(e.message)}</div>`;
+  }
+}
+
+window.searchProfiles = async function(term) {
+  document.getElementById('profWrap').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  try {
+    const snap = await get(ref(rtdb,'PROFILES'));
+    showProfiles(snap.val()||{}, term);
+  } catch(e) { document.getElementById('profWrap').innerHTML = `<div class="err-msg">${escH(e.message)}</div>`; }
+};
+
+function showProfiles(data, search) {
+  let entries = Object.entries(data);
+  if (search) {
+    const q = search.toLowerCase();
+    entries = entries.filter(([k,v]) =>
+      k.toLowerCase().includes(q) ||
+      String(v?.username||'').toLowerCase().includes(q) ||
+      String(v?.displayName||'').toLowerCase().includes(q) ||
+      String(v?.email||'').toLowerCase().includes(q)
+    );
+  }
+  if (!entries.length) { document.getElementById('profWrap').innerHTML='<div class="empty">No profiles found</div>'; return; }
+  const rows = entries.slice(0,100).map(([k,v]) => `<tr>
+    <td class="mono">${escH(k.slice(0,20))}${k.length>20?'…':''}</td>
+    <td>${escH(v?.username||v?.displayName||'—')}</td>
+    <td>${escH(v?.email||'—')}</td>
+    <td>${v?.isArtist ? '<span class="badge badge-approved">Artist</span>' : '<span style="color:var(--muted);font-size:11px">Fan</span>'}</td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-xs btn-ghost" onclick="goDb('PROFILES/${safePath(k)}')">Edit</button>
+      <button class="btn btn-xs btn-red" onclick="delDb('PROFILES/${safePath(k)}')">Del</button>
+    </td>
+  </tr>`).join('');
+  document.getElementById('profWrap').innerHTML = `
+    <div class="table-wrap"><table>
+      <thead><tr><th>UID</th><th>Username</th><th>Email</th><th>Type</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    ${entries.length>100?`<div style="font-size:12px;color:var(--muted);padding:10px">Showing 100 of ${entries.length}</div>`:''}
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════
+// SONGS (RTDB)
+// ══════════════════════════════════════════════════════════════
+async function renderRtdbSongs(search) {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Songs</div><div class="ph-sub">RTDB / SONGS</div></div>
+    <div class="form-row">
+      <input class="fi wide" id="songSrch" placeholder="Search by title or artist…" value="${escH(search)}" onkeydown="if(event.key==='Enter')searchSongs(this.value)">
+      <button class="btn btn-accent" onclick="searchSongs(document.getElementById('songSrch').value)">Search</button>
+      <button class="btn btn-ghost" onclick="goDb('SONGS')">Open in DB Explorer</button>
+    </div>
+    <div id="songWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(query(ref(rtdb,'SONGS'), limitToFirst(100)));
+    showSongs(snap.val()||{}, search);
+  } catch(e) {
+    document.getElementById('songWrap').innerHTML = `<div class="err-msg">${escH(e.message)}</div>`;
+  }
+}
+
+window.searchSongs = async function(term) {
+  document.getElementById('songWrap').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  const snap = await get(ref(rtdb,'SONGS'));
+  showSongs(snap.val()||{}, term);
+};
+
+function showSongs(data, search) {
+  let entries = Object.entries(data);
+  if (search) {
+    const q = search.toLowerCase();
+    entries = entries.filter(([k,v]) =>
+      (v?.title||'').toLowerCase().includes(q) ||
+      (v?.artist||v?.artistName||'').toLowerCase().includes(q) ||
+      k.toLowerCase().includes(q)
+    );
+  }
+  if (!entries.length) { document.getElementById('songWrap').innerHTML='<div class="empty">No songs found</div>'; return; }
+  const rows = entries.slice(0,100).map(([k,v]) => `<tr>
+    <td class="mono">${escH(k.slice(0,14))}${k.length>14?'…':''}</td>
+    <td>${escH(v?.title||'—')}</td>
+    <td>${escH(v?.artist||v?.artistName||'—')}</td>
+    <td>${v?.plays||v?.playCount||0}</td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-xs btn-ghost" onclick="goDb('SONGS/${safePath(k)}')">Edit</button>
+      <button class="btn btn-xs btn-red" onclick="delDb('SONGS/${safePath(k)}')">Del</button>
+    </td>
+  </tr>`).join('');
+  document.getElementById('songWrap').innerHTML = `
+    <div class="table-wrap"><table>
+      <thead><tr><th>Key</th><th>Title</th><th>Artist</th><th>Plays</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════
+// PARTIES
+// ══════════════════════════════════════════════════════════════
+async function renderParties() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Parties</div><div class="ph-sub">ASTEROID_PARTIES submissions</div></div>
+    <div class="ftabs">
+      <button class="ftab ${partyFilter==='all'?'active':''}" onclick="setPartyF('all')">All</button>
+      <button class="ftab ${partyFilter==='pending'?'active':''}" onclick="setPartyF('pending')">⏳ Pending</button>
+      <button class="ftab ${partyFilter==='approved'?'active':''}" onclick="setPartyF('approved')">✓ Approved</button>
+      <button class="ftab ${partyFilter==='rejected'?'active':''}" onclick="setPartyF('rejected')">✕ Rejected</button>
+    </div>
+    <div id="partyWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(ref(rtdb,'ASTEROID_PARTIES'));
+    showParties(snap.val()||{});
+  } catch(e) {
+    document.getElementById('partyWrap').innerHTML = `<div class="err-msg">${escH(e.message)}</div>`;
+  }
+}
+
+window.setPartyF = function(f) { partyFilter = f; renderParties(); };
+
+function showParties(data) {
+  let entries = Object.entries(data).sort((a,b) => (b[1].submittedAt||0)-(a[1].submittedAt||0));
+  if (partyFilter !== 'all') entries = entries.filter(([,v]) => (v.status||'pending') === partyFilter);
+  if (!entries.length) { document.getElementById('partyWrap').innerHTML='<div class="empty">No parties match filter</div>'; return; }
+
+  const cards = entries.map(([k,v]) => {
+    const st = v.status||'pending';
+    return `<div class="p-card ${st}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div class="p-name">${escH(v.venueName||v.partyName||v.name||'Unnamed Party')}</div>
+          <div class="p-meta">
+            ${v.city||v.location ? `📍 ${escH(v.city||v.location)}` : ''}
+            ${v.eventDate ? ` · 📅 ${escH(fmtTs(v.eventDate))}` : ''}
+            ${v.contactEmail ? ` · ✉ ${escH(v.contactEmail)}` : ''}
+            ${v.contactPhone ? ` · 📞 ${escH(v.contactPhone)}` : ''}
+            ${v.submittedAt ? ` · Submitted: ${fmtTs(v.submittedAt)}` : ''}
+          </div>
+          ${v.description ? `<div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5">${escH(v.description.slice(0,200))}${v.description.length>200?'…':''}</div>` : ''}
+        </div>
+        <span class="badge badge-${st}">${st}</span>
+      </div>
+      <div class="p-acts">
+        ${st!=='approved' ? `<button class="btn btn-sm btn-green" onclick="setPS('${k}','approved')">✓ Approve</button>` : ''}
+        ${st!=='rejected' ? `<button class="btn btn-sm btn-red" onclick="setPS('${k}','rejected')">✕ Reject</button>` : ''}
+        ${st!=='pending' ? `<button class="btn btn-sm btn-yellow" onclick="setPS('${k}','pending')">↺ Reset</button>` : ''}
+        <button class="btn btn-sm btn-ghost" onclick="goDb('ASTEROID_PARTIES/${k}')">View Raw</button>
+        <button class="btn btn-sm btn-red" onclick="delDb('ASTEROID_PARTIES/${k}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('partyWrap').innerHTML = cards;
+}
+
+window.setPS = async function(k, status) {
+  try {
+    await update(ref(rtdb,`ASTEROID_PARTIES/${k}`), { status, reviewedAt: Date.now() });
+    toast(`Party ${status} ✓`, 'success');
+    renderParties();
+  } catch(e) { toast('Error: '+e.message, 'error'); }
+};
+
+// ══════════════════════════════════════════════════════════════
+// FEATURE REQUESTS
+// ══════════════════════════════════════════════════════════════
+async function renderFR() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Feature Requests</div><div class="ph-sub">RTDB / FEATURE_REQUESTS</div></div>
+    <div style="margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" onclick="goDb('FEATURE_REQUESTS')">Open in DB Explorer</button>
+    </div>
+    <div id="frWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(ref(rtdb,'FEATURE_REQUESTS'));
+    const data = snap.val()||{};
+    const entries = Object.entries(data).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+    if (!entries.length) { document.getElementById('frWrap').innerHTML='<div class="empty">No feature requests</div>'; return; }
+    const rows = entries.map(([k,v]) => `<tr>
+      <td style="max-width:220px;white-space:normal">${escH((v.title||'—').slice(0,80))}</td>
+      <td>${escH(v.category||'—')}</td>
+      <td>${escH(v.authorName||'—')}</td>
+      <td style="max-width:200px;white-space:normal;font-size:12px;color:var(--muted)">${escH((v.description||'').slice(0,80))}${(v.description||'').length>80?'…':''}</td>
+      <td class="mono">${fmtTs(v.createdAt)}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-xs btn-ghost" onclick="goDb('FEATURE_REQUESTS/${safePath(k)}')">Edit</button>
+        <button class="btn btn-xs btn-red" onclick="delDb('FEATURE_REQUESTS/${safePath(k)}')">Del</button>
+      </td>
+    </tr>`).join('');
+    document.getElementById('frWrap').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Description</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  } catch(e) { document.getElementById('frWrap').innerHTML=`<div class="err-msg">${escH(e.message)}</div>`; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// SUBASTROIDS
+// ══════════════════════════════════════════════════════════════
+async function renderSubA() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">SubAsteroids</div><div class="ph-sub">Community posts & comments</div></div>
+    <div style="margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" onclick="goDb('subAsteroids')">Open in DB Explorer</button>
+    </div>
+    <div id="subWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(ref(rtdb,'subAsteroids'));
+    const data = snap.val()||{};
+    let posts = [];
+    for (const [sub, sd] of Object.entries(data)) {
+      if (sd?.posts) {
+        for (const [pid, p] of Object.entries(sd.posts)) {
+          posts.push({ sub, pid, ...p, comments: p.comments ? Object.keys(p.comments).length : 0 });
+        }
+      }
+    }
+    posts.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    if (!posts.length) { document.getElementById('subWrap').innerHTML='<div class="empty">No posts</div>'; return; }
+    const rows = posts.slice(0,100).map(p => `<tr>
+      <td>${escH(p.sub)}</td>
+      <td style="max-width:200px;white-space:normal">${escH((p.title||'—').slice(0,60))}</td>
+      <td>${escH(p.artist||'—')}</td>
+      <td>${p.comments}</td>
+      <td class="mono">${fmtTs(p.createdAt)}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-xs btn-ghost" onclick="goDb('subAsteroids/${p.sub}/posts/${safePath(p.pid)}')">Edit</button>
+        <button class="btn btn-xs btn-red" onclick="delDb('subAsteroids/${p.sub}/posts/${safePath(p.pid)}')">Del</button>
+      </td>
+    </tr>`).join('');
+    document.getElementById('subWrap').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Sub</th><th>Title</th><th>Artist</th><th>Comments</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  } catch(e) { document.getElementById('subWrap').innerHTML=`<div class="err-msg">${escH(e.message)}</div>`; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// LIVE ROOMS
+// ══════════════════════════════════════════════════════════════
+async function renderLiveRooms() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Live Rooms</div><div class="ph-sub">RTDB / LiveRooms</div></div>
+    <div style="margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" onclick="goDb('LiveRooms')">Open in DB Explorer</button>
+    </div>
+    <div id="lrWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(ref(rtdb,'LiveRooms'));
+    const data = snap.val()||{};
+    const entries = Object.entries(data);
+    if (!entries.length) { document.getElementById('lrWrap').innerHTML='<div class="empty">No live rooms</div>'; return; }
+    const rows = entries.map(([k,v]) => `<tr>
+      <td class="mono">${escH(k)}</td>
+      <td>${escH(v?.name||v?.title||'—')}</td>
+      <td>${escH(v?.host||v?.artistKey||'—')}</td>
+      <td>${escH(v?.isLive ? '🔴 Live' : '—')}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-xs btn-ghost" onclick="goDb('LiveRooms/${safePath(k)}')">Edit</button>
+        <button class="btn btn-xs btn-red" onclick="delDb('LiveRooms/${safePath(k)}')">Del</button>
+      </td>
+    </tr>`).join('');
+    document.getElementById('lrWrap').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Key</th><th>Name</th><th>Host</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  } catch(e) { document.getElementById('lrWrap').innerHTML=`<div class="err-msg">${escH(e.message)}</div>`; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// POLLS
+// ══════════════════════════════════════════════════════════════
+async function renderPolls() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Artist Polls</div><div class="ph-sub">RTDB / ARTIST_POLLS</div></div>
+    <div style="margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" onclick="goDb('ARTIST_POLLS')">Open in DB Explorer</button>
+    </div>
+    <div id="pollWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const snap = await get(query(ref(rtdb,'ARTIST_POLLS'), limitToFirst(60)));
+    const data = snap.val()||{};
+    const entries = Object.entries(data);
+    if (!entries.length) { document.getElementById('pollWrap').innerHTML='<div class="empty">No polls</div>'; return; }
+    const rows = entries.map(([k,v]) => {
+      const votes = v?.votes ? Object.keys(v.votes).length : 0;
+      return `<tr>
+        <td style="max-width:180px;white-space:normal">${escH((v?.question||v?.title||k).slice(0,80))}</td>
+        <td>${escH(v?.artistKey||'—')}</td>
+        <td>${votes}</td>
+        <td class="mono">${fmtTs(v?.createdAt||v?.ts)}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-xs btn-ghost" onclick="goDb('ARTIST_POLLS/${safePath(k)}')">Edit</button>
+          <button class="btn btn-xs btn-red" onclick="delDb('ARTIST_POLLS/${safePath(k)}')">Del</button>
+        </td>
+      </tr>`;
+    }).join('');
+    document.getElementById('pollWrap').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Question</th><th>Artist</th><th>Votes</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  } catch(e) { document.getElementById('pollWrap').innerHTML=`<div class="err-msg">${escH(e.message)}</div>`; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// FIRESTORE BROWSER
+// ══════════════════════════════════════════════════════════════
+const FS_LABELS = {
+  users: 'Users',
+  songs: 'Songs',
+  featureQueue: 'Feature Queue',
+  founding_supporters: 'Founding Supporters'
+};
+const FS_NOTES = {
+  users: 'Note: fields like <code>tier</code>, <code>partnerStatus</code>, <code>referral_count</code> are write-protected by Firestore rules. Use Firebase Console to edit those.',
+  founding_supporters: 'Read-only collection (write-protected by Firestore rules).'
+};
+
+async function renderFs(colName, cursor) {
+  fsCurCol = colName;
+  if (!cursor) fsCursor = null;
+
+  setHTML(`
+    <div class="ph"><div class="ph-title">Firestore: ${FS_LABELS[colName]||colName}</div><div class="ph-sub">Collection: ${colName}</div></div>
+    ${FS_NOTES[colName] ? `<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--yellow);margin-bottom:16px">${FS_NOTES[colName]}</div>` : ''}
+    <div style="margin-bottom:14px;display:flex;gap:8px">
+      <button class="btn btn-accent btn-sm" onclick="addFsDoc('${colName}')">+ Add Document</button>
+    </div>
+    <div id="fsWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+
+  try {
+    const colRef = collection(fs, colName);
+    const q = cursor
+      ? fq(colRef, orderBy('__name__'), startAfter(cursor), limit(25))
+      : fq(colRef, orderBy('__name__'), limit(25));
+    const snap = await getDocs(q);
+    const docs = snap.docs;
+    fsCursor = docs.length === 25 ? docs[docs.length-1] : null;
+
+    if (!docs.length && !cursor) {
+      document.getElementById('fsWrap').innerHTML = '<div class="empty">No documents found</div>';
+      return;
+    }
+
+    const rows = docs.map(d => {
+      const data = d.data();
+      const preview = Object.entries(data).slice(0,4).map(([k,v]) => {
+        const disp = v === null ? 'null' : typeof v === 'object' ? '{…}' : String(v).slice(0,35);
+        return `<span style="color:var(--muted);font-size:11px">${escH(k)}</span><span style="color:var(--faint);font-size:11px">: </span><span style="font-size:11px">${escH(disp)}</span>`;
+      }).join('<span style="color:var(--faint);font-size:11px;margin:0 6px">·</span>');
+      return `<tr>
+        <td class="mono">${escH(d.id)}</td>
+        <td style="max-width:480px;white-space:normal;line-height:1.8">${preview}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-xs btn-ghost" onclick="editFsDoc('${colName}','${d.id}')">Edit</button>
+          <button class="btn btn-xs btn-red" onclick="delFsDoc('${colName}','${d.id}')">Del</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('fsWrap').innerHTML = `
+      <div class="table-wrap"><table>
+        <thead><tr><th>Document ID</th><th>Preview</th><th>Actions</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+      ${fsCursor ? `<div style="text-align:center;padding:16px"><button class="btn btn-ghost" onclick="loadMoreFs('${colName}')">Load More</button></div>` : ''}
+    `;
+  } catch(e) {
+    document.getElementById('fsWrap').innerHTML = `<div class="err-msg">Error: ${escH(e.message)}</div>`;
+  }
+}
+
+window.loadMoreFs = async function(colName) {
+  if (!fsCursor) return;
+  const q = fq(collection(fs,colName), orderBy('__name__'), startAfter(fsCursor), limit(25));
+  const snap = await getDocs(q);
+  const docs = snap.docs;
+  fsCursor = docs.length===25 ? docs[docs.length-1] : null;
+  const tbody = document.querySelector('#fsWrap tbody');
+  if (!tbody) return;
+  docs.forEach(d => {
+    const data = d.data();
+    const preview = Object.entries(data).slice(0,4).map(([k,v]) => {
+      const disp = v===null?'null':typeof v==='object'?'{…}':String(v).slice(0,35);
+      return `<span style="color:var(--muted);font-size:11px">${escH(k)}</span>: <span style="font-size:11px">${escH(disp)}</span>`;
+    }).join(' · ');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="mono">${escH(d.id)}</td><td style="max-width:480px;white-space:normal">${preview}</td><td style="white-space:nowrap"><button class="btn btn-xs btn-ghost" onclick="editFsDoc('${colName}','${d.id}')">Edit</button><button class="btn btn-xs btn-red" onclick="delFsDoc('${colName}','${d.id}')">Del</button></td>`;
+    tbody.appendChild(tr);
+  });
+  if (!fsCursor) {
+    const btn = document.querySelector('#fsWrap .btn-ghost[onclick*="loadMoreFs"]');
+    if (btn) btn.parentElement.remove();
+  }
+};
+
+window.editFsDoc = async function(colName, docId) {
+  const snap = await getDoc(doc(fs, colName, docId));
+  if (!snap.exists()) { toast('Document not found', 'error'); return; }
+  const data = snap.data();
+  openModal(`Edit: ${docId}`, `
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:10px">📁 ${colName} / ${docId}</div>
+    <label class="fi-label">Document JSON</label>
+    <textarea class="fi-ta" id="fsDocTA" style="min-height:320px">${escH(JSON.stringify(data, null, 2))}</textarea>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px">⚠ Full overwrite (setDoc). Some fields may be restricted by Firestore rules.</div>
+  `, async () => {
+    let newData;
+    try { newData = JSON.parse(document.getElementById('fsDocTA').value); }
+    catch { toast('Invalid JSON', 'error'); return; }
+    try {
+      await setDoc(doc(fs, colName, docId), newData);
+      toast('Document saved ✓', 'success');
+      window.closeModal();
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Save');
+};
+
+window.delFsDoc = function(colName, docId) {
+  openModal('Delete Document', `
+    <p style="color:var(--muted);font-size:14px">Permanently delete:</p>
+    <p style="font-family:'JetBrains Mono',monospace;padding:10px;margin:12px 0;background:rgba(248,113,113,0.07);border-radius:8px;color:var(--red)">${colName} / ${docId}</p>
+    <p style="color:var(--muted);font-size:13px">Cannot be undone.</p>
+  `, async () => {
+    try {
+      await deleteDoc(doc(fs, colName, docId));
+      toast('Document deleted', 'success');
+      window.closeModal();
+      renderFs(colName, null);
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Delete', 'btn-red');
+};
+
+window.addFsDoc = function(colName) {
+  openModal('Add Document', `
+    <div style="margin-bottom:14px">
+      <label class="fi-label">Document ID (blank = auto)</label>
+      <input class="fi fi-mono" id="newFsId" placeholder="auto-generated" style="width:100%">
+    </div>
+    <div>
+      <label class="fi-label">Data (JSON)</label>
+      <textarea class="fi-ta" id="newFsData" style="min-height:180px" placeholder='{\n  "field": "value"\n}'></textarea>
+    </div>
+  `, async () => {
+    let data;
+    try { data = JSON.parse(document.getElementById('newFsData').value); }
+    catch { toast('Invalid JSON', 'error'); return; }
+    const id = document.getElementById('newFsId').value.trim();
+    try {
+      const colRef = collection(fs, colName);
+      const docRef = id ? doc(colRef, id) : doc(colRef);
+      await setDoc(docRef, data);
+      toast('Document created ✓', 'success');
+      window.closeModal();
+      renderFs(colName, null);
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+  }, 'Create');
+};
+
+</script>
+</body>
+</html>
