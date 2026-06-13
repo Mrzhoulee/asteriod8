@@ -1,49 +1,60 @@
-// Multi-account email. Accounts are defined in .env as a JSON array:
+// Multi-account email. Accounts are defined in .env with simple numbered keys:
 //
-//   GMAIL_ACCOUNTS=[
-//     {"label":"Personal","user":"me@gmail.com","pass":"xxxx-xxxx-xxxx-xxxx"},
-//     {"label":"Work","user":"work@company.com","pass":"yyyy-yyyy-yyyy-yyyy"},
-//     {"label":"Support","user":"support@company.com","pass":"zzzz-zzzz-zzzz-zzzz"}
-//   ]
+//   GMAIL_ACCOUNT_1_LABEL=Personal
+//   GMAIL_ACCOUNT_1_USER=me@gmail.com
+//   GMAIL_ACCOUNT_1_PASS=ernt xvok demw yzni
 //
-// Single-account legacy format still works (GMAIL_USER / GMAIL_PASS).
-// SMTP accounts can be mixed in too:
-//   {"label":"Outlook","host":"smtp.office365.com","port":587,"user":"...","pass":"..."}
+//   GMAIL_ACCOUNT_2_LABEL=Work
+//   GMAIL_ACCOUNT_2_USER=work@company.com
+//   GMAIL_ACCOUNT_2_PASS=yyyy yyyy yyyy yyyy
+//
+// (App-password spaces are stripped automatically.) For a non-Gmail SMTP
+// account, add GMAIL_ACCOUNT_N_HOST / _PORT / _SECURE.
+//
+// Single-account legacy format still works: GMAIL_USER / GMAIL_PASS or SMTP_*.
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const nodemailer = require('nodemailer');
+
+// Gmail app passwords are shown in groups of 4 with spaces — strip them.
+function cleanGmailPass(pass) {
+  return pass ? pass.replace(/\s+/g, '') : pass;
+}
 
 // ── Account loader ────────────────────────────────────────────────────────────
 
 function loadAccounts() {
   const accounts = [];
 
-  // Multi-account JSON array
-  if (process.env.GMAIL_ACCOUNTS) {
-    try {
-      const parsed = JSON.parse(process.env.GMAIL_ACCOUNTS);
-      for (const a of parsed) {
-        accounts.push({
-          label: a.label || a.user,
-          user: a.user,
-          pass: a.pass,
-          host: a.host || null,  // null = Gmail service
-          port: a.port || 587,
-          secure: a.secure || false,
-        });
-      }
-    } catch (e) {
-      console.error('[email] Could not parse GMAIL_ACCOUNTS JSON:', e.message);
-    }
+  // Numbered accounts: GMAIL_ACCOUNT_<N>_USER / _PASS / _LABEL / _HOST / ...
+  const indices = new Set();
+  for (const key of Object.keys(process.env)) {
+    const m = key.match(/^GMAIL_ACCOUNT_(\d+)_USER$/);
+    if (m) indices.add(parseInt(m[1], 10));
+  }
+  for (const n of [...indices].sort((a, b) => a - b)) {
+    const p = `GMAIL_ACCOUNT_${n}_`;
+    const user = process.env[`${p}USER`];
+    const pass = process.env[`${p}PASS`];
+    if (!user || !pass) continue;
+    const host = process.env[`${p}HOST`] || null;
+    accounts.push({
+      label: process.env[`${p}LABEL`] || user,
+      user,
+      pass: host ? pass : cleanGmailPass(pass), // only strip spaces for Gmail
+      host,
+      port: parseInt(process.env[`${p}PORT`] || '587', 10),
+      secure: process.env[`${p}SECURE`] === 'true',
+    });
   }
 
-  // Legacy single account — added as "default" if not already in array
+  // Legacy single Gmail account
   if (process.env.GMAIL_USER && process.env.GMAIL_PASS) {
     const already = accounts.some((a) => a.user === process.env.GMAIL_USER);
     if (!already) {
       accounts.unshift({
         label: 'default',
         user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS,
+        pass: cleanGmailPass(process.env.GMAIL_PASS),
         host: null,
       });
     }
