@@ -87,6 +87,9 @@ async function fetchGA4Report({ propertyId, startDate = '7daysAgo', endDate = 't
   });
 
   const data = await res.json();
+  if (res.status === 401) {
+    return { success: false, error: 'GA4 access token expired or invalid. OAuth Playground tokens last ~1 hour — get a fresh one, or switch to GOOGLE_SERVICE_ACCOUNT_JSON for auto-refresh.' };
+  }
   if (!res.ok) return { success: false, error: data.error?.message || `GA4 API ${res.status}` };
 
   // Flatten into readable rows
