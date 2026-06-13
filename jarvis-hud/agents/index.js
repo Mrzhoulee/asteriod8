@@ -48,6 +48,8 @@ async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
     { role: 'user', content: message },
   ];
 
+  let assistantText = ''; // accumulates all visible JARVIS text across the loop
+
   // Agentic loop — keeps going while JARVIS wants to use tools
   while (true) {
     const stream = client.messages.stream({
@@ -63,6 +65,7 @@ async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
         event.type === 'content_block_delta' &&
         event.delta.type === 'text_delta'
       ) {
+        assistantText += event.delta.text;
         if (onToken) onToken(event.delta.text);
       }
     }
@@ -73,6 +76,8 @@ async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
     messages.push({ role: 'assistant', content: finalMsg.content });
 
     if (finalMsg.stop_reason !== 'tool_use') break;
+
+    if (assistantText && !assistantText.endsWith('\n')) assistantText += '\n';
 
     // Process all tool calls and collect results
     const toolResults = [];
@@ -96,6 +101,8 @@ async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
     // Feed results back so JARVIS can respond
     messages.push({ role: 'user', content: toolResults });
   }
+
+  return assistantText;
 }
 
 module.exports = { runJarvis, runSubAgent };

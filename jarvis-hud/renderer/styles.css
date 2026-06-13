@@ -275,9 +275,14 @@ body {
   margin-top: 6px;
 }
 
-.tool-result-badge.email  { border-color: rgba(255, 110, 180, 0.3); color: var(--hannah); background: rgba(255,110,180,0.06); }
-.tool-result-badge.shell  { border-color: rgba(0, 255, 136, 0.3);   color: var(--marcus); background: rgba(0,255,136,0.06); }
-.tool-result-badge.url    { border-color: rgba(255, 170, 0, 0.3);   color: var(--rob);    background: rgba(255,170,0,0.06); }
+.tool-result-badge.email    { border-color: rgba(255, 110, 180, 0.3); color: var(--hannah); background: rgba(255,110,180,0.06); }
+.tool-result-badge.shell    { border-color: rgba(0, 255, 136, 0.3);   color: var(--marcus); background: rgba(0,255,136,0.06); }
+.tool-result-badge.url      { border-color: rgba(255, 170, 0, 0.3);   color: var(--rob);    background: rgba(255,170,0,0.06); }
+.tool-result-badge.mac      { border-color: rgba(0, 212, 255, 0.3);   color: var(--jarvis); background: rgba(0,212,255,0.06); }
+.tool-result-badge.social   { border-color: rgba(255, 110, 180, 0.3); color: var(--hannah); background: rgba(255,110,180,0.06); }
+.tool-result-badge.calendar { border-color: rgba(255, 170, 0, 0.3);   color: var(--rob);    background: rgba(255,170,0,0.06); }
+.tool-result-badge.web      { border-color: rgba(120, 180, 255, 0.35); color: #78b4ff;       background: rgba(120,180,255,0.06); }
+.tool-result-badge.file     { border-color: rgba(0, 255, 136, 0.3);   color: var(--marcus); background: rgba(0,255,136,0.06); }
 
 /* ─── Input Bar ──────────────────────────────────────────────── */
 #input-bar {

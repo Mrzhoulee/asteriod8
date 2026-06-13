@@ -1,11 +1,15 @@
 {
   "name": "jarvis-hud",
-  "version": "1.0.0",
-  "description": "Multi-agent JARVIS HUD overlay — powered by Claude",
+  "version": "1.1.0",
+  "description": "Multi-agent JARVIS HUD — a Claude-powered macOS assistant that can control your computer, post to social, schedule calls, check analytics, and more.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "ELECTRON_ENABLE_LOGGING=1 electron ."
+    "dev": "ELECTRON_ENABLE_LOGGING=1 electron .",
+    "icon": "node scripts/gen-icon.js && bash scripts/make-icns.sh",
+    "pack": "npm run icon && electron-builder --dir",
+    "dist": "npm run icon && electron-builder",
+    "postinstall": "node scripts/gen-icon.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
@@ -14,6 +18,37 @@
     "nodemailer": "^6.9.15"
   },
   "devDependencies": {
-    "electron": "^35.1.0"
+    "electron": "^35.1.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.jarvis.hud",
+    "productName": "JARVIS",
+    "files": [
+      "**/*",
+      "!**/*.md",
+      "!.env",
+      "!.env.example",
+      "!scripts/${/*}"
+    ],
+    "extraMetadata": {
+      "main": "main.js"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns",
+      "target": [
+        { "target": "dmg", "arch": ["arm64", "x64"] },
+        "dir"
+      ],
+      "extendInfo": {
+        "LSUIElement": false,
+        "NSMicrophoneUsageDescription": "JARVIS uses the microphone for voice commands.",
+        "NSAppleEventsUsageDescription": "JARVIS uses AppleScript to automate apps you ask it to control."
+      }
+    },
+    "dmg": {
+      "title": "JARVIS"
+    }
   }
 }

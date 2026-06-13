@@ -1,7 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const MEMORY_PATH = path.join(__dirname, '../memory/context.json');
+// In a packaged .app the bundle is read-only, so main sets JARVIS_DATA_DIR to a
+// writable userData path. In dev we fall back to the project's memory/ folder.
+const MEMORY_PATH = process.env.JARVIS_DATA_DIR
+  ? path.join(process.env.JARVIS_DATA_DIR, 'context.json')
+  : path.join(__dirname, '../memory/context.json');
 const MAX_ENTRIES = 20;
 const CONTEXT_WINDOW = 10;
 

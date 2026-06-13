@@ -29,7 +29,7 @@ function getTransporter() {
   return _transporter;
 }
 
-async function sendEmail({ to, subject, body, cc }) {
+async function sendEmail({ to, subject, body, cc, attachmentPath }) {
   const transport = getTransporter();
   if (!transport) {
     return {
@@ -41,6 +41,14 @@ async function sendEmail({ to, subject, body, cc }) {
   const from = process.env.GMAIL_USER || process.env.SMTP_USER;
   const isHtml = /<[a-z][\s\S]*>/i.test(body);
 
+  const attachments = [];
+  if (attachmentPath) {
+    const fs = require('fs');
+    if (fs.existsSync(attachmentPath)) {
+      attachments.push({ path: attachmentPath });
+    }
+  }
+
   try {
     const info = await transport.sendMail({
       from,
@@ -48,6 +56,7 @@ async function sendEmail({ to, subject, body, cc }) {
       cc: cc || undefined,
       subject,
       ...(isHtml ? { html: body } : { text: body }),
+      ...(attachments.length ? { attachments } : {}),
     });
     return { success: true, messageId: info.messageId };
   } catch (err) {

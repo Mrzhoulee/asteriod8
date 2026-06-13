@@ -122,27 +122,45 @@ function finishBubble(agent) {
 }
 
 /** Add a tool-result badge below the current JARVIS message. */
-function addToolBadge(tool, result) {
+function addToolBadge(tool, result, extra) {
   const bodyId = state.currentMsgId.jarvis;
   const target = bodyId ? $(bodyId)?.parentElement : $('jarvis-messages').lastElementChild;
   if (!target) return;
 
-  const badge = document.createElement('div');
-  const typeMap = { send_email: 'email', run_shell_command: 'shell', open_url: 'url', delegate_to_agent: 'delegate' };
+  // Map each tool to a colour class + icon.
+  const typeMap = {
+    send_email: 'email', run_command: 'shell', open_url: 'url',
+    run_applescript: 'shell', control_mac: 'mac', post_social: 'social',
+    schedule_event: 'calendar', web_request: 'web', write_file: 'file',
+  };
   const cls = typeMap[tool] || '';
-  badge.className = `tool-result-badge ${cls}`;
-
-  const icons = { email: '✉', shell: '⚡', url: '🔗', delegate: '→' };
+  const icons = {
+    email: '✉', shell: '⚡', url: '🔗', mac: '🖥', social: '📣',
+    calendar: '📅', web: '🌐', file: '📄',
+  };
   const icon = icons[cls] || '◆';
 
-  let label = '';
-  if (tool === 'send_email')        label = result?.success ? 'Email sent' : `Email failed: ${result?.error}`;
-  else if (tool === 'run_shell_command') label = result?.success ? `$ ${result.stdout?.substring(0, 60) || 'done'}` : `Error: ${result?.error?.substring(0, 60)}`;
-  else if (tool === 'open_url')     label = `Opened: ${result?.url}`;
-  else label = tool;
+  const ok = result?.success;
+  const err = (result?.error || '').substring(0, 70);
+  let label;
+  switch (tool) {
+    case 'send_email':      label = ok ? `Email sent to ${result?.to || ''}`.trim() : `Email failed: ${err}`; break;
+    case 'run_command':     label = ok ? `$ ${(result.stdout || 'done').substring(0, 60)}` : `Error: ${err}`; break;
+    case 'run_applescript': label = ok ? 'AppleScript ran' : `AppleScript failed: ${err}`; break;
+    case 'control_mac':     label = ok ? `Mac: ${extra?.action || 'action'}` : `Mac action failed: ${err}`; break;
+    case 'open_url':        label = `Opened ${result?.url || ''}`; break;
+    case 'post_social':     label = result?.needsBrowser ? `Opened ${result.platform} composer` : (ok ? `Posted to ${result?.platform || 'social'}` : `Post failed: ${err}`); break;
+    case 'schedule_event':  label = ok ? `Scheduled: ${result?.title || 'event'}` : `Schedule failed: ${err}`; break;
+    case 'web_request':     label = ok ? `${result?.status} ${result?.contentType?.split(';')[0] || ''}`.trim() : `Request failed: ${err}`; break;
+    case 'write_file':      label = ok ? `Wrote ${result?.path || 'file'}` : `Write failed: ${err}`; break;
+    default:                label = tool;
+  }
 
+  const badge = document.createElement('div');
+  badge.className = `tool-result-badge ${cls}`;
   badge.textContent = `${icon} ${label}`;
   target.appendChild(badge);
+  scrollToBottom($('jarvis-messages'));
 }
 
 /** Show a delegation notice in the sub-agent panel. */
@@ -197,8 +215,8 @@ async function sendMessage(skipConfirm = false) {
   setHeaderStatus('PROCESSING');
   $('send-btn').disabled = true;
 
-  // Save user turn to memory
-  await window.jarvis.saveMemory({ role: 'user', agent: 'user', content: text });
+  // Memory is persisted by the main process (user + assistant turns) to keep a
+  // single source of truth and correct ordering.
 
   // Start JARVIS bubble
   startAgentBubble('jarvis');
@@ -243,14 +261,9 @@ function setupIPCListeners() {
 
     const jarvisResponse = state.buffers.jarvis;
 
-    // TTS for JARVIS response
+    // TTS for JARVIS response (memory is persisted by the main process)
     if (state.ttsEnabled && jarvisResponse && jarvisResponse.length < 600) {
       window.jarvis.speak(jarvisResponse);
-    }
-
-    // Persist JARVIS response
-    if (jarvisResponse) {
-      window.jarvis.saveMemory({ role: 'assistant', agent: 'jarvis', content: jarvisResponse });
     }
 
     // Reset state
@@ -293,14 +306,9 @@ function setupIPCListeners() {
     showDelegationBadge(subAgent, task);
   });
 
-  // Delegation end
+  // Delegation end (memory is persisted by the main process)
   window.jarvis.onDelegateEnd(({ subAgent }) => {
     if (state.currentMsgId[subAgent]) finishBubble(subAgent);
-
-    const response = state.buffers[subAgent];
-    if (response) {
-      window.jarvis.saveMemory({ role: 'assistant', agent: subAgent, content: response });
-    }
 
     setStatus(subAgent, 'DONE');
     setDot(subAgent, false);
@@ -312,8 +320,8 @@ function setupIPCListeners() {
   });
 
   // Tool result
-  window.jarvis.onToolResult(({ tool, result }) => {
-    addToolBadge(tool, result);
+  window.jarvis.onToolResult(({ tool, result, action }) => {
+    addToolBadge(tool, result, { action });
   });
 }
 

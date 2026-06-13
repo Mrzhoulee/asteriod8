@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+*.log
+
+# Generated icons (run `npm run icon` to recreate)
+build/icon.icns
+build/icon.iconset/
