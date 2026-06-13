@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JARVIS HUD</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="hud">
+
+  <!-- Title Bar -->
+  <div id="titlebar">
+    <div class="title-logo">
+      J.A.R.V.I.S
+      <span>HUD v1.0 — MULTI-AGENT</span>
+    </div>
+    <span class="header-status" id="header-status">READY</span>
+    <div class="window-controls">
+      <button class="wc-btn hide"  id="btn-hide"  title="Hide (⌘⇧J)"></button>
+      <button class="wc-btn min"   id="btn-min"   title="Minimize"></button>
+      <button class="wc-btn close" id="btn-close" title="Quit"></button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="content">
+
+    <!-- JARVIS Panel -->
+    <div id="jarvis-panel">
+      <div class="panel-header">
+        <div class="panel-dot" id="jarvis-dot" style="--agent-color:var(--jarvis)"></div>
+        <span class="panel-name" style="--agent-color:var(--jarvis);--agent-glow:var(--jarvis-glow)">J.A.R.V.I.S</span>
+        <span class="panel-role">CENTER BRAIN</span>
+        <span class="panel-status" id="jarvis-status">IDLE</span>
+      </div>
+      <div class="messages" id="jarvis-messages">
+        <div class="empty-hint" id="jarvis-hint">
+          Ask me anything. I can delegate to my team,<br>
+          send emails, run shell commands, and open URLs.<br><br>
+          <span class="shortcut">⌘⇧J</span> to toggle this window.
+        </div>
+      </div>
+      <div id="input-bar">
+        <button class="icon-btn" id="tts-btn"   title="Toggle voice responses">🔊</button>
+        <button class="icon-btn" id="voice-btn" title="Hold to record (Groq Whisper)">🎤</button>
+        <input  type="text"      id="user-input" placeholder="Talk to JARVIS…" autocomplete="off" spellcheck="false" />
+        <button id="send-btn" title="Send (Enter)">➤</button>
+      </div>
+    </div>
+
+    <!-- Sub-agent Sidebar -->
+    <div id="agents-sidebar">
+
+      <!-- Hannah -->
+      <div class="agent-panel" data-agent="hannah" id="panel-hannah">
+        <div class="panel-header">
+          <div class="panel-dot" id="hannah-dot"></div>
+          <span class="panel-name">HANNAH</span>
+          <span class="panel-role">MARKETING</span>
+          <span class="panel-status" id="hannah-status">IDLE</span>
+        </div>
+        <div class="messages" id="hannah-messages">
+          <div class="empty-hint">Campaigns · Copywriting · Strategy</div>
+        </div>
+      </div>
+
+      <!-- Marcus -->
+      <div class="agent-panel" data-agent="marcus" id="panel-marcus">
+        <div class="panel-header">
+          <div class="panel-dot" id="marcus-dot"></div>
+          <span class="panel-name">MARCUS</span>
+          <span class="panel-role">DEVELOPER</span>
+          <span class="panel-status" id="marcus-status">IDLE</span>
+        </div>
+        <div class="messages" id="marcus-messages">
+          <div class="empty-hint">Code · Debug · Architecture</div>
+        </div>
+      </div>
+
+      <!-- Rob -->
+      <div class="agent-panel" data-agent="rob" id="panel-rob">
+        <div class="panel-header">
+          <div class="panel-dot" id="rob-dot"></div>
+          <span class="panel-name">ROB</span>
+          <span class="panel-role">CUSTOMER SUCCESS</span>
+          <span class="panel-status" id="rob-status">IDLE</span>
+        </div>
+        <div class="messages" id="rob-messages">
+          <div class="empty-hint">De-escalation · Communications · Retention</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
