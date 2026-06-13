@@ -34,6 +34,8 @@ const { postSocial } = require('./tools/social');
 const { postTikTokVideo, postTikTokPhotos, getTikTokAnalytics } = require('./tools/tiktok');
 const { postInstagramPhoto, postInstagramReel, postInstagramCarousel, getInstagramInsights, getInstagramMedia } = require('./tools/instagram');
 const { fetchGA4Report, fetchAppStoreSales, fetchAppStoreApps, fetchAppStoreReviews } = require('./tools/analytics');
+const appfigures = require('./tools/appfigures');
+const mailchimp = require('./tools/mailchimp');
 const { scheduleEvent } = require('./tools/calendar');
 const { webRequest } = require('./tools/web');
 const files = require('./tools/files');
@@ -320,10 +322,69 @@ function buildToolHandler(send, skipConfirm) {
           case 'appstore_reviews':
             result = await fetchAppStoreReviews({ appId: input.appId });
             break;
+          case 'appfigures_sales':
+            result = await appfigures.fetchSales({ startDate: input.startDate, endDate: input.endDate, groupBy: input.groupBy });
+            break;
+          case 'appfigures_reviews':
+            result = await appfigures.fetchReviews({});
+            break;
+          case 'appfigures_ratings':
+            result = await appfigures.fetchRatings();
+            break;
+          case 'appfigures_products':
+            result = await appfigures.fetchProducts();
+            break;
           default:
-            result = { success: false, error: `Unknown analytics source: "${input.source}". Use ga4, appstore, appstore_apps, or appstore_reviews.` };
+            result = { success: false, error: `Unknown analytics source: "${input.source}".` };
         }
         send('agent:tool_result', { tool: 'get_analytics', result });
+        return JSON.stringify(result);
+      }
+
+      // ── Mailchimp ────────────────────────────────────────────
+      case 'mailchimp': {
+        let result;
+        switch (input.action) {
+          case 'list_audiences':
+            result = await mailchimp.listAudiences();
+            break;
+          case 'audience_stats':
+            result = await mailchimp.audienceStats(input.listId);
+            break;
+          case 'add_subscriber':
+            result = await mailchimp.addSubscriber(input);
+            break;
+          case 'list_campaigns':
+            result = await mailchimp.listCampaigns({});
+            break;
+          case 'create_campaign': {
+            // Sending a campaign blasts real subscribers — confirm first.
+            if (input.send && !skipConfirm) {
+              const audience = await mailchimp.audienceStats(input.listId);
+              const count = audience.success ? audience.members : '?';
+              const ok = await confirm({
+                danger: true,
+                title: 'Send Mailchimp campaign',
+                message: `Send "${input.subject}" to ${count} subscribers?`,
+                detail: `From: ${input.fromName} <${input.replyTo}>\n\nThis emails your entire audience and cannot be undone.`,
+              });
+              if (!ok) {
+                result = await mailchimp.createCampaign({ ...input, send: false });
+                result.note = 'User declined to send — saved as a draft instead.';
+                send('agent:tool_result', { tool: 'mailchimp', result, action: input.action });
+                return JSON.stringify(result);
+              }
+            }
+            result = await mailchimp.createCampaign(input);
+            break;
+          }
+          case 'campaign_report':
+            result = await mailchimp.campaignReport(input.campaignId);
+            break;
+          default:
+            result = { success: false, error: `Unknown mailchimp action: "${input.action}".` };
+        }
+        send('agent:tool_result', { tool: 'mailchimp', result, action: input.action });
         return JSON.stringify(result);
       }
 

@@ -18,7 +18,8 @@ Your capabilities (tools):
 - send_email — send mail (confirmation dialog first).
 - open_url — open links.
 - post_social — post to TikTok (video/photos), Instagram (photo/reel/carousel), X, LinkedIn, Facebook, Threads, Reddit. For TikTok/Instagram, pass mediaUrl or mediaUrls (public HTTPS URLs).
-- get_analytics — fetch Google Analytics (GA4) data, App Store Connect sales/downloads/reviews. Specify source: "ga4", "appstore", "appstore_apps", or "appstore_reviews".
+- get_analytics — fetch Google Analytics (GA4), App Store Connect, or Appfigures (cross-store sales/reviews/ratings). Sources: "ga4", "appstore", "appstore_apps", "appstore_reviews", "appfigures_sales", "appfigures_reviews", "appfigures_ratings", "appfigures_products".
+- mailchimp — email marketing: list audiences, view stats, add subscribers, create/send campaigns, get campaign reports.
 - web_request — call any web API with a configured auth profile, including Fastlane AI (use authProfile:"fastlane").
 - schedule_event — book calls/meetings into Calendar and generate .ics invites.
 - read_file / write_file / list_directory — work with the filesystem.

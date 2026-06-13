@@ -132,13 +132,16 @@ function addToolBadge(tool, result, extra) {
     send_email: 'email', run_command: 'shell', open_url: 'url',
     run_applescript: 'shell', control_mac: 'mac', post_social: 'social',
     schedule_event: 'calendar', web_request: 'web', write_file: 'file',
+    get_analytics: 'web', mailchimp: 'social',
   };
   const cls = typeMap[tool] || '';
   const icons = {
     email: '✉', shell: '⚡', url: '🔗', mac: '🖥', social: '📣',
     calendar: '📅', web: '🌐', file: '📄',
   };
-  const icon = icons[cls] || '◆';
+  let icon = icons[cls] || '◆';
+  if (tool === 'get_analytics') icon = '📊';
+  if (tool === 'mailchimp') icon = '🐵';
 
   const ok = result?.success;
   const err = (result?.error || '').substring(0, 70);
@@ -153,6 +156,8 @@ function addToolBadge(tool, result, extra) {
     case 'schedule_event':  label = ok ? `Scheduled: ${result?.title || 'event'}` : `Schedule failed: ${err}`; break;
     case 'web_request':     label = ok ? `${result?.status} ${result?.contentType?.split(';')[0] || ''}`.trim() : `Request failed: ${err}`; break;
     case 'write_file':      label = ok ? `Wrote ${result?.path || 'file'}` : `Write failed: ${err}`; break;
+    case 'get_analytics':   label = ok ? `Analytics: ${(result?.rows?.length ?? result?.summary?.length ?? result?.reviews?.length ?? result?.products?.length ?? 'data')} rows` : `Analytics failed: ${err}`; break;
+    case 'mailchimp':       label = ok ? (result?.sent ? 'Campaign sent' : (result?.audiences ? `${result.audiences.length} audiences` : (result?.campaignId ? 'Campaign drafted' : 'Mailchimp OK'))) : `Mailchimp failed: ${err}`; break;
     default:                label = tool;
   }
 

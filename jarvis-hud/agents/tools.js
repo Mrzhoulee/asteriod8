@@ -116,20 +116,52 @@ const JARVIS_TOOLS = [
   {
     name: 'get_analytics',
     description:
-      'Fetch analytics from Google Analytics (GA4) or App Store Connect. For GA4, asks for users/sessions/pageviews over a date range. For App Store, fetches sales/downloads reports and can fetch app reviews.',
+      'Fetch analytics. Sources: "ga4" (Google Analytics users/sessions/pageviews), "appstore"/"appstore_reviews"/"appstore_apps" (App Store Connect), "appfigures_sales"/"appfigures_reviews"/"appfigures_ratings"/"appfigures_products" (Appfigures cross-store app analytics).',
     input_schema: {
       type: 'object',
       properties: {
-        source: { type: 'string', enum: ['ga4', 'appstore', 'appstore_reviews', 'appstore_apps'], description: 'Which analytics source to query.' },
-        startDate: { type: 'string', description: 'GA4: "7daysAgo", "30daysAgo", or "YYYY-MM-DD". App Store: "YYYY-MM" for monthly.' },
-        endDate: { type: 'string', description: 'GA4: "today" or "YYYY-MM-DD".' },
-        metrics: { type: 'array', items: { type: 'string' }, description: 'GA4: metric names (e.g. ["activeUsers","sessions"]). App Store: ignored.' },
+        source: {
+          type: 'string',
+          enum: ['ga4', 'appstore', 'appstore_reviews', 'appstore_apps', 'appfigures_sales', 'appfigures_reviews', 'appfigures_ratings', 'appfigures_products'],
+          description: 'Which analytics source to query.',
+        },
+        startDate: { type: 'string', description: 'GA4: "7daysAgo"/"YYYY-MM-DD". App Store: "YYYY-MM". Appfigures: "YYYY-MM-DD".' },
+        endDate: { type: 'string', description: 'End date where applicable ("today" or "YYYY-MM-DD").' },
+        metrics: { type: 'array', items: { type: 'string' }, description: 'GA4 metric names (e.g. ["activeUsers","sessions"]).' },
         dimensions: { type: 'array', items: { type: 'string' }, description: 'GA4 dimension names (e.g. ["date","country"]).' },
-        propertyId: { type: 'string', description: 'GA4 property ID (overrides GOOGLE_ANALYTICS_PROPERTY_ID in .env).' },
-        frequency: { type: 'string', description: 'App Store report frequency: DAILY, WEEKLY, or MONTHLY.' },
-        appId: { type: 'string', description: 'App Store app ID (needed for appstore_reviews). Get it via source="appstore_apps".' },
+        propertyId: { type: 'string', description: 'GA4 property ID override.' },
+        frequency: { type: 'string', description: 'App Store report frequency: DAILY, WEEKLY, MONTHLY.' },
+        appId: { type: 'string', description: 'App Store app ID (for appstore_reviews).' },
+        groupBy: { type: 'string', description: 'Appfigures sales grouping: product, date, country, or store.' },
       },
       required: ['source'],
+    },
+  },
+
+  {
+    name: 'mailchimp',
+    description:
+      'Manage Mailchimp email marketing. Actions: list_audiences, audience_stats, add_subscriber, list_campaigns, create_campaign (optionally send), campaign_report.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        action: {
+          type: 'string',
+          enum: ['list_audiences', 'audience_stats', 'add_subscriber', 'list_campaigns', 'create_campaign', 'campaign_report'],
+        },
+        listId: { type: 'string', description: 'Audience/list ID (from list_audiences).' },
+        email: { type: 'string', description: 'Subscriber email (add_subscriber).' },
+        firstName: { type: 'string' },
+        lastName: { type: 'string' },
+        subject: { type: 'string', description: 'Campaign subject line (create_campaign).' },
+        fromName: { type: 'string', description: 'Sender name (create_campaign).' },
+        replyTo: { type: 'string', description: 'Reply-to email (create_campaign).' },
+        html: { type: 'string', description: 'Campaign HTML body (create_campaign).' },
+        title: { type: 'string', description: 'Internal campaign name.' },
+        send: { type: 'boolean', description: 'create_campaign: send immediately instead of saving a draft.' },
+        campaignId: { type: 'string', description: 'Campaign ID (campaign_report).' },
+      },
+      required: ['action'],
     },
   },
 
