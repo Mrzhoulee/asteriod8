@@ -542,24 +542,31 @@
       if (p.publicProfile === false) return true;
       return false;
     }
+    const RTDB_REST_BASE = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
     async function loadVipFromRtdb() {
-      // Fallback: aggregate RTDB referralCounts + PROFILES/nicknames.
-      // Hide users whose profile is private.
-      const [countsSnap, profilesSnap] = await Promise.all([
-        get(ref(db, 'referralCounts')).catch(() => null),
-        get(ref(db, 'PROFILES')).catch(() => null)
+      // The Firebase SDK websocket can stall inside the iOS WebView, which made
+      // this tab "load forever". Plain REST GETs are tiny here and resolve fast
+      // and reliably. Aggregate referralCounts + PROFILES/nicknames; hide
+      // users whose profile is private.
+      const [counts, profiles] = await Promise.all([
+        fetch(RTDB_REST_BASE + '/referralCounts.json', { cache: 'no-store' })
+          .then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch(RTDB_REST_BASE + '/PROFILES.json', { cache: 'no-store' })
+          .then(r => r.ok ? r.json() : null).catch(() => null)
       ]);
-      const counts = (countsSnap && countsSnap.exists()) ? countsSnap.val() : {};
-      const profiles = (profilesSnap && profilesSnap.exists()) ? profilesSnap.val() : {};
-      const artists = Object.keys(counts).map((key) => {
-        const c = counts[key] || {};
-        const p = profiles[key] || {};
-        const count = Number(c.count || c.referralCount || 0);
+      const c = counts || {};
+      const p = profiles || {};
+      const artists = Object.keys(c).map((key) => {
+        const v = c[key] || {};
+        const prof = p[key] || {};
+        // Successful referrals are stored under the user's emailKey as `count`
+        // (referral *codes* store `clicks`, which we ignore here).
+        const count = Number(v.count || v.referralCount || v.signups || 0);
         return {
           uid: key,
-          username: p.username || p.nickname || key.split('@')[0] || 'Artist',
+          username: prof.nickname || prof.username || prof.fullName || key.split('@')[0] || 'Artist',
           referralCount: count,
-          _profile: p
+          _profile: prof
         };
       }).filter(a => a.referralCount > 0 && !isProfilePrivate(a._profile));
       artists.sort((a, b) => b.referralCount - a.referralCount);
@@ -567,45 +574,14 @@
     }
     async function loadVip() {
       vipLoaded = true;
-      const el = document.getElementById('vipList');
-      // Safety net: if nothing resolves within 8 s, show empty state.
-      let resolved = false;
-      const safetyTimer = setTimeout(() => {
-        if (!resolved) { resolved = true; renderVipList([]); }
-      }, 8000);
-
-      const finish = (artists) => {
-        if (resolved) return;
-        resolved = true;
-        clearTimeout(safetyTimer);
+      try {
+        const artists = await loadVipFromRtdb();
         renderVipList(artists);
-      };
-
-      try {
-        const rtdbArtists = await loadVipFromRtdb();
-        if (rtdbArtists.length) { finish(rtdbArtists); return; }
       } catch (e) {
-        console.warn('VIP RTDB load', e);
+        console.warn('VIP load failed', e);
+        vipLoaded = false; // allow a retry on next tab click
+        renderVipList([]);
       }
-      try {
-        const mod = await import('./js/referral-system.js');
-        if (typeof mod.subscribeToTopVipArtists === 'function') {
-          const profilesSnap = await get(ref(db, 'PROFILES')).catch(() => null);
-          const profiles = (profilesSnap && profilesSnap.exists()) ? profilesSnap.val() : {};
-          mod.subscribeToTopVipArtists(50, (artists) => {
-            const visible = (artists || []).filter(a => {
-              const emailKey = (a.email || '').replace(/[.#$[\]]/g, '_');
-              const p = emailKey ? profiles[emailKey] : null;
-              return !isProfilePrivate(p);
-            });
-            finish(visible);
-          });
-          return;
-        }
-      } catch (e) {
-        console.warn('VIP firestore load', e);
-      }
-      finish([]);
     }
 
     (async () => {

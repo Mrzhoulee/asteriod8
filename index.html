@@ -2021,8 +2021,9 @@ body.create-profile-active {
   .ob-desc { font-size: 13px; }
   .ob-feat { padding: 10px 12px; }
 }
-.logout-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-.logout-modal .logout-modal-box { background: #0a0a0a; color: #fff; padding: 28px 32px; border-radius: 20px; width: 100%; max-width: 380px; border: 1px solid rgba(255,127,80,0.25); box-shadow: 0 24px 48px rgba(0,0,0,0.5); font-family: 'Poppins', sans-serif; }
+.logout-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100000; align-items: center; justify-content: center; padding: 20px; pointer-events: auto; touch-action: manipulation; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.logout-modal .logout-modal-box { background: #0a0a0a; color: #fff; padding: 28px 32px; border-radius: 20px; width: 100%; max-width: 380px; max-height: min(90vh, 720px); overflow-y: auto; -webkit-overflow-scrolling: touch; border: 1px solid rgba(255,127,80,0.25); box-shadow: 0 24px 48px rgba(0,0,0,0.5); font-family: 'Poppins', sans-serif; position: relative; z-index: 1; pointer-events: auto; }
+#switchToArtistBtn, #switchToListenerBtn { position: relative; z-index: 5; pointer-events: auto !important; touch-action: manipulation; -webkit-tap-highlight-color: transparent; min-height: 44px; }
 .logout-modal-header { display: flex; align-items: center; margin-bottom: 16px; gap: 12px; }
 .logout-modal-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,127,80,0.2); display: flex; align-items: center; justify-content: center; font-size: 20px; }
 .logout-modal-title { margin: 0; font-size: 20px; font-weight: 600; color: #fff; font-family: 'Montserrat', sans-serif; }
@@ -4660,7 +4661,7 @@ console.log("960");
      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
   import { getDownloadURL, ref, uploadBytes, getStorage } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
-  import { initializeAuth, getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, OAuthProvider, GoogleAuthProvider, linkWithPopup, signOut, onAuthStateChanged, deleteUser, setPersistence, browserLocalPersistence, browserPopupRedirectResolver } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+  import { initializeAuth, getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, OAuthProvider, GoogleAuthProvider, linkWithPopup, linkWithRedirect, linkWithCredential, signOut, onAuthStateChanged, deleteUser, setPersistence, browserLocalPersistence, indexedDBLocalPersistence, browserPopupRedirectResolver } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
   import { getDatabase, ref as ref2, onValue, update, get, set, remove, push, limitToFirst, startAt, orderByKey, query} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
   import { getPerformance } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-performance.js";
   import { songShowsExplicitBadge } from "./js/explicit-appendix.js";
@@ -4684,10 +4685,11 @@ const firebaseConfig = {
 console.log('1067')
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
+const __isCapNativeAuth = typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
 let auth;
 try {
   auth = initializeAuth(app, {
-    persistence: browserLocalPersistence,
+    persistence: __isCapNativeAuth ? indexedDBLocalPersistence : browserLocalPersistence,
     popupRedirectResolver: browserPopupRedirectResolver,
   });
 } catch (e) {
@@ -4779,7 +4781,12 @@ function whenElementReady(id, callback, retries = 10) {
       const reqs = v[k];
       if (!reqs || typeof reqs !== 'object') continue;
       for (const f in reqs) {
-        if (reqs[f] && reqs[f].status === 'featured') {
+        // A referral request is created the moment a fan uses an artist's code
+        // (status 'pending_upload'); it later flips to 'featured' once the artist
+        // uploads. Show the artist as soon as their code is used so successful
+        // referrals appear in Featured Songs right away.
+        const st = reqs[f] && reqs[f].status;
+        if (st === 'featured' || st === 'pending_upload') {
           const ts = Number(reqs[f].requestedAt) || 0;
           if (!ts || ts >= cutoff) s.add(k);
           break;
@@ -5801,7 +5808,9 @@ function fetchSongsViaREST() {
     songsReceived = true;
     globalSongsData = songsData;
     window.__asteroidSongsDataForDiscovery = songsData;
-    const html = renderSongsFromData(songsData);
+    const dailyList = getSessionBalancedPick(songsData, 50);
+    const renderData = dailyList ? flatListToSongsData(dailyList) : songsData;
+    const html = renderSongsFromData(renderData);
     whenElementReady("ab", (ab) => {
       const extra = document.getElementById("artists-grid-8");
       ab.innerHTML = html + (extra ? extra.innerHTML : "");
@@ -5887,6 +5896,68 @@ function getDailyPick(songsData, n) {
   }
   return shuffled.slice(0, n);
 }
+
+// ── Per-session balanced picker ────────────────────────────────────────────
+// Picks N songs per SESSION (re-rolls on each new app session, stays stable
+// within a session) and spreads the slots EQUALLY across every uploading
+// artist so each artist gets fair exposure — not just whoever uploaded most.
+function _sessionSeed() {
+  try {
+    let s = sessionStorage.getItem('asteroidSessionSeed');
+    if (!s) {
+      s = String((Date.now() ^ Math.floor(Math.random() * 0x7fffffff)) >>> 0);
+      sessionStorage.setItem('asteroidSessionSeed', s);
+    }
+    return parseInt(s, 10) || Date.now();
+  } catch (e) {
+    return Date.now();
+  }
+}
+function _songOwnerKey(s) {
+  // Group by uploader identity first, then fall back to artist name.
+  const up = (s.uploader || s.uploaderEmail || s.uploadedBy || s.userEmail || s.email || "").toString().trim().toLowerCase();
+  if (up) return 'u:' + up;
+  const ar = (s.artist || s.uploaderName || "").toString().trim().toLowerCase();
+  if (ar) return 'a:' + ar;
+  return 'x:' + ((s.title || 'unknown').toString().trim().toLowerCase());
+}
+function getSessionBalancedPick(songsData, n) {
+  const all = flattenSongsData(songsData);
+  if (all.length <= n) return null; // fewer than limit — show all
+  const rand = _seededRand(_sessionSeed());
+  const shuffle = (arr) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+  // Bucket songs by artist/uploader, shuffle within each bucket.
+  const buckets = new Map();
+  all.forEach((s) => {
+    const k = _songOwnerKey(s);
+    if (!buckets.has(k)) buckets.set(k, []);
+    buckets.get(k).push(s);
+  });
+  buckets.forEach((list) => shuffle(list));
+  // Shuffle the order in which artists get their turn, then round-robin so
+  // every artist contributes one song per pass before anyone contributes two.
+  const order = shuffle(Array.from(buckets.keys()));
+  const picked = [];
+  let added = true;
+  while (picked.length < n && added) {
+    added = false;
+    for (const k of order) {
+      const list = buckets.get(k);
+      if (list && list.length) {
+        picked.push(list.shift());
+        added = true;
+        if (picked.length >= n) break;
+      }
+    }
+  }
+  return shuffle(picked).slice(0, n);
+}
 // Rebuild a minimal SONGS-shaped object from a flat list for renderSongsFromData
 function flatListToSongsData(list) {
   const out = {};
@@ -5919,12 +5990,12 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
   }
   globalSongsData = songsData;
   window.__asteroidSongsDataForDiscovery = songsData;
-  // Pick 75 songs for today (deterministic per-day shuffle)
-  const dailyList = getDailyPick(songsData, 75);
+  // Pick 50 songs for this session, spread equally across every artist.
+  const dailyList = getSessionBalancedPick(songsData, 50);
   const renderData = dailyList ? flatListToSongsData(dailyList) : songsData;
   const html = renderSongsFromData(renderData);
   const songCount = html ? (html.match(/class="sssh"/g) || []).length : 0;
-  console.log("✅ Songs rendered:", songCount, dailyList ? "(daily pick of 75)" : "(all songs)");
+  console.log("✅ Songs rendered:", songCount, dailyList ? "(session pick of 50, balanced across artists)" : "(all songs)");
   whenElementReady("ab", (ab) => {
     const extra = document.getElementById("artists-grid-8");
     ab.innerHTML = html + (extra ? extra.innerHTML : "");
@@ -7220,6 +7291,21 @@ function confirmLogout() {
 // Wire modal buttons
 document.getElementById("logoutCancelBtn")?.addEventListener("click", closeLogoutModal);
 document.getElementById("logoutConfirmBtn")?.addEventListener("click", confirmLogout);
+document.querySelector(".logout-modal-box")?.addEventListener("click", (ev) => { ev.stopPropagation(); });
+document.getElementById("logoutModal")?.addEventListener("click", (ev) => {
+  if (ev.target && ev.target.id === "logoutModal") closeLogoutModal();
+});
+if (!window.__roleSwitchTapFix) {
+  window.__roleSwitchTapFix = true;
+  document.addEventListener("touchend", (ev) => {
+    const btn = ev.target && ev.target.closest ? ev.target.closest("#switchToArtistBtn, #switchToListenerBtn") : null;
+    if (!btn) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (btn.id === "switchToArtistBtn" && typeof window._switchToArtist === "function") window._switchToArtist();
+    else if (btn.id === "switchToListenerBtn" && typeof window._switchToListener === "function") window._switchToListener();
+  }, { capture: true, passive: false });
+}
 
 // --- DELETE ACCOUNT (fully self-contained — uses REST API, no module imports needed) ---
 function openDeleteAccountModal() {
@@ -7292,39 +7378,117 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
 
           const isCapacitorNative = () => typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
           const getAppPlugin = () => { try { return window.Capacitor?.Plugins?.App || null; } catch (e) { return null; } }
+          const GOOGLE_AUTH_BRIDGE_URL = "https://asteroid-cdc13.firebaseapp.com/google-auth-bridge";
 
-          // Google sign-in required for Artist role (popup on web, redirect on Capacitor iOS).
+          async function persistGoogleLinkForUser(googleUser, userKey) {
+            const gEmail = googleUser.email || (googleUser.providerData && googleUser.providerData[0]?.email) || "";
+            const gUid = googleUser.uid || "";
+            const ekKey = userKey || localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
+            localStorage.setItem("_googleLinked", "1");
+            localStorage.setItem("_googleEmail", gEmail);
+            if (ekKey) {
+              fetch("https://asteroid-cdc13-default-rtdb.firebaseio.com/GOOGLE_LINKED/" + encodeURIComponent(ekKey) + ".json", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  googleEmail: gEmail,
+                  googleUid: gUid,
+                  linkedAt: Date.now(),
+                })
+              }).catch((e) => console.warn("[google-link] REST PUT:", e));
+            }
+          }
+
+          async function finishGoogleArtistNativeFlow() {
+            if (sessionStorage.getItem("_switchToArtistPending") === "1" || sessionStorage.getItem("_googleArtistRedirectPending") === "1") {
+              sessionStorage.removeItem("_switchToArtistPending");
+              sessionStorage.removeItem("_googleArtistRedirectPending");
+              localStorage.setItem("profileType", "artist");
+              localStorage.removeItem("appleOnboardingDone");
+              closeLogoutModal();
+              if (typeof window.openAppleOnboardingModal === "function") window.openAppleOnboardingModal();
+              const ekKey = localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
+              if (ekKey) _restPatchProfileRole(ekKey).catch((rErr) => console.warn("[google-link] REST role switch:", rErr));
+              return true;
+            }
+            const pending = sessionStorage.getItem("_pendingArtistProfile");
+            if (!pending) return false;
+            sessionStorage.removeItem("_pendingArtistProfile");
+            try {
+              const p = JSON.parse(pending);
+              const profilePayload = {
+                nickname: p.nickname, profileNickname: p.nickname,
+                publicUsername: p.handleRaw, email: p.key,
+                profileType: "artist", profileVisibility: "public",
+                publicProfile: true, hideEmail: false,
+                role: "Artist", profileRole: "Artist",
+                onboardingComplete: true, onboardingUpdatedAt: Date.now(),
+              };
+              ["instagram","twitter","tiktok","youtube","spotify","soundcloud","website"].forEach((k) => {
+                if (p[k]) profilePayload[k] = p[k];
+              });
+              await update(ref2(database, "PROFILES/" + p.key), profilePayload);
+              localStorage.setItem("fullName", p.nickname);
+              localStorage.setItem("profileType", "artist");
+              localStorage.setItem("appleOnboardingDone", "1");
+              localStorage.removeItem("appleOnboardingSkipped");
+              const gcd = document.getElementById("gcd");
+              if (gcd) gcd.textContent = p.nickname;
+            } catch (rErr) { console.warn("[google-link] resume profile save:", rErr); }
+            return true;
+          }
+
+          async function handleGoogleAuthRedirect(url) {
+            if (!url || !String(url).startsWith("asteroid://google-auth")) return;
+            await dismissInAppBrowser("google-deeplink");
+            const qs = String(url).split("?")[1] || "";
+            const params = new URLSearchParams(qs);
+            const err = params.get("error");
+            if (err) throw new Error(err);
+            if (params.get("ok") !== "1") return;
+            const idToken = params.get("idToken") || "";
+            const accessToken = params.get("accessToken") || "";
+            if (!idToken) throw new Error("missing-id-token");
+            const credential = GoogleAuthProvider.credential(idToken, accessToken || undefined);
+            const currentUser = auth.currentUser;
+            let result;
+            if (currentUser) {
+              try {
+                result = await linkWithCredential(currentUser, credential);
+              } catch (linkErr) {
+                const linkCode = linkErr && linkErr.code ? String(linkErr.code) : "";
+                if (linkCode === "auth/credential-already-in-use" || linkCode === "auth/provider-already-linked" || linkCode === "auth/email-already-in-use") {
+                  result = await signInWithCredential(auth, credential);
+                } else {
+                  throw linkErr;
+                }
+              }
+            } else {
+              result = await signInWithCredential(auth, credential);
+            }
+            await persistGoogleLinkForUser(result.user);
+            await finishGoogleArtistNativeFlow();
+            try { window.dispatchEvent(new CustomEvent("asteroid:auth-changed", { detail: { signedIn: true, source: "google-bridge" } })); } catch (e) {}
+          }
+
+          // Google sign-in required for Artist role (popup on web, hosted bridge on Capacitor iOS).
           window._signInWithGoogleForArtist = async function(userKey) {
             const googleProvider = new GoogleAuthProvider();
             googleProvider.addScope("email");
             googleProvider.addScope("profile");
 
-            async function saveGoogleLink(googleUser) {
-              const gEmail = googleUser.email || (googleUser.providerData && googleUser.providerData[0]?.email) || "";
-              const gUid = googleUser.uid || "";
-              const ekKey = userKey || localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
-              // Set local flags first — they're what gates UI. The DB write fires
-              // in background via REST so a stalled WebSocket can't block sign-in.
-              localStorage.setItem("_googleLinked", "1");
-              localStorage.setItem("_googleEmail", gEmail);
-              if (ekKey) {
-                fetch("https://asteroid-cdc13-default-rtdb.firebaseio.com/GOOGLE_LINKED/" + encodeURIComponent(ekKey) + ".json", {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    googleEmail: gEmail,
-                    googleUid: gUid,
-                    linkedAt: Date.now(),
-                  })
-                }).catch((e) => console.warn("[google-link] REST PUT:", e));
-              }
-            }
-
             if (isCapacitorNative()) {
-              // Store that we need to complete artist setup after the redirect
               try { sessionStorage.setItem("_googleArtistRedirectPending", "1"); } catch (_) {}
-              await signInWithRedirectCapacitorBrowser(auth, googleProvider);
-              throw new Error("redirect"); // signal caller to bail — resume happens in getRedirectResult
+              const bridgeUrl =
+                GOOGLE_AUTH_BRIDGE_URL +
+                "?return=" + encodeURIComponent("asteroid://google-auth");
+              const Browser = getBrowserPlugin();
+              if (!Browser || typeof Browser.open !== "function") {
+                throw new Error("Google sign-in needs the in-app browser. Rebuild the iOS app with Capacitor Browser.");
+              }
+              try { sessionStorage.setItem("capAuthBrowserOpened", String(Date.now())); } catch (_) {}
+              await Browser.open({ url: bridgeUrl, presentationStyle: "fullscreen" });
+              throw new Error("redirect");
             }
 
             // Web: popup
@@ -7343,7 +7507,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               } else {
                 result = await signInWithPopup(auth, googleProvider);
               }
-              await saveGoogleLink(result.user);
+              await persistGoogleLinkForUser(result.user, userKey);
               return result;
             } catch (e) {
               if (e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request") {
@@ -7355,8 +7519,6 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             }
           };
 
-          // REST PATCH helper — bypasses the SDK WebSocket so the role switch
-          // doesn't hang waiting for a stalled realtime connection.
           async function _restPatchProfileRole(key) {
             const url = "https://asteroid-cdc13-default-rtdb.firebaseio.com/PROFILES/" + encodeURIComponent(key) + ".json";
             const r = await fetch(url, {
@@ -7373,6 +7535,99 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             });
             if (!r.ok) throw new Error("PATCH PROFILES HTTP " + r.status);
           }
+
+          async function _restPatchProfileListener(key) {
+            const url = "https://asteroid-cdc13-default-rtdb.firebaseio.com/PROFILES/" + encodeURIComponent(key) + ".json";
+            const r = await fetch(url, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                profileType: "listener",
+                profileVisibility: "private",
+                publicProfile: false,
+                hideEmail: true,
+                role: "Listener",
+                profileRole: "Listener",
+              })
+            });
+            if (!r.ok) throw new Error("PATCH PROFILES HTTP " + r.status);
+          }
+
+          async function processGoogleArtistRedirectResult(result) {
+            if (!result || !result.user) return false;
+            const isGoogleArtistResume = sessionStorage.getItem("_googleArtistRedirectPending") === "1";
+            if (!isGoogleArtistResume) return false;
+            sessionStorage.removeItem("_googleArtistRedirectPending");
+            const gEmail = result.user.email || "";
+            const ekKey = localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
+            localStorage.setItem("_googleLinked", "1");
+            localStorage.setItem("_googleEmail", gEmail);
+            if (ekKey) {
+              fetch("https://asteroid-cdc13-default-rtdb.firebaseio.com/GOOGLE_LINKED/" + encodeURIComponent(ekKey) + ".json", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  googleEmail: gEmail,
+                  googleUid: result.user.uid || "",
+                  linkedAt: Date.now(),
+                })
+              }).catch((e) => console.warn("[google-link] REST PUT:", e));
+            }
+            if (sessionStorage.getItem("_switchToArtistPending") === "1") {
+              sessionStorage.removeItem("_switchToArtistPending");
+              localStorage.setItem("profileType", "artist");
+              localStorage.removeItem("appleOnboardingDone");
+              closeLogoutModal();
+              if (typeof window.openAppleOnboardingModal === "function") window.openAppleOnboardingModal();
+              if (ekKey) _restPatchProfileRole(ekKey).catch((rErr) => console.warn("[google-link] REST role switch:", rErr));
+              return true;
+            }
+            const pending = sessionStorage.getItem("_pendingArtistProfile");
+            if (pending) {
+              sessionStorage.removeItem("_pendingArtistProfile");
+              try {
+                const p = JSON.parse(pending);
+                const profilePayload = {
+                  nickname: p.nickname, profileNickname: p.nickname,
+                  publicUsername: p.handleRaw, email: p.key,
+                  profileType: "artist", profileVisibility: "public",
+                  publicProfile: true, hideEmail: false,
+                  role: "Artist", profileRole: "Artist",
+                  onboardingComplete: true, onboardingUpdatedAt: Date.now(),
+                };
+                ["instagram","twitter","tiktok","youtube","spotify","soundcloud","website"].forEach(k => {
+                  if (p[k]) profilePayload[k] = p[k];
+                });
+                await update(ref2(database, "PROFILES/" + p.key), profilePayload);
+                localStorage.setItem("fullName", p.nickname);
+                localStorage.setItem("profileType", "artist");
+                localStorage.setItem("appleOnboardingDone", "1");
+                localStorage.removeItem("appleOnboardingSkipped");
+                const gcd = document.getElementById("gcd");
+                if (gcd) gcd.textContent = p.nickname;
+              } catch (rErr) { console.warn("[google-link] resume profile save:", rErr); }
+            }
+            return true;
+          }
+
+          async function resumePendingGoogleAuth() {
+            const pending =
+              sessionStorage.getItem("_googleArtistRedirectPending") === "1" ||
+              sessionStorage.getItem("_switchToArtistPending") === "1" ||
+              !!sessionStorage.getItem("_pendingArtistProfile");
+            if (!pending) return;
+            try {
+              const result = await getRedirectResult(auth);
+              if (result && result.user) {
+                const handled = await processGoogleArtistRedirectResult(result);
+                if (handled) return;
+              }
+            } catch (e) {
+              const code = e && e.code ? String(e.code) : "";
+              if (code && code.indexOf("auth/") === 0) console.warn("[auth] resumePendingGoogleAuth:", code, e.message || e);
+            }
+          }
+          window.resumePendingGoogleAuth = resumePendingGoogleAuth;
 
           window._switchToArtist = async function() {
             const statusEl = document.getElementById("roleSwitchStatus");
@@ -7426,15 +7681,11 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               return;
             }
             try {
-              await update(ref2(database, "PROFILES/" + key), {
-                profileType: "listener",
-                profileVisibility: "private",
-                publicProfile: false,
-                hideEmail: true,
-                role: "Listener",
-                profileRole: "Listener",
-              });
+              await _restPatchProfileListener(key);
               localStorage.setItem("profileType", "listener");
+              localStorage.setItem("profileVisibility", "private");
+              localStorage.removeItem("_googleLinked");
+              if (typeof setArtistDashboardNavVisible === "function") setArtistDashboardNavVisible(false);
               if (statusEl) { statusEl.style.color = "#6bffb0"; statusEl.textContent = "Switched to Listener!"; }
               const aBtn = document.getElementById("switchToArtistBtn");
               const lBtn = document.getElementById("switchToListenerBtn");
@@ -7519,6 +7770,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             let hrefDesc = null;
 
             const openOAuthBrowser = (url) => {
+              if (window.__oauthPreferWebView) return false;
               if (oauthOpened) return false;
               if (!shouldOpenOAuthInCapBrowser(url)) return false;
               oauthOpened = true;
@@ -7583,17 +7835,14 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                   if (!sessionStorage.getItem("asteroidFirebaseDomainHintShown")) {
                     sessionStorage.setItem("asteroidFirebaseDomainHintShown", "1");
                     const o = typeof location !== "undefined" ? location.origin : "";
-                    const host = typeof location !== "undefined" ? location.hostname : "";
                     alert(
                       "Firebase: auth/unauthorized-domain\n\n" +
-                        "This WebView origin is not allowed for OAuth. Add it in Firebase Console:\n" +
-                        "Authentication → Settings → Authorized domains → Add domain\n\n" +
-                        "Use the hostname only (no path), e.g.:\n• " +
-                        (host || "(unknown host)") +
-                        "\n• localhost\n• www.asteroid8.net and asteroid8.net\n• your Xcode live-reload host (LAN IP) if you use one\n\n" +
-                        "Current origin: " +
-                        (o || "(unknown)") +
-                        "\n\nNative Sign in with Apple does not need this once it works."
+                        "The app WebView origin must be https://localhost (not ionic://).\n\n" +
+                        "1. Rebuild the iOS app after cap sync (capacitor.config uses iosScheme: https).\n" +
+                        "2. Firebase Console → Authentication → Settings → Authorized domains → ensure localhost is listed.\n" +
+                        "3. Google Cloud Console → APIs & Services → Credentials → your Web OAuth client → " +
+                        "Authorized JavaScript origins → add https://localhost\n\n" +
+                        "Current origin: " + (o || "(unknown)")
                     );
                   }
                 } catch (a0) {}
@@ -7802,10 +8051,13 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             const artistRadio = document.getElementById("appleProfileTypeArtist");
             const listenerRadio = document.getElementById("appleProfileTypeListener");
             if (artistRadio && listenerRadio) {
+              const note = document.getElementById("artistGoogleNote");
               if (storedType === "artist") {
                 artistRadio.checked = true;
+                if (note) note.style.display = "flex";
               } else {
                 listenerRadio.checked = true;
+                if (note) note.style.display = "none";
               }
             }
             m.style.display = "flex";
@@ -7913,8 +8165,8 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             const profileType = selectedTypeEl ? selectedTypeEl.value : "listener";
             const isPublicArtist = profileType === "artist";
 
-            // Artist role requires Google sign-in verification.
-            if (isPublicArtist) {
+            // Artist role requires Google sign-in verification (skip if already linked this session).
+            if (isPublicArtist && localStorage.getItem("_googleLinked") !== "1") {
               const saveBtn = document.getElementById("appleOnboardingSaveBtn");
               const origText = saveBtn ? saveBtn.textContent : "Save";
               if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Opening Google sign-in…"; }
@@ -8097,6 +8349,20 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
           async function handleAuthRedirectUrl(url) {
             if (!url) return;
             const s = String(url);
+            if (s.startsWith("asteroid://google-auth")) {
+              try {
+                await handleGoogleAuthRedirect(url);
+              } catch (gErr) {
+                console.warn("[auth] handleGoogleAuthRedirect:", gErr);
+                const statusEl = document.getElementById("roleSwitchStatus");
+                if (statusEl) {
+                  statusEl.style.color = "#ff6b6b";
+                  statusEl.textContent = (gErr && gErr.message) ? gErr.message : "Google sign-in failed.";
+                }
+                alert("Google sign-in failed. Please try again.");
+              }
+              return;
+            }
             if (s.startsWith("asteroid://auth-apple")) {
               await dismissInAppBrowser("apple-deeplink");
               await handleAppleAuthRedirect(url);
@@ -8104,6 +8370,8 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             }
             if (s.includes("/__/auth/handler")) {
               await dismissInAppBrowser("firebase-auth-handler");
+              await resumePendingGoogleAuth();
+              return;
             }
           }
           let _lastAppleRedirectIndex = null;
@@ -8179,6 +8447,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                   App.addListener("resume", () => {
                     const t = parseInt(sessionStorage.getItem("capAuthBrowserOpened") || "0", 10);
                     if (t && Date.now() - t < 180000) void dismissInAppBrowser("app-resume-fallback");
+                    void resumePendingGoogleAuth();
                   });
                 }
               } catch (e) { console.warn("Capacitor App listener:", e); }
@@ -8364,76 +8633,8 @@ document.getElementById("user-profile-button")?.addEventListener("click", () => 
               const hadPreviousUser = localStorage.getItem("asteroidSignedInBefore") === "true";
               const result = await getRedirectResult(auth);
               if (result && result.user) {
-                const isGoogleArtistResume = sessionStorage.getItem("_googleArtistRedirectPending") === "1";
-                if (isGoogleArtistResume) {
-                  // Google redirect completed for artist verification — save the linked Google info
-                  sessionStorage.removeItem("_googleArtistRedirectPending");
-                  const gEmail = result.user.email || "";
-                  const ekKey = localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
-                  // Set locally first; fire REST PUT in background so we don't block on a stalled WS.
-                  localStorage.setItem("_googleLinked", "1");
-                  localStorage.setItem("_googleEmail", gEmail);
-                  if (ekKey) {
-                    fetch("https://asteroid-cdc13-default-rtdb.firebaseio.com/GOOGLE_LINKED/" + encodeURIComponent(ekKey) + ".json", {
-                      method: "PUT",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        googleEmail: gEmail,
-                        googleUid: result.user.uid || "",
-                        linkedAt: Date.now(),
-                      })
-                    }).catch((e) => console.warn("[google-link] REST PUT:", e));
-                  }
-                  // Role switch via redirect: update PROFILES to Artist
-                  if (sessionStorage.getItem("_switchToArtistPending") === "1") {
-                    sessionStorage.removeItem("_switchToArtistPending");
-                    // Flip local state + open the onboarding form FIRST so the user
-                    // sees the form immediately on resume. The DB write fires in
-                    // the background via REST so it can't block the UI.
-                    localStorage.setItem("profileType", "artist");
-                    localStorage.removeItem("appleOnboardingDone");
-                    if (typeof window.openAppleOnboardingModal === "function") window.openAppleOnboardingModal();
-                    if (ekKey) {
-                      fetch("https://asteroid-cdc13-default-rtdb.firebaseio.com/PROFILES/" + encodeURIComponent(ekKey) + ".json", {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          profileType: "artist", profileVisibility: "public",
-                          publicProfile: true, hideEmail: false,
-                          role: "Artist", profileRole: "Artist",
-                        })
-                      }).catch((rErr) => console.warn("[google-link] REST role switch:", rErr));
-                    }
-                    return;
-                  }
-                  // Resume pending artist profile if saved
-                  const pending = sessionStorage.getItem("_pendingArtistProfile");
-                  if (pending) {
-                    sessionStorage.removeItem("_pendingArtistProfile");
-                    try {
-                      const p = JSON.parse(pending);
-                      const profilePayload = {
-                        nickname: p.nickname, profileNickname: p.nickname,
-                        publicUsername: p.handleRaw, email: p.key,
-                        profileType: "artist", profileVisibility: "public",
-                        publicProfile: true, hideEmail: false,
-                        role: "Artist", profileRole: "Artist",
-                        onboardingComplete: true, onboardingUpdatedAt: Date.now(),
-                      };
-                      ["instagram","twitter","tiktok","youtube","spotify","soundcloud","website"].forEach(k => {
-                        if (p[k]) profilePayload[k] = p[k];
-                      });
-                      await update(ref2(database, "PROFILES/" + p.key), profilePayload);
-                      localStorage.setItem("fullName", p.nickname);
-                      localStorage.setItem("profileType", "artist");
-                      localStorage.setItem("appleOnboardingDone", "1");
-                      localStorage.removeItem("appleOnboardingSkipped");
-                      const gcd = document.getElementById("gcd");
-                      if (gcd) gcd.textContent = p.nickname;
-                    } catch (rErr) { console.warn("[google-link] resume profile save:", rErr); }
-                  }
-                  return; // Don't call handleSignInSuccess — the Apple session is already active
-                }
+                const handledArtist = await processGoogleArtistRedirectResult(result);
+                if (handledArtist) return;
                 console.log("[auth] getRedirectResult: completed redirect sign-in");
                 await handleSignInSuccess(result, hadPreviousUser);
               }
@@ -10164,6 +10365,7 @@ console.log('1171')
   bootFeed();
 </script>
 <script src="js/miniplayer.js" defer></script>
+<script src="js/referral-deeplink.js" defer></script>
 
 <!-- ═══════════════════════════════════════════════════════════
      SPACE BACKGROUND v2 — physically-based planets, stars, comets

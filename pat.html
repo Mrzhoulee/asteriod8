@@ -278,14 +278,16 @@
     }
 
     /** Pull PLAYLISTS/{uid} from Firebase via REST, merge with localStorage, persist, re-render. */
-    function syncPlaylistFromFirebase() {
+    function syncPlaylistFromFirebase(attempt) {
+      attempt = attempt || 0;
       var uid = patPlaylistUid();
-      if (!uid) return Promise.resolve();
+      if (!uid) { render(); return Promise.resolve(); }
       return fetch(PAT_RTDB_BASE + '/PLAYLISTS/' + uid + '.json', { cache: 'no-store' })
         .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(function (remote) {
           if (!remote || typeof remote !== 'object') {
             console.log('[pat] Firebase playlist empty for', uid);
+            render(); // clears any "Loading…" placeholder → correct empty state
             return;
           }
           var local = getPlaylist();
@@ -313,6 +315,12 @@
         })
         .catch(function (err) {
           console.warn('[pat] Firebase sync failed:', err && (err.message || err));
+          // One retry — iOS WebViews occasionally drop the first request on cold start.
+          if (attempt < 1) {
+            return new Promise(function (res) { setTimeout(res, 1200); })
+              .then(function () { return syncPlaylistFromFirebase(attempt + 1); });
+          }
+          render(); // ensure we never get stuck on the "Loading…" placeholder
         });
     }
 
@@ -431,13 +439,26 @@
     }
 
     window.addEventListener('DOMContentLoaded', function() {
-      var currentUser = (localStorage.getItem('CurrentUser') || localStorage.getItem('email') || '').trim();
+      var currentUser = (localStorage.getItem('CurrentUser') || localStorage.getItem('email') || localStorage.getItem('userEmail') || '').trim();
       if (!currentUser) {
         window.location.href = 'index.html';
         return;
       }
-      render();
-      // Pull any songs the user added on another device — runs in parallel with the local render.
+      var local = getPlaylist();
+      if (local.length) {
+        render();
+      } else {
+        // Nothing cached locally yet — show a loading state while we pull this
+        // account's playlist from Firebase (e.g. fresh install / new device).
+        var container = document.getElementById('playlist');
+        if (container) {
+          container.innerHTML = '<div class="empty-state">' +
+            '<span class="material-symbols-outlined">queue_music</span>' +
+            '<p>Loading your playlist…</p>' +
+            '</div>';
+        }
+      }
+      // Pull this account's saved songs from Firebase (per-user PLAYLISTS/{uid}).
       syncPlaylistFromFirebase();
     });
   </script>

@@ -64,6 +64,23 @@ export async function initFollowedArtistSongs() {
     return "";
   }
 
+  // Collect every display name a followed artist might publish songs under, so
+  // we can also match uploads that lack an `uploader` field by artist name.
+  async function profileNamesForKey(artistKey) {
+    const names = new Set();
+    try {
+      const ps = await getFn(refFn(db, "PROFILES/" + artistKey));
+      if (ps.exists()) {
+        const p = ps.val() || {};
+        [p.nickname, p.profileNickname, p.fullName, p.username, p.name, p.artistName].forEach((n) => {
+          const v = String(n || "").trim().toLowerCase();
+          if (v) names.add(v);
+        });
+      }
+    } catch (e) { /* ignore */ }
+    return names;
+  }
+
   let gen = 0;
   let unbind = null;
 
@@ -86,7 +103,9 @@ export async function initFollowedArtistSongs() {
         mount.innerHTML = `<p class="fan-feed-empty">Loading tracks…</p>`;
 
         // Build uploader-key match set: PROFILES key + sanitized profile.email variants.
+        // Also collect each followed artist's display names for name-based matching.
         const matchKeys = new Set();
+        const matchNames = new Set();
         for (const ak of artistKeys) {
           matchKeys.add(ak);
           const em = await profileEmailForKey(ak);
@@ -95,6 +114,8 @@ export async function initFollowedArtistSongs() {
             matchKeys.add(sanitizeKeyPart(em));
             matchKeys.add(sanitizeKeyPart(em.toLowerCase()));
           }
+          const names = await profileNamesForKey(ak);
+          names.forEach((n) => matchNames.add(n));
         }
 
         // Separate featured-artist keys (feat_XX) from regular SONGS keys.
@@ -172,15 +193,19 @@ export async function initFollowedArtistSongs() {
                   const s = all[titleKey][albumKey][artistKeyInner];
                   if (!s || !s.fileInp) continue;
                   const up = String(s.uploader || "").trim();
-                  if (!up) continue;
-                  if (
+                  const sArtist = String(s.artist || "").trim().toLowerCase();
+                  const sUpName = String(s.uploaderName || "").trim().toLowerCase();
+                  const keyMatch = up && (
                     matchKeys.has(up) ||
                     matchKeys.has(sanitizeKeyPart(up)) ||
                     matchKeys.has(sanitizeKeyPart(up.toLowerCase()))
-                  ) {
-                    let ownerKey = sanitizeKeyPart(up);
-                    if (!artistKeys.includes(ownerKey)) {
-                      for (const ak of artistKeys) if (matchKeys.has(up) && ak) { ownerKey = ak; break; }
+                  );
+                  // Fall back to artist-name match for uploads without an uploader key.
+                  const nameMatch = (sArtist && matchNames.has(sArtist)) || (sUpName && matchNames.has(sUpName));
+                  if (keyMatch || nameMatch) {
+                    let ownerKey = up ? sanitizeKeyPart(up) : "";
+                    if (!ownerKey || !artistKeys.includes(ownerKey)) {
+                      for (const ak of artistKeys) if ((keyMatch || nameMatch) && ak) { ownerKey = ak; break; }
                     }
                     matches.push({
                       ownerKey,

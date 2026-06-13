@@ -1486,6 +1486,18 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                         <i class="fas fa-envelope"></i>
                         Email
                     </a>
+                    <a class="ref-share-btn ref-facebook" id="refShareFacebook" href="#" target="_blank" rel="noopener">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        Facebook
+                    </a>
+                    <a class="ref-share-btn ref-telegram" id="refShareTelegram" href="#" target="_blank" rel="noopener">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                        Telegram
+                    </a>
+                    <a class="ref-share-btn ref-reddit" id="refShareReddit" href="#" target="_blank" rel="noopener">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 11.779c0-1.459-1.192-2.645-2.657-2.645-.715 0-1.363.286-1.84.746-1.81-1.191-4.259-1.949-6.971-2.046l1.483-4.669 4.016.941-.006.058c0 1.193.975 2.163 2.174 2.163 1.198 0 2.172-.97 2.172-2.163s-.975-2.164-2.172-2.164c-.92 0-1.704.574-2.021 1.379l-4.329-1.015c-.189-.046-.381.063-.44.249l-1.654 5.207c-2.759.052-5.245.815-7.085 2.013-.476-.465-1.129-.755-1.853-.755C1.192 9.135 0 10.32 0 11.779c0 1.07.645 1.992 1.567 2.402-.041.207-.07.417-.07.63 0 3.461 4.021 6.276 8.957 6.276s8.957-2.815 8.957-6.276c0-.211-.028-.423-.071-.631.922-.41 1.567-1.332 1.567-2.401zM5.785 13.969c0-.794.645-1.439 1.439-1.439.793 0 1.438.645 1.438 1.439 0 .793-.645 1.438-1.438 1.438-.794.001-1.439-.645-1.439-1.438zm9.945 4.067c-1.197 1.197-3.482 1.288-4.152 1.288-.671 0-2.956-.091-4.151-1.288a.408.408 0 0 1 0-.577.408.408 0 0 1 .577 0c.754.755 2.368.977 3.574.977 1.207 0 2.821-.222 3.575-.977a.408.408 0 0 1 .577 0 .406.406 0 0 1 .013.577zm-.564-2.629c-.793 0-1.438-.645-1.438-1.438 0-.794.645-1.439 1.438-1.439.794 0 1.439.645 1.439 1.439 0 .793-.645 1.438-1.439 1.438z"/></svg>
+                        Reddit
+                    </a>
                 </div>
             </div>
 
@@ -3347,28 +3359,55 @@ async function loadGrowTab() {
   const inp = document.getElementById('refLinkInput');
   if (inp) inp.value = link;
 
-  // 3. Wire up copy button
+  // 3. Wire up copy button (robust for the iOS Capacitor WebView)
+  async function dashCopyText(text) {
+    text = String(text == null ? '' : text);
+    try {
+      const Cap = window.Capacitor;
+      if (Cap && Cap.Plugins && Cap.Plugins.Clipboard && Cap.Plugins.Clipboard.write) {
+        await Cap.Plugins.Clipboard.write({ string: text });
+        return true;
+      }
+    } catch (_) {}
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (_) {}
+    try {
+      if (inp) { inp.focus(); inp.select(); try { inp.setSelectionRange(0, text.length); } catch (_) {} }
+      return document.execCommand('copy');
+    } catch (_) {}
+    return false;
+  }
   const copyBtn = document.getElementById('refCopyBtn');
   if (copyBtn) {
     copyBtn.onclick = async () => {
-      try {
-        await navigator.clipboard.writeText(link);
-        document.getElementById('refCopyLabel').textContent = 'Copied!';
-        setTimeout(() => { document.getElementById('refCopyLabel').textContent = 'Copy'; }, 2000);
-      } catch (_) {
-        inp.select(); document.execCommand('copy');
+      const ok = await dashCopyText(link);
+      const lbl = document.getElementById('refCopyLabel');
+      if (lbl) {
+        lbl.textContent = ok ? 'Copied!' : 'Press & hold';
+        setTimeout(() => { lbl.textContent = 'Copy'; }, 2000);
       }
     };
   }
 
   // 4. Wire up share buttons
   const msg = encodeURIComponent(`Join me on Asteroid — upload your music, go live, and grow your fanbase 🪐\n${link}`);
+  const subject = encodeURIComponent('Join me on Asteroid 🪐');
   const tw = document.getElementById('refShareTwitter');
   const wa = document.getElementById('refShareWhatsapp');
   const em = document.getElementById('refShareEmail');
+  const fb = document.getElementById('refShareFacebook');
+  const tg = document.getElementById('refShareTelegram');
+  const rd = document.getElementById('refShareReddit');
   if (tw) tw.href = `https://twitter.com/intent/tweet?text=${msg}`;
   if (wa) wa.href = `https://wa.me/?text=${msg}`;
-  if (em) em.href = `mailto:?subject=${encodeURIComponent('Join me on Asteroid 🪐')}&body=${msg.replace(/%0A/g,'%0D%0A')}`;
+  if (em) em.href = `mailto:?subject=${subject}&body=${msg.replace(/%0A/g,'%0D%0A')}`;
+  if (fb) fb.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}&quote=${msg}`;
+  if (tg) tg.href = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`;
+  if (rd) rd.href = `https://www.reddit.com/submit?url=${encodeURIComponent(link)}&title=${subject}`;
 
   // 5. Load stats
   if (_refCode) {
@@ -3540,6 +3579,9 @@ async function loadGrowTab() {
 .ref-twitter:hover { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.2); }
 .ref-whatsapp:hover { background: rgba(37,211,102,0.15); border-color: rgba(37,211,102,0.3); }
 .ref-email:hover { background: rgba(255,127,80,0.12); border-color: rgba(255,127,80,0.3); }
+.ref-facebook:hover { background: rgba(24,119,242,0.15); border-color: rgba(24,119,242,0.35); }
+.ref-telegram:hover { background: rgba(34,158,217,0.15); border-color: rgba(34,158,217,0.35); }
+.ref-reddit:hover { background: rgba(255,69,0,0.15); border-color: rgba(255,69,0,0.35); }
 
 .ref-stats-row {
   display: grid; grid-template-columns: repeat(3, 1fr);
