@@ -20,6 +20,9 @@ contextBridge.exposeInMainWorld('jarvis', {
     ].forEach((ch) => ipcRenderer.removeAllListeners(ch));
   },
 
+  // ── Email accounts ──────────────────────────────────────────
+  listEmailAccounts: () => ipcRenderer.invoke('email:list_accounts'),
+
   // ── Memory ──────────────────────────────────────────────────
   loadMemory: () => ipcRenderer.invoke('memory:load'),
   saveMemory: (entry) => ipcRenderer.invoke('memory:save', entry),

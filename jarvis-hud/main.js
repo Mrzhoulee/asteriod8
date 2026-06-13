@@ -26,7 +26,7 @@ const userEnv = path.join(DATA_DIR, '.env');
 if (fs.existsSync(userEnv)) require('dotenv').config({ path: userEnv, override: false });
 
 const { runJarvis, runSubAgent } = require('./agents/index');
-const { sendEmail } = require('./tools/email');
+const { sendEmail, listAccounts } = require('./tools/email');
 const { runShell, classifyCommand } = require('./tools/shell');
 const { loadMemory, saveMemory, buildClaudeHistory } = require('./tools/memory');
 const mac = require('./tools/mac');
@@ -146,6 +146,7 @@ ipcMain.handle('window:hide', () => mainWindow?.hide());
 ipcMain.handle('window:close', () => app.quit());
 ipcMain.handle('window:minimize', () => mainWindow?.minimize());
 ipcMain.handle('memory:load', () => loadMemory());
+ipcMain.handle('email:list_accounts', () => listAccounts());
 ipcMain.handle('memory:save', (_, entry) => saveMemory(entry));
 
 ipcMain.handle('voice:transcribe', async (_, audioBuffer) => {
@@ -240,10 +241,15 @@ function buildToolHandler(send, skipConfirm) {
       // ── Email ───────────────────────────────────────────────
       case 'send_email': {
         if (!skipConfirm) {
+          // Resolve which account will send so the user can see it in the dialog
+          const accounts = listAccounts();
+          const fromLabel = input.fromAccount
+            ? accounts.find((a) => a.label.toLowerCase().includes(input.fromAccount.toLowerCase()) || a.user === input.fromAccount)?.user || input.fromAccount
+            : (accounts[0]?.user || '');
           const ok = await confirm({
             title: 'Confirm Email',
             message: `Send email to ${input.to}?`,
-            detail: `Subject: ${input.subject}\n\n${input.body.substring(0, 300)}${input.body.length > 300 ? '…' : ''}`,
+            detail: `From: ${fromLabel}\nSubject: ${input.subject}\n\n${input.body.substring(0, 300)}${input.body.length > 300 ? '…' : ''}`,
           });
           if (!ok) return JSON.stringify({ cancelled: true, message: 'User cancelled.' });
         }

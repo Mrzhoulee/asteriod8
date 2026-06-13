@@ -67,15 +67,19 @@ const JARVIS_TOOLS = [
 
   {
     name: 'send_email',
-    description: 'Send an email. A confirmation dialog appears unless the user said to skip it.',
+    description: 'Send an email from a configured Gmail/SMTP account. A confirmation dialog appears unless the user said to skip it. If the user says "from my work email" or "from personal", pass that as fromAccount.',
     input_schema: {
       type: 'object',
       properties: {
-        to: { type: 'string' },
+        to: { type: 'string', description: 'Recipient address(es), comma-separated.' },
         subject: { type: 'string' },
         body: { type: 'string' },
         cc: { type: 'string' },
-        attachmentPath: { type: 'string', description: 'Optional local file to attach (e.g. an .ics invite).' },
+        fromAccount: {
+          type: 'string',
+          description: 'Which account to send from — use the label (e.g. "Work", "Personal") or the email address. Omit to use the default (first configured) account.',
+        },
+        attachmentPath: { type: 'string', description: 'Optional local file path to attach (e.g. a generated .ics invite).' },
       },
       required: ['to', 'subject', 'body'],
     },
