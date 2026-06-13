@@ -98,16 +98,38 @@ const JARVIS_TOOLS = [
   {
     name: 'post_social',
     description:
-      'Post to social media. Uses a configured webhook (multi-platform) or platform API when available; otherwise opens a pre-filled compose window for one-click posting.',
+      'Post to social media. For TikTok videos/photos use platform="tiktok" with mediaUrl. For Instagram photos/reels/carousels use platform="instagram" with mediaUrl or mediaUrls. For X, LinkedIn, Facebook, Threads, Reddit — uses a webhook (if configured) or opens a compose window.',
     input_schema: {
       type: 'object',
       properties: {
-        platform: { type: 'string', description: 'x, linkedin, facebook, threads, reddit, instagram…' },
-        text: { type: 'string', description: 'The post copy.' },
-        link: { type: 'string', description: 'Optional URL to share.' },
-        mediaPath: { type: 'string', description: 'Optional local image/video path.' },
+        platform: { type: 'string', description: 'x, twitter, linkedin, facebook, threads, reddit, tiktok, instagram' },
+        text: { type: 'string', description: 'Caption or post copy.' },
+        link: { type: 'string', description: 'Optional URL to include.' },
+        mediaUrl: { type: 'string', description: 'Public HTTPS URL to an image or video (for TikTok & Instagram).' },
+        mediaUrls: { type: 'array', items: { type: 'string' }, description: 'Multiple media URLs for a carousel (Instagram) or photo post (TikTok).' },
+        hashtags: { type: 'array', items: { type: 'string' }, description: 'Hashtags to append (Instagram/TikTok). No # needed — added automatically.' },
       },
-      required: ['text'],
+      required: ['platform', 'text'],
+    },
+  },
+
+  {
+    name: 'get_analytics',
+    description:
+      'Fetch analytics from Google Analytics (GA4) or App Store Connect. For GA4, asks for users/sessions/pageviews over a date range. For App Store, fetches sales/downloads reports and can fetch app reviews.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        source: { type: 'string', enum: ['ga4', 'appstore', 'appstore_reviews', 'appstore_apps'], description: 'Which analytics source to query.' },
+        startDate: { type: 'string', description: 'GA4: "7daysAgo", "30daysAgo", or "YYYY-MM-DD". App Store: "YYYY-MM" for monthly.' },
+        endDate: { type: 'string', description: 'GA4: "today" or "YYYY-MM-DD".' },
+        metrics: { type: 'array', items: { type: 'string' }, description: 'GA4: metric names (e.g. ["activeUsers","sessions"]). App Store: ignored.' },
+        dimensions: { type: 'array', items: { type: 'string' }, description: 'GA4 dimension names (e.g. ["date","country"]).' },
+        propertyId: { type: 'string', description: 'GA4 property ID (overrides GOOGLE_ANALYTICS_PROPERTY_ID in .env).' },
+        frequency: { type: 'string', description: 'App Store report frequency: DAILY, WEEKLY, or MONTHLY.' },
+        appId: { type: 'string', description: 'App Store app ID (needed for appstore_reviews). Get it via source="appstore_apps".' },
+      },
+      required: ['source'],
     },
   },
 

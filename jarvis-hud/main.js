@@ -31,6 +31,9 @@ const { runShell, classifyCommand } = require('./tools/shell');
 const { loadMemory, saveMemory, buildClaudeHistory } = require('./tools/memory');
 const mac = require('./tools/mac');
 const { postSocial } = require('./tools/social');
+const { postTikTokVideo, postTikTokPhotos, getTikTokAnalytics } = require('./tools/tiktok');
+const { postInstagramPhoto, postInstagramReel, postInstagramCarousel, getInstagramInsights, getInstagramMedia } = require('./tools/instagram');
+const { fetchGA4Report, fetchAppStoreSales, fetchAppStoreApps, fetchAppStoreReviews } = require('./tools/analytics');
 const { scheduleEvent } = require('./tools/calendar');
 const { webRequest } = require('./tools/web');
 const files = require('./tools/files');
@@ -268,11 +271,59 @@ function buildToolHandler(send, skipConfirm) {
 
       // ── Social ──────────────────────────────────────────────
       case 'post_social': {
-        const result = await postSocial(input);
-        if (result.needsBrowser && result.url) {
-          await shell.openExternal(result.url);
+        const plat = (input.platform || '').toLowerCase();
+        let result;
+
+        if (plat === 'tiktok') {
+          // TikTok: video or photo carousel
+          if (input.mediaUrls?.length) {
+            result = await postTikTokPhotos({ photoUrls: input.mediaUrls, caption: input.text });
+          } else if (input.mediaUrl) {
+            result = await postTikTokVideo({ videoUrl: input.mediaUrl, caption: input.text });
+          } else {
+            result = { success: false, error: 'TikTok requires mediaUrl (video) or mediaUrls (photos).' };
+          }
+        } else if (plat === 'instagram') {
+          // Instagram: reel, carousel, or photo
+          if (input.mediaUrls?.length > 1) {
+            result = await postInstagramCarousel({ mediaUrls: input.mediaUrls, caption: input.text, hashtags: input.hashtags });
+          } else if (input.mediaUrl?.match(/\.(mp4|mov|avi)$/i)) {
+            result = await postInstagramReel({ videoUrl: input.mediaUrl, caption: input.text, hashtags: input.hashtags });
+          } else if (input.mediaUrl) {
+            result = await postInstagramPhoto({ imageUrl: input.mediaUrl, caption: input.text, hashtags: input.hashtags });
+          } else {
+            result = { success: false, error: 'Instagram requires mediaUrl (photo/video) or mediaUrls (carousel).' };
+          }
+        } else {
+          // X, LinkedIn, Facebook, Threads, Reddit — webhook or compose window
+          result = await postSocial(input);
+          if (result.needsBrowser && result.url) await shell.openExternal(result.url);
         }
+
         send('agent:tool_result', { tool: 'post_social', result });
+        return JSON.stringify(result);
+      }
+
+      // ── Analytics ────────────────────────────────────────────
+      case 'get_analytics': {
+        let result;
+        switch (input.source) {
+          case 'ga4':
+            result = await fetchGA4Report(input);
+            break;
+          case 'appstore':
+            result = await fetchAppStoreSales({ frequency: input.frequency, reportDate: input.startDate });
+            break;
+          case 'appstore_apps':
+            result = await fetchAppStoreApps();
+            break;
+          case 'appstore_reviews':
+            result = await fetchAppStoreReviews({ appId: input.appId });
+            break;
+          default:
+            result = { success: false, error: `Unknown analytics source: "${input.source}". Use ga4, appstore, appstore_apps, or appstore_reviews.` };
+        }
+        send('agent:tool_result', { tool: 'get_analytics', result });
         return JSON.stringify(result);
       }
 
