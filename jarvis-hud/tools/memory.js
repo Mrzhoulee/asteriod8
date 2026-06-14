@@ -58,4 +58,14 @@ function buildClaudeHistory(memory) {
   return messages;
 }
 
-module.exports = { loadMemory, saveMemory, buildClaudeHistory };
+function clearMemory() {
+  try {
+    fs.mkdirSync(path.dirname(MEMORY_PATH), { recursive: true });
+    fs.writeFileSync(MEMORY_PATH, '[]');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+module.exports = { loadMemory, saveMemory, clearMemory, buildClaudeHistory };

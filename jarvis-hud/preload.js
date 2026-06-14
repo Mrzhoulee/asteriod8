@@ -29,12 +29,14 @@ contextBridge.exposeInMainWorld('jarvis', {
   // ── Memory ──────────────────────────────────────────────────
   loadMemory: () => ipcRenderer.invoke('memory:load'),
   saveMemory: (entry) => ipcRenderer.invoke('memory:save', entry),
+  clearMemory: () => ipcRenderer.invoke('memory:clear'),
 
   // ── Voice ───────────────────────────────────────────────────
   transcribeAudio: (audioBuffer) => ipcRenderer.invoke('voice:transcribe', audioBuffer),
 
   // ── TTS ─────────────────────────────────────────────────────
-  speak: (text) => ipcRenderer.invoke('tts:speak', text),
+  speak: (textOrOpts) => ipcRenderer.invoke('tts:speak', textOrOpts),
+  listVoices: () => ipcRenderer.invoke('tts:voices'),
 
   // ── Shell ───────────────────────────────────────────────────
   openExternal: (url) => ipcRenderer.invoke('app:open-external', url),

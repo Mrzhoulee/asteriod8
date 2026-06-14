@@ -14,7 +14,7 @@ const {
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const { exec } = require('child_process');
+const { exec, execFile } = require('child_process');
 
 // Writable data dir (memory, an optional .env) — must be set before requiring memory.
 const DATA_DIR = app.getPath('userData');
@@ -28,7 +28,7 @@ if (fs.existsSync(userEnv)) require('dotenv').config({ path: userEnv, override: 
 const { runJarvis, runSubAgent } = require('./agents/index');
 const { sendEmail, listAccounts } = require('./tools/email');
 const { runShell, classifyCommand } = require('./tools/shell');
-const { loadMemory, saveMemory, buildClaudeHistory } = require('./tools/memory');
+const { loadMemory, saveMemory, clearMemory, buildClaudeHistory } = require('./tools/memory');
 const mac = require('./tools/mac');
 const { postSocial } = require('./tools/social');
 const { postTikTokVideo, postTikTokPhotos, getTikTokAnalytics } = require('./tools/tiktok');
@@ -156,6 +156,7 @@ ipcMain.handle('window:minimize', () => mainWindow?.minimize());
 ipcMain.handle('memory:load', () => loadMemory());
 ipcMain.handle('email:list_accounts', () => listAccounts());
 ipcMain.handle('memory:save', (_, entry) => saveMemory(entry));
+ipcMain.handle('memory:clear', () => clearMemory());
 
 // Report which integrations are configured — booleans only, NEVER the secrets.
 // Powers the onboarding checklist so users can see what's left to connect.
@@ -193,12 +194,34 @@ ipcMain.handle('voice:transcribe', async (_, audioBuffer) => {
   }
 });
 
-ipcMain.handle('tts:speak', (_, text) => {
+ipcMain.handle('tts:speak', (_, payload) => {
   if (process.platform !== 'darwin') return { success: false, error: 'TTS only on macOS' };
-  const safe = text.replace(/"/g, '\\"').substring(0, 500);
-  exec(`say "${safe}"`);
+  const opts = typeof payload === 'string' ? { text: payload } : (payload || {});
+  const text = String(opts.text || '').substring(0, 500);
+  if (!text) return { success: false, error: 'No text to speak' };
+  const args = [];
+  if (opts.voice) args.push('-v', String(opts.voice));
+  if (opts.rate) args.push('-r', String(parseInt(opts.rate, 10) || 175));
+  args.push(text);
+  // execFile (no shell) — voice names with spaces/parentheses and arbitrary
+  // reply text are passed as literal args, so nothing can break or inject.
+  execFile('say', args);
   return { success: true };
 });
+
+// List installed macOS voices for the Settings voice picker.
+ipcMain.handle('tts:voices', () => new Promise((resolve) => {
+  if (process.platform !== 'darwin') return resolve([]);
+  execFile('say', ['-v', '?'], { maxBuffer: 4 * 1024 * 1024 }, (err, stdout) => {
+    if (err || !stdout) return resolve([]);
+    const voices = [];
+    for (const line of stdout.split('\n')) {
+      const m = line.match(/^(.+?)\s+([a-zA-Z]{2}[-_][a-zA-Z]{2,3})\s+#\s?(.*)$/);
+      if (m) voices.push({ name: m[1].trim(), locale: m[2], sample: m[3].trim() });
+    }
+    resolve(voices);
+  });
+}));
 
 // ─── Tool dispatch ────────────────────────────────────────────
 

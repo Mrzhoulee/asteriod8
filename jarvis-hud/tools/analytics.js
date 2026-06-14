@@ -169,9 +169,15 @@ async function fetchAppStoreSales({ frequency = 'MONTHLY', reportDate, vendorNum
   if (!vendor) return { success: false, error: 'Set APP_STORE_CONNECT_VENDOR_NUMBER in .env (find it in App Store Connect → Payments & Financial Reports → My Vendors).' };
 
   const now = new Date();
-  const defaultDate = frequency === 'DAILY'
-    ? new Date(now - 86400000).toISOString().slice(0, 10)
-    : `${now.getFullYear()}-${String(now.getMonth()).padStart(2, '0')}`; // last month
+  let defaultDate;
+  if (frequency === 'DAILY') {
+    defaultDate = new Date(now - 86400000).toISOString().slice(0, 10); // yesterday
+  } else {
+    // Last month, with correct year rollover (getMonth() is 0-indexed, so
+    // getMonth()-1 with a Date handles January → previous December).
+    const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    defaultDate = `${lm.getFullYear()}-${String(lm.getMonth() + 1).padStart(2, '0')}`;
+  }
 
   const params = new URLSearchParams({
     'filter[reportType]': 'SALES',

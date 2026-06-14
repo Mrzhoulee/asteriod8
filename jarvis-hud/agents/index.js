@@ -52,6 +52,11 @@ async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
 
   let assistantText = '';
 
+  // Safety cap: stop an agentic tool loop that never settles — prevents the
+  // "thinking forever" hang and runaway API cost if a tool keeps failing.
+  const MAX_TOOL_ROUNDS = 12;
+  let round = 0;
+
   while (true) {
     const stream = client.messages.stream({
       model: MODEL,
@@ -75,6 +80,13 @@ async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
     messages.push({ role: 'assistant', content: finalMsg.content });
 
     if (finalMsg.stop_reason !== 'tool_use') break;
+
+    if (++round > MAX_TOOL_ROUNDS) {
+      const note = '\n\n[Paused: too many tool calls in a row. Clear the conversation or rephrase if this wasn\'t expected.]';
+      assistantText += note;
+      if (onToken) onToken(note);
+      break;
+    }
 
     if (assistantText && !assistantText.endsWith('\n')) assistantText += '\n';
 
