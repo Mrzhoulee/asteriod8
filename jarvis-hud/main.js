@@ -441,6 +441,32 @@ function buildToolHandler(send, skipConfirm) {
 
 // ─── Agent runner ─────────────────────────────────────────────
 
+// Translate raw Anthropic API errors into plain, actionable guidance so the HUD
+// shows something useful instead of a cryptic provider string.
+function friendlyAgentError(err) {
+  const raw = err?.message || String(err);
+  const status = err?.status;
+  const lower = raw.toLowerCase();
+
+  if (lower.includes('credit balance') || lower.includes('billing') ||
+      (status === 400 && lower.includes('too low'))) {
+    return 'Anthropic API credit is empty. A Claude Pro/Max subscription does NOT include API access — the API is billed separately. Add credits at console.anthropic.com → Settings → Billing → "Buy credits", then try again.';
+  }
+  if (status === 401 || lower.includes('invalid x-api-key') || lower.includes('authentication_error')) {
+    return 'Anthropic rejected the API key. Check ANTHROPIC_API_KEY in your .env — grab a fresh one at console.anthropic.com → Settings → API keys (starts with sk-ant-).';
+  }
+  if (status === 429 || lower.includes('rate_limit') || lower.includes('rate limit')) {
+    return 'Hit Anthropic\'s rate limit. Wait a few seconds and try again, or raise your limits in the console.';
+  }
+  if (status === 404 && lower.includes('model')) {
+    return `That Claude model isn't available on your account: ${raw}`;
+  }
+  if (status === 529 || lower.includes('overloaded')) {
+    return 'Anthropic is temporarily overloaded. Try again in a moment.';
+  }
+  return raw;
+}
+
 ipcMain.on('agent:run', async (event, { requestId, message, skipConfirm }) => {
   const send = (channel, data) => {
     if (!event.sender.isDestroyed()) event.sender.send(channel, { requestId, ...data });
@@ -462,6 +488,6 @@ ipcMain.on('agent:run', async (event, { requestId, message, skipConfirm }) => {
     if (finalText) saveMemory({ role: 'assistant', agent: 'jarvis', content: finalText });
     send('agent:done', { agent: 'jarvis' });
   } catch (err) {
-    send('agent:error', { agent: 'jarvis', error: err.message });
+    send('agent:error', { agent: 'jarvis', error: friendlyAgentError(err) });
   }
 });
