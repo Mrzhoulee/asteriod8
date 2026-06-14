@@ -26,7 +26,7 @@ const userEnv = path.join(DATA_DIR, '.env');
 if (fs.existsSync(userEnv)) require('dotenv').config({ path: userEnv, override: false });
 
 const { runJarvis, runSubAgent } = require('./agents/index');
-const { sendEmail, listAccounts } = require('./tools/email');
+const { sendEmail, listAccounts, verifyAccounts } = require('./tools/email');
 const { runShell, classifyCommand } = require('./tools/shell');
 const { loadMemory, saveMemory, clearMemory, buildClaudeHistory } = require('./tools/memory');
 const mac = require('./tools/mac');
@@ -155,6 +155,7 @@ ipcMain.handle('window:close', () => app.quit());
 ipcMain.handle('window:minimize', () => mainWindow?.minimize());
 ipcMain.handle('memory:load', () => loadMemory());
 ipcMain.handle('email:list_accounts', () => listAccounts());
+ipcMain.handle('email:verify', () => verifyAccounts());
 ipcMain.handle('memory:save', (_, entry) => saveMemory(entry));
 ipcMain.handle('memory:clear', () => clearMemory());
 

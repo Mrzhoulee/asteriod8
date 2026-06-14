@@ -22,6 +22,7 @@ contextBridge.exposeInMainWorld('jarvis', {
 
   // ── Email accounts ──────────────────────────────────────────
   listEmailAccounts: () => ipcRenderer.invoke('email:list_accounts'),
+  verifyEmail: () => ipcRenderer.invoke('email:verify'),
 
   // ── Integrations status (for onboarding checklist) ──────────
   getIntegrations: () => ipcRenderer.invoke('integrations:status'),

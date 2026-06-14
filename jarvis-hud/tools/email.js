@@ -85,16 +85,20 @@ const _transporters = new Map(); // label -> nodemailer transport
 function getTransporter(account) {
   if (_transporters.has(account.label)) return _transporters.get(account.label);
 
+  // Bounded timeouts so a bad network/credential can't hang verify() or send forever.
+  const timeouts = { connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 20000 };
   const transport = account.host
     ? nodemailer.createTransport({
         host: account.host,
         port: account.port,
         secure: account.secure,
         auth: { user: account.user, pass: account.pass },
+        ...timeouts,
       })
     : nodemailer.createTransport({
         service: 'gmail',
         auth: { user: account.user, pass: account.pass },
+        ...timeouts,
       });
 
   _transporters.set(account.label, transport);
@@ -160,8 +164,9 @@ async function sendEmail({ to, subject, body, cc, attachmentPath, fromAccount })
   }
 
   try {
+    const displayName = account.label && account.label !== 'default' ? account.label.replace(/"/g, '') : '';
     const info = await transport.sendMail({
-      from: `${account.label !== 'default' ? account.label + ' ' : ''}<${account.user}>`,
+      from: displayName ? `"${displayName}" <${account.user}>` : account.user,
       to,
       cc: cc || undefined,
       subject,
@@ -174,4 +179,46 @@ async function sendEmail({ to, subject, body, cc, attachmentPath, fromAccount })
   }
 }
 
-module.exports = { sendEmail, listAccounts };
+// Map raw SMTP errors to plain guidance the user can act on.
+function friendlyMailError(err) {
+  const m = (err && err.message) || String(err);
+  const low = m.toLowerCase();
+  if (low.includes('username and password not accepted') || low.includes('invalid login') ||
+      low.includes('badcredentials') || (err && err.responseCode === 535)) {
+    return 'Gmail rejected the login. Use a 16-character App Password (NOT your normal Gmail password), and make sure 2-Step Verification is ON. Create one at myaccount.google.com/apppasswords.';
+  }
+  if (low.includes('missing credentials')) return 'Username or password is empty — check GMAIL_ACCOUNT_1_USER / _PASS in .env.';
+  if (low.includes('timeout') || low.includes('etimedout') || low.includes('econnrefused') || low.includes('enotfound')) {
+    return 'Could not reach the mail server — check your network/firewall, or the SMTP host/port for a non-Gmail account.';
+  }
+  return m;
+}
+
+/**
+ * Verify each configured account can actually authenticate (real SMTP handshake,
+ * no email sent). Surfaces the true connection state instead of just "is a
+ * username set". Returns per-account ok/error.
+ */
+async function verifyAccounts() {
+  const accounts = loadAccounts();
+  if (!accounts.length) {
+    return {
+      configured: false,
+      success: false,
+      accounts: [],
+      error: 'No email account configured. Add GMAIL_ACCOUNT_1_USER and GMAIL_ACCOUNT_1_PASS (a Gmail App Password) to your .env, then restart.',
+    };
+  }
+  const results = [];
+  for (const a of accounts) {
+    try {
+      await getTransporter(a).verify();
+      results.push({ label: a.label, user: a.user, ok: true });
+    } catch (err) {
+      results.push({ label: a.label, user: a.user, ok: false, error: friendlyMailError(err) });
+    }
+  }
+  return { configured: true, success: results.every((r) => r.ok), accounts: results };
+}
+
+module.exports = { sendEmail, listAccounts, verifyAccounts };
