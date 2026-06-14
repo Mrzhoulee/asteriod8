@@ -23,6 +23,9 @@ contextBridge.exposeInMainWorld('jarvis', {
   // ── Email accounts ──────────────────────────────────────────
   listEmailAccounts: () => ipcRenderer.invoke('email:list_accounts'),
 
+  // ── Integrations status (for onboarding checklist) ──────────
+  getIntegrations: () => ipcRenderer.invoke('integrations:status'),
+
   // ── Memory ──────────────────────────────────────────────────
   loadMemory: () => ipcRenderer.invoke('memory:load'),
   saveMemory: (entry) => ipcRenderer.invoke('memory:save', entry),
@@ -32,6 +35,9 @@ contextBridge.exposeInMainWorld('jarvis', {
 
   // ── TTS ─────────────────────────────────────────────────────
   speak: (text) => ipcRenderer.invoke('tts:speak', text),
+
+  // ── Shell ───────────────────────────────────────────────────
+  openExternal: (url) => ipcRenderer.invoke('app:open-external', url),
 
   // ── Window ──────────────────────────────────────────────────
   hideWindow: () => ipcRenderer.invoke('window:hide'),

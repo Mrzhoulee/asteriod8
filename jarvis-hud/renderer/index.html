@@ -4,17 +4,31 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JARVIS HUD</title>
+  <!-- Modern fonts: Orbitron for the HUD/sci-fi headings, Space Grotesk for UI, JetBrains Mono for code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 <div id="hud">
 
-  <!-- Title Bar -->
+  <!-- ─── Title Bar ─────────────────────────────────────────── -->
   <div id="titlebar">
     <div class="title-logo">
       J.A.R.V.I.S
-      <span>HUD v1.0 — MULTI-AGENT</span>
+      <span>HUD v2.0 · MULTI-AGENT CORE</span>
     </div>
+
+    <div class="toolbar" id="toolbar">
+      <button class="tb-btn" data-panel="onboarding" title="Setup / Connect APIs (⌘1)"><span class="tb-ico">◎</span><span class="tb-lbl">Setup</span></button>
+      <button class="tb-btn" data-panel="diagram"    title="Diagrams (⌘2)"><span class="tb-ico">⌗</span><span class="tb-lbl">Diagram</span></button>
+      <button class="tb-btn" data-panel="logs"       title="Activity log (⌘3)"><span class="tb-ico">≡</span><span class="tb-lbl">Logs</span></button>
+      <button class="tb-btn" data-panel="stats"      title="Stats (⌘4)"><span class="tb-ico">▤</span><span class="tb-lbl">Stats</span></button>
+      <button class="tb-btn" data-panel="settings"   title="Customize (⌘,)"><span class="tb-ico">✦</span><span class="tb-lbl">Customize</span></button>
+      <button class="tb-btn" id="palette-btn"        title="Command palette (⌘K)"><span class="tb-ico">⌘</span><span class="tb-lbl">⌘K</span></button>
+    </div>
+
     <span class="header-status" id="header-status">READY</span>
     <div class="window-controls">
       <button class="wc-btn hide"  id="btn-hide"  title="Hide (⌘⇧J)"></button>
@@ -23,36 +37,67 @@
     </div>
   </div>
 
-  <!-- Main Content -->
+  <!-- ─── Main Content: chat · core · agents ────────────────── -->
   <div id="content">
 
-    <!-- JARVIS Panel -->
+    <!-- JARVIS chat (left) -->
     <div id="jarvis-panel">
       <div class="panel-header">
-        <div class="panel-dot" id="jarvis-dot" style="--agent-color:var(--jarvis)"></div>
-        <span class="panel-name" style="--agent-color:var(--jarvis);--agent-glow:var(--jarvis-glow)">J.A.R.V.I.S</span>
+        <div class="panel-dot" id="jarvis-dot" style="--agent-color:var(--accent)"></div>
+        <span class="panel-name" style="--agent-color:var(--accent);--agent-glow:var(--accent-glow)">J.A.R.V.I.S</span>
         <span class="panel-role">CENTER BRAIN</span>
         <span class="panel-status" id="jarvis-status">IDLE</span>
-      </div>
-      <div class="messages" id="jarvis-messages">
-        <div class="empty-hint" id="jarvis-hint">
-          Ask me anything. I can delegate to my team,<br>
-          send emails, run shell commands, and open URLs.<br><br>
-          <span class="shortcut">⌘⇧J</span> to toggle this window.
+        <div class="panel-actions">
+          <button class="mini-btn" id="search-btn"  title="Search conversation (⌘F)">⌕</button>
+          <button class="mini-btn" id="export-btn"  title="Export conversation">⤓</button>
+          <button class="mini-btn" id="clear-btn"   title="Clear conversation">⌫</button>
         </div>
       </div>
+
+      <div class="messages" id="jarvis-messages">
+        <div class="empty-hint" id="jarvis-hint">
+          <div class="hint-title">Online and ready.</div>
+          I orchestrate a team, take real action on your Mac, post to social,
+          run analytics, and more.<br><br>
+          <span class="shortcut">⌘K</span> commands ·
+          <span class="shortcut">⌘1</span> setup ·
+          <span class="shortcut">⌘⇧J</span> toggle
+        </div>
+      </div>
+
+      <!-- Quick-start suggestion chips -->
+      <div id="quick-chips">
+        <button class="chip" data-prompt="Show me a diagram of how your agent team is wired up.">⌗ Show team diagram</button>
+        <button class="chip" data-prompt="What are my App Store downloads for last month?">📊 App Store stats</button>
+        <button class="chip" data-prompt="Draft an Instagram post to launch our app and post it.">📣 Launch post</button>
+        <button class="chip" data-prompt="Check my Mailchimp audience stats.">🐵 Audience stats</button>
+      </div>
+
       <div id="input-bar">
         <button class="icon-btn" id="tts-btn"   title="Toggle voice responses">🔊</button>
         <button class="icon-btn" id="voice-btn" title="Hold to record (Groq Whisper)">🎤</button>
-        <input  type="text"      id="user-input" placeholder="Talk to JARVIS…" autocomplete="off" spellcheck="false" />
+        <input  type="text"      id="user-input" placeholder="Talk to JARVIS…  (try /help)" autocomplete="off" spellcheck="false" />
         <button id="send-btn" title="Send (Enter)">➤</button>
       </div>
     </div>
 
-    <!-- Sub-agent Sidebar -->
-    <div id="agents-sidebar">
+    <!-- Reactor core: the big animated particle sphere (center) -->
+    <div id="core-panel">
+      <canvas id="core-canvas"></canvas>
+      <div id="core-overlay">
+        <div class="core-state" id="core-state">IDLE</div>
+        <div class="core-sub" id="core-sub">SYSTEMS NOMINAL</div>
+      </div>
+      <div id="core-readout">
+        <div class="ro"><span class="ro-k">MODEL</span><span class="ro-v" id="ro-model">—</span></div>
+        <div class="ro"><span class="ro-k">TURNS</span><span class="ro-v" id="ro-turns">0</span></div>
+        <div class="ro"><span class="ro-k">TOOLS</span><span class="ro-v" id="ro-tools">0</span></div>
+        <div class="ro"><span class="ro-k">LINKED</span><span class="ro-v" id="ro-linked">0/10</span></div>
+      </div>
+    </div>
 
-      <!-- Hannah -->
+    <!-- Sub-agent sidebar (right) -->
+    <div id="agents-sidebar">
       <div class="agent-panel" data-agent="hannah" id="panel-hannah">
         <div class="panel-header">
           <div class="panel-dot" id="hannah-dot"></div>
@@ -65,7 +110,6 @@
         </div>
       </div>
 
-      <!-- Marcus -->
       <div class="agent-panel" data-agent="marcus" id="panel-marcus">
         <div class="panel-header">
           <div class="panel-dot" id="marcus-dot"></div>
@@ -78,7 +122,6 @@
         </div>
       </div>
 
-      <!-- Rob -->
       <div class="agent-panel" data-agent="rob" id="panel-rob">
         <div class="panel-header">
           <div class="panel-dot" id="rob-dot"></div>
@@ -90,9 +133,93 @@
           <div class="empty-hint">De-escalation · Communications · Retention</div>
         </div>
       </div>
-
     </div>
   </div>
+
+  <!-- ─── Search bar (slides under titlebar) ────────────────── -->
+  <div id="search-bar" class="hidden">
+    <span class="search-ico">⌕</span>
+    <input type="text" id="search-input" placeholder="Find in conversation…" autocomplete="off" />
+    <span id="search-count">0/0</span>
+    <button class="mini-btn" id="search-prev">↑</button>
+    <button class="mini-btn" id="search-next">↓</button>
+    <button class="mini-btn" id="search-close">✕</button>
+  </div>
+
+  <!-- ─── Overlays ──────────────────────────────────────────── -->
+  <div id="overlay-root" class="hidden">
+    <div class="overlay-backdrop" id="overlay-backdrop"></div>
+
+    <!-- Command palette -->
+    <div class="overlay palette hidden" id="overlay-palette">
+      <input type="text" id="palette-input" placeholder="Type a command…  e.g. theme, export, clear" autocomplete="off" />
+      <div class="palette-list" id="palette-list"></div>
+    </div>
+
+    <!-- Settings / Customize -->
+    <div class="overlay sheet hidden" id="overlay-settings">
+      <div class="sheet-head"><span>✦ Customize</span><button class="sheet-x" data-close>✕</button></div>
+      <div class="sheet-body" id="settings-body"><!-- built in JS --></div>
+    </div>
+
+    <!-- Activity log -->
+    <div class="overlay sheet hidden" id="overlay-logs">
+      <div class="sheet-head">
+        <span>≡ Activity Log</span>
+        <div class="sheet-head-actions">
+          <select id="log-filter" class="mini-select">
+            <option value="all">All</option>
+            <option value="message">Messages</option>
+            <option value="tool">Tools</option>
+            <option value="system">System</option>
+            <option value="error">Errors</option>
+          </select>
+          <button class="ghost-btn" id="log-export">Export</button>
+          <button class="ghost-btn" id="log-clear">Clear</button>
+          <button class="sheet-x" data-close>✕</button>
+        </div>
+      </div>
+      <div class="sheet-body log-body" id="logs-body"></div>
+    </div>
+
+    <!-- Stats dashboard -->
+    <div class="overlay sheet hidden" id="overlay-stats">
+      <div class="sheet-head"><span>▤ Usage Stats</span><button class="sheet-x" data-close>✕</button></div>
+      <div class="sheet-body" id="stats-body"></div>
+    </div>
+
+    <!-- Onboarding / integrations -->
+    <div class="overlay sheet hidden" id="overlay-onboarding">
+      <div class="sheet-head"><span>◎ Setup — Road to 1,000 Users</span><button class="sheet-x" data-close>✕</button></div>
+      <div class="sheet-body" id="onboarding-body"></div>
+    </div>
+
+    <!-- Diagram -->
+    <div class="overlay sheet wide hidden" id="overlay-diagram">
+      <div class="sheet-head">
+        <span>⌗ Diagram Studio</span>
+        <div class="sheet-head-actions">
+          <button class="ghost-btn" id="diagram-arch">Agent Architecture</button>
+          <button class="ghost-btn" id="diagram-render">Render ▸</button>
+          <button class="sheet-x" data-close>✕</button>
+        </div>
+      </div>
+      <div class="sheet-body diagram-body">
+        <textarea id="diagram-input" spellcheck="false" placeholder="One edge per line:  A -> B  |  Label: A -> B&#10;&#10;Example:&#10;User -> JARVIS&#10;JARVIS -> Hannah&#10;JARVIS -> Marcus&#10;JARVIS -> Rob"></textarea>
+        <div id="diagram-canvas"></div>
+      </div>
+    </div>
+
+    <!-- Keyboard shortcuts help -->
+    <div class="overlay sheet hidden" id="overlay-help">
+      <div class="sheet-head"><span>⌨ Shortcuts</span><button class="sheet-x" data-close>✕</button></div>
+      <div class="sheet-body" id="help-body"></div>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toast-stack"></div>
+
 </div>
 
 <script src="app.js"></script>

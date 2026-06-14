@@ -147,12 +147,34 @@ async function confirm({ title, message, detail, danger }) {
 
 // ─── Window / memory / voice / TTS IPC ────────────────────────
 
+ipcMain.handle('app:open-external', (_, url) => {
+  if (typeof url === 'string' && /^https?:\/\//i.test(url)) shell.openExternal(url);
+});
 ipcMain.handle('window:hide', () => mainWindow?.hide());
 ipcMain.handle('window:close', () => app.quit());
 ipcMain.handle('window:minimize', () => mainWindow?.minimize());
 ipcMain.handle('memory:load', () => loadMemory());
 ipcMain.handle('email:list_accounts', () => listAccounts());
 ipcMain.handle('memory:save', (_, entry) => saveMemory(entry));
+
+// Report which integrations are configured — booleans only, NEVER the secrets.
+// Powers the onboarding checklist so users can see what's left to connect.
+ipcMain.handle('integrations:status', () => {
+  const has = (...keys) => keys.some((k) => !!process.env[k]);
+  return {
+    llm:        has('ANTHROPIC_API_KEY'),
+    voice:      has('GROQ_API_KEY'),
+    email:      has('GMAIL_ACCOUNT_1_USER', 'GMAIL_USER'),
+    social:     has('LATE_API_KEY', 'SOCIAL_WEBHOOK_URL', 'BUFFER_ACCESS_TOKEN', 'X_BEARER_TOKEN'),
+    tiktok:     has('TIKTOK_ACCESS_TOKEN', 'LATE_API_KEY', 'SOCIAL_WEBHOOK_URL'),
+    instagram:  has('INSTAGRAM_ACCESS_TOKEN', 'LATE_API_KEY', 'SOCIAL_WEBHOOK_URL'),
+    analytics:  has('GOOGLE_ANALYTICS_TOKEN', 'GOOGLE_SERVICE_ACCOUNT_JSON'),
+    appstore:   has('APP_STORE_CONNECT_KEY_ID'),
+    appfigures: has('APPFIGURES_TOKEN'),
+    mailchimp:  has('MAILCHIMP_API_KEY'),
+    model:      process.env.JARVIS_MODEL || 'claude-sonnet-4-6',
+  };
+});
 
 ipcMain.handle('voice:transcribe', async (_, audioBuffer) => {
   try {
