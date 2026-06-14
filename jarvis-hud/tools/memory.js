@@ -6,8 +6,8 @@ const path = require('path');
 const MEMORY_PATH = process.env.JARVIS_DATA_DIR
   ? path.join(process.env.JARVIS_DATA_DIR, 'context.json')
   : path.join(__dirname, '../memory/context.json');
-const MAX_ENTRIES = 20;
-const CONTEXT_WINDOW = 10;
+const MAX_ENTRIES = 40;
+const CONTEXT_WINDOW = 16;
 
 function loadMemory() {
   try {

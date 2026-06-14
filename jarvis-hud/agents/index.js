@@ -4,9 +4,16 @@ const PERSONAS = require('./personas');
 const { JARVIS_TOOLS } = require('./tools');
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-// claude-sonnet-4-6 — strong tool-use at lower cost than Opus.
-// Override with JARVIS_MODEL in .env (e.g. claude-opus-4-8, claude-haiku-4-5).
-const MODEL = process.env.JARVIS_MODEL || 'claude-sonnet-4-6';
+// Default to Opus 4.8 — Anthropic's most capable model, so JARVIS reasons and
+// finishes complex multi-step jobs like the real thing. To spend less, set
+// JARVIS_MODEL=claude-sonnet-4-6 (balanced) or claude-haiku-4-5 (cheapest) in .env.
+const MODEL = process.env.JARVIS_MODEL || 'claude-opus-4-8';
+
+// Extended thinking: let JARVIS reason privately before answering/acting — this is
+// what makes it genuinely smart on hard, multi-step requests instead of replying
+// off the top of its head. Set JARVIS_THINKING=off to disable, or tune the budget.
+const THINKING_BUDGET = parseInt(process.env.JARVIS_THINKING_BUDGET || '2048', 10);
+const USE_THINKING = process.env.JARVIS_THINKING !== 'off' && THINKING_BUDGET >= 1024;
 
 /**
  * Run a sub-agent (Hannah, Marcus, Rob) — text-only, no tools.
@@ -18,7 +25,7 @@ async function runSubAgent(agentName, task, onToken) {
 
   const stream = client.messages.stream({
     model: MODEL,
-    max_tokens: 2048,
+    max_tokens: 4096,
     system: persona.system,
     messages: [{ role: 'user', content: task }],
   });
@@ -54,17 +61,24 @@ async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
 
   // Safety cap: stop an agentic tool loop that never settles — prevents the
   // "thinking forever" hang and runaway API cost if a tool keeps failing.
-  const MAX_TOOL_ROUNDS = 12;
+  const MAX_TOOL_ROUNDS = 16;
   let round = 0;
 
   while (true) {
-    const stream = client.messages.stream({
+    const params = {
       model: MODEL,
-      max_tokens: 4096,
+      // Roomy output budget so JARVIS finishes the whole answer instead of
+      // getting cut off mid-job. (Output here = thinking + visible reply.)
+      max_tokens: 8192,
       system: PERSONAS.jarvis.system,
       tools: JARVIS_TOOLS,
       messages,
-    });
+    };
+    // Extended thinking makes it reason through hard, multi-step requests before
+    // acting — the difference between a smart operator and a chatbot.
+    if (USE_THINKING) params.thinking = { type: 'enabled', budget_tokens: THINKING_BUDGET };
+
+    const stream = client.messages.stream(params);
 
     for await (const event of stream) {
       if (
@@ -78,6 +92,14 @@ async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
 
     const finalMsg = await stream.finalMessage();
     messages.push({ role: 'assistant', content: finalMsg.content });
+
+    // Ran out of output budget mid-answer — ask it to continue rather than
+    // leaving the user with a truncated, "unfinished" reply.
+    if (finalMsg.stop_reason === 'max_tokens') {
+      if (++round > MAX_TOOL_ROUNDS) break;
+      messages.push({ role: 'user', content: 'Continue exactly where you left off.' });
+      continue;
+    }
 
     if (finalMsg.stop_reason !== 'tool_use') break;
 
