@@ -1,4 +1,10 @@
-const PERSONAS = {
+const fs = require('fs');
+const path = require('path');
+
+// The built-in roster. These are the defaults the user starts from — every field
+// (name, role, system prompt, accent color) can be overridden from the Customize
+// panel and is persisted to personas.json, leaving these untouched as a baseline.
+const DEFAULT_PERSONAS = {
   jarvis: {
     name: 'J.A.R.V.I.S',
     role: 'Center Brain',
@@ -84,4 +90,107 @@ Be warm, genuine, and solution-focused. When drafting communications, deliver th
   },
 };
 
-module.exports = PERSONAS;
+// The teammates JARVIS can delegate to (everyone except JARVIS itself).
+const SUBAGENTS = ['hannah', 'marcus', 'rob'];
+
+// Models the user can pick from in the Customize panel. Opus 4.8 is the default —
+// the most capable, so JARVIS reasons through and finishes complex multi-step jobs.
+const MODELS = [
+  { id: 'claude-opus-4-8',   label: 'Opus 4.8 — smartest' },
+  { id: 'claude-sonnet-4-6', label: 'Sonnet 4.6 — balanced' },
+  { id: 'claude-haiku-4-5',  label: 'Haiku 4.5 — fastest' },
+];
+const DEFAULT_MODEL = 'claude-opus-4-8';
+
+// User customizations (renamed jobs, rewritten prompts, chosen model) live in a
+// writable JSON file. In a packaged .app the bundle is read-only, so main sets
+// JARVIS_DATA_DIR to a userData path; in dev we fall back to the project folder.
+const CONFIG_PATH = process.env.JARVIS_DATA_DIR
+  ? path.join(process.env.JARVIS_DATA_DIR, 'personas.json')
+  : path.join(__dirname, '../memory/personas.json');
+
+// Only these per-agent fields can be overridden — a malformed file can never strip
+// a required field (color/role) or inject anything unexpected into a persona.
+const EDITABLE_FIELDS = ['name', 'role', 'system', 'color'];
+
+function loadConfig() {
+  try {
+    if (!fs.existsSync(CONFIG_PATH)) return {};
+    const raw = fs.readFileSync(CONFIG_PATH, 'utf8').trim();
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+// Strip a raw config down to known keys/fields with trimmed, non-empty strings, so
+// whatever we persist (and later merge into prompts) is always well-formed.
+function sanitizeConfig(config) {
+  const clean = {};
+  const model = config && typeof config.model === 'string' ? config.model.trim() : '';
+  if (MODELS.some((m) => m.id === model)) clean.model = model;
+
+  const agentsIn = (config && config.agents) || {};
+  const agents = {};
+  for (const key of Object.keys(DEFAULT_PERSONAS)) {
+    const o = agentsIn[key];
+    if (!o || typeof o !== 'object') continue;
+    const entry = {};
+    for (const f of EDITABLE_FIELDS) {
+      if (typeof o[f] === 'string' && o[f].trim() !== '') entry[f] = o[f].trim();
+    }
+    if (Object.keys(entry).length) agents[key] = entry;
+  }
+  if (Object.keys(agents).length) clean.agents = agents;
+  return clean;
+}
+
+// The active roster: defaults with the user's per-agent overrides merged in.
+function loadPersonas() {
+  const { agents = {} } = sanitizeConfig(loadConfig());
+  const merged = {};
+  for (const [key, base] of Object.entries(DEFAULT_PERSONAS)) {
+    merged[key] = { ...base, ...(agents[key] || {}) };
+  }
+  return merged;
+}
+
+// Which Claude model powers the agents. A model chosen in the UI wins; then a
+// JARVIS_MODEL env override; then the Opus 4.8 default.
+function getModel() {
+  return sanitizeConfig(loadConfig()).model || process.env.JARVIS_MODEL || DEFAULT_MODEL;
+}
+
+function saveConfig(config) {
+  const clean = sanitizeConfig(config);
+  fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
+  fs.writeFileSync(CONFIG_PATH, JSON.stringify(clean, null, 2));
+  return clean;
+}
+
+function resetConfig() {
+  try { if (fs.existsSync(CONFIG_PATH)) fs.unlinkSync(CONFIG_PATH); } catch {}
+  return true;
+}
+
+// Build the delegate tool's description from the current roster, so JARVIS always
+// knows who's who — even after a teammate is renamed or their job is rewritten.
+function delegateDescription(personas) {
+  const p = personas || loadPersonas();
+  const roster = SUBAGENTS.map((k) => `${k}=${p[k].name} (${p[k].role})`).join(', ');
+  return `Delegate a task to a specialist teammate. ${roster}. Pass the task with full context.`;
+}
+
+module.exports = {
+  DEFAULT_PERSONAS,
+  SUBAGENTS,
+  MODELS,
+  DEFAULT_MODEL,
+  EDITABLE_FIELDS,
+  loadConfig,
+  loadPersonas,
+  getModel,
+  saveConfig,
+  resetConfig,
+  delegateDescription,
+};

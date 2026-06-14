@@ -3,6 +3,9 @@ dist/
 .env
 *.log
 
+# User's local team/jobs + model customizations (written at runtime in dev)
+memory/personas.json
+
 # Generated icons (run `npm run icon` to recreate)
 build/icon.icns
 build/icon.iconset/

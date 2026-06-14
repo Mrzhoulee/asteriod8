@@ -1,13 +1,21 @@
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const Anthropic = require('@anthropic-ai/sdk');
-const PERSONAS = require('./personas');
+const { loadPersonas, getModel, delegateDescription } = require('./personas');
 const { JARVIS_TOOLS } = require('./tools');
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-// Default to Opus 4.8 — Anthropic's most capable model, so JARVIS reasons and
-// finishes complex multi-step jobs like the real thing. To spend less, set
-// JARVIS_MODEL=claude-sonnet-4-6 (balanced) or claude-haiku-4-5 (cheapest) in .env.
-const MODEL = process.env.JARVIS_MODEL || 'claude-opus-4-8';
+// The model and the full roster (names, roles, system prompts) are resolved per
+// request from the persona store, so the user's Customize-panel edits and model
+// choice take effect immediately — no restart needed. Default model is Opus 4.8.
+
+// Clone the tool list with a delegate description generated from the live roster,
+// so JARVIS delegates to the right teammate even after they've been renamed.
+function buildTools(personas) {
+  return JARVIS_TOOLS.map((tool) =>
+    tool.name === 'delegate_to_agent'
+      ? { ...tool, description: delegateDescription(personas) }
+      : tool);
+}
 
 // Extended thinking: let JARVIS reason privately before answering/acting.
 // Set JARVIS_THINKING=off to disable. Control reasoning depth with JARVIS_THINKING_EFFORT
@@ -20,11 +28,11 @@ const THINKING_EFFORT = process.env.JARVIS_THINKING_EFFORT || 'medium';
  * Streams tokens via onToken callback.
  */
 async function runSubAgent(agentName, task, onToken) {
-  const persona = PERSONAS[agentName];
+  const persona = loadPersonas()[agentName];
   if (!persona) throw new Error(`Unknown agent: ${agentName}`);
 
   const stream = client.messages.stream({
-    model: MODEL,
+    model: getModel(),
     max_tokens: 4096,
     system: persona.system,
     messages: [{ role: 'user', content: task }],
@@ -57,6 +65,12 @@ async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
     { role: 'user', content: message },
   ];
 
+  // Resolve the model, roster, and tools once for this whole turn so a mid-turn
+  // edit can't change them under us — but the next turn picks up any new edits.
+  const personas = loadPersonas();
+  const model = getModel();
+  const tools = buildTools(personas);
+
   let assistantText = '';
 
   // Safety cap: stop an agentic tool loop that never settles — prevents the
@@ -66,12 +80,12 @@ async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
 
   while (true) {
     const params = {
-      model: MODEL,
+      model,
       // Roomy output budget so JARVIS finishes the whole answer instead of
       // getting cut off mid-job. (Output here = thinking + visible reply.)
       max_tokens: 8192,
-      system: PERSONAS.jarvis.system,
-      tools: JARVIS_TOOLS,
+      system: personas.jarvis.system,
+      tools,
       messages,
     };
     // Extended thinking makes it reason through hard, multi-step requests before

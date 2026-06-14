@@ -748,6 +748,39 @@ body {
 .range { -webkit-appearance: none; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.12); width: 140px; outline: none; }
 .range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 8px var(--accent-glow); }
 
+/* Team / jobs editor */
+.persona-card {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,0.02);
+}
+.persona-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.persona-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 8px currentColor; }
+.persona-input {
+  background: var(--bg-input); color: var(--text);
+  border: 1px solid var(--border); border-radius: 6px;
+  font-family: var(--font-ui); font-size: 12px; padding: 5px 8px; outline: none; min-width: 0;
+}
+.persona-input:focus { border-color: rgba(var(--accent-rgb),0.5); }
+.persona-name { flex: 0 0 34%; font-weight: 600; }
+.persona-role { flex: 1 1 auto; color: var(--text-dim); text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.06em; }
+.persona-reset {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  color: var(--text-dim); border-radius: 6px; cursor: pointer;
+  width: 26px; height: 26px; flex-shrink: 0; font-size: 13px; line-height: 1;
+}
+.persona-reset:hover { color: var(--text-bright); border-color: rgba(var(--accent-rgb),0.4); }
+.persona-area {
+  width: 100%; box-sizing: border-box;
+  background: var(--bg-input); color: var(--text);
+  border: 1px solid var(--border); border-radius: 6px;
+  font-family: var(--font-mono); font-size: 11px; line-height: 1.5;
+  padding: 8px; outline: none; resize: vertical; min-height: 64px;
+}
+.persona-area:focus { border-color: rgba(var(--accent-rgb),0.5); }
+
 /* Logs */
 .log-body { font-family: var(--font-mono); font-size: 11px; }
 .log-line {

@@ -14,6 +14,11 @@ overlay that lives on your dock and in your menu bar.
 | Marcus | Development & debugging | green |
 | Rob    | Customer success & comms | amber |
 
+These are just the defaults. Open **Customize (⌘,) → "AI model & team"** to rename
+any teammate, change their role, or rewrite their job (system prompt) — and to pick
+the Claude model that powers everyone (Opus 4.8 / Sonnet 4.6 / Haiku 4.5). Changes
+save to `personas.json` and apply to your next message; "Reset" restores a default.
+
 ## What JARVIS can do
 
 - **Your computer** — `run_command` runs any shell command; `run_applescript`
@@ -56,7 +61,8 @@ npm start
 
 ### Required keys (`.env`)
 
-- `ANTHROPIC_API_KEY` — powers every agent (model: `claude-opus-4-6`)
+- `ANTHROPIC_API_KEY` — powers every agent (default model: `claude-opus-4-8`;
+  switch it live in Customize → "AI model & team", or set `JARVIS_MODEL`)
 - `GROQ_API_KEY` — voice input (Whisper)
 - Email: `GMAIL_USER` + `GMAIL_PASS` (app password) **or** `SMTP_*`
 
@@ -100,7 +106,7 @@ jarvis-hud/
 ├── preload.js              # contextBridge API
 ├── agents/
 │   ├── index.js            # streaming runJarvis() agentic loop + runSubAgent()
-│   ├── personas.js         # locked system prompts
+│   ├── personas.js         # default roster + editable name/role/job + model store
 │   └── tools.js            # Claude tool schemas (the 12-tool surface)
 ├── tools/
 │   ├── shell.js            # tiered command classifier + executor

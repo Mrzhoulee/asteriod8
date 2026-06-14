@@ -26,6 +26,7 @@ const userEnv = path.join(DATA_DIR, '.env');
 if (fs.existsSync(userEnv)) require('dotenv').config({ path: userEnv, override: false });
 
 const { runJarvis, runSubAgent } = require('./agents/index');
+const personaStore = require('./agents/personas');
 const { sendEmail, listAccounts, verifyAccounts, readEmails } = require('./tools/email');
 const { runShell, classifyCommand } = require('./tools/shell');
 const { loadMemory, saveMemory, clearMemory, buildClaudeHistory } = require('./tools/memory');
@@ -175,7 +176,36 @@ ipcMain.handle('integrations:status', () => {
     appstore:   has('APP_STORE_CONNECT_KEY_ID'),
     appfigures: has('APPFIGURES_TOKEN'),
     mailchimp:  has('MAILCHIMP_API_KEY'),
-    model:      process.env.JARVIS_MODEL || 'claude-sonnet-4-6',
+    model:      personaStore.getModel(),
+  };
+});
+
+// ─── Team / jobs customization ────────────────────────────────
+// The user can rename teammates, rewrite each job's system prompt, and pick the
+// Claude model from the Customize panel. Edits persist to personas.json and take
+// effect on the next message — no restart.
+ipcMain.handle('personas:get', () => ({
+  model: personaStore.getModel(),
+  models: personaStore.MODELS,
+  personas: personaStore.loadPersonas(),
+  defaults: personaStore.DEFAULT_PERSONAS,
+  subagents: personaStore.SUBAGENTS,
+  editable: personaStore.EDITABLE_FIELDS,
+}));
+
+ipcMain.handle('personas:save', (_, config) => {
+  personaStore.saveConfig(config || {});
+  return {
+    model: personaStore.getModel(),
+    personas: personaStore.loadPersonas(),
+  };
+});
+
+ipcMain.handle('personas:reset', () => {
+  personaStore.resetConfig();
+  return {
+    model: personaStore.getModel(),
+    personas: personaStore.loadPersonas(),
   };
 });
 

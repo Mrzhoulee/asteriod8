@@ -28,6 +28,11 @@ contextBridge.exposeInMainWorld('jarvis', {
   getIntegrations: () => ipcRenderer.invoke('integrations:status'),
   verifyGA4: () => ipcRenderer.invoke('analytics:verify_ga4'),
 
+  // ── Team / jobs + model customization ───────────────────────
+  getPersonas: () => ipcRenderer.invoke('personas:get'),
+  savePersonas: (config) => ipcRenderer.invoke('personas:save', config),
+  resetPersonas: () => ipcRenderer.invoke('personas:reset'),
+
   // ── Memory ──────────────────────────────────────────────────
   loadMemory: () => ipcRenderer.invoke('memory:load'),
   saveMemory: (entry) => ipcRenderer.invoke('memory:save', entry),
