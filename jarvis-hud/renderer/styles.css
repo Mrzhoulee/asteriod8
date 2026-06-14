@@ -892,3 +892,85 @@ body {
 .toast.fade { animation: toast-out 0.3s ease-in forwards; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes toast-out { to { opacity: 0; transform: translateY(10px); } }
+
+/* ─── Thai Typing Practice ──────────────────────────────────────────────────── */
+.thai-wrap { display: flex; flex-direction: column; gap: 14px; }
+.thai-levels { display: flex; gap: 6px; flex-wrap: wrap; }
+.thai-level-btn {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  color: var(--text-dim); border-radius: 6px; cursor: pointer;
+  font-family: var(--font-ui); font-size: 11px; padding: 5px 13px;
+  transition: all 0.15s;
+}
+.thai-level-btn:hover { color: var(--text-bright); border-color: rgba(var(--accent-rgb),0.4); }
+.thai-level-btn.active { color: var(--accent); border-color: var(--accent); background: rgba(var(--accent-rgb),0.1); }
+
+.thai-stats-bar {
+  display: flex; gap: 16px; align-items: center;
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
+  padding: 6px 12px; background: rgba(255,255,255,0.02);
+  border-radius: 7px; border: 1px solid var(--border-dim);
+}
+
+.thai-card {
+  background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+  border-radius: 12px; padding: 28px 20px 20px;
+  display: flex; flex-direction: column; gap: 10px; align-items: center;
+}
+.thai-prompt {
+  font-size: 54px; line-height: 1.3; color: var(--accent);
+  text-shadow: 0 0 22px var(--accent-glow); letter-spacing: 0.06em;
+  text-align: center; min-height: 72px;
+}
+.thai-meaning {
+  font-family: var(--font-ui); font-size: 12.5px; color: var(--text-dim);
+  text-align: center; min-height: 16px;
+}
+.thai-chars { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; min-height: 38px; }
+.thai-char {
+  font-size: 22px; padding: 3px 5px; border-radius: 5px;
+  border: 1px solid transparent; transition: color 0.1s, background 0.1s;
+}
+.thai-char.correct { color: #00ff88; border-color: rgba(0,255,136,0.2); background: rgba(0,255,136,0.07); }
+.thai-char.wrong   { color: #ff5f57; border-color: rgba(255,95,87,0.25); background: rgba(255,95,87,0.09); }
+.thai-char.pending { color: var(--text-dim); }
+.thai-char.cursor  { border-color: rgba(var(--accent-rgb),0.5); }
+
+.thai-input {
+  width: 100%; max-width: 360px; box-sizing: border-box;
+  background: var(--bg-input); color: var(--text-bright);
+  border: 1px solid var(--border); border-radius: 8px;
+  font-family: var(--font-ui); font-size: 17px; padding: 10px 14px;
+  outline: none; text-align: center; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.thai-input:focus { border-color: rgba(var(--accent-rgb),0.5); box-shadow: 0 0 0 2px rgba(var(--accent-rgb),0.12); }
+.thai-input.success { border-color: #00ff88; box-shadow: 0 0 0 2px rgba(0,255,136,0.15); }
+.thai-input.wrong-border { border-color: rgba(255,95,87,0.6); }
+
+.thai-feedback {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em;
+  min-height: 18px; text-align: center;
+}
+.thai-feedback.good { color: #00ff88; }
+.thai-feedback.bad  { color: #ff5f57; }
+
+.thai-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.thai-progress { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); margin-left: auto; }
+
+/* Keyboard reference */
+.thai-keyboard-ref {
+  background: rgba(255,255,255,0.015); border: 1px solid var(--border-dim);
+  border-radius: 9px; padding: 14px;
+}
+.thai-kb-title {
+  font-family: var(--font-mono); font-size: 9.5px; color: var(--text-dim);
+  letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; line-height: 1.5;
+}
+.thai-kb-row { display: flex; gap: 4px; margin-bottom: 4px; flex-wrap: wrap; }
+.thai-kb-key {
+  display: flex; flex-direction: column; align-items: center;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  border-radius: 5px; width: 37px; min-height: 36px; padding: 4px 2px;
+}
+.thai-kb-key .k-thai { font-size: 15px; color: var(--accent); line-height: 1.3; }
+.thai-kb-key .k-qwerty { font-size: 8px; color: var(--text-dim); font-family: var(--font-mono); }
