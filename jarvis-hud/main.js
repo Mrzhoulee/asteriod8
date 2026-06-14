@@ -448,21 +448,21 @@ function friendlyAgentError(err) {
   const status = err?.status;
   const lower = raw.toLowerCase();
 
-  if (lower.includes('credit balance') || lower.includes('billing') ||
-      (status === 400 && lower.includes('too low'))) {
-    return 'Anthropic API credit is empty. A Claude Pro/Max subscription does NOT include API access — the API is billed separately. Add credits at console.anthropic.com → Settings → Billing → "Buy credits", then try again.';
+  // Gemini: missing or invalid API key
+  if (!process.env.GEMINI_API_KEY) {
+    return 'GEMINI_API_KEY is not set. Get a free key at aistudio.google.com → "Get API key", then add it to your .env file.';
   }
-  if (status === 401 || lower.includes('invalid x-api-key') || lower.includes('authentication_error')) {
-    return 'Anthropic rejected the API key. Check ANTHROPIC_API_KEY in your .env — grab a fresh one at console.anthropic.com → Settings → API keys (starts with sk-ant-).';
+  if (status === 403 || lower.includes('api key not valid') || lower.includes('api_key_invalid') || lower.includes('permission denied')) {
+    return 'Google rejected the API key. Check GEMINI_API_KEY in your .env — get a fresh one at aistudio.google.com → "Get API key".';
   }
-  if (status === 429 || lower.includes('rate_limit') || lower.includes('rate limit')) {
-    return 'Hit Anthropic\'s rate limit. Wait a few seconds and try again, or raise your limits in the console.';
+  if (status === 429 || lower.includes('quota') || lower.includes('rate_limit') || lower.includes('rate limit')) {
+    return 'Hit the Gemini API rate limit. Wait a few seconds and try again, or check your quota at console.cloud.google.com.';
   }
-  if (status === 404 && lower.includes('model')) {
-    return `That Claude model isn't available on your account: ${raw}`;
+  if ((status === 404 || status === 400) && lower.includes('model')) {
+    return `That Gemini model isn't available: ${raw}. Try setting JARVIS_MODEL=gemini-2.0-flash in your .env.`;
   }
-  if (status === 529 || lower.includes('overloaded')) {
-    return 'Anthropic is temporarily overloaded. Try again in a moment.';
+  if (status === 500 || lower.includes('internal')) {
+    return 'Google\'s servers returned an internal error. Try again in a moment.';
   }
   return raw;
 }

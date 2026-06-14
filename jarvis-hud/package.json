@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
+    "@google/generative-ai": "^0.24.1",
     "dotenv": "^16.4.5",
     "groq-sdk": "^0.13.0",
     "nodemailer": "^6.9.15"
@@ -40,7 +41,13 @@
       "category": "public.app-category.productivity",
       "icon": "build/icon.icns",
       "target": [
-        { "target": "dmg", "arch": ["arm64", "x64"] },
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
         "dir"
       ],
       "extendInfo": {

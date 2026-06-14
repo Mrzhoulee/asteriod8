@@ -1,10 +1,35 @@
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
-const Anthropic = require('@anthropic-ai/sdk');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const PERSONAS = require('./personas');
 const { JARVIS_TOOLS } = require('./tools');
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const MODEL = 'claude-opus-4-6';
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// gemini-2.0-flash — fast, free-tier, strong tool use. Override with JARVIS_MODEL in .env.
+const MODEL = process.env.JARVIS_MODEL || 'gemini-2.0-flash';
+
+// Convert Anthropic-style input_schema → Gemini functionDeclarations parameters.
+// Also normalises union type arrays (e.g. ['object','string']) to the first type.
+function toGeminiFunctions(tools) {
+  return tools.map(({ name, description, input_schema }) => {
+    const params = JSON.parse(JSON.stringify(input_schema)); // deep clone
+    sanitiseSchema(params);
+    return { name, description, parameters: params };
+  });
+}
+
+function sanitiseSchema(obj) {
+  if (!obj || typeof obj !== 'object') return;
+  if (Array.isArray(obj.type)) obj.type = obj.type[0]; // Gemini doesn't allow union types
+  for (const v of Object.values(obj)) sanitiseSchema(v);
+}
+
+// Convert Anthropic-format history ({ role, content }) → Gemini format ({ role, parts })
+function toGeminiHistory(messages) {
+  return messages.map(({ role, content }) => ({
+    role: role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: typeof content === 'string' ? content : JSON.stringify(content) }],
+  }));
+}
 
 /**
  * Run a sub-agent (Hannah, Marcus, Rob) — text-only, no tools.
@@ -14,92 +39,83 @@ async function runSubAgent(agentName, task, onToken) {
   const persona = PERSONAS[agentName];
   if (!persona) throw new Error(`Unknown agent: ${agentName}`);
 
-  const stream = client.messages.stream({
+  const model = genAI.getGenerativeModel({
     model: MODEL,
-    max_tokens: 2048,
-    system: persona.system,
-    messages: [{ role: 'user', content: task }],
+    systemInstruction: persona.system,
   });
 
+  const result = await model.generateContentStream([
+    { role: 'user', parts: [{ text: task }] },
+  ]);
+
   let fullText = '';
-  for await (const event of stream) {
-    if (
-      event.type === 'content_block_delta' &&
-      event.delta.type === 'text_delta'
-    ) {
-      const tok = event.delta.text;
+  for await (const chunk of result.stream) {
+    let tok = '';
+    try { tok = chunk.text(); } catch { /* function call chunk — skip */ }
+    if (tok) {
       fullText += tok;
       if (onToken) onToken(tok);
     }
   }
-
-  await stream.finalMessage(); // ensure stream is fully consumed
   return fullText;
 }
 
 /**
  * Run JARVIS with full tool-use agentic loop.
  * Streams text tokens via onToken. Calls onToolCall for each tool.
- * Continues looping until stop_reason === 'end_turn'.
+ * Continues looping until the model stops requesting function calls.
  */
 async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
-  const messages = [
-    ...claudeHistory,
-    { role: 'user', content: message },
-  ];
+  const model = genAI.getGenerativeModel({
+    model: MODEL,
+    systemInstruction: PERSONAS.jarvis.system,
+    tools: [{ functionDeclarations: toGeminiFunctions(JARVIS_TOOLS) }],
+    toolConfig: { functionCallingConfig: { mode: 'AUTO' } },
+  });
 
-  let assistantText = ''; // accumulates all visible JARVIS text across the loop
+  const chat = model.startChat({ history: toGeminiHistory(claudeHistory) });
 
-  // Agentic loop — keeps going while JARVIS wants to use tools
+  let assistantText = '';
+  let currentInput = message;
+
   while (true) {
-    const stream = client.messages.stream({
-      model: MODEL,
-      max_tokens: 4096,
-      system: PERSONAS.jarvis.system,
-      tools: JARVIS_TOOLS,
-      messages,
-    });
+    const streamResult = await chat.sendMessageStream(currentInput);
 
-    for await (const event of stream) {
-      if (
-        event.type === 'content_block_delta' &&
-        event.delta.type === 'text_delta'
-      ) {
-        assistantText += event.delta.text;
-        if (onToken) onToken(event.delta.text);
+    // Drain the stream — text chunks arrive here, function-call chunks are silent
+    for await (const chunk of streamResult.stream) {
+      let tok = '';
+      try { tok = chunk.text(); } catch { /* function-call part — handled below */ }
+      if (tok) {
+        assistantText += tok;
+        if (onToken) onToken(tok);
       }
     }
 
-    const finalMsg = await stream.finalMessage();
+    const response = await streamResult.response;
+    const parts = response.candidates?.[0]?.content?.parts ?? [];
+    const functionCalls = parts.filter(p => p.functionCall).map(p => p.functionCall);
 
-    // Add JARVIS's full response to the conversation
-    messages.push({ role: 'assistant', content: finalMsg.content });
-
-    if (finalMsg.stop_reason !== 'tool_use') break;
+    if (!functionCalls.length) break; // no more tool calls → we're done
 
     if (assistantText && !assistantText.endsWith('\n')) assistantText += '\n';
 
-    // Process all tool calls and collect results
-    const toolResults = [];
-    for (const block of finalMsg.content) {
-      if (block.type !== 'tool_use') continue;
-
-      let result;
+    // Execute every function call and collect responses
+    const functionResponses = [];
+    for (const fc of functionCalls) {
+      let toolResult;
       try {
-        result = await onToolCall(block.name, block.input);
+        toolResult = await onToolCall(fc.name, fc.args);
       } catch (err) {
-        result = JSON.stringify({ error: err.message });
+        toolResult = JSON.stringify({ error: err.message });
       }
-
-      toolResults.push({
-        type: 'tool_result',
-        tool_use_id: block.id,
-        content: typeof result === 'string' ? result : JSON.stringify(result),
+      const resultStr = typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult);
+      functionResponses.push({
+        functionResponse: { name: fc.name, response: { result: resultStr } },
       });
     }
 
-    // Feed results back so JARVIS can respond
-    messages.push({ role: 'user', content: toolResults });
+    // Feed results back so the model can continue
+    currentInput = functionResponses;
   }
 
   return assistantText;
