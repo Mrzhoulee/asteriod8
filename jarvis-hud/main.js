@@ -33,7 +33,7 @@ const mac = require('./tools/mac');
 const { postSocial } = require('./tools/social');
 const { postTikTokVideo, postTikTokPhotos, getTikTokAnalytics } = require('./tools/tiktok');
 const { postInstagramPhoto, postInstagramReel, postInstagramCarousel, getInstagramInsights, getInstagramMedia } = require('./tools/instagram');
-const { fetchGA4Report, fetchAppStoreSales, fetchAppStoreApps, fetchAppStoreReviews } = require('./tools/analytics');
+const { fetchGA4Report, fetchAppStoreSales, fetchAppStoreApps, fetchAppStoreReviews, verifyGA4 } = require('./tools/analytics');
 const appfigures = require('./tools/appfigures');
 const mailchimp = require('./tools/mailchimp');
 const { scheduleEvent } = require('./tools/calendar');
@@ -156,6 +156,7 @@ ipcMain.handle('window:minimize', () => mainWindow?.minimize());
 ipcMain.handle('memory:load', () => loadMemory());
 ipcMain.handle('email:list_accounts', () => listAccounts());
 ipcMain.handle('email:verify', () => verifyAccounts());
+ipcMain.handle('analytics:verify_ga4', () => verifyGA4());
 ipcMain.handle('memory:save', (_, entry) => saveMemory(entry));
 ipcMain.handle('memory:clear', () => clearMemory());
 

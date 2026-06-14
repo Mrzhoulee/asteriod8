@@ -203,6 +203,38 @@ INSTAGRAM_BUSINESS_ID=17841xxxxxxxxxxxx
 
 ---
 
+## 6. Google Analytics (GA4) — 8 min, the permanent fix
+
+GA4 has two auth modes. The OAuth Playground token is fine for a 5-minute test but
+**dies after ~1 hour**. The **service account** is the permanent one — it
+auto-refreshes and never expires.
+
+**Service account (recommended):**
+
+1. Go to <https://console.cloud.google.com> and create or pick a project.
+2. **APIs & Services → Library** → search **Google Analytics Data API** → **Enable**.
+3. **APIs & Services → Credentials → Create credentials → Service account**. Name it
+   `jarvis`, **Create and continue**, skip the optional role step, **Done**.
+4. Open the new service account → **Keys → Add key → Create new key → JSON**. A
+   `.json` file downloads — save it somewhere stable, e.g. `~/keys/ga4-sa.json`.
+5. Copy the service account **email** (looks like
+   `jarvis@your-project.iam.gserviceaccount.com`).
+6. In **Google Analytics → Admin → Property Access Management → ＋**, add that email
+   as a **Viewer**. *This is the step everyone forgets — skip it and you get a 403.*
+7. Find your **Property ID**: GA4 **Admin → Property Settings** — a number like
+   `123456789` (NOT the `G-XXXX` measurement ID).
+8. In `.env`:
+   ```
+   GOOGLE_SERVICE_ACCOUNT_JSON=/Users/you/keys/ga4-sa.json
+   GOOGLE_ANALYTICS_PROPERTY_ID=123456789
+   ```
+   You can also paste the JSON **contents** inline instead of a path.
+9. Restart, then **Setup (⌘1) → Test Google Analytics** to confirm it connects.
+
+Then ask JARVIS *"how many users visited last week?"* or *"GA4 sessions by country."*
+
+---
+
 ## After you add credentials
 
 1. Save `.env`.

@@ -13,47 +13,65 @@ require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 // ── GA4 ──────────────────────────────────────────────────────────────────────
 
+// Resolve the service account credential: inline JSON, ~ path, abs path, or
+// a path relative to the data dir.
+function loadServiceAccount() {
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (!raw) return null;
+  const v = raw.trim();
+  if (v.startsWith('{')) return JSON.parse(v); // whole JSON pasted into .env
+  const p = v.startsWith('~')
+    ? path.join(os.homedir(), v.slice(1))
+    : (v.startsWith('/') ? v : path.join(process.env.JARVIS_DATA_DIR || path.join(__dirname, '..'), v));
+  return JSON.parse(fs.readFileSync(p, 'utf8'));
+}
+
+// Cache the service-account access token until ~5 min before it expires, so we
+// don't re-sign a JWT and round-trip to Google on every single report.
+let _ga4TokenCache = { token: null, exp: 0 };
+
 async function getGA4Token() {
-  // Option A: simple bearer token
-  if (process.env.GOOGLE_ANALYTICS_TOKEN) {
-    return process.env.GOOGLE_ANALYTICS_TOKEN;
+  // Option A: a pre-supplied OAuth bearer token (simplest; ~1h expiry).
+  if (process.env.GOOGLE_ANALYTICS_TOKEN) return process.env.GOOGLE_ANALYTICS_TOKEN;
+
+  // Option B: service account → signed JWT → access token (auto-refreshes).
+  if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON) return null;
+
+  const now = Math.floor(Date.now() / 1000);
+  if (_ga4TokenCache.token && _ga4TokenCache.exp - 300 > now) return _ga4TokenCache.token;
+
+  const sa = loadServiceAccount();
+  if (!sa || !sa.client_email || !sa.private_key) {
+    throw new Error('Service account JSON is missing client_email/private_key — re-download the key from Google Cloud.');
   }
-  // Option B: service account JSON → JWT → access token exchange
-  if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
-    const saPath = process.env.GOOGLE_SERVICE_ACCOUNT_JSON.startsWith('/')
-      ? process.env.GOOGLE_SERVICE_ACCOUNT_JSON
-      : path.join(process.env.JARVIS_DATA_DIR || __dirname, '..', process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
-    const sa = JSON.parse(fs.readFileSync(saPath, 'utf8'));
 
-    const now = Math.floor(Date.now() / 1000);
-    const header = Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })).toString('base64url');
-    const claim = Buffer.from(JSON.stringify({
-      iss: sa.client_email,
-      scope: 'https://www.googleapis.com/auth/analytics.readonly',
-      aud: 'https://oauth2.googleapis.com/token',
-      iat: now,
-      exp: now + 3600,
-    })).toString('base64url');
+  const header = Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })).toString('base64url');
+  const claim = Buffer.from(JSON.stringify({
+    iss: sa.client_email,
+    scope: 'https://www.googleapis.com/auth/analytics.readonly',
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now,
+    exp: now + 3600,
+  })).toString('base64url');
 
-    const toSign = `${header}.${claim}`;
-    const sign = crypto.createSign('RSA-SHA256');
-    sign.update(toSign);
-    const sig = sign.sign(sa.private_key, 'base64url');
-    const jwt = `${toSign}.${sig}`;
+  const toSign = `${header}.${claim}`;
+  const sig = crypto.createSign('RSA-SHA256').update(toSign).sign(sa.private_key, 'base64url');
+  const jwt = `${toSign}.${sig}`;
 
-    const res = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`,
-    });
-    const data = await res.json();
-    if (!data.access_token) throw new Error(`SA auth failed: ${data.error_description || JSON.stringify(data)}`);
-    return data.access_token;
-  }
-  return null;
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`,
+  });
+  const data = await res.json();
+  if (!data.access_token) throw new Error(`Service account auth failed: ${data.error_description || data.error || JSON.stringify(data).slice(0, 200)}`);
+
+  _ga4TokenCache = { token: data.access_token, exp: now + (data.expires_in || 3600) };
+  return data.access_token;
 }
 
 /**
@@ -89,6 +107,11 @@ async function fetchGA4Report({ propertyId, startDate = '7daysAgo', endDate = 't
   const data = await res.json();
   if (res.status === 401) {
     return { success: false, error: 'GA4 access token expired or invalid. OAuth Playground tokens last ~1 hour — get a fresh one, or switch to GOOGLE_SERVICE_ACCOUNT_JSON for auto-refresh.' };
+  }
+  if (res.status === 403) {
+    let email = '';
+    try { email = (loadServiceAccount() || {}).client_email || ''; } catch {}
+    return { success: false, error: `GA4 denied access (403). Share your GA4 property with the service account${email ? ` (${email})` : ''} as a Viewer: GA4 Admin → Property Access Management → "+". ${data.error?.message || ''}`.trim() };
   }
   if (!res.ok) return { success: false, error: data.error?.message || `GA4 API ${res.status}` };
 
@@ -228,4 +251,56 @@ async function fetchAppStoreReviews({ appId, limit = 10 }) {
   return ascGet(`/v1/apps/${appId}/customerReviews?sort=-createdDate&limit=${limit}`);
 }
 
-module.exports = { fetchGA4Report, fetchAppStoreSales, fetchAppStoreApps, fetchAppStoreReviews };
+/**
+ * Verify GA4 connectivity without pulling a full report: get a token and hit the
+ * property metadata endpoint. Confirms both auth AND property access in one shot.
+ */
+async function verifyGA4() {
+  const usingSA = !!process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  const usingToken = !!process.env.GOOGLE_ANALYTICS_TOKEN;
+  if (!usingSA && !usingToken) {
+    return { configured: false, success: false, error: 'GA4 not configured. Set GOOGLE_SERVICE_ACCOUNT_JSON (recommended — auto-refreshes) or GOOGLE_ANALYTICS_TOKEN, plus GOOGLE_ANALYTICS_PROPERTY_ID.' };
+  }
+  const pid = process.env.GOOGLE_ANALYTICS_PROPERTY_ID;
+  if (!pid) return { configured: true, success: false, error: 'Set GOOGLE_ANALYTICS_PROPERTY_ID in .env (GA4 Admin → Property Settings — a number like 123456789).' };
+
+  let token;
+  try { token = await getGA4Token(); }
+  catch (e) {
+    let msg = e.message;
+    if (/decoder|unsupported|asn1|pem|bad base|wrong tag/i.test(msg)) {
+      msg = 'The service account private key is malformed — re-download the JSON key from Google Cloud and don\'t hand-edit it.';
+    }
+    return { configured: true, success: false, method: usingSA ? 'service account' : 'oauth token', error: msg };
+  }
+  if (!token) return { configured: true, success: false, error: 'Could not obtain a GA4 access token.' };
+
+  try {
+    const res = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${pid}/metadata`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      return {
+        configured: true, success: true,
+        method: usingSA ? 'service account' : 'oauth token',
+        propertyId: pid,
+        note: usingSA ? 'Auto-refreshes — never expires.' : 'OAuth token expires in ~1h.',
+      };
+    }
+    if (res.status === 401) {
+      return { configured: true, success: false, error: usingSA
+        ? 'Service account token was rejected — the JSON key may be invalid or revoked.'
+        : 'OAuth token expired/invalid (Playground tokens last ~1h). Switch to a service account for a permanent fix.' };
+    }
+    if (res.status === 403) {
+      let email = ''; try { email = (loadServiceAccount() || {}).client_email || ''; } catch {}
+      return { configured: true, success: false, error: `Access denied (403). Add the service account${email ? ` (${email})` : ''} to your GA4 property as a Viewer (GA4 Admin → Property Access Management → "+").` };
+    }
+    return { configured: true, success: false, error: data.error?.message || `GA4 API ${res.status}` };
+  } catch (e) {
+    return { configured: true, success: false, error: e.message };
+  }
+}
+
+module.exports = { fetchGA4Report, fetchAppStoreSales, fetchAppStoreApps, fetchAppStoreReviews, verifyGA4 };

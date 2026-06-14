@@ -26,6 +26,7 @@ contextBridge.exposeInMainWorld('jarvis', {
 
   // ── Integrations status (for onboarding checklist) ──────────
   getIntegrations: () => ipcRenderer.invoke('integrations:status'),
+  verifyGA4: () => ipcRenderer.invoke('analytics:verify_ga4'),
 
   // ── Memory ──────────────────────────────────────────────────
   loadMemory: () => ipcRenderer.invoke('memory:load'),
