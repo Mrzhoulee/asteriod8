@@ -276,8 +276,14 @@ function buildToolHandler(send, skipConfirm) {
         const plat = (input.platform || '').toLowerCase();
         let result;
 
-        if (plat === 'tiktok') {
-          // TikTok: video or photo carousel
+        // If an aggregator is configured (Late / webhook / Buffer), route EVERY
+        // platform — TikTok & Instagram included — through it, so the user never
+        // needs their own TikTok/Instagram developer apps. Direct platform APIs are
+        // only used as a fallback when no aggregator is set.
+        const hasAggregator = process.env.LATE_API_KEY || process.env.SOCIAL_WEBHOOK_URL || process.env.BUFFER_ACCESS_TOKEN;
+
+        if (plat === 'tiktok' && !hasAggregator) {
+          // Direct TikTok API: video or photo carousel
           if (input.mediaUrls?.length) {
             result = await postTikTokPhotos({ photoUrls: input.mediaUrls, caption: input.text });
           } else if (input.mediaUrl) {
@@ -285,8 +291,8 @@ function buildToolHandler(send, skipConfirm) {
           } else {
             result = { success: false, error: 'TikTok requires mediaUrl (video) or mediaUrls (photos).' };
           }
-        } else if (plat === 'instagram') {
-          // Instagram: reel, carousel, or photo
+        } else if (plat === 'instagram' && !hasAggregator) {
+          // Direct Instagram API: reel, carousel, or photo
           if (input.mediaUrls?.length > 1) {
             result = await postInstagramCarousel({ mediaUrls: input.mediaUrls, caption: input.text, hashtags: input.hashtags });
           } else if (input.mediaUrl?.match(/\.(mp4|mov|avi)$/i)) {
@@ -297,7 +303,8 @@ function buildToolHandler(send, skipConfirm) {
             result = { success: false, error: 'Instagram requires mediaUrl (photo/video) or mediaUrls (carousel).' };
           }
         } else {
-          // X, LinkedIn, Facebook, Threads, Reddit — webhook or compose window
+          // Aggregator path (Late/webhook/Buffer) for any platform, plus the
+          // browser-compose fallback for X, LinkedIn, Facebook, Threads, Reddit.
           result = await postSocial(input);
           if (result.needsBrowser && result.url) await shell.openExternal(result.url);
         }

@@ -1,25 +1,33 @@
 # Getting your API credentials
 
-## The easy path for Instagram + TikTok: Buffer
+## The easy path for Instagram + TikTok: Late (getlate.dev)
 
-If you already use Buffer (or are happy to sign up — free plan covers this), you can
-skip the direct Instagram and TikTok OAuth flows entirely. Connect both accounts once
-in Buffer's dashboard, then give JARVIS a single Buffer access token:
+You wanted "one service that already connects to Instagram and TikTok so I don't have
+to do OAuth." That used to be Buffer, but **Buffer stopped issuing new developer
+tokens**, so its API is closed to new accounts. The current equivalent is
+**Late (getlate.dev)** — free signup, one API key, posts to 13 platforms, and it
+handles the Instagram/TikTok connections on its side so you never touch a developer app.
 
-1. Go to <https://buffer.com/developers/apps> → **Create an App**.
-2. Name it `jarvis`, set the redirect URI to `https://localhost/`.
-3. On the app page, click **Access Token** — Buffer generates one tied to your account.
+1. Sign up at <https://getlate.dev> (free tier available).
+2. In the dashboard, **connect your accounts** — click Instagram, click TikTok, log in
+   to each once. Late stores the connection.
+3. Go to **Settings → API** and copy your **API key**.
 4. Paste it in `.env`:
    ```
-   BUFFER_ACCESS_TOKEN=1/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   LATE_API_KEY=late_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
    ```
 
-That's it. JARVIS will look up your connected Buffer profiles and post to whichever
-platform you ask — Instagram, TikTok, LinkedIn, X, Facebook, Pinterest — all via
-Buffer. No Instagram OAuth, no TikTok OAuth.
+That's it. Ask JARVIS *"post this to Instagram"* or *"post to TikTok"* and it looks up
+your connected Late accounts and publishes — no `npm run auth:*`, no Meta/TikTok
+developer apps, no token refreshing.
 
-> **Note:** Buffer's free plan allows up to 3 channels and 10 scheduled posts. The
-> token is long-lived and doesn't expire unless you revoke it.
+> **Why not Buffer?** Buffer closed new developer-app registration. If you happen to
+> already have a legacy Buffer token it still works (`BUFFER_ACCESS_TOKEN=` in `.env`),
+> but for a fresh setup, Late is the path.
+>
+> **Prefer to own the whole pipeline / pay nothing ever?** The direct OAuth route
+> (sections 4 & 5 below, via `npm run auth:tiktok` / `npm run auth:instagram`) keeps
+> everything on your own developer apps with no third party in the middle.
 
 ---
 
@@ -33,7 +41,7 @@ Paste each value into `jarvis-hud/.env` (copy `.env.example` to `.env` first).
 
 | Service | Time | Difficulty | Helper |
 |---------|------|------------|--------|
-| [Buffer (Instagram + TikTok + more)](#the-easy-path-for-instagram--tiktok-buffer) | ~2 min | trivial | — |
+| [Late — Instagram + TikTok + more](#the-easy-path-for-instagram--tiktok-late-getlatedev) | ~3 min | trivial | — |
 | [Mailchimp](#1-mailchimp--1-min) | ~1 min | trivial | — |
 | [Appfigures](#2-appfigures--2-min) | ~2 min | trivial | — |
 | [App Store Connect](#3-app-store-connect--5-min) | ~5 min | easy | — |
