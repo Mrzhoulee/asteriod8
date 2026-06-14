@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Asteroid8 — Music that happens in real time</title>
+<meta name="description" content="Asteroid8 is where music happens live. Concerts, parties, orbit jams and real-time charts — all in one place." />
+<link rel="icon" href="astei.png" />
+<style>
+  :root{
+    --bg:#08090c;
+    --bg-soft:#0e1015;
+    --card:#13151c;
+    --line:rgba(255,255,255,.08);
+    --txt:#f4f5f7;
+    --muted:#8b8f9a;
+    --coral:#FF7F50;
+    --coral-soft:rgba(255,127,80,.14);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--txt);line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+
+  /* ambient glows */
+  .glow{position:fixed;border-radius:50%;filter:blur(120px);z-index:0;pointer-events:none;opacity:.5}
+  .glow.coral{width:520px;height:520px;background:var(--coral);top:-160px;right:-120px;opacity:.22}
+  .glow.blue{width:480px;height:480px;background:#3b6cff;bottom:-200px;left:-140px;opacity:.16}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+    background:rgba(8,9,12,.7);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:.2px}
+  .brand img{width:30px;height:30px;border-radius:8px;object-fit:cover}
+  .nav-links{display:flex;gap:30px;align-items:center}
+  .nav-links a{color:var(--muted);font-size:14px;font-weight:500;transition:.2s}
+  .nav-links a:hover{color:var(--txt)}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;
+    padding:11px 22px;border-radius:999px;transition:.2s;border:1px solid transparent;cursor:pointer}
+  .btn-primary{background:var(--coral);color:#1a0d06}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 30px -8px var(--coral)}
+  .btn-ghost{border-color:var(--line);color:var(--txt)}
+  .btn-ghost:hover{background:rgba(255,255,255,.05)}
+  @media(max-width:760px){.nav-links{display:none}}
+
+  /* hero */
+  header{position:relative;z-index:1;padding:120px 0 100px;text-align:center}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;
+    color:var(--coral);background:var(--coral-soft);border:1px solid rgba(255,127,80,.25);
+    padding:7px 16px;border-radius:999px;margin-bottom:30px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--coral);
+    box-shadow:0 0 0 0 var(--coral);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,127,80,.6)}70%{box-shadow:0 0 0 10px rgba(255,127,80,0)}100%{box-shadow:0 0 0 0 rgba(255,127,80,0)}}
+  h1{font-size:clamp(40px,7vw,76px);line-height:1.05;font-weight:800;letter-spacing:-1.5px;margin-bottom:24px}
+  h1 .grad{background:linear-gradient(120deg,var(--coral),#ffb38a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{font-size:clamp(16px,2.4vw,20px);color:var(--muted);max-width:600px;margin:0 auto 40px}
+  .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+  /* stats */
+  .stats{display:flex;gap:60px;justify-content:center;flex-wrap:wrap;margin-top:72px}
+  .stat .n{font-size:34px;font-weight:800;color:var(--txt)}
+  .stat .l{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
+
+  /* sections */
+  section{position:relative;z-index:1;padding:90px 0}
+  .eyebrow{color:var(--coral);font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:14px}
+  h2{font-size:clamp(30px,4.5vw,46px);font-weight:800;letter-spacing:-1px;text-align:center;margin-bottom:16px}
+  .section-sub{color:var(--muted);text-align:center;max-width:560px;margin:0 auto 56px}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px;transition:.25s}
+  .card:hover{transform:translateY(-4px);border-color:rgba(255,127,80,.35);background:#161922}
+  .ic{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:24px;
+    background:var(--coral-soft);margin-bottom:18px}
+  .card h3{font-size:19px;font-weight:700;margin-bottom:8px}
+  .card p{color:var(--muted);font-size:15px}
+
+  /* artist band */
+  .band{position:relative;z-index:1;margin:30px auto;max-width:1140px}
+  .band-in{background:linear-gradient(120deg,#16110d,#0e1015);border:1px solid rgba(255,127,80,.2);
+    border-radius:24px;padding:60px 48px;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap}
+  .band-in h2{text-align:left;margin-bottom:12px}
+  .band-in p{color:var(--muted);max-width:440px}
+
+  /* final cta */
+  .final{text-align:center;padding:110px 0}
+  .final h2{margin-bottom:20px}
+
+  footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:46px 0;color:var(--muted);font-size:14px}
+  .foot-in{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+  .foot-links{display:flex;gap:26px;flex-wrap:wrap}
+  .foot-links a:hover{color:var(--txt)}
+</style>
+</head>
+<body>
+  <div class="glow coral"></div>
+  <div class="glow blue"></div>
+
+  <nav>
+    <div class="wrap nav-in">
+      <a class="brand" href="landingpage.html"><img src="astei.png" alt="Asteroid8" /> Asteroid8</a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="charts.html">Charts</a>
+        <a href="#artists">For Artists</a>
+        <a href="Premium.html">Premium</a>
+      </div>
+      <a class="btn btn-primary" href="index.html">Open App</a>
+    </div>
+  </nav>
+
+  <header>
+    <div class="wrap">
+      <div class="pill"><span class="dot"></span> Live right now on Asteroid8</div>
+      <h1>Music that happens <br /><span class="grad">in real time.</span></h1>
+      <p class="sub">Live concerts, parties and orbit jams streaming as they happen. Tune into the charts, join the room, feel the moment — together.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="index.html">Launch Asteroid8 →</a>
+        <a class="btn btn-ghost" href="#features">Explore features</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="n">24/7</div><div class="l">Live</div></div>
+        <div class="stat"><div class="n">∞</div><div class="l">Orbit Jams</div></div>
+        <div class="stat"><div class="n">Real-time</div><div class="l">Charts</div></div>
+      </div>
+    </div>
+  </header>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="eyebrow">What you get</div>
+      <h2>Everything happens live</h2>
+      <p class="section-sub">Asteroid8 isn't a library you scroll. It's a stage that's always on.</p>
+      <div class="grid">
+        <div class="card"><div class="ic">🎤</div><h3>Live Concerts</h3><p>Watch artists perform in real time and react with the crowd as it happens.</p></div>
+        <div class="card"><div class="ic">🎉</div><h3>Parties</h3><p>Drop into shared listening rooms where the playlist is alive and the room moves together.</p></div>
+        <div class="card"><div class="ic">🪐</div><h3>Orbit Jams</h3><p>Spontaneous collaborative sessions that pull listeners and creators into the same orbit.</p></div>
+        <div class="card"><div class="ic">📈</div><h3>Live Charts</h3><p>Rankings that shift by the second based on what the world is actually playing right now.</p></div>
+        <div class="card"><div class="ic">💬</div><h3>Live Chat</h3><p>Talk, hype and connect with everyone in the room while the music plays.</p></div>
+        <div class="card"><div class="ic">⭐</div><h3>Premium</h3><p>Unlock boosts, exclusive drops and the best seat in every live room.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="band" id="artists">
+    <div class="band-in">
+      <div>
+        <div class="eyebrow" style="text-align:left">For Artists</div>
+        <h2>Your stage, your numbers, your fans.</h2>
+        <p>Go live, climb the charts and track it all from the artist dashboard. Build a real-time audience that shows up the moment you do.</p>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a class="btn btn-primary" href="artist.html">Become an Artist</a>
+        <a class="btn btn-ghost" href="ArtistDashboard.html">Artist Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="final">
+    <div class="wrap">
+      <div class="eyebrow">Ready?</div>
+      <h2>The room is already live.</h2>
+      <p class="section-sub">Step in and hear what's happening right now.</p>
+      <a class="btn btn-primary" href="index.html" style="padding:15px 34px;font-size:16px">Open Asteroid8 →</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap foot-in">
+      <a class="brand" href="landingpage.html"><img src="astei.png" alt="Asteroid8" style="width:26px;height:26px" /> Asteroid8</a>
+      <div class="foot-links">
+        <a href="charts.html">Charts</a>
+        <a href="Premium.html">Premium</a>
+        <a href="support.html">Support</a>
+        <a href="policy.html">Privacy</a>
+        <a href="Asteroid Terms.html">Terms</a>
+      </div>
+      <div>© 2025 Asteroid8</div>
+    </div>
+  </footer>
+</body>
+</html>
