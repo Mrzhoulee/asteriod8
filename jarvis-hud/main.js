@@ -26,7 +26,7 @@ const userEnv = path.join(DATA_DIR, '.env');
 if (fs.existsSync(userEnv)) require('dotenv').config({ path: userEnv, override: false });
 
 const { runJarvis, runSubAgent } = require('./agents/index');
-const { sendEmail, listAccounts, verifyAccounts } = require('./tools/email');
+const { sendEmail, listAccounts, verifyAccounts, readEmails } = require('./tools/email');
 const { runShell, classifyCommand } = require('./tools/shell');
 const { loadMemory, saveMemory, clearMemory, buildClaudeHistory } = require('./tools/memory');
 const mac = require('./tools/mac');
@@ -291,6 +291,12 @@ function buildToolHandler(send, skipConfirm) {
       }
 
       // ── Email ───────────────────────────────────────────────
+      case 'read_emails': {
+        const result = await readEmails(input);
+        send('agent:tool_result', { tool: 'read_emails', result });
+        return JSON.stringify(result);
+      }
+
       case 'send_email': {
         if (!skipConfirm) {
           // Resolve which account will send so the user can see it in the dialog

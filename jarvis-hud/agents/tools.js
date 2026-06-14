@@ -66,6 +66,36 @@ const JARVIS_TOOLS = [
   },
 
   {
+    name: 'read_emails',
+    description: 'Read and check emails from a configured Gmail/IMAP inbox. Use this when the user asks to check emails, show inbox, find messages, or read new mail. Returns a list of messages with sender, subject, date, and read/unread status.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        account: {
+          type: 'string',
+          description: 'Which account to read from — label (e.g. "Work", "Personal") or email address. Omit for default account.',
+        },
+        folder: {
+          type: 'string',
+          description: 'Mailbox folder to read. Default is "INBOX". Other options: "Sent", "[Gmail]/Spam", "[Gmail]/All Mail".',
+        },
+        limit: {
+          type: 'number',
+          description: 'Max number of emails to return (default 10, max 50).',
+        },
+        search: {
+          type: 'string',
+          description: 'Search query — finds emails matching subject or sender address/name.',
+        },
+        unreadOnly: {
+          type: 'boolean',
+          description: 'If true, only return unread/unseen emails.',
+        },
+      },
+    },
+  },
+
+  {
     name: 'send_email',
     description: 'Send an email from a configured Gmail/SMTP account. A confirmation dialog appears unless the user said to skip it. If the user says "from my work email" or "from personal", pass that as fromAccount.',
     input_schema: {

@@ -221,4 +221,89 @@ async function verifyAccounts() {
   return { configured: true, success: results.every((r) => r.ok), accounts: results };
 }
 
-module.exports = { sendEmail, listAccounts, verifyAccounts };
+/**
+ * Read emails from a Gmail/IMAP inbox.
+ *
+ * @param {object} opts
+ * @param {string} [opts.account]     label or email of the account to read
+ * @param {string} [opts.folder]      mailbox folder (default "INBOX")
+ * @param {number} [opts.limit]       max messages to return (default 10, max 50)
+ * @param {string} [opts.search]      search subject/from by this string
+ * @param {boolean} [opts.unreadOnly] only return unseen messages
+ */
+async function readEmails({ account, folder = 'INBOX', limit = 10, search, unreadOnly = false } = {}) {
+  let ImapFlow;
+  try {
+    ImapFlow = require('imapflow').ImapFlow;
+  } catch {
+    return { success: false, error: 'IMAP library not installed. Run: cd jarvis-hud && npm install' };
+  }
+
+  const acc = resolveAccount(account);
+  if (!acc) {
+    return { success: false, error: 'No email account configured. Add GMAIL_ACCOUNT_1_USER and GMAIL_ACCOUNT_1_PASS to .env.' };
+  }
+
+  // Derive IMAP host: custom accounts specify a HOST, Gmail uses imap.gmail.com.
+  const imapHost = acc.host
+    ? acc.host.replace(/^smtp\./i, 'imap.')
+    : 'imap.gmail.com';
+
+  const client = new ImapFlow({
+    host: imapHost,
+    port: 993,
+    secure: true,
+    auth: { user: acc.user, pass: acc.pass },
+    logger: false,
+  });
+
+  try {
+    await client.connect();
+    await client.mailboxOpen(folder);
+
+    // Build search query for imapflow
+    let query;
+    if (search) {
+      const s = String(search).trim();
+      query = unreadOnly
+        ? { seen: false, or: [{ subject: s }, { from: s }] }
+        : { or: [{ subject: s }, { from: s }] };
+    } else {
+      query = unreadOnly ? { seen: false } : { all: true };
+    }
+
+    const uids = await client.search(query, { uid: true });
+    const n = Math.min(Math.max(parseInt(limit) || 10, 1), 50);
+    const take = uids.slice(-n); // last N UIDs = most recent messages
+
+    const emails = [];
+    if (take.length) {
+      for await (const msg of client.fetch(take, { envelope: true, flags: true }, { uid: true })) {
+        const f0 = msg.envelope?.from?.[0];
+        emails.push({
+          uid: msg.uid,
+          from: f0?.address || '',
+          fromName: f0?.name || '',
+          subject: msg.envelope?.subject || '(no subject)',
+          date: msg.envelope?.date ? new Date(msg.envelope.date).toISOString() : '',
+          unread: !msg.flags?.has('\\Seen'),
+        });
+      }
+    }
+
+    await client.logout();
+    return {
+      success: true,
+      account: acc.label,
+      folder,
+      total: uids.length,
+      shown: emails.length,
+      emails: emails.reverse(), // newest first
+    };
+  } catch (err) {
+    try { await client.logout(); } catch {}
+    return { success: false, error: friendlyMailError(err) };
+  }
+}
+
+module.exports = { sendEmail, listAccounts, verifyAccounts, readEmails };
