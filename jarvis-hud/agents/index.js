@@ -9,11 +9,11 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 // JARVIS_MODEL=claude-sonnet-4-6 (balanced) or claude-haiku-4-5 (cheapest) in .env.
 const MODEL = process.env.JARVIS_MODEL || 'claude-opus-4-8';
 
-// Extended thinking: let JARVIS reason privately before answering/acting — this is
-// what makes it genuinely smart on hard, multi-step requests instead of replying
-// off the top of its head. Set JARVIS_THINKING=off to disable, or tune the budget.
-const THINKING_BUDGET = parseInt(process.env.JARVIS_THINKING_BUDGET || '2048', 10);
-const USE_THINKING = process.env.JARVIS_THINKING !== 'off' && THINKING_BUDGET >= 1024;
+// Extended thinking: let JARVIS reason privately before answering/acting.
+// Set JARVIS_THINKING=off to disable. Control reasoning depth with JARVIS_THINKING_EFFORT
+// (low | medium | high | xhigh | max). Defaults to "medium".
+const USE_THINKING = process.env.JARVIS_THINKING !== 'off';
+const THINKING_EFFORT = process.env.JARVIS_THINKING_EFFORT || 'medium';
 
 /**
  * Run a sub-agent (Hannah, Marcus, Rob) — text-only, no tools.
@@ -76,7 +76,10 @@ async function runJarvis(message, claudeHistory, { onToken, onToolCall }) {
     };
     // Extended thinking makes it reason through hard, multi-step requests before
     // acting — the difference between a smart operator and a chatbot.
-    if (USE_THINKING) params.thinking = { type: 'enabled', budget_tokens: THINKING_BUDGET };
+    if (USE_THINKING) {
+      params.thinking = { type: 'adaptive' };
+      params.output_config = { effort: THINKING_EFFORT };
+    }
 
     const stream = client.messages.stream(params);
 
