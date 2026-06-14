@@ -1,5 +1,29 @@
 # Getting your API credentials
 
+## The easy path for Instagram + TikTok: Buffer
+
+If you already use Buffer (or are happy to sign up — free plan covers this), you can
+skip the direct Instagram and TikTok OAuth flows entirely. Connect both accounts once
+in Buffer's dashboard, then give JARVIS a single Buffer access token:
+
+1. Go to <https://buffer.com/developers/apps> → **Create an App**.
+2. Name it `jarvis`, set the redirect URI to `https://localhost/`.
+3. On the app page, click **Access Token** — Buffer generates one tied to your account.
+4. Paste it in `.env`:
+   ```
+   BUFFER_ACCESS_TOKEN=1/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   ```
+
+That's it. JARVIS will look up your connected Buffer profiles and post to whichever
+platform you ask — Instagram, TikTok, LinkedIn, X, Facebook, Pinterest — all via
+Buffer. No Instagram OAuth, no TikTok OAuth.
+
+> **Note:** Buffer's free plan allows up to 3 channels and 10 scheduled posts. The
+> token is long-lived and doesn't expire unless you revoke it.
+
+---
+
+
 Everything JARVIS connects to lives behind your own logins, so these have to be
 created by you. Below is the exact click-path for each, **ordered fastest-first**.
 Paste each value into `jarvis-hud/.env` (copy `.env.example` to `.env` first).
@@ -9,11 +33,12 @@ Paste each value into `jarvis-hud/.env` (copy `.env.example` to `.env` first).
 
 | Service | Time | Difficulty | Helper |
 |---------|------|------------|--------|
+| [Buffer (Instagram + TikTok + more)](#the-easy-path-for-instagram--tiktok-buffer) | ~2 min | trivial | — |
 | [Mailchimp](#1-mailchimp--1-min) | ~1 min | trivial | — |
 | [Appfigures](#2-appfigures--2-min) | ~2 min | trivial | — |
 | [App Store Connect](#3-app-store-connect--5-min) | ~5 min | easy | — |
-| [TikTok](#4-tiktok--15-min) | ~15 min | involved | `npm run auth:tiktok` |
-| [Instagram](#5-instagram--15-min) | ~15 min | involved | `npm run auth:instagram` |
+| [TikTok (direct, no Buffer)](#4-tiktok--15-min) | ~15 min | involved | `npm run auth:tiktok` |
+| [Instagram (direct, no Buffer)](#5-instagram--15-min) | ~15 min | involved | `npm run auth:instagram` |
 
 ---
 
