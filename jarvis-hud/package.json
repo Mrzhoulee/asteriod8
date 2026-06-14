@@ -6,6 +6,8 @@
   "scripts": {
     "start": "electron .",
     "dev": "ELECTRON_ENABLE_LOGGING=1 electron .",
+    "auth:tiktok": "node scripts/tiktok-auth.js",
+    "auth:instagram": "node scripts/instagram-auth.js",
     "icon": "node scripts/gen-icon.js && bash scripts/make-icns.sh",
     "pack": "npm run icon && electron-builder --dir",
     "dist": "npm run icon && electron-builder",
