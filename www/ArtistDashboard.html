@@ -1918,13 +1918,35 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                         const ansText = ta.value.trim();
                         if (!ansText) return;
                         btn.disabled = true; btn.textContent = 'Sending…';
+                        const ansPayload = { answer: ansText, answeredAt: Date.now() };
+                        // SDK update, racing a timeout; REST PATCH fallback for the iOS WebView.
+                        let ok = false;
                         try {
-                            await update(ref(database, 'ARTIST_QA/' + akey + '/' + qid), {
-                                answer: ansText,
-                                answeredAt: Date.now(),
-                            });
+                            const sdkTry = update(ref(database, 'ARTIST_QA/' + akey + '/' + qid), ansPayload)
+                                .then(() => true).catch(() => false);
+                            const raced = await Promise.race([
+                                sdkTry,
+                                new Promise(res => setTimeout(() => res('timeout'), 4000)),
+                            ]);
+                            ok = (raced === true);
+                            if (!ok) {
+                                const r = await fetch(RTDB_BASE_AD + '/ARTIST_QA/' + encodeURIComponent(akey) + '/' + encodeURIComponent(qid) + '.json', {
+                                    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ansPayload),
+                                });
+                                ok = r.ok;
+                            }
                         } catch (e) {
                             console.warn('[qa-tab] answer write failed', e);
+                        }
+                        if (ok) {
+                            // Optimistically show the reply in case the live listener is asleep.
+                            const card = document.getElementById('qa-card-' + qid);
+                            if (card) {
+                                const form = card.querySelector('.qa-answer-form');
+                                if (form) form.outerHTML = '<div class="qa-answered-wrap"><div class="qa-answered-label">✓ Your reply</div><div class="qa-answered-text">' + escH(ansText) + '</div></div>';
+                                card.classList.remove('qa-unanswered');
+                            }
+                        } else {
                             btn.disabled = false; btn.textContent = 'Send Reply';
                         }
                     });

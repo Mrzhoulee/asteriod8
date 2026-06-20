@@ -130,6 +130,7 @@
 
   const app = getApps().length ? getApp() : initializeApp(FC);
   const db = getDatabase(app);
+  const REST_BASE = "https://asteroid-cdc13-default-rtdb.firebaseio.com";
 
   // ── parse artist key from URL ──
   const params = new URLSearchParams(location.search);
@@ -140,19 +141,32 @@
   }
 
   // ── load artist profile for hero ──
+  function renderHero(p) {
+    p = p || {};
+    const name = p.nickname || p.fullName || p.displayName || 'Artist';
+    document.getElementById('topbarArtistName').textContent = name;
+    document.getElementById('heroName').textContent = name;
+    const avatarEl = document.getElementById('heroAvatar');
+    const pic = p.profilePicture || p.profileImage || p.photoURL || '';
+    avatarEl.innerHTML = pic
+      ? `<img src="${escHtml(pic)}" alt="${escHtml(name)}">`
+      : escHtml(name.charAt(0).toUpperCase());
+    document.getElementById('artistHero').style.display = 'flex';
+  }
   if (artistKey) {
+    let heroLoaded = false;
     onValue(ref(db, 'PROFILES/' + artistKey), (snap) => {
-      const p = snap.val() || {};
-      const name = p.nickname || p.fullName || p.displayName || 'Artist';
-      document.getElementById('topbarArtistName').textContent = name;
-      document.getElementById('heroName').textContent = name;
-      const avatarEl = document.getElementById('heroAvatar');
-      const pic = p.profilePicture || p.profileImage || p.photoURL || '';
-      avatarEl.innerHTML = pic
-        ? `<img src="${escHtml(pic)}" alt="${escHtml(name)}">`
-        : escHtml(name.charAt(0).toUpperCase());
-      document.getElementById('artistHero').style.display = 'flex';
+      heroLoaded = true;
+      renderHero(snap.val());
     }, { onlyOnce: true });
+    // REST fallback for iOS WebView where the SDK websocket may never connect.
+    setTimeout(() => {
+      if (heroLoaded) return;
+      fetch(REST_BASE + '/PROFILES/' + encodeURIComponent(artistKey) + '.json', { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : null)
+        .then(p => { if (!heroLoaded && p) renderHero(p); })
+        .catch(() => {});
+    }, 3000);
   }
 
   // ── pre-fill name from localStorage ──
@@ -243,21 +257,49 @@
     const askerName = document.getElementById('askerName').value.trim() || 'Anonymous';
     if (askerName !== 'Anonymous') localStorage.setItem('qaAskerName', askerName);
 
-    const qRef = push(ref(db, 'ARTIST_QA/' + artistKey));
-    await set(qRef, {
+    const key = push(ref(db, 'ARTIST_QA/' + artistKey)).key;
+    const payload = {
       question: questionText,
       askerName,
       askerKey: localStorage.getItem('emailKey') || localStorage.getItem('CurrentUser') || '',
       ts: Date.now(),
       fcmToken: fcmToken || '',
       platform: (window.Capacitor ? 'ios' : 'web'),
-    });
+    };
 
-    document.getElementById('questionText').value = '';
+    // Write via SDK, but don't hang on a stalled iOS websocket — fall back to REST PUT.
+    const ok = await writeQuestion(key, payload);
+
+    if (ok) {
+      document.getElementById('questionText').value = '';
+      submitBtn.textContent = 'Question sent! ✓';
+      // Refresh the list over REST so the new question shows even if onValue is dead.
+      fetchQAListViaRest();
+    } else {
+      submitBtn.textContent = 'Could not send — try again';
+    }
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Question sent! ✓';
     setTimeout(() => { submitBtn.textContent = 'Submit question'; }, 3000);
   });
+
+  // Reliable write: SDK first (racing a timeout), REST PUT fallback for iOS.
+  async function writeQuestion(key, payload) {
+    const path = 'ARTIST_QA/' + artistKey + '/' + key;
+    const sdkTry = (async () => {
+      try { await set(ref(db, path), payload); return true; } catch (e) { return false; }
+    })();
+    const raced = await Promise.race([
+      sdkTry,
+      new Promise(res => setTimeout(() => res('timeout'), 4000)),
+    ]);
+    if (raced === true) return true;
+    try {
+      const r = await fetch(REST_BASE + '/ARTIST_QA/' + encodeURIComponent(artistKey) + '/' + key + '.json', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+      });
+      return r.ok;
+    } catch (e) { return false; }
+  }
 
   // ── load Q&A list ──
   function escHtml(s) {
@@ -273,29 +315,54 @@
     return Math.floor(d / 86400) + 'd ago';
   }
 
+  let _qaListLoaded = false;
+  function renderQAItems(items) {
+    const listEl = document.getElementById('qaList');
+    if (!listEl) return;
+    items = (items || []).filter(q => q && q.question);
+    if (!items.length) {
+      listEl.innerHTML = '<div class="qa-empty">No questions yet — be the first to ask!</div>';
+      return;
+    }
+    items.sort((a, b) => (b.ts || 0) - (a.ts || 0)); // newest first
+    listEl.innerHTML = items.slice(0, 50).map(q => `
+      <div class="qa-card">
+        <div class="qa-question">${escHtml(q.question)}</div>
+        <div class="qa-meta">${escHtml(q.askerName || 'Anonymous')} · ${timeAgo(q.ts)}</div>
+        ${q.answer
+          ? `<div class="qa-answer-wrap">
+              <div class="qa-answer-label"><span class="material-symbols-outlined" style="font-size:14px">mic</span> Artist replied</div>
+              <div class="qa-answer-text">${escHtml(q.answer)}</div>
+             </div>`
+          : `<span class="qa-unanswered-badge">Awaiting answer</span>`
+        }
+      </div>`).join('');
+  }
+  function itemsFromObj(obj) {
+    if (!obj || typeof obj !== 'object') return [];
+    return Object.keys(obj).map(k => ({ id: k, ...obj[k] }));
+  }
+  // REST pull — reliable on the iOS WebView, and used to refresh after a submit.
+  function fetchQAListViaRest() {
+    if (!artistKey) return;
+    fetch(REST_BASE + '/ARTIST_QA/' + encodeURIComponent(artistKey) + '.json', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(obj => { _qaListLoaded = true; renderQAItems(itemsFromObj(obj)); })
+      .catch(() => {});
+  }
+
   if (artistKey) {
     onValue(query(ref(db, 'ARTIST_QA/' + artistKey), orderByChild('ts'), limitToLast(50)), (snap) => {
-      const listEl = document.getElementById('qaList');
-      if (!snap.exists()) {
-        listEl.innerHTML = '<div class="qa-empty">No questions yet — be the first to ask!</div>';
-        return;
-      }
+      _qaListLoaded = true;
       const items = [];
-      snap.forEach((child) => items.push({ id: child.key, ...child.val() }));
-      items.reverse(); // newest first
-      listEl.innerHTML = items.map(q => `
-        <div class="qa-card">
-          <div class="qa-question">${escHtml(q.question)}</div>
-          <div class="qa-meta">${escHtml(q.askerName || 'Anonymous')} · ${timeAgo(q.ts)}</div>
-          ${q.answer
-            ? `<div class="qa-answer-wrap">
-                <div class="qa-answer-label"><span class="material-symbols-outlined" style="font-size:14px">mic</span> Artist replied</div>
-                <div class="qa-answer-text">${escHtml(q.answer)}</div>
-               </div>`
-            : `<span class="qa-unanswered-badge">Awaiting answer</span>`
-          }
-        </div>`).join('');
+      if (snap.exists()) snap.forEach((child) => { items.push({ id: child.key, ...child.val() }); });
+      renderQAItems(items);
+    }, (err) => {
+      console.warn('[qa] list onValue error:', err && (err.message || err));
+      fetchQAListViaRest();
     });
+    // If the websocket never fires (common in the iOS WebView), pull over REST.
+    setTimeout(() => { if (!_qaListLoaded) fetchQAListViaRest(); }, 3500);
   }
 </script>
 </body>
