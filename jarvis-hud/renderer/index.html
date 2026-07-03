@@ -22,6 +22,9 @@
 
     <div class="toolbar" id="toolbar">
       <button class="tb-btn" data-panel="onboarding" title="Setup / Connect APIs (⌘1)"><span class="tb-ico">◎</span><span class="tb-lbl">Setup</span></button>
+      <button class="tb-btn" data-panel="growth"     title="Growth hub — road to 1,000 users (⌘5)"><span class="tb-ico">➚</span><span class="tb-lbl">Growth</span></button>
+      <button class="tb-btn" data-panel="toolkit"    title="Startup toolkit (⌘6)"><span class="tb-ico">⚒</span><span class="tb-lbl">Toolkit</span></button>
+      <button class="tb-btn" data-panel="focus"      title="Focus mode (⌘7)"><span class="tb-ico">◉</span><span class="tb-lbl">Focus</span></button>
       <button class="tb-btn" data-panel="diagram"    title="Diagrams (⌘2)"><span class="tb-ico">⌗</span><span class="tb-lbl">Diagram</span></button>
       <button class="tb-btn" data-panel="logs"       title="Activity log (⌘3)"><span class="tb-ico">≡</span><span class="tb-lbl">Logs</span></button>
       <button class="tb-btn" data-panel="stats"      title="Stats (⌘4)"><span class="tb-ico">▤</span><span class="tb-lbl">Stats</span></button>
@@ -29,6 +32,7 @@
       <button class="tb-btn" id="palette-btn"        title="Command palette (⌘K)"><span class="tb-ico">⌘</span><span class="tb-lbl">⌘K</span></button>
     </div>
 
+    <span id="focus-badge" class="hidden" title="Focus session running — click to open">◉ 25:00</span>
     <span class="header-status" id="header-status">READY</span>
     <div class="window-controls">
       <button class="wc-btn hide"  id="btn-hide"  title="Hide (⌘⇧J)"></button>
@@ -67,7 +71,7 @@
 
       <!-- Quick-start suggestion chips -->
       <div id="quick-chips">
-        <button class="chip" data-prompt="Show me a diagram of how your agent team is wired up.">⌗ Show team diagram</button>
+        <button class="chip" data-prompt="Give me a growth plan for today for Asteroid, my music platform app. Check my analytics with get_analytics first, then give me 3 concrete high-leverage actions to move toward 1,000 users.">🎯 Plan my day</button>
         <button class="chip" data-prompt="What are my App Store downloads for last month?">📊 App Store stats</button>
         <button class="chip" data-prompt="Draft an Instagram post to launch our app and post it.">📣 Launch post</button>
         <button class="chip" data-prompt="Check my Mailchimp audience stats.">🐵 Audience stats</button>
@@ -221,6 +225,24 @@
       <div class="sheet-head"><span>ก Thai Typing Practice</span><button class="sheet-x" data-close>✕</button></div>
       <div class="sheet-body" id="thai-body"></div>
     </div>
+
+    <!-- Growth hub — road to 1,000 users -->
+    <div class="overlay sheet wide hidden" id="overlay-growth">
+      <div class="sheet-head"><span>➚ Growth Hub — Road to 1,000 Users</span><button class="sheet-x" data-close>✕</button></div>
+      <div class="sheet-body" id="growth-body"></div>
+    </div>
+
+    <!-- Startup toolkit -->
+    <div class="overlay sheet wide hidden" id="overlay-toolkit">
+      <div class="sheet-head"><span>⚒ Startup Toolkit</span><button class="sheet-x" data-close>✕</button></div>
+      <div class="sheet-body" id="toolkit-body"></div>
+    </div>
+
+    <!-- Focus mode -->
+    <div class="overlay sheet hidden" id="overlay-focus">
+      <div class="sheet-head"><span>◉ Focus Mode</span><button class="sheet-x" data-close>✕</button></div>
+      <div class="sheet-body" id="focus-body"></div>
+    </div>
   </div>
 
   <!-- Toasts -->
@@ -229,5 +251,6 @@
 </div>
 
 <script src="app.js"></script>
+<script src="growth.js"></script>
 </body>
 </html>

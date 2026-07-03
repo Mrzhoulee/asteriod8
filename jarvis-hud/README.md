@@ -34,6 +34,51 @@ save to `personas.json` and apply to your next message; "Reset" restores a defau
 - **Files** — `read_file`, `write_file`, `list_directory`.
 - **Delegation** — hands specialist work to Hannah, Marcus, or Rob.
 
+## The Growth Suite — built to get Asteroid to 1,000 users
+
+Three founder hubs live next to the chat (every feature can hand its work
+straight to JARVIS and the team):
+
+**➚ Growth Hub (⌘5, `/growth`)**
+- 🎯 **Mission** — north-star tracker to 1,000 users with source attribution,
+  milestone celebrations (confetti at 10 → 1K), founder XP/levels, and one-click
+  "what should I do next?" powered by your real analytics. Backup/import all data.
+- ☑ **Daily** — recurring growth checklist (post, engage, DM curators…) with
+  day-streak tracking; every task has a ▶ button that makes JARVIS do it.
+- 📅 **Content** — content calendar per platform with idea→drafted→scheduled→posted
+  statuses, "draft with Hannah" and "post via JARVIS" on every row.
+- 🤝 **Outreach** — mini-CRM for playlist curators / influencers / press with
+  pipeline statuses, follow-up dates, due-today banner, and Hannah-drafted pitches.
+- ⚗ **Experiments** — growth-bet backlog ranked by ICE score with JARVIS planning.
+- 💬 **Feedback** — user feedback inbox with tags + upvotes, and a testimonial
+  vault (star praise → copy-ready social proof).
+- 🔭 **Rivals** — competitor watchlist with one-click JARVIS deep-dives.
+- 🚀 **Launch** — App Store / Product Hunt / press / community launch checklist
+  with overall readiness meter.
+
+**⚒ Startup Toolkit (⌘6, `/toolkit`)**
+- ▶ **Playbooks** — one-click multi-tool JARVIS plays (morning briefing `/brief`,
+  evening wrap-up, 10 TikTok hooks, curator pitch sprint, ASO tune-up, review
+  reply sweep, weekly growth report, launch thread) + your own saved playbooks.
+- ✉ **Templates** — outreach email library (curator pitch, influencer collab,
+  press pitch, beta invite, win-back) with live `{{variable}}` fill, copy, and
+  send-via-JARVIS.
+- # **Hashtags** — music-niche hashtag bank per platform, one-click copy.
+- 🔗 **UTM Links** — trackable link builder with history (see which channel
+  actually converts in GA4).
+- 🕐 **Best Times** — when to post per platform.
+- 💰 **Revenue** — conversion → MRR/ARR calculator, incl. "at 1,000 users".
+- 📰 **Press Kit** — one-pager generator (markdown, copy/download, polish with
+  Hannah).
+
+**◉ Focus Mode (⌘7, `/focus`)**
+- Pomodoro timer (25/50 min) with a live mini-badge in the title bar, spoken
+  alerts, and per-day session counts.
+- Today's Top-3 goals with daily rollover + yesterday's score.
+- Persistent scratchpad with markdown export.
+
+All growth data persists locally (and exports to JSON from the Mission tab).
+
 ## Safety model — "do anything", with a human in the loop
 
 The agent reads untrusted content (emails, web pages), so destructive actions are
