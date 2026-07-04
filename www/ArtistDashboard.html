@@ -1718,6 +1718,14 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
         async function pinFeaturedArtistSong(emailKey, signedInEmail) {
             if (!emailKey) return;
+            // Write-once: never overwrite an already-featured song. Keeps the FIRST
+            // track that earned the feature; new uploads just go to the library.
+            try {
+                const existing = await fastGet('FEATURED_ARTIST_SONG/' + emailKey);
+                if (existing && existing.exists() && existing.val() && existing.val().fileInp) {
+                    return;
+                }
+            } catch (e) { /* fall through and attempt to pin */ }
             const emailVariants = new Set();
             const addVariant = (e) => {
                 if (!e) return;
@@ -1754,7 +1762,8 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     }
                 }
                 if (!matches.length) return;
-                matches.sort((a, b) => (Number(b.s.createdAt) || 0) - (Number(a.s.createdAt) || 0));
+                // Oldest-first: feature the FIRST song the artist uploaded.
+                matches.sort((a, b) => (Number(a.s.createdAt) || 0) - (Number(b.s.createdAt) || 0));
                 const top = matches[0];
                 await set(ref(database, 'FEATURED_ARTIST_SONG/' + emailKey), {
                     title: top.s.title || '',
@@ -2802,7 +2811,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 if (currentUserEmail) localStorage.setItem("artemail", currentUserEmail);
 
                 // Self-heal for the Featured Songs card on the home page: pin this
-                // artist's most recent upload (matched by uploaderOwnerKey, then
+                // artist's FIRST upload (write-once, matched by uploaderOwnerKey then
                 // uploader email) to FEATURED_ARTIST_SONG/<currentEmailKey> so the
                 // home loader can surface it instantly without bridging.
                 pinFeaturedArtistSong(currentEmailKey, currentUserEmail).catch((e) => console.warn('[autopin]', e));

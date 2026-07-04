@@ -4922,11 +4922,14 @@ function whenElementReady(id, callback, retries = 10) {
                 }
               }
             }
-            allMatches.sort((a, b) => b.__created - a.__created);
+            // Feature the FIRST song the artist uploaded (oldest-first). This stays
+            // stable as they upload more — new tracks go to the library, not the card.
+            allMatches.sort((a, b) => a.__created - b.__created);
             const top = allMatches[0] || null;
             if (top) {
               song = top;
               // Self-heal: pin this match back to FEATURED_ARTIST_SONG for future visitors.
+              // Only runs when no song was pinned yet, so it's effectively write-once.
               try {
                 const viewerKey = (localStorage.getItem('emailKey') || '').trim();
                 if (viewerKey && viewerKey === ownerKey) {
@@ -5808,7 +5811,7 @@ function fetchSongsViaREST() {
     songsReceived = true;
     globalSongsData = songsData;
     window.__asteroidSongsDataForDiscovery = songsData;
-    const dailyList = getSessionBalancedPick(songsData, 50);
+    const dailyList = getDailyBalancedPick(songsData, 100);
     const renderData = dailyList ? flatListToSongsData(dailyList) : songsData;
     const html = renderSongsFromData(renderData);
     whenElementReady("ab", (ab) => {
@@ -5897,22 +5900,11 @@ function getDailyPick(songsData, n) {
   return shuffled.slice(0, n);
 }
 
-// ── Per-session balanced picker ────────────────────────────────────────────
-// Picks N songs per SESSION (re-rolls on each new app session, stays stable
-// within a session) and spreads the slots EQUALLY across every uploading
-// artist so each artist gets fair exposure — not just whoever uploaded most.
-function _sessionSeed() {
-  try {
-    let s = sessionStorage.getItem('asteroidSessionSeed');
-    if (!s) {
-      s = String((Date.now() ^ Math.floor(Math.random() * 0x7fffffff)) >>> 0);
-      sessionStorage.setItem('asteroidSessionSeed', s);
-    }
-    return parseInt(s, 10) || Date.now();
-  } catch (e) {
-    return Date.now();
-  }
-}
+// ── Daily balanced discovery picker ────────────────────────────────────────
+// Chooses N songs for the whole day (deterministic per YYYY-MM-DD, so the set is
+// stable for 24h and rotates the next day) and spreads the slots EQUALLY across
+// every uploading artist so each artist gets fair daily exposure — not just
+// whoever uploaded the most. This is the "recommended" library ordering.
 function _songOwnerKey(s) {
   // Group by uploader identity first, then fall back to artist name.
   const up = (s.uploader || s.uploaderEmail || s.uploadedBy || s.userEmail || s.email || "").toString().trim().toLowerCase();
@@ -5921,10 +5913,10 @@ function _songOwnerKey(s) {
   if (ar) return 'a:' + ar;
   return 'x:' + ((s.title || 'unknown').toString().trim().toLowerCase());
 }
-function getSessionBalancedPick(songsData, n) {
+function getDailyBalancedPick(songsData, n) {
   const all = flattenSongsData(songsData);
   if (all.length <= n) return null; // fewer than limit — show all
-  const rand = _seededRand(_sessionSeed());
+  const rand = _seededRand(_dailySeed());
   const shuffle = (arr) => {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(rand() * (i + 1));
@@ -5990,12 +5982,12 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
   }
   globalSongsData = songsData;
   window.__asteroidSongsDataForDiscovery = songsData;
-  // Pick 50 songs for this session, spread equally across every artist.
-  const dailyList = getSessionBalancedPick(songsData, 50);
+  // Pick 100 songs for today (24h), spread equally across every artist.
+  const dailyList = getDailyBalancedPick(songsData, 100);
   const renderData = dailyList ? flatListToSongsData(dailyList) : songsData;
   const html = renderSongsFromData(renderData);
   const songCount = html ? (html.match(/class="sssh"/g) || []).length : 0;
-  console.log("✅ Songs rendered:", songCount, dailyList ? "(session pick of 50, balanced across artists)" : "(all songs)");
+  console.log("✅ Songs rendered:", songCount, dailyList ? "(daily pick of 100, balanced across artists)" : "(all songs)");
   whenElementReady("ab", (ab) => {
     const extra = document.getElementById("artists-grid-8");
     ab.innerHTML = html + (extra ? extra.innerHTML : "");

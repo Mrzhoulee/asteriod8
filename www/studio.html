@@ -3148,19 +3148,32 @@
       // their referral code, instead of having to bridge by email/name later.
       if (uploaderOwnerKey) {
         try {
-          await Promise.race([
-            set(ref2(db, "FEATURED_ARTIST_SONG/" + uploaderOwnerKey), {
-              title: title,
-              album: album,
-              artist: artist,
-              fileInp: url,
-              uploader: email,
-              uploaderName: fullName,
-              songPath: dbPath,
-              uploadedAt: Date.now(),
-            }),
-            new Promise((r) => setTimeout(r, 5000)),
+          // Write-once: the featured song is the FIRST track that earned the
+          // feature. If this artist already has one pinned, DON'T overwrite it —
+          // the new upload just goes to the library.
+          const existingPin = await Promise.race([
+            get(ref2(db, "FEATURED_ARTIST_SONG/" + uploaderOwnerKey)),
+            new Promise((r) => setTimeout(() => r(null), 5000)),
           ]);
+          const alreadyPinned = !!(existingPin && existingPin.exists && existingPin.exists() &&
+            existingPin.val() && existingPin.val().fileInp);
+          if (!alreadyPinned) {
+            await Promise.race([
+              set(ref2(db, "FEATURED_ARTIST_SONG/" + uploaderOwnerKey), {
+                title: title,
+                album: album,
+                artist: artist,
+                fileInp: url,
+                uploader: email,
+                uploaderName: fullName,
+                songPath: dbPath,
+                uploadedAt: Date.now(),
+              }),
+              new Promise((r) => setTimeout(r, 5000)),
+            ]);
+          } else {
+            console.log("[studio] featured song already pinned — keeping the first one, new upload goes to library");
+          }
         } catch (e) { console.warn("[studio] FEATURED_ARTIST_SONG write", e); }
         // Promote any pending_upload referrals for this artist to 'featured'
         // now that they have actually uploaded a song.
