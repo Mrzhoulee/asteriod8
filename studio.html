@@ -869,7 +869,7 @@
   
         <input type="file"
                id="boostFileInp"
-               accept=".mp3,.wav"
+               accept=".mp3,.wav,audio/mpeg,audio/wav,audio/x-wav"
                hidden
                required>
   
@@ -956,14 +956,22 @@
     boostInput.click();
   });
   
-  // Show file name when selected
+  // Show file name when selected — only .mp3 / .wav allowed.
   boostInput.addEventListener("change", () => {
     if (boostInput.files.length > 0) {
-      boostUploadText.textContent =
-        "File Selected ✅"
+      var okBoost = window.isAllowedSongFile
+        ? window.isAllowedSongFile(boostInput.files[0])
+        : /\.(mp3|wav)$/i.test(boostInput.files[0].name || "");
+      if (!okBoost) {
+        alert("Only MP3 or WAV audio files are allowed. Please choose an .mp3 or .wav file.");
+        boostInput.value = "";
+        boostUploadText.textContent = "🎵 Drag & Drop Your Audio Here";
+        return;
+      }
+      boostUploadText.textContent = "File Selected ✅";
     }
   });
-  </script>  
+  </script>
 
   <form id="uploadForm">
     <h2>Upload Your Media</h2>
@@ -1143,11 +1151,11 @@
           🎵 Drag & Drop Your Audio Here
         </p>
         <p class="upload-sub" id="uploadSub">
-          or click to upload (.mp3 only)
+          or click to upload (.mp3 / .wav only)
         </p>
       </div>
  
-      <input type="file" id="fileInp" accept="audio/mpeg/wav" required>
+      <input type="file" id="fileInp" accept=".mp3,.wav,audio/mpeg,audio/wav,audio/x-wav" required>
       
     </div>
   </center>
@@ -1157,20 +1165,33 @@
       const uploadMain = document.getElementById("uploadMain");
       const uploadSub = document.getElementById("uploadSub");
     
+      // Only .mp3 / .wav audio files may be uploaded.
+      window.isAllowedSongFile = function (file) {
+        return !!file && /\.(mp3|wav)$/i.test(String(file.name || ""));
+      };
+
       function showFileName(file) {
         uploadMain.textContent = "✅ " + file.name;
         uploadSub.textContent = "Click to change file";
         dropArea.classList.add("file-selected");
       }
-    
+
       // Click to open
       dropArea.addEventListener("click", () => {
         fileInput.click();
       });
-    
+
       // File selected from picker
       fileInput.addEventListener("change", () => {
         if (fileInput.files.length > 0) {
+          if (!window.isAllowedSongFile(fileInput.files[0])) {
+            alert("Only MP3 or WAV audio files are allowed. Please choose an .mp3 or .wav file.");
+            fileInput.value = "";
+            uploadMain.textContent = "Drag & drop your track";
+            uploadSub.textContent = "or click to upload (.mp3 / .wav only)";
+            dropArea.classList.remove("file-selected");
+            return;
+          }
           showFileName(fileInput.files[0]);
         }
       });
@@ -1190,6 +1211,10 @@
         dropArea.classList.remove("dragover");
     
         if (e.dataTransfer.files.length > 0) {
+          if (!window.isAllowedSongFile(e.dataTransfer.files[0])) {
+            alert("Only MP3 or WAV audio files are allowed. Please choose an .mp3 or .wav file.");
+            return;
+          }
           fileInput.files = e.dataTransfer.files;
           showFileName(e.dataTransfer.files[0]);
         }
@@ -3066,6 +3091,11 @@
       appendUploadStatus("Please fill in: " + missing.join(", "));
       return;
     }
+    if (!(window.isAllowedSongFile ? window.isAllowedSongFile(_file) : /\.(mp3|wav)$/i.test(_file.name || ""))) {
+      appendUploadStatus("Only .mp3 or .wav files are allowed.");
+      alert("Only MP3 or WAV audio files are allowed. Please choose an .mp3 or .wav file.");
+      return;
+    }
 
     appendUploadStatus("Preparing upload…");
 
@@ -3241,7 +3271,7 @@
       document.getElementById("uploadForm").reset();
       document.getElementById("fileInp").value = "";
       document.getElementById("uploadMain").textContent = "🎵 Drag & Drop Your Audio Here";
-      document.getElementById("uploadSub").textContent = "or click to upload (.mp3 only)";
+      document.getElementById("uploadSub").textContent = "or click to upload (.mp3 / .wav only)";
       document.getElementById("dropArea").classList.remove("file-selected");
       document.getElementById("agreement").checked = false;
       var songTitleLabel = document.getElementById("agreementSongTitle");
@@ -3377,8 +3407,12 @@ boostBtn.addEventListener("click", async (e) => {
   const email = (localStorage.getItem("email") || "").trim() || (auth.currentUser && (auth.currentUser.email || auth.currentUser.uid)) || "";
   const file = document.getElementById("boostFileInp").files[0];
 
-  if (!email || !file) {             
+  if (!email || !file) {
     alert("Sign in and select a file!");
+    return;
+  }
+  if (!(window.isAllowedSongFile ? window.isAllowedSongFile(file) : /\.(mp3|wav)$/i.test(file.name || ""))) {
+    alert("Only MP3 or WAV audio files are allowed. Please choose an .mp3 or .wav file.");
     return;
   }
 
