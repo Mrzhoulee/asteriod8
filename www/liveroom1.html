@@ -165,30 +165,67 @@
 <!-- Scroll Down Indicator removed per request. Empty hidden stub kept so existing scripts that set #scrollIndicator.style don't throw. -->
 <div id="scrollIndicator" style="display:none !important;"></div>
 <script>
-/* Build a clean, WebView-friendly YouTube embed + a guaranteed "Open in YouTube"
-   fallback link. Fixes the "Video player configuration error (Error 153)" that
-   YouTube shows when its player can't validate the embedding context inside the
-   iOS Capacitor WebView. Non-YouTube embeds (Twitch, etc.) are used as pasted. */
+/* Render the live stream for the current room. YouTube plays inline via an
+   asteroid8.net proxy page (yt.html) so YouTube accepts the embedding origin and
+   no longer throws "Video player configuration error / Error 153" inside the iOS
+   WebView. TikTok & Instagram are also supported: their VIDEO posts embed inline,
+   but their LIVE streams cannot be iframed (both platforms block framing), so a
+   live gets a one-tap "Watch on ..." launcher. */
 window.__renderStreamEmbed = function (raw) {
   var s = String(raw == null ? "" : raw).trim();
   if (!s) return "";
-  var m = s.match(/(?:youtube\.com\/(?:embed|live|shorts)\/|youtu\.be\/|[?&]v=)([A-Za-z0-9_-]{11})/) || s.match(/^([A-Za-z0-9_-]{11})$/);
-  if (!m) return s;
-  var id = m[1];
-  var src = "https://www.youtube.com/embed/" + id + "?playsinline=1&rel=0&modestbranding=1&origin=https://www.asteroid8.net";
-  var watch = "https://www.youtube.com/watch?v=" + id;
-  return '' +
-    '<div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;">' +
-      '<iframe src="' + src + '" title="Live stream" ' +
-      'style="position:absolute;inset:0;width:100%;height:100%;border:0;" ' +
-      'frameborder="0" allowfullscreen playsinline ' +
-      'referrerpolicy="strict-origin-when-cross-origin" ' +
-      'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>' +
-    '</div>' +
-    '<div style="text-align:center;margin-top:8px;">' +
-      '<a href="' + watch + '" target="_blank" rel="noopener" ' +
+  function firstUrl(t) { var m = t.match(/https?:\/\/[^\s"'<>]+/i); return m ? m[0] : t; }
+  function frame(src, extra) {
+    return '<div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;">' +
+      '<iframe src="' + src + '" title="Live stream" style="position:absolute;inset:0;width:100%;height:100%;border:0;" ' +
+      'frameborder="0" allowfullscreen playsinline referrerpolicy="strict-origin-when-cross-origin" ' +
+      'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe></div>' +
+      (extra || '');
+  }
+  function link(url, label) {
+    return '<div style="text-align:center;margin-top:8px;"><a href="' + url + '" target="_blank" rel="noopener" ' +
       'style="display:inline-flex;align-items:center;gap:6px;color:#ff7f50;font-size:13px;font-weight:600;text-decoration:none;">' +
-      'Trouble watching? Open in YouTube ↗</a></div>';
+      label + ' ↗</a></div>';
+  }
+  function card(url, platform, emoji) {
+    return '<div style="text-align:center;padding:34px 20px;background:linear-gradient(135deg,#1a1a1f,#0e0e12);border:1px solid rgba(255,127,80,0.28);border-radius:14px;">' +
+      '<div style="font-size:42px;margin-bottom:10px;">' + emoji + '</div>' +
+      '<div style="color:#fff;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;margin-bottom:4px;">Live on ' + platform + '</div>' +
+      '<div style="color:rgba(255,255,255,0.55);font-size:12px;margin-bottom:16px;">' + platform + ' live streams open in the ' + platform + ' app.</div>' +
+      '<a href="' + url + '" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(90deg,#ff3b3b,#ff7a3b);color:#fff;padding:13px 24px;border-radius:12px;font-weight:700;text-decoration:none;">Watch on ' + platform + ' ↗</a></div>';
+  }
+
+  // YouTube — inline via the domain proxy (fixes Error 153).
+  var yt = s.match(/(?:youtube\.com\/(?:embed|live|shorts)\/|youtu\.be\/)([A-Za-z0-9_-]{11})/) ||
+           s.match(/[?&]v=([A-Za-z0-9_-]{11})/) || s.match(/^([A-Za-z0-9_-]{11})$/);
+  if (yt) {
+    return frame("https://www.asteroid8.net/yt.html?v=" + yt[1],
+      link("https://www.youtube.com/watch?v=" + yt[1], "Trouble watching? Open in YouTube"));
+  }
+
+  // TikTok — video embeds inline; LIVE opens in the app.
+  if (/tiktok\.com/i.test(s)) {
+    var tv = s.match(/tiktok\.com\/[^\s"'<>]*\/video\/(\d+)/i) || s.match(/[?&]video_id=(\d+)/i) || s.match(/tiktok\.com\/embed\/v2\/(\d+)/i);
+    var turl = firstUrl(s);
+    if (tv) return frame("https://www.tiktok.com/embed/v2/" + tv[1], link(turl, "Open on TikTok"));
+    return card(turl, "TikTok", "🎵");
+  }
+
+  // Instagram — post/reel embeds inline; LIVE opens in the app.
+  if (/instagram\.com/i.test(s)) {
+    var ig = s.match(/instagram\.com\/(p|reel|tv)\/([A-Za-z0-9_-]+)/i);
+    var iurl = firstUrl(s);
+    if (ig) return frame("https://www.instagram.com/" + ig[1] + "/" + ig[2] + "/embed", link(iurl, "Open on Instagram"));
+    return card(iurl, "Instagram", "📸");
+  }
+
+  // Already an embed (iframe/script/blockquote) — use as pasted.
+  if (/<iframe|<script|<blockquote/i.test(s)) return s;
+
+  // Any other bare URL — iframe it with an open-in fallback.
+  if (/^https?:\/\//i.test(s)) return frame(s, link(s, "Open stream"));
+
+  return s;
 };
 </script>
 
@@ -332,8 +369,19 @@ onValue(roomPath, (snapshot) => {
     const data = snapshot.val();
     const status = data && data.status ? String(data.status).toLowerCase().trim() : "";
     const embedValue = data && data.embed ? String(data.embed).trim() : "";
-    console.log("[room-status]", status || "(none)", "embed?", !!embedValue);
-    const isLive = !!(snapshot.exists() && embedValue);
+    const STREAM_MAX_MS = 10 * 60 * 60 * 1000; // streams auto-end after 10 hours
+    const startedAtVal = data && Number(data.startedAt) ? Number(data.startedAt) : 0;
+    const streamExpired = startedAtVal > 0 && (Date.now() - startedAtVal) > STREAM_MAX_MS;
+    console.log("[room-status]", status || "(none)", "embed?", !!embedValue, streamExpired ? "(expired >10h)" : "");
+    const isLive = !!(snapshot.exists() && embedValue && !streamExpired);
+    // Auto-end after 10 hours: free the room and bump chatEpoch so the chat and
+    // thank-you notes clear for the next host (the epoch bump is what clears them
+    // — see js/concert-social.js). LiveRooms is writable so this is allowed.
+    if (snapshot.exists() && embedValue && streamExpired) {
+      try {
+        update(roomPath, { embed: "", donationEmbed: "", socials: "", passcode: "", status: "offline", chatEpoch: Date.now() });
+      } catch (eExp) { console.warn("[liveroom] auto-end >10h failed", eExp); }
+    }
 
     function viewerConcertHostKey() {
         const ek = (localStorage.getItem("emailKey") || "").trim();

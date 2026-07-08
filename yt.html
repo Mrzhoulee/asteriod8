@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Asteroid Live Player</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+    #yt { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }
+    .msg { color: #fff; font-family: -apple-system, system-ui, sans-serif; text-align: center; margin-top: 40px; }
+  </style>
+</head>
+<body>
+  <!--
+    YouTube embed proxy. Loaded inside an iframe from the Asteroid app (which runs on
+    https://localhost inside the iOS WebView). Because THIS page is served from the real
+    asteroid8.net domain, the nested YouTube player sees a valid embedding origin and no
+    longer throws "Video player configuration error (Error 153)".
+    Usage: yt.html?v=VIDEO_ID
+  -->
+  <script>
+    (function () {
+      var p = new URLSearchParams(location.search);
+      var v = (p.get('v') || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 20);
+      if (!v) {
+        document.body.innerHTML = '<p class="msg">No video specified.</p>';
+        return;
+      }
+      var params = 'playsinline=1&rel=0&modestbranding=1&autoplay=1&fs=1';
+      var src = 'https://www.youtube.com/embed/' + v + '?' + params;
+      var f = document.createElement('iframe');
+      f.id = 'yt';
+      f.src = src;
+      f.title = 'Live stream';
+      f.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+      f.setAttribute('allowfullscreen', '');
+      f.setAttribute('frameborder', '0');
+      document.body.appendChild(f);
+    })();
+  </script>
+</body>
+</html>

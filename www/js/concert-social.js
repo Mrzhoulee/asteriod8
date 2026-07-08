@@ -61,6 +61,7 @@ export function mountConcertDock(db, roomNum) {
 
   let currentChatEpoch = 0;
   let lastMessagesVal = null;
+  let lastStickiesVal = null;
 
   function messageMatchesEpoch(m) {
     const e = m && typeof m.epoch === "number" && !Number.isNaN(m.epoch) ? m.epoch : 0;
@@ -98,6 +99,7 @@ export function mountConcertDock(db, roomNum) {
     currentChatEpoch =
       d && typeof d.chatEpoch === "number" && !Number.isNaN(d.chatEpoch) ? d.chatEpoch : 0;
     renderChatFromCache();
+    renderStickiesFromCache(); // epoch changed → clear old notes when a stream ends/starts
   });
 
   onValue(messagesRef, (snap) => {
@@ -105,18 +107,21 @@ export function mountConcertDock(db, roomNum) {
     renderChatFromCache();
   });
 
-  onValue(stickiesRef, (snap) => {
-    const v = snap.val();
+  // Sticky notes are epoch-filtered like the chat, so they clear for the next
+  // host when a stream ends/starts (the room's chatEpoch is bumped then).
+  function renderStickiesFromCache() {
+    const v = lastStickiesVal;
     if (!v) {
       stickyList.innerHTML = '<p class="cr-empty">No notes yet.</p>';
       return;
     }
     const sorted = Object.entries(v)
       .map(([id, n]) => ({ id, ...n }))
+      .filter((n) => messageMatchesEpoch(n))
       .sort((a, b) => (b.ts || 0) - (a.ts || 0));
     const rows = filterStickyNotesByBlocklist(sorted).slice(0, 40);
     if (!rows.length) {
-      stickyList.innerHTML = '<p class="cr-empty">No notes to show.</p>';
+      stickyList.innerHTML = '<p class="cr-empty">No notes yet.</p>';
       return;
     }
     stickyList.innerHTML = rows
@@ -131,6 +136,11 @@ export function mountConcertDock(db, roomNum) {
         return `<div class="cr-sticky">${e}${esc(n.text || "")}</div>`;
       })
       .join("");
+  }
+
+  onValue(stickiesRef, (snap) => {
+    lastStickiesVal = snap.val();
+    renderStickiesFromCache();
   });
 
   async function sendChat() {
@@ -169,6 +179,7 @@ export function mountConcertDock(db, roomNum) {
       text,
       ts: Date.now(),
       anonId: anonId(),
+      epoch: currentChatEpoch, // tie the note to the current stream so it clears when it ends
       isExplicit: textContainsAppendixExplicit(trimmed),
     };
     if (authorKey) payload.authorKey = authorKey;

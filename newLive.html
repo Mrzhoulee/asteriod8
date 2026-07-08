@@ -175,10 +175,10 @@
       <div class="card-head"><div class="card-num">1</div><h2>Stream details</h2></div>
 
       <div class="field">
-        <label for="uinp">YouTube Live embed code or URL</label>
+        <label for="uinp">Live stream link (YouTube, TikTok or Instagram)</label>
         <input class="large-input" id="uinp" type="text"
-               placeholder="Paste your YouTube Live embed code or link" />
-        <span class="hint">Paste the full &lt;iframe&gt; embed code, or just the YouTube watch/share URL.</span>
+               placeholder="Paste your YouTube / TikTok / Instagram live link" />
+        <span class="hint">Paste a YouTube embed/URL (plays inline), or a TikTok / Instagram live link (opens a “Watch on …” button, since those apps don’t allow inline embedding of lives).</span>
       </div>
 
       <div class="field">
@@ -199,7 +199,7 @@
         <label for="passcode">Live passcode</label>
         <input class="large-input" id="passcode" type="text"
                placeholder="Create a passcode to end your stream later" />
-        <span class="hint">You'll use this passcode to end the stream. Keep it private.</span>
+        <span class="hint">You'll use this passcode to end the stream. Keep it private. Streams also end automatically after 10 hours.</span>
       </div>
     </div>
 
@@ -239,6 +239,10 @@
       <button id="helloWorld" class="concert-live-btn" type="button" style="display:none;">
         <span class="material-symbols-outlined">celebration</span> Your concert is live — open your room
       </button>
+      <p style="margin:12px 0 0;text-align:center;color:rgba(255,255,255,0.5);font-size:12px;">
+        <span class="material-symbols-outlined" style="font-size:15px;vertical-align:-3px;color:var(--coral);">schedule</span>
+        Streams automatically end after 10 hours.
+      </p>
       <div id="liveshow"></div>
     </div>
 
@@ -404,7 +408,9 @@
             const data = snapshot.val();
             const status = data && data.status ? String(data.status).toLowerCase().trim() : "";
             const hasEmbed = !!(data && data.embed && String(data.embed).trim());
-            const roomAlreadyLive = status === "online" || status === "active" || status === "live" || (status !== "offline" && hasEmbed);
+            const startedAt = data && Number(data.startedAt) ? Number(data.startedAt) : 0;
+            const expired = startedAt > 0 && (Date.now() - startedAt) > (10 * 60 * 60 * 1000);
+            const roomAlreadyLive = !expired && (status === "online" || status === "active" || status === "live" || (status !== "offline" && hasEmbed));
 
             if (roomAlreadyLive) {
                 alert('This room is already live! Please pick another.');
