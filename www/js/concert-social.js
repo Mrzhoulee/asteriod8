@@ -71,7 +71,7 @@ export function mountConcertDock(db, roomNum) {
   function renderChatFromCache() {
     const v = lastMessagesVal;
     if (!v) {
-      chatList.innerHTML = '<p class="cr-empty">No messages yet — say hi!</p>';
+      chatList.innerHTML = '<p class="cr-empty">No messages yet - say hi!</p>';
       return;
     }
     const rows = Object.entries(v)
@@ -80,7 +80,7 @@ export function mountConcertDock(db, roomNum) {
       .sort((a, b) => (a.ts || 0) - (b.ts || 0))
       .slice(-80);
     if (!rows.length) {
-      chatList.innerHTML = '<p class="cr-empty">No messages yet — say hi!</p>';
+      chatList.innerHTML = '<p class="cr-empty">No messages yet - say hi!</p>';
       return;
     }
     chatList.innerHTML = rows
@@ -99,7 +99,7 @@ export function mountConcertDock(db, roomNum) {
     currentChatEpoch =
       d && typeof d.chatEpoch === "number" && !Number.isNaN(d.chatEpoch) ? d.chatEpoch : 0;
     renderChatFromCache();
-    renderStickiesFromCache(); // epoch changed → clear old notes when a stream ends/starts
+    renderStickiesFromCache(); // epoch changed  clear old notes when a stream ends/starts
   });
 
   onValue(messagesRef, (snap) => {

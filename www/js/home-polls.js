@@ -150,7 +150,7 @@ function renderPollRows(mount, rows, db, refFn, getFn, setFn) {
   active.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   const lim = active.slice(0, 12);
   if (!lim.length) {
-    mount.innerHTML = '<p class="home-polls-empty">No active artist battles — polls auto-close after 7 days.</p>';
+    mount.innerHTML = '<p class="home-polls-empty">No active artist battles - polls auto-close after 7 days.</p>';
     return;
   }
   mount.innerHTML = lim.map((p) => cardHtml({ ...p, id: p.id })).join("");
@@ -209,7 +209,7 @@ export function initHomePolls() {
       (snap) => {
         liveChannelOk = true;
         if (!snap.exists()) {
-          mount.innerHTML = '<p class="home-polls-empty">No artist battles yet — check back soon.</p>';
+          mount.innerHTML = '<p class="home-polls-empty">No artist battles yet - check back soon.</p>';
           return;
         }
         const rows = rowsFromSnapshot(snap);
@@ -236,7 +236,7 @@ export function initHomePolls() {
         if (liveChannelOk) return;
         const rows = rowsFromObject(obj || {});
         if (!rows.length) {
-          mount.innerHTML = '<p class="home-polls-empty">No artist battles yet — check back soon.</p>';
+          mount.innerHTML = '<p class="home-polls-empty">No artist battles yet - check back soon.</p>';
           return;
         }
         renderPollRows(mount, rows, db, refFn, getFn, setFn);

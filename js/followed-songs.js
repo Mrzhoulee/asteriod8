@@ -124,7 +124,7 @@ export async function initFollowedArtistSongs() {
 
         const matches = [];
 
-        // Resolve featured-artist follow keys (feat_MB, feat_DCC, …) → ownerKey via ARTIST_PROFILES + AGREEMENTS.
+        // Resolve featured-artist follow keys (feat_MB, feat_DCC, …)  ownerKey via ARTIST_PROFILES + AGREEMENTS.
         // ARTIST_PROFILES maps short id ("MB") to display name ("Melodic Black").
         // AGREEMENTS is keyed by sanitized email (= ownerKey for FEATURED_ARTIST_SONG) and contains { name, email }.
         if (featKeys.length) {
@@ -241,7 +241,7 @@ export async function initFollowedArtistSongs() {
               <div class="followed-song-meta">${esc(m.displayArtist)}${m.album ? " · " + esc(m.album) : ""}</div>
             </div>
             <div class="followed-song-actions">
-              <button class="followed-song-btn" data-action="play" aria-label="Play">▶</button>
+              <button class="followed-song-btn" data-action="play" aria-label="Play">►</button>
               <button class="followed-song-btn" data-action="queue" aria-label="Add to queue">＋</button>
             </div>
           </div>`).join("");

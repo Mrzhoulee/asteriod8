@@ -82,7 +82,7 @@
             touch-action: manipulation;
         }
 
-        /* Hover only on devices that actually support it — iOS Safari otherwise
+        /* Hover only on devices that actually support it - iOS Safari otherwise
            "stickies" the hover state after a tap, hiding the active tab color. */
         @media (hover: hover) {
             .tab-btn:hover { color: var(--text-primary); }
@@ -1109,10 +1109,10 @@
     </style>
 </head>
 <body>
-<!-- Artist role gate — shown immediately if profileType != 'artist' -->
+<!-- Artist role gate - shown immediately if profileType != 'artist' -->
 <div id="artistRoleGate" style="display:none;position:fixed;inset:0;z-index:99999;background:#0a0a0f;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:420px;">
-    <div style="font-size:3.5rem;margin-bottom:1rem;">🎵</div>
+    <div style="font-size:3.5rem;margin-bottom:1rem;"></div>
     <h2 style="color:#ff7f50;font-size:1.6rem;font-weight:700;margin-bottom:0.75rem;">Artist Access Required</h2>
     <p style="color:rgba(255,255,255,0.75);font-size:0.97rem;line-height:1.7;margin-bottom:2rem;">
       This page is only available for <strong style="color:#ffffff;">Artist</strong> accounts.<br><br>
@@ -1202,12 +1202,12 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Followers</div>
-                    <div class="stat-value" id="statFollowers">—</div>
+                    <div class="stat-value" id="statFollowers"> - </div>
                     <div class="stat-change"><i class="fas fa-user-friends"></i> People following you</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Following</div>
-                    <div class="stat-value" id="statFollowing">—</div>
+                    <div class="stat-value" id="statFollowing"> - </div>
                     <div class="stat-change"><i class="fas fa-user-plus"></i> Artists you follow</div>
                 </div>
             </div>
@@ -1267,7 +1267,7 @@
                     <div class="form-group">
                         <label class="form-label">Public username (unique, one-time)</label>
                         <input type="text" id="profilePublicUsername" class="form-input" placeholder="e.g. lunar_beats" maxlength="40" autocomplete="username">
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.35rem;">3–40 chars: letters, numbers, underscores only. Once saved, it stays yours; cannot be taken by someone else.</p>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.35rem;">3-40 chars: letters, numbers, underscores only. Once saved, it stays yours; cannot be taken by someone else.</p>
                     </div>
 
                     <div class="form-group">
@@ -1307,7 +1307,7 @@
                     <label class="form-label" for="tinp">Donation Box Embed Code</label>
                     <input class="form-input" id="tinp"
 type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
-<h3>ⓘ Paste your full DonorBox iframe embed code, or just enter the donation page URL and it will be displayed in an iframe</h3>
+<h3>Paste your full DonorBox iframe embed code, or just enter the donation page URL and it will be displayed in an iframe</h3>
 
                     <button type="button" class="btn btn-primary" onclick="saveProfile()">
                         <i class="fas fa-save"></i> Save Profile
@@ -1321,7 +1321,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 </h2>
                 <div class="profile-preview" id="profilePreview">
                     <div class="preview-header">
-                        <div class="preview-avatar" id="previewAvatar">🎵</div>
+                        <div class="preview-avatar" id="previewAvatar"></div>
                         <div class="preview-name" id="previewName">Your Artist Name</div>
                         <div class="preview-bio" id="previewBio">Your bio will appear here...</div>
                         <div class="preview-socials" id="prevTin">Your donation box wil appear here...</div> 
@@ -1384,7 +1384,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 <div id="creatorAgreementsList" class="songs-list"><div class="loading">Loading…</div></div>
             </div>
             <div class="analytics-section">
-                <h2 class="section-title"><i class="fas fa-route"></i> Listen journey (before → your song)</h2>
+                <h2 class="section-title"><i class="fas fa-route"></i> Listen journey (before  your song)</h2>
                 <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">What people played right before one of your tracks, and what they played after (from LISTEN_JOURNEYS).</p>
                 <div id="creatorJourneysList" class="songs-list"><div class="loading">Loading…</div></div>
             </div>
@@ -1397,7 +1397,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
                 <div class="form-group">
                     <label class="form-label">Post an update to your followers</label>
-                    <textarea id="creatorNoticeText" class="form-input" rows="3" maxlength="800" placeholder="e.g. New single &quot;Midnight Drive&quot; is out now — link in my profile!"></textarea>
+                    <textarea id="creatorNoticeText" class="form-input" rows="3" maxlength="800" placeholder="e.g. New single &quot;Midnight Drive&quot; is out now - link in my profile!"></textarea>
                     <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.35rem;">
                         Tip: when you drop a new song, write a short update here. Everyone who follows you will see it on their home feed the next time they open the app. (Max 800 characters. You need a saved public username before you can post.)
                     </p>
@@ -1458,7 +1458,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
             <!-- Hero -->
             <div class="ref-hero">
-                <div class="ref-hero-icon">🚀</div>
+                <div class="ref-hero-icon"></div>
                 <h2 class="ref-hero-title">Invite artists to Asteroid</h2>
                 <p class="ref-hero-sub">Share your personal link. Every artist that joins through it counts toward your milestones.</p>
             </div>
@@ -1505,17 +1505,17 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             <div class="ref-stats-row">
                 <div class="ref-stat-card">
                     <div class="ref-stat-icon"><i class="fas fa-mouse-pointer"></i></div>
-                    <div class="ref-stat-val" id="refStatClicks">—</div>
+                    <div class="ref-stat-val" id="refStatClicks"> - </div>
                     <div class="ref-stat-label">Link clicks</div>
                 </div>
                 <div class="ref-stat-card">
                     <div class="ref-stat-icon"><i class="fas fa-user-plus"></i></div>
-                    <div class="ref-stat-val" id="refStatSignups">—</div>
+                    <div class="ref-stat-val" id="refStatSignups"> - </div>
                     <div class="ref-stat-label">Artists joined</div>
                 </div>
                 <div class="ref-stat-card">
                     <div class="ref-stat-icon"><i class="fas fa-trophy"></i></div>
-                    <div class="ref-stat-val" id="refStatNext">—</div>
+                    <div class="ref-stat-val" id="refStatNext"> - </div>
                     <div class="ref-stat-label">Until next milestone</div>
                 </div>
             </div>
@@ -1524,7 +1524,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             <div class="ref-milestones">
                 <div class="ref-milestones-title"><i class="fas fa-flag"></i> Milestones</div>
                 <div class="ref-milestone" id="ms1">
-                    <div class="ref-ms-icon" id="ms1icon">🌟</div>
+                    <div class="ref-ms-icon" id="ms1icon"></div>
                     <div class="ref-ms-body">
                         <div class="ref-ms-name">Early Adopter</div>
                         <div class="ref-ms-desc">Invite your first artist to join Asteroid</div>
@@ -1532,7 +1532,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     <div class="ref-ms-badge" id="ms1badge">1 artist</div>
                 </div>
                 <div class="ref-milestone" id="ms2">
-                    <div class="ref-ms-icon" id="ms2icon">🚀</div>
+                    <div class="ref-ms-icon" id="ms2icon"></div>
                     <div class="ref-ms-body">
                         <div class="ref-ms-name">Community Builder</div>
                         <div class="ref-ms-desc">3 artists joined through your link</div>
@@ -1540,7 +1540,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     <div class="ref-ms-badge" id="ms2badge">3 artists</div>
                 </div>
                 <div class="ref-milestone" id="ms3">
-                    <div class="ref-ms-icon" id="ms3icon">🎖️</div>
+                    <div class="ref-ms-icon" id="ms3icon"></div>
                     <div class="ref-ms-body">
                         <div class="ref-ms-name">Featured on Asteroid</div>
                         <div class="ref-ms-desc">Your profile gets highlighted on the homepage</div>
@@ -1548,10 +1548,10 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     <div class="ref-ms-badge" id="ms3badge">5 artists</div>
                 </div>
                 <div class="ref-milestone" id="ms4">
-                    <div class="ref-ms-icon" id="ms4icon">💎</div>
+                    <div class="ref-ms-icon" id="ms4icon"></div>
                     <div class="ref-ms-body">
                         <div class="ref-ms-name">Asteroid Pro</div>
-                        <div class="ref-ms-desc">Unlock Pro features — coming soon</div>
+                        <div class="ref-ms-desc">Unlock Pro features - coming soon</div>
                     </div>
                     <div class="ref-ms-badge" id="ms4badge">10 artists</div>
                 </div>
@@ -1702,7 +1702,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
         async function fastGetRef(refOrPath) {
           // Accepts either a string path or a Firebase Reference (uses ._path or .key chain).
           if (typeof refOrPath === 'string') return fastGet(refOrPath);
-          // Reference object — extract path from internal _path or fall back to toString.
+          // Reference object - extract path from internal _path or fall back to toString.
           let p = '';
           try {
             if (refOrPath && refOrPath._path && refOrPath._path.pieces_) {
@@ -1873,7 +1873,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
 
             onValue(ref(database, 'ARTIST_QA/' + artistKey), (snap) => {
                 if (!snap.exists()) {
-                    listEl.innerHTML = `<div class="qa-empty"><div class="qa-empty-icon">💬</div><div class="qa-empty-text">No questions yet.<br>Share your Q&amp;A link to get started.</div></div>`;
+                    listEl.innerHTML = `<div class="qa-empty"><div class="qa-empty-icon"></div><div class="qa-empty-text">No questions yet.<br>Share your Q&amp;A link to get started.</div></div>`;
                     if (badge) badge.style.display = 'none';
                     return;
                 }
@@ -1952,7 +1952,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                             const card = document.getElementById('qa-card-' + qid);
                             if (card) {
                                 const form = card.querySelector('.qa-answer-form');
-                                if (form) form.outerHTML = '<div class="qa-answered-wrap"><div class="qa-answered-label">✓ Your reply</div><div class="qa-answered-text">' + escH(ansText) + '</div></div>';
+                                if (form) form.outerHTML = '<div class="qa-answered-wrap"><div class="qa-answered-label"> Your reply</div><div class="qa-answered-text">' + escH(ansText) + '</div></div>';
                                 card.classList.remove('qa-unanswered');
                             }
                         } else {
@@ -2032,7 +2032,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 }
                 if (fansEl) {
                     fansEl.innerHTML = unique.length
-                        ? unique.map((r) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(r.label || 'Anonymous')}</div><div class="song-artist">${r.anonymous ? 'Anonymous listener' : 'Signed in'} · ${escapeHtml(r.songTitle || '')}</div></div><div class="song-stats"><span class="song-stat-value" style="font-size:0.85rem;">${r.cameFromTitle ? 'From: ' + escapeHtml(r.cameFromTitle) : '—'}</span></div></div>`).join('')
+                        ? unique.map((r) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(r.label || 'Anonymous')}</div><div class="song-artist">${r.anonymous ? 'Anonymous listener' : 'Signed in'} · ${escapeHtml(r.songTitle || '')}</div></div><div class="song-stats"><span class="song-stat-value" style="font-size:0.85rem;">${r.cameFromTitle ? 'From: ' + escapeHtml(r.cameFromTitle) : ' - '}</span></div></div>`).join('')
                         : '<div class="empty-state">No fan plays yet. Open <strong>www/ArtistDashboard.html</strong> if your site lives under <code>www/</code>. Tracks need <code>uploader</code> on each song. This list merges <code>FAN_ENGAGEMENT</code> and <code>LISTEN_JOURNEYS</code> for your email and user id.</div>';
                 }
             } catch (e) {
@@ -2095,7 +2095,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 journeys.sort((a, b) => (b.ts || 0) - (a.ts || 0));
                 if (jouEl) {
                     jouEl.innerHTML = journeys.length
-                        ? journeys.slice(0, 120).map((j) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(j.playedTitle || '')}</div><div class="song-artist">Before: ${escapeHtml(j.prevTitle || '—')} · After: ${escapeHtml(j.nextTitle || '—')}</div></div><div class="song-stats"><span class="song-stat-label">${j.listenerLabel ? escapeHtml(j.listenerLabel) : ''}</span></div></div>`).join('')
+                        ? journeys.slice(0, 120).map((j) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(j.playedTitle || '')}</div><div class="song-artist">Before: ${escapeHtml(j.prevTitle || ' - ')} · After: ${escapeHtml(j.nextTitle || ' - ')}</div></div><div class="song-stats"><span class="song-stat-label">${j.listenerLabel ? escapeHtml(j.listenerLabel) : ''}</span></div></div>`).join('')
                         : '<div class="empty-state">No journey rows yet. New plays from the home library are mirrored here automatically. Older data may appear after a successful indexed query once rules are deployed.</div>';
                 }
             } catch (e) {
@@ -2177,7 +2177,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             const raw = (document.getElementById('creatorFollowUsername')?.value || '').trim().toLowerCase();
             const normalized = raw.replace(/[^a-z0-9_]/g, '');
             if (!normalized || normalized.length < 3) {
-                alert('Enter a valid public username (letters, numbers, underscores; 3–40 characters).');
+                alert('Enter a valid public username (letters, numbers, underscores; 3-40 characters).');
                 return;
             }
             const viewerKey = currentEmailKey;
@@ -2423,7 +2423,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 const rawUsername = (document.getElementById('profilePublicUsername') && document.getElementById('profilePublicUsername').value) || '';
                 const normalized = rawUsername.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
                 if (rawUsername.trim() && (normalized.length < 3 || normalized.length > 40)) {
-                    alert('Public username must be 3–40 characters (letters, numbers, underscores only).');
+                    alert('Public username must be 3-40 characters (letters, numbers, underscores only).');
                     return;
                 }
                 const locked = prevProf.publicUsername ? String(prevProf.publicUsername).toLowerCase() : '';
@@ -2763,7 +2763,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             }
         }
         // FAST-PATH: kick off the loaders IMMEDIATELY using the localStorage-derived
-        // identity. Don't wait for onAuthStateChanged — Firebase Auth init can take
+        // identity. Don't wait for onAuthStateChanged - Firebase Auth init can take
         // several seconds (especially on Apple sign-in), and we already have the
         // emailKey that index.html persisted. The auth callback below will re-run
         // the loaders later if the identity changes, so this is safe.
@@ -2772,7 +2772,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             const storedCurrentUser = (localStorage.getItem("CurrentUser") || "").trim();
             const storedEmail = (localStorage.getItem("email") || "").trim();
             const accountId = storedCurrentUser || storedEmail || localStorage.getItem("artemail") || "";
-            if (!storedEmailKey && !accountId) return; // No identity yet — wait for auth callback
+            if (!storedEmailKey && !accountId) return; // No identity yet - wait for auth callback
             currentUserEmail = accountId || storedEmailKey || "";
             currentEmailKey = storedEmailKey || sanitizeEmail(accountId);
             if (currentUserEmail) try { localStorage.setItem("artemail", currentUserEmail); } catch (e) {}
@@ -2826,7 +2826,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                         loadAllUsers().catch((e) => console.warn('[dashboard] loadAllUsers:', e))
                     ]);
                 } else {
-                    console.log('[dashboard] auth callback — same emailKey as fast-boot, skipping reload');
+                    console.log('[dashboard] auth callback - same emailKey as fast-boot, skipping reload');
                 }
 
                 // Tear down any listeners from a previous auth-state fire before re-subscribing.
@@ -2878,7 +2878,7 @@ if (!sub || !title) {
     return;
 }
 
-// Resolve a stable artist label: profile nickname → currentEmailKey → relay email → "Unknown Artist"
+// Resolve a stable artist label: profile nickname  currentEmailKey  relay email  "Unknown Artist"
 let artistLabel = (document.getElementById('profileNickname')?.value || '').trim();
 if (!artistLabel && currentEmailKey) artistLabel = currentEmailKey;
 if (!artistLabel) artistLabel = auth.currentUser?.email || "Unknown Artist";
@@ -2895,7 +2895,7 @@ await set(postRef, {
     planes: 0
 });
 
-alert("Posted into " + sub + " 🪐");
+alert("Posted into " + sub + " ");
 
 document.getElementById("subSongTitle").value = "";
 document.getElementById("subSongDesc").value = "";
@@ -2930,7 +2930,7 @@ input.value = "";
 };
 
 
-// Live Feed — track inner comment listeners so we can tear them down
+// Live Feed - track inner comment listeners so we can tear them down
 // each render (otherwise every parent fire stacks N new subscriptions).
 const _subCommentUnsubs = [];
 function _clearSubCommentListeners() {
@@ -2988,7 +2988,7 @@ _clearSubCommentListeners();
 feed.innerHTML = "";
 
 if (!data) {
-    feed.innerHTML = '<div class="sub-empty">No posts yet — be the first to share something.</div>';
+    feed.innerHTML = '<div class="sub-empty">No posts yet - be the first to share something.</div>';
     return;
 }
 
@@ -3090,7 +3090,7 @@ Object.keys(data).forEach(sub => {
 });
 
 if (postCount === 0) {
-    feed.innerHTML = '<div class="sub-empty">No posts yet — be the first to share something.</div>';
+    feed.innerHTML = '<div class="sub-empty">No posts yet - be the first to share something.</div>';
 }
 
 });
@@ -3111,7 +3111,7 @@ const STORY_BG_PRESETS = [
     { id:'paper',   bg:'#fff7ed' }
 ];
 const STORY_TEXT_COLORS = ['#ffffff', '#0a0a0f', '#ff7f50', '#fcd34d', '#a78bfa', '#34d399', '#f472b6'];
-const STORY_STICKERS = ['', '🌟', '💌', '🎵', '🌹', '🌅', '🪐', '🔥', '✨', '🦋', '☁️', '🍓'];
+const STORY_STICKERS = [''];
 const STORY_RTDB_BASE = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
 const STORY_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -3183,7 +3183,7 @@ function _storyBuildComposer() {
     if (stkGrid && !stkGrid.dataset.built) {
         stkGrid.dataset.built = '1';
         stkGrid.innerHTML = STORY_STICKERS.map((s, i) =>
-            `<button class="story-sticker-btn ${i===0?'selected':''}" data-i="${i}" type="button">${s || '∅'}</button>`
+            `<button class="story-sticker-btn ${i===0?'selected':''}" data-i="${i}" type="button">${s || 'None'}</button>`
         ).join('');
         stkGrid.addEventListener('click', (ev) => {
             const btn = ev.target.closest('.story-sticker-btn');
@@ -3300,7 +3300,7 @@ async function loadMyStories() {
                 ${s.sticker ? `<div style="position:absolute;bottom:36px;right:10px;font-size:28px;transform:rotate(-8deg);">${s.sticker}</div>` : ''}
                 <div class="stories-card-mini-meta">
                     <span>${ttl} left</span>
-                    <span>👁 ${s.views || 0}</span>
+                    <span> ${s.views || 0}</span>
                 </div>
                 <button class="stories-card-mini-delete" data-del="${s.id}" type="button" aria-label="Delete"><i class="fas fa-times"></i></button>
             </div>`;
@@ -3425,8 +3425,8 @@ async function loadGrowTab() {
   }
 
   // 4. Wire up share buttons
-  const msg = encodeURIComponent(`Join me on Asteroid — upload your music, go live, and grow your fanbase 🪐\n${link}`);
-  const subject = encodeURIComponent('Join me on Asteroid 🪐');
+  const msg = encodeURIComponent(`Join me on Asteroid - upload your music, go live, and grow your fanbase \n${link}`);
+  const subject = encodeURIComponent('Join me on Asteroid ');
   const tw = document.getElementById('refShareTwitter');
   const wa = document.getElementById('refShareWhatsapp');
   const em = document.getElementById('refShareEmail');
@@ -3452,7 +3452,7 @@ async function loadGrowTab() {
       el('refStatSignups', signups);
       // Next milestone
       const nextMs = MILESTONES.find(m => m.n > signups);
-      el('refStatNext', nextMs ? (nextMs.n - signups) : '🎉');
+      el('refStatNext', nextMs ? (nextMs.n - signups) : '');
       // Unlock milestones
       MILESTONES.forEach(m => {
         const el = document.getElementById(m.id);
@@ -3666,14 +3666,14 @@ async function loadGrowTab() {
   color: #4ade80;
   border-color: rgba(74,222,128,0.3);
 }
-.ref-milestone.unlocked .ref-ms-badge::before { content: '✓ '; }
+.ref-milestone.unlocked .ref-ms-badge::before { content: ' '; }
 
 @media (max-width: 480px) {
   .ref-stats-row { grid-template-columns: 1fr 1fr; }
   .ref-stats-row .ref-stat-card:last-child { grid-column: span 2; }
 }
 
-/* Phase 1 — Invite link card */
+/* Phase 1 - Invite link card */
 #inviteLinkCard{background:linear-gradient(135deg,rgba(255,127,80,.12),rgba(255,127,80,.04));border:1px solid rgba(255,127,80,.3);border-radius:16px;padding:1.25rem;margin:1rem 0 2rem;display:none}
 #inviteLinkCard.show{display:block}
 #inviteLinkCard h3{font-size:1.1rem;margin-bottom:.25rem;color:#ff7f50}
@@ -3684,7 +3684,7 @@ async function loadGrowTab() {
 #inviteLinkCard button.ok{background:#10b981;color:#fff}
 #inviteLinkCard a.more{color:#ff7f50;text-decoration:none;font-size:.9rem;margin-left:auto}
 
-/* Phase 1 — Artist inbox (milestone notifications) */
+/* Phase 1 - Artist inbox (milestone notifications) */
 #inboxBell{position:fixed;top:1rem;right:1rem;width:44px;height:44px;border-radius:50%;background:rgba(255,127,80,.18);border:1px solid rgba(255,127,80,.4);color:#ff7f50;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;font-size:20px;backdrop-filter:blur(10px)}
 #inboxBell:hover{background:rgba(255,127,80,.25)}
 #inboxBell .ibBadge{position:absolute;top:-2px;right:-2px;background:#ff5c8a;color:#fff;font-size:.7rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px}
@@ -3700,7 +3700,7 @@ async function loadGrowTab() {
 .ibTime{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:.25rem}
 .ibEmpty{padding:1rem;text-align:center;color:rgba(255,255,255,.5);font-size:.85rem}
 
-/* Floating vinyl — appears at bottom-right when any audio plays on the page */
+/* Floating vinyl - appears at bottom-right when any audio plays on the page */
 #pageVinylDock{position:fixed;bottom:1rem;right:1rem;z-index:999;opacity:0;transform:translateY(8px) scale(.9);transition:opacity .35s,transform .35s;pointer-events:none}
 #pageVinylDock.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
 #pageVinylDock #pageVinyl{--vinyl-size:100px;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5))}
@@ -3745,11 +3745,11 @@ async function loadGrowTab() {
     c.id = 'inviteLinkCard';
     c.innerHTML = `
       <h3><i class="fa-solid fa-link"></i> Your invite link</h3>
-      <div class="sub" id="ilSub">Share this with fans — they auto-follow you on signup and you climb the supporter chart.</div>
+      <div class="sub" id="ilSub">Share this with fans - they auto-follow you on signup and you climb the supporter chart.</div>
       <div class="row">
-        <input id="ilInput" readonly value="—">
+        <input id="ilInput" readonly value=" - ">
         <button id="ilCopy">Copy link</button>
-        <a class="more" href="/artist-referrals">View referrals →</a>
+        <a class="more" href="/artist-referrals">View referrals </a>
       </div>`;
     return c;
   }
@@ -3775,9 +3775,9 @@ async function loadGrowTab() {
       if (d.slug && d.is_referral_eligible){
         document.getElementById('ilInput').value = `https://www.asteroid8.net/r/${d.slug}`;
         document.getElementById('ilSub').textContent =
-          `Share this with fans — they auto-follow you on signup. ${d.referral_count || 0} supporters so far.`;
+          `Share this with fans - they auto-follow you on signup. ${d.referral_count || 0} supporters so far.`;
       } else {
-        document.getElementById('ilInput').value = '—';
+        document.getElementById('ilInput').value = ' - ';
         document.getElementById('ilSub').innerHTML =
           'Enable referrals to get your invite link. <button id="ilEnable" style="margin-left:.5rem;background:#10b981;color:#fff;border:none;padding:.4rem .8rem;border-radius:6px;cursor:pointer">Enable</button>';
         document.getElementById('ilEnable').addEventListener('click', async () => {
@@ -3791,7 +3791,7 @@ async function loadGrowTab() {
     document.addEventListener('click', (e) => {
       if (e.target.id !== 'ilCopy') return;
       const v = document.getElementById('ilInput').value;
-      if (!v || v === '—') return;
+      if (!v || v === ' - ') return;
       navigator.clipboard.writeText(v).then(() => {
         const b = e.target; b.classList.add('ok'); b.textContent = 'Copied!';
         setTimeout(() => { b.classList.remove('ok'); b.textContent = 'Copy link'; }, 1500);

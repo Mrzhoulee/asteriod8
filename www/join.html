@@ -578,6 +578,12 @@
 </head>
 <body>
 
+<!-- Deferred-referral CTA: shown on iOS Safari when arriving via an invite link -->
+<div id="getAppBar" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#0f0f0f;border-top:1px solid rgba(255,127,80,.3);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));align-items:center;gap:12px;">
+  <div style="flex:1;font-size:13px;color:#fff;font-family:'Poppins',sans-serif;line-height:1.4;">Continue in the Asteroid app - your invite stays linked.</div>
+  <button type="button" onclick="asteroidGetApp()" style="flex-shrink:0;padding:10px 18px;border:none;border-radius:10px;background:linear-gradient(135deg,#ff7f50,#e85d2c);color:#fff;font-weight:600;font-size:14px;font-family:'Poppins',sans-serif;cursor:pointer;">Get the app</button>
+</div>
+
 <div class="page-loading" id="pageLoading">
   <div class="page-loader"></div>
 </div>
@@ -586,7 +592,7 @@
   <!-- Top bar -->
   <div class="topbar">
     <a class="logo-link" href="index.html">
-      <div class="logo-icon">🪐</div>
+      <div class="logo-icon"></div>
       <span class="logo-name">Asteroid</span>
     </a>
     <div class="step-dots" id="stepDots">
@@ -603,7 +609,7 @@
     <div class="step active" id="stepRole">
       <div class="step-heading">
         <h1>What brings you to Asteroid?</h1>
-        <p>Pick your role — you can always change it later.</p>
+        <p>Pick your role - you can always change it later.</p>
       </div>
       <div class="role-cards">
         <div class="role-card artist-card" id="pickArtist" role="button" tabindex="0" aria-label="Join as Artist">
@@ -759,7 +765,7 @@
         <div class="success-ring">
           <span class="material-symbols-outlined">check_circle</span>
         </div>
-        <div class="success-title">You're in! 🎉</div>
+        <div class="success-title">You're in! </div>
         <div class="success-sub" id="successMsg">Your account is ready. Taking you to Asteroid…</div>
       </div>
     </div>
@@ -789,7 +795,7 @@
 
   const app = initializeApp(FB_CFG);
   // Use browserLocalPersistence (localStorage) to avoid IndexedDB deadlock with
-  // the Firebase Messaging service worker. No popupRedirectResolver needed —
+  // the Firebase Messaging service worker. No popupRedirectResolver needed - 
   // we use the Identity Toolkit REST API for OAuth instead of the SDK's redirect.
   const auth = initializeAuth(app, {
     persistence: browserLocalPersistence
@@ -827,6 +833,21 @@
       } catch (_) {}
     })();
   }
+
+  // ── Deferred deep link (clipboard): stash the invite so it survives an
+  //    App Store install, then go to the App Store. iOS Safari only. ──
+  window.asteroidGetApp = function () {
+    const go = () => { location.href = 'https://apps.apple.com/app/id6752210015'; };
+    if (activeRef && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText('asteroid-ref:' + activeRef).then(go, go);
+    } else { go(); }
+  };
+  (() => {
+    const native = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+    const iosWeb = !native && /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const bar = document.getElementById('getAppBar');
+    if (bar && iosWeb && activeRef) bar.style.display = 'flex';
+  })();
 
   // ── State ─────────────────────────────────────────────────────────
   let currentStep = 0;
@@ -925,7 +946,7 @@
     if (msg) console.error('[join] auth error shown:', msg);
   }
 
-  // PostHog — lazy init via /api/config (project key is public-safe by design)
+  // PostHog - lazy init via /api/config (project key is public-safe by design)
   let _phLoaded = null;
   async function _ensurePostHog() {
     if (_phLoaded) return _phLoaded;
@@ -989,14 +1010,14 @@
     } catch (err) {
       console.error('[join] handleAuthSuccess error', err);
     }
-    // Always advance — step transition must not be blocked by anything above.
+    // Always advance - step transition must not be blocked by anything above.
     try { goToStep(2); } catch (err) { console.error('[join] goToStep error', err); }
   }
 
   let signingIn = false;
 
-  // Google sign-in — standard Firebase SDK popup. The /__/auth/handler endpoint
-  // is served by Firebase Hosting on asteroid8.net, so the popup → opener
+  // Google sign-in - standard Firebase SDK popup. The /__/auth/handler endpoint
+  // is served by Firebase Hosting on asteroid8.net, so the popup  opener
   // postMessage works without the COOP issues firebaseapp.com had.
   async function startGoogleSignIn(btn) {
     showAuthErr('');
@@ -1049,8 +1070,8 @@
   function friendlyAuthErr(e) {
     if (!e) return 'Something went wrong. Try again.';
     const c = e.code || '';
-    if (c === 'auth/popup-blocked') return 'Popup was blocked — please allow popups for this site.';
-    if (c === 'auth/network-request-failed') return 'Network error — check your connection.';
+    if (c === 'auth/popup-blocked') return 'Popup was blocked - please allow popups for this site.';
+    if (c === 'auth/network-request-failed') return 'Network error - check your connection.';
     if (c === 'auth/operation-not-allowed') return 'This sign-in method isn\'t enabled yet. Contact support.';
     if (c === 'auth/account-exists-with-different-credential') return 'An account already exists with this email using a different sign-in method.';
     if (c) return 'Sign-in error: ' + c;
@@ -1171,7 +1192,7 @@
       btn.disabled = false;
       spinner.style.display = 'none';
       document.getElementById('finishLabel').textContent = 'Finish & go to Asteroid';
-      alert('Could not save profile — please check your connection and try again.');
+      alert('Could not save profile - please check your connection and try again.');
     }
   });
 
@@ -1200,7 +1221,7 @@
     // Already finished handling this user.
     if (authedUser && authedUser.uid === user.uid) return;
 
-    // If a button-driven sign-in is happening, just advance — popup may be
+    // If a button-driven sign-in is happening, just advance - popup may be
     // hung/delayed and we already have the user. Skip the profile fetch so we
     // don't race the click handler.
     if (signingIn) {
@@ -1208,7 +1229,7 @@
       return;
     }
 
-    // Page loaded with an existing Firebase Auth session — check their profile.
+    // Page loaded with an existing Firebase Auth session - check their profile.
     const accountId = getStableId(user);
     const emailKey = sanitizeKey(accountId);
     setLocalAuth(user, user.displayName || '');
@@ -1218,7 +1239,7 @@
       const res = await fetch(`${RTDB}/PROFILES/${encodeURIComponent(emailKey)}.json`,
         { signal: AbortSignal.timeout(5000) });
       profile = await res.json();
-    } catch (_) { /* network/timeout — treat as no profile */ }
+    } catch (_) { /* network/timeout - treat as no profile */ }
 
     if (profile && profile.nickname) {
       const sub = document.querySelector('.success-screen .success-sub');

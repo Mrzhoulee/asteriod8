@@ -57,13 +57,16 @@ width: 100%;
     </div>
 
     <script>
-        document.getElementById("loginForm").addEventListener("submit", function(event) {
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
             event.preventDefault(); // Prevent form submission
-            
+
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
-            
-            if (username === "Preuser" && password === "User102049") {
+
+            // SHA-256 of "username:password" — credentials are no longer shipped in source.
+            var _buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(username + ":" + password));
+            var _hex = Array.from(new Uint8Array(_buf)).map(function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+            if (_hex === "a876aba42c248de400413f45fbde51ad0595e6967bfc7caa9771fcc26a2ff0c3") {
                 alert("Login successful!");
                 window.location.href = "presigma.html"; // Redirect to Game.html
             } else {

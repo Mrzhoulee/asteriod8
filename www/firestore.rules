@@ -1,19 +1,47 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // users — public read for profile/wall lookups. Self-writes for most fields.
+    // Function-only writes for referral_count, signup_order_for_artist, tier,
+    // partnerStatus, equityEligible (admin SDK bypasses these rules).
     match /users/{userId} {
       allow read: if true;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && !request.resource.data.diff(resource.data).affectedKeys()
+                       .hasAny(['referral_count', 'signup_order_for_artist',
+                                'referred_by_artist_id', 'tier',
+                                'partnerStatus', 'equityEligible',
+                                'is_referral_eligible', 'slug']);
       allow delete: if request.auth != null && request.auth.uid == userId;
     }
+
     match /songs/{songId} {
       allow read: if true;
       allow create: if request.auth != null;
       allow update, delete: if request.auth != null;
     }
+
     match /featureQueue/{docId} {
       allow read, write: if request.auth != null;
+    }
+
+    // founding_supporters — public read for the wall, function-only write
+    match /founding_supporters/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // referral_clicks — function-only
+    match /referral_clicks/{docId} {
+      allow read, write: if false;
+    }
+
+    // audit_log — function-only
+    match /audit_log/{docId} {
+      allow read, write: if false;
     }
   }
 }

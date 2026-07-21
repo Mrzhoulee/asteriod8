@@ -70,11 +70,19 @@
       color: #fff;
     }
     button[type="submit"]:hover { filter: brightness(1.06); }
+    button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
     .err {
       min-height: 20px;
       margin-top: 12px;
       font-size: 13px;
       color: #ff6b6b;
+      text-align: center;
+    }
+    .ok {
+      min-height: 20px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #6bd49b;
       text-align: center;
     }
     .back-row {
@@ -92,67 +100,312 @@
       font-family: inherit;
     }
     .back-link:hover { color: #ffa07a; }
+    .row-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      font-size: 13px;
+    }
+    .link-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+      font-size: 13px;
+      color: rgba(255, 127, 80, 0.95);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .link-btn:hover { color: #ffa07a; text-decoration: underline; }
+    .notice {
+      margin: 0 0 18px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(255, 255, 255, 0.04);
+      color: rgba(255, 255, 255, 0.65);
+    }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="back-row">
-      <a class="back-link" href="index.html">← Back to home</a>
+      <a class="back-link" href="index.html"> Back to home</a>
     </div>
-    <h1>Sign in</h1>
-    <p class="sub">Enter your email and password to continue.</p>
-    <form id="loginForm" novalidate>
+
+    <h1 id="formTitle">Sign in</h1>
+    <p class="sub" id="formSub">Enter your email and password to continue.</p>
+
+    <!-- Sign in / Create account -->
+    <form id="authForm" class="auth-view" novalidate>
       <label for="email">Email</label>
       <input type="email" id="email" name="email" autocomplete="username" required placeholder="you@example.com">
+
       <label for="password">Password</label>
       <input type="password" id="password" name="password" autocomplete="current-password" required placeholder="Password">
-      <button type="submit">Sign In</button>
-      <div id="loginErr" class="err" role="alert"></div>
+
+      <div id="confirmRow" class="hidden">
+        <label for="confirmPassword">Confirm password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password" placeholder="Confirm password">
+      </div>
+
+      <button type="submit" id="authSubmit">Sign In</button>
+      <div id="authErr" class="err" role="alert"></div>
+
+      <div class="row-between">
+        <button type="button" class="link-btn" id="forgotBtn">Forgot password?</button>
+        <button type="button" class="link-btn" id="toggleMode">Create account</button>
+      </div>
+    </form>
+
+    <!-- Forgot password -->
+    <form id="resetForm" class="reset-view hidden" novalidate>
+      <label for="resetEmail">Email</label>
+      <input type="email" id="resetEmail" name="resetEmail" autocomplete="username" required placeholder="you@example.com">
+
+      <button type="submit" id="resetSubmit">Send reset email</button>
+      <div id="resetMsg" class="ok" role="status"></div>
+      <div id="resetErr" class="err" role="alert"></div>
+
+      <div class="row-between">
+        <button type="button" class="link-btn" id="backToSignIn"> Back to sign in</button>
+      </div>
     </form>
   </div>
-  <script>
-    let demoEmail = "demo@asteroid8.net";
-    let demoPassword = "Password123";
-  </script>
+
   <script src="auth.js"></script>
-  <script>
-    (function () {
-      function postLoginRedirect() {
-        var q = new URLSearchParams(window.location.search);
-        var ret = (q.get("return") || "").trim();
-        var allow = { "index.html": 1, "studio.html": 1, "pat.html": 1 };
-        window.location.replace(allow[ret] ? ret : "index.html");
-      }
 
-      if (typeof isSessionValid === "function" && isSessionValid()) {
-        postLoginRedirect();
-        return;
-      }
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import {
+      initializeAuth, getAuth,
+      browserLocalPersistence, browserPopupRedirectResolver,
+      signInWithEmailAndPassword, createUserWithEmailAndPassword,
+      sendPasswordResetEmail, updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-      var form = document.getElementById("loginForm");
-      var errEl = document.getElementById("loginErr");
-      form.addEventListener("submit", function (ev) {
-        ev.preventDefault();
-        if (errEl) errEl.textContent = "";
-        var email = (document.getElementById("email").value || "").trim();
-        var password = document.getElementById("password").value || "";
-        if (email === demoEmail && password === demoPassword) {
-          localStorage.setItem("isLoggedIn", "true");
-          localStorage.setItem("userEmail", email);
-          localStorage.setItem("userName", "User");
-          localStorage.setItem("localAuthOnly", "1");
-          var key = email.replace(/[.#$[\]]/g, "_");
-          localStorage.setItem("email", email);
-          localStorage.setItem("CurrentUser", email);
-          localStorage.setItem("fullName", "User");
-          localStorage.setItem("asteroidSignedInBefore", "true");
-          localStorage.setItem("emailKey", key);
-          postLoginRedirect();
-        } else {
-          if (errEl) errEl.textContent = "Invalid login";
-        }
+    const firebaseConfig = {
+      apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+      authDomain: "asteroid-cdc13.firebaseapp.com",
+      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+      projectId: "asteroid-cdc13",
+      storageBucket: "asteroid-cdc13.appspot.com",
+      messagingSenderId: "793353824502",
+      appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+      measurementId: "G-GV72TMNNGR"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    let auth;
+    try {
+      auth = initializeAuth(app, {
+        persistence: browserLocalPersistence,
+        popupRedirectResolver: browserPopupRedirectResolver,
       });
-    })();
+    } catch (e) {
+      const code = e && e.code ? String(e.code) : "";
+      const msg = e && e.message ? String(e.message) : "";
+      if (code === "auth/already-initialized" || /already.*initialized/i.test(msg)) {
+        auth = getAuth(app);
+      } else {
+        auth = getAuth(app);
+      }
+    }
+
+    // ---- redirect helpers ----------------------------------------------------
+    function postLoginRedirect() {
+      const q = new URLSearchParams(window.location.search);
+      const ret = (q.get("return") || "").trim();
+      const allow = { "index.html": 1, "studio.html": 1, "pat.html": 1 };
+      window.location.replace(allow[ret] ? ret : "index.html");
+    }
+
+    function sanitizeKey(s) {
+      return String(s || "").trim().replace(/[.#$[\]]/g, "_");
+    }
+
+    function applySession(user, email) {
+      const displayName = (user && user.displayName) ? user.displayName : "";
+      const name = displayName || (email.includes("@") ? email.split("@")[0] : email);
+      const key = sanitizeKey(email);
+
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userEmail", email);
+      localStorage.setItem("email", email);
+      localStorage.setItem("CurrentUser", email);
+      localStorage.setItem("userName", name);
+      localStorage.setItem("fullName", name);
+      localStorage.setItem("asteroidSignedInBefore", "true");
+      localStorage.setItem("emailKey", key);
+      // Important: do NOT set localAuthOnly - this is real Firebase auth.
+      localStorage.removeItem("localAuthOnly");
+    }
+
+    // If a session is already valid, bounce out immediately.
+    if (typeof window.isSessionValid === "function" && window.isSessionValid()) {
+      postLoginRedirect();
+    }
+
+    // ---- error message mapping -----------------------------------------------
+    function friendlyError(code) {
+      switch (code) {
+        case "auth/invalid-credential":
+        case "auth/wrong-password":
+        case "auth/user-not-found":
+          return "Wrong email or password. Try again, or create an account.";
+        case "auth/email-already-in-use":
+          return "An account with that email already exists. Try signing in instead.";
+        case "auth/weak-password":
+          return "Password is too weak. Use at least 6 characters.";
+        case "auth/invalid-email":
+          return "That email address doesn't look right.";
+        case "auth/network-request-failed":
+          return "Network problem. Check your connection and try again.";
+        case "auth/too-many-requests":
+          return "Too many attempts. Please wait a moment, then try again.";
+        case "auth/missing-password":
+          return "Please enter your password.";
+        case "auth/operation-not-allowed":
+          return "Email sign-in is not enabled yet. Please contact support.";
+        default:
+          return "Couldn't complete that. Please try again.";
+      }
+    }
+
+    // ---- DOM ----------------------------------------------------------------
+    const authForm     = document.getElementById("authForm");
+    const resetForm    = document.getElementById("resetForm");
+    const formTitle    = document.getElementById("formTitle");
+    const formSub      = document.getElementById("formSub");
+    const emailInput   = document.getElementById("email");
+    const passInput    = document.getElementById("password");
+    const confirmRow   = document.getElementById("confirmRow");
+    const confirmInput = document.getElementById("confirmPassword");
+    const submitBtn    = document.getElementById("authSubmit");
+    const errEl        = document.getElementById("authErr");
+    const toggleBtn    = document.getElementById("toggleMode");
+    const forgotBtn    = document.getElementById("forgotBtn");
+    const resetEmail   = document.getElementById("resetEmail");
+    const resetSubmit  = document.getElementById("resetSubmit");
+    const resetMsg     = document.getElementById("resetMsg");
+    const resetErr     = document.getElementById("resetErr");
+    const backToSignIn = document.getElementById("backToSignIn");
+
+    let mode = "signin"; // "signin" | "signup"
+
+    function setMode(next) {
+      mode = next;
+      const isSignup = mode === "signup";
+      formTitle.textContent = isSignup ? "Create account" : "Sign in";
+      formSub.textContent   = isSignup
+        ? "Use your email and pick a password (at least 6 characters)."
+        : "Enter your email and password to continue.";
+      submitBtn.textContent = isSignup ? "Create Account" : "Sign In";
+      toggleBtn.textContent = isSignup ? "Have an account? Sign in" : "Create account";
+      confirmRow.classList.toggle("hidden", !isSignup);
+      passInput.setAttribute("autocomplete", isSignup ? "new-password" : "current-password");
+      passInput.setAttribute("placeholder", isSignup ? "At least 6 characters" : "Password");
+      errEl.textContent = "";
+    }
+
+    toggleBtn.addEventListener("click", () => setMode(mode === "signin" ? "signup" : "signin"));
+
+    forgotBtn.addEventListener("click", () => {
+      authForm.classList.add("hidden");
+      resetForm.classList.remove("hidden");
+      formTitle.textContent = "Reset password";
+      formSub.textContent   = "Enter your email - we'll send a reset link.";
+      resetEmail.value      = emailInput.value;
+      resetMsg.textContent  = "";
+      resetErr.textContent  = "";
+    });
+
+    backToSignIn.addEventListener("click", () => {
+      resetForm.classList.add("hidden");
+      authForm.classList.remove("hidden");
+      setMode(mode);
+    });
+
+    // ---- submit: sign in / sign up ------------------------------------------
+    authForm.addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      errEl.textContent = "";
+
+      const email = (emailInput.value || "").trim();
+      const password = passInput.value || "";
+
+      if (!email) { errEl.textContent = "Please enter your email."; return; }
+      if (!password) { errEl.textContent = "Please enter your password."; return; }
+
+      if (mode === "signup") {
+        if (password.length < 6) {
+          errEl.textContent = "Password must be at least 6 characters.";
+          return;
+        }
+        if (password !== (confirmInput.value || "")) {
+          errEl.textContent = "Passwords don't match.";
+          return;
+        }
+      }
+
+      submitBtn.disabled = true;
+      const originalLabel = submitBtn.textContent;
+      submitBtn.textContent = mode === "signup" ? "Creating account…" : "Signing in…";
+
+      try {
+        let cred;
+        if (mode === "signup") {
+          cred = await createUserWithEmailAndPassword(auth, email, password);
+          // Set a default display name from the email prefix.
+          try {
+            const prefix = email.includes("@") ? email.split("@")[0] : email;
+            if (cred.user && !cred.user.displayName) {
+              await updateProfile(cred.user, { displayName: prefix });
+            }
+          } catch (_) { /* non-fatal */ }
+        } else {
+          cred = await signInWithEmailAndPassword(auth, email, password);
+        }
+
+        applySession(cred.user, email);
+        postLoginRedirect();
+      } catch (e) {
+        const code = (e && e.code) ? String(e.code) : "";
+        errEl.textContent = friendlyError(code);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalLabel;
+      }
+    });
+
+    // ---- submit: forgot password --------------------------------------------
+    resetForm.addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      resetMsg.textContent = "";
+      resetErr.textContent = "";
+
+      const email = (resetEmail.value || "").trim();
+      if (!email) { resetErr.textContent = "Please enter your email."; return; }
+
+      resetSubmit.disabled = true;
+      const originalLabel = resetSubmit.textContent;
+      resetSubmit.textContent = "Sending…";
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        resetMsg.textContent = "Reset email sent. Check your inbox.";
+      } catch (e) {
+        const code = (e && e.code) ? String(e.code) : "";
+        resetErr.textContent = friendlyError(code);
+      } finally {
+        resetSubmit.disabled = false;
+        resetSubmit.textContent = originalLabel;
+      }
+    });
   </script>
 </body>
 </html>

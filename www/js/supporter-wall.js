@@ -1,4 +1,4 @@
-// Supporter wall — avatar grid for an artist's public profile.
+// Supporter wall - avatar grid for an artist's public profile.
 // Usage: <div id="supporterWall" data-artist-id="..."></div>
 // then: import { mountSupporterWall } from './js/supporter-wall.js';
 //       mountSupporterWall(document.getElementById('supporterWall'));
@@ -64,7 +64,7 @@ export async function mountSupporterWall(host) {
   }
 
   if (!supporters.length) {
-    host.innerHTML = '<p class="empty">No founding supporters yet — be the first.</p>';
+    host.innerHTML = '<p class="empty">No founding supporters yet - be the first.</p>';
     return;
   }
 

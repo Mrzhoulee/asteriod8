@@ -146,7 +146,7 @@
 
 <div class="cr-shell">
   <header class="cr-room-head">
-    <a href="lively.html" class="cr-back">← Live concerts</a>
+    <a href="lively.html" class="cr-back"> Live concerts</a>
     <h1>Room 2</h1>
   </header>
   <div class="cr-grid">
@@ -185,17 +185,17 @@ window.__renderStreamEmbed = function (raw) {
   function link(url, label) {
     return '<div style="text-align:center;margin-top:8px;"><a href="' + url + '" target="_blank" rel="noopener" ' +
       'style="display:inline-flex;align-items:center;gap:6px;color:#ff7f50;font-size:13px;font-weight:600;text-decoration:none;">' +
-      label + ' ↗</a></div>';
+      label + '</a></div>';
   }
   function card(url, platform, emoji) {
     return '<div style="text-align:center;padding:34px 20px;background:linear-gradient(135deg,#1a1a1f,#0e0e12);border:1px solid rgba(255,127,80,0.28);border-radius:14px;">' +
       '<div style="font-size:42px;margin-bottom:10px;">' + emoji + '</div>' +
       '<div style="color:#fff;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;margin-bottom:4px;">Live on ' + platform + '</div>' +
       '<div style="color:rgba(255,255,255,0.55);font-size:12px;margin-bottom:16px;">' + platform + ' live streams open in the ' + platform + ' app.</div>' +
-      '<a href="' + url + '" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(90deg,#ff3b3b,#ff7a3b);color:#fff;padding:13px 24px;border-radius:12px;font-weight:700;text-decoration:none;">Watch on ' + platform + ' ↗</a></div>';
+      '<a href="' + url + '" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(90deg,#ff3b3b,#ff7a3b);color:#fff;padding:13px 24px;border-radius:12px;font-weight:700;text-decoration:none;">Watch on ' + platform + '</a></div>';
   }
 
-  // YouTube — inline via the domain proxy (fixes Error 153).
+  // YouTube - inline via the domain proxy (fixes Error 153).
   var yt = s.match(/(?:youtube\.com\/(?:embed|live|shorts)\/|youtu\.be\/)([A-Za-z0-9_-]{11})/) ||
            s.match(/[?&]v=([A-Za-z0-9_-]{11})/) || s.match(/^([A-Za-z0-9_-]{11})$/);
   if (yt) {
@@ -203,26 +203,26 @@ window.__renderStreamEmbed = function (raw) {
       link("https://www.youtube.com/watch?v=" + yt[1], "Trouble watching? Open in YouTube"));
   }
 
-  // TikTok — video embeds inline; LIVE opens in the app.
+  // TikTok - video embeds inline; LIVE opens in the app.
   if (/tiktok\.com/i.test(s)) {
     var tv = s.match(/tiktok\.com\/[^\s"'<>]*\/video\/(\d+)/i) || s.match(/[?&]video_id=(\d+)/i) || s.match(/tiktok\.com\/embed\/v2\/(\d+)/i);
     var turl = firstUrl(s);
     if (tv) return frame("https://www.tiktok.com/embed/v2/" + tv[1], link(turl, "Open on TikTok"));
-    return card(turl, "TikTok", "🎵");
+    return card(turl, "TikTok", "");
   }
 
-  // Instagram — post/reel embeds inline; LIVE opens in the app.
+  // Instagram - post/reel embeds inline; LIVE opens in the app.
   if (/instagram\.com/i.test(s)) {
     var ig = s.match(/instagram\.com\/(p|reel|tv)\/([A-Za-z0-9_-]+)/i);
     var iurl = firstUrl(s);
     if (ig) return frame("https://www.instagram.com/" + ig[1] + "/" + ig[2] + "/embed", link(iurl, "Open on Instagram"));
-    return card(iurl, "Instagram", "📸");
+    return card(iurl, "Instagram", "");
   }
 
-  // Already an embed (iframe/script/blockquote) — use as pasted.
+  // Already an embed (iframe/script/blockquote) - use as pasted.
   if (/<iframe|<script|<blockquote/i.test(s)) return s;
 
-  // Any other bare URL — iframe it with an open-in fallback.
+  // Any other bare URL - iframe it with an open-in fallback.
   if (/^https?:\/\//i.test(s)) return frame(s, link(s, "Open stream"));
 
   return s;
@@ -322,7 +322,7 @@ window.__renderStreamEmbed = function (raw) {
         <p class="cr-hint">No sign-in required. Send the artist a short anonymous note (also filtered).</p>
         <div id="concertStickyList"></div>
         <div class="cr-chat-row">
-          <input type="text" id="concertStickyInput" maxlength="280" placeholder="Thanks for the set! 🎵" autocomplete="off" />
+          <input type="text" id="concertStickyInput" maxlength="280" placeholder="Thanks for the set! " autocomplete="off" />
           <button type="button" class="cr-btn-send" id="concertStickySend">Post note</button>
         </div>
       </div>
@@ -376,7 +376,7 @@ onValue(roomPath, (snapshot) => {
     const isLive = !!(snapshot.exists() && embedValue && !streamExpired);
     // Auto-end after 10 hours: free the room and bump chatEpoch so the chat and
     // thank-you notes clear for the next host (the epoch bump is what clears them
-    // — see js/concert-social.js). LiveRooms is writable so this is allowed.
+    // - see js/concert-social.js). LiveRooms is writable so this is allowed.
     if (snapshot.exists() && embedValue && streamExpired) {
       try {
         update(roomPath, { embed: "", donationEmbed: "", socials: "", passcode: "", status: "offline", chatEpoch: Date.now() });

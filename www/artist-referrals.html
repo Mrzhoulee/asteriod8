@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Referrals — Artist Dashboard</title>
+<title>Referrals - Artist Dashboard</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
 <style>
   :root{--primary:#ff7f50;--bg:#0a0a0f;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--text:#fff;--muted:rgba(255,255,255,.7);--success:#10b981}
@@ -68,7 +68,7 @@
         Enable referrals on your profile to get an invite link.
         <button id="enableBtn" style="margin-left:.5rem">Enable referrals</button>
       </div>
-      <input id="linkInput" readonly value="—">
+      <input id="linkInput" readonly value=" - ">
       <button id="copyBtn">Copy link</button>
     </div>
 
@@ -77,7 +77,7 @@
       <div id="supTable"><div class="empty">Loading…</div></div>
       <div class="pager">
         <button id="prev" disabled>Prev</button>
-        <span id="pageInfo" style="color:var(--muted);font-size:.85rem;padding:.4rem 0">—</span>
+        <span id="pageInfo" style="color:var(--muted);font-size:.85rem;padding:.4rem 0"> - </span>
         <button id="next-page" disabled>Next</button>
       </div>
     </div>
@@ -146,7 +146,7 @@
     document.getElementById('notEligible').style.display = eligible ? 'none' : 'block';
     document.getElementById('linkInput').value = eligible
       ? `https://www.asteroid8.net/r/${d.slug}`
-      : '—';
+      : ' - ';
   }
 
   async function loadPage(uid, direction){
@@ -156,7 +156,7 @@
     const snap = await getDocs(q);
     if (snap.empty) {
       document.getElementById('supTable').innerHTML = '<div class="empty">No supporters yet.</div>';
-      document.getElementById('pageInfo').textContent = '—';
+      document.getElementById('pageInfo').textContent = ' - ';
       return;
     }
     if (direction === 'next') firstDocStack.push(lastDoc);
@@ -178,12 +178,12 @@
 
     document.getElementById('prev').disabled      = firstDocStack.length === 0;
     document.getElementById('next-page').disabled = snap.docs.length < PAGE_SIZE;
-    document.getElementById('pageInfo').textContent = `Showing 1–${snap.docs.length}`;
+    document.getElementById('pageInfo').textContent = `Showing 1 - ${snap.docs.length}`;
   }
 
   document.getElementById('copyBtn').addEventListener('click', () => {
     const v = document.getElementById('linkInput').value;
-    if (!v || v === '—') return;
+    if (!v || v === ' - ') return;
     navigator.clipboard.writeText(v).then(() => {
       const b = document.getElementById('copyBtn');
       b.classList.add('ok'); b.textContent = 'Copied!';

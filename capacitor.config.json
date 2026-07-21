@@ -17,7 +17,9 @@
     }
   },
   "server": {
-    "iosScheme": "ionic",
+    "hostname": "localhost",
+    "iosScheme": "https",
+    "androidScheme": "https",
     "allowNavigation": [
       "https://appleid.apple.com",
       "https://www.apple.com",

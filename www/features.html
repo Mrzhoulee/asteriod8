@@ -331,15 +331,15 @@
     </div>
     <div class="hero-stats">
       <div class="hero-stat">
-        <div class="hero-stat-num" id="statTotal">–</div>
+        <div class="hero-stat-num" id="statTotal"> - </div>
         <div class="hero-stat-label">Ideas</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-num" id="statVotes">–</div>
+        <div class="hero-stat-num" id="statVotes"> - </div>
         <div class="hero-stat-label">Votes cast</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-num" id="statShipped">–</div>
+        <div class="hero-stat-num" id="statShipped"> - </div>
         <div class="hero-stat-label">Shipped</div>
       </div>
     </div>
@@ -391,7 +391,7 @@
         <span class="material-symbols-outlined">lightbulb</span>
         Submit an idea
       </div>
-      <p class="modal-sub">Be specific — the clearer the idea, the easier it is to build.</p>
+      <p class="modal-sub">Be specific - the clearer the idea, the easier it is to build.</p>
 
       <div class="field">
         <label>Title <span style="color:var(--coral)">*</span></label>
@@ -406,11 +406,11 @@
       <div class="field">
         <label>Category</label>
         <select id="reqCat">
-          <option value="music">🎵 Music / Playback</option>
-          <option value="social">👥 Social / Artists</option>
-          <option value="ui">🎨 Design / UI</option>
-          <option value="discovery">🔭 Discovery</option>
-          <option value="other">✨ Other</option>
+          <option value="music"> Music / Playback</option>
+          <option value="social"> Social / Artists</option>
+          <option value="ui"> Design / UI</option>
+          <option value="discovery"> Discovery</option>
+          <option value="other"> Other</option>
         </select>
       </div>
       <div class="field">
@@ -419,7 +419,7 @@
       </div>
       <div class="modal-actions">
         <button class="btn-ghost" id="cancelSubmitBtn">Cancel</button>
-        <button class="btn-submit" id="submitReqBtn">Submit idea 🚀</button>
+        <button class="btn-submit" id="submitReqBtn">Submit idea </button>
       </div>
     </div>
   </div>
@@ -438,15 +438,15 @@
   <script>
     const RTDB = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
     const CAT_LABELS = {
-      music: '🎵 Music', social: '👥 Social', ui: '🎨 Design',
-      discovery: '🔭 Discovery', other: '✨ Other'
+      music: ' Music', social: ' Social', ui: ' Design',
+      discovery: ' Discovery', other: ' Other'
     };
     const STATUS_META = {
       new:         { label: 'New',         cls: 'badge-new' },
       review:      { label: 'Under Review', cls: 'badge-review' },
       planned:     { label: 'Planned',      cls: 'badge-planned' },
       in_progress: { label: 'In Progress',  cls: 'badge-in_progress' },
-      shipped:     { label: '✅ Shipped',   cls: 'badge-shipped' }
+      shipped:     { label: ' Shipped',   cls: 'badge-shipped' }
     };
 
     let allReqs = [];      // [{id, title, desc, cat, status, createdAt, authorName, votes}]
@@ -520,13 +520,13 @@
       const board = document.getElementById('board');
       const list = filtered();
       if (!list.length) {
-        board.innerHTML = `<div class="board-empty"><span class="material-symbols-outlined">lightbulb</span><p>No ideas here yet — be the first!</p></div>`;
+        board.innerHTML = `<div class="board-empty"><span class="material-symbols-outlined">lightbulb</span><p>No ideas here yet - be the first!</p></div>`;
         return;
       }
       board.innerHTML = list.map((r, i) => {
         const voted = votedIds.has(r.id);
         const sm = STATUS_META[r.status] || STATUS_META.new;
-        const catLabel = CAT_LABELS[r.cat] || '✨ Other';
+        const catLabel = CAT_LABELS[r.cat] || ' Other';
         const delay = Math.min(i * 40, 300);
         return `<div class="req-card" style="animation-delay:${delay}ms" data-id="${escH(r.id)}">
           <div class="vote-col">
@@ -637,12 +637,12 @@
         document.getElementById('reqAuthor').value = '';
         document.getElementById('titleLen').textContent = '0';
         document.getElementById('descLen').textContent = '0';
-        showToast('🚀 Idea submitted! Thank you.', 'success');
+        showToast(' Idea submitted! Thank you.', 'success');
         await loadAll();
       } catch (e) {
         showToast('Could not submit. Try again.', 'error');
       } finally {
-        btn.disabled = false; btn.textContent = 'Submit idea 🚀';
+        btn.disabled = false; btn.textContent = 'Submit idea ';
       }
     }
 

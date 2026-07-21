@@ -98,7 +98,7 @@ export async function initFollowedArtistNotices() {
         return;
       }
 
-      // Resolve feat_* keys → real ownerKeys via ARTIST_PROFILES + AGREEMENTS,
+      // Resolve feat_* keys  real ownerKeys via ARTIST_PROFILES + AGREEMENTS,
       // so static featured artists' posts appear when their dashboard owner posts.
       const profiles = window.ARTIST_PROFILES || {};
       let agreementsCache = null;
@@ -165,7 +165,7 @@ export async function initFollowedArtistNotices() {
       all.sort((a, b) => b.ts - a.ts);
       const top = all.slice(0, 30);
       if (!top.length) {
-        renderEmpty("No posts yet from people you follow — check back later.");
+        renderEmpty("No posts yet from people you follow - check back later.");
         return;
       }
 

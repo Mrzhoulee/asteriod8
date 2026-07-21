@@ -429,7 +429,7 @@
       entries.sort((a, b) => b.count - a.count);
       const top = entries.filter(e => e.count > 0).slice(0, 50);
       if (!top.length) {
-        list.innerHTML = '<div class="state-msg">No trending songs yet — start playing songs in the app to see the charts.</div>';
+        list.innerHTML = '<div class="state-msg">No trending songs yet - start playing songs in the app to see the charts.</div>';
         return;
       }
       list.innerHTML = top.map((e, i) => {
@@ -537,7 +537,7 @@
       }).join('');
     }
     function isProfilePrivate(p) {
-      if (!p) return true; // no profile → treat as private
+      if (!p) return true; // no profile  treat as private
       if (String(p.profileVisibility || '').toLowerCase() === 'private') return true;
       if (p.publicProfile === false) return true;
       return false;

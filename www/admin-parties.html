@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Asteroid Parties — Admin</title>
+<title>Asteroid Parties - Admin</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #050810; color: #fff; font-family: 'Poppins', sans-serif; min-height: 100vh; }
@@ -65,7 +65,7 @@
 <body>
 
 <div class="topbar">
-  <button class="topbar-back" onclick="history.length > 1 ? history.back() : location.replace('ArtistDashboard.html')">← Back</button>
+  <button class="topbar-back" onclick="history.length > 1 ? history.back() : location.replace('ArtistDashboard.html')"> Back</button>
   <div class="topbar-title">Asteroid Parties <span>Admin</span></div>
   <div id="topbarPending" style="font-size:12px;color:#f59e0b;font-weight:700;"></div>
 </div>
@@ -96,7 +96,12 @@
   import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
   import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
-  const ADMIN_PASSWORD = "asteroid_admin_2024";
+  // SHA-256 of the admin password (plaintext is no longer shipped in source).
+  const ADMIN_PW_HASH = "9f58b3677ed78e81b8cbb663f9da60d038d09b9d62b2c2d680b8f247ffabbf76";
+  async function _sha256Hex(s) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(s)));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
 
   const firebaseConfig = {
     apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
@@ -120,9 +125,9 @@
     return d.innerHTML;
   }
 
-  window.checkPw = function() {
+  window.checkPw = async function() {
     const val = document.getElementById('adminPwInput').value;
-    if (val === ADMIN_PASSWORD) {
+    if (await _sha256Hex(val) === ADMIN_PW_HASH) {
       sessionStorage.setItem('_partyAdmin', '1');
       document.getElementById('loginGate').style.display = 'none';
       document.getElementById('adminContent').style.display = 'block';
@@ -177,18 +182,18 @@
     listEl.innerHTML = items.map(p => {
       const status = p.status || 'pending';
       const d = p.date ? new Date(p.date + 'T12:00:00') : null;
-      const month = d ? d.toLocaleString('en', { month: 'short' }).toUpperCase() : '—';
-      const day = d ? d.getDate() : '—';
-      const submittedDate = p.submittedAt ? new Date(p.submittedAt).toLocaleDateString('en', { day:'numeric', month:'short', year:'numeric' }) : '—';
+      const month = d ? d.toLocaleString('en', { month: 'short' }).toUpperCase() : ' - ';
+      const day = d ? d.getDate() : ' - ';
+      const submittedDate = p.submittedAt ? new Date(p.submittedAt).toLocaleDateString('en', { day:'numeric', month:'short', year:'numeric' }) : ' - ';
 
       const actionBtns = status === 'pending'
-        ? `<button class="btn-approve" onclick="setStatus('${escH(p.id)}','approved',this)">✓ Approve</button>
-           <button class="btn-reject"  onclick="setStatus('${escH(p.id)}','rejected',this)">✕ Reject</button>`
+        ? `<button class="btn-approve" onclick="setStatus('${escH(p.id)}','approved',this)"> Approve</button>
+           <button class="btn-reject"  onclick="setStatus('${escH(p.id)}','rejected',this)">× Reject</button>`
         : status === 'approved'
-        ? `<button class="btn-reject"  onclick="setStatus('${escH(p.id)}','rejected',this)">✕ Reject</button>
-           <button class="btn-pending" onclick="setStatus('${escH(p.id)}','pending',this)">↺ Back to Pending</button>`
-        : `<button class="btn-approve" onclick="setStatus('${escH(p.id)}','approved',this)">✓ Approve</button>
-           <button class="btn-pending" onclick="setStatus('${escH(p.id)}','pending',this)">↺ Back to Pending</button>`;
+        ? `<button class="btn-reject"  onclick="setStatus('${escH(p.id)}','rejected',this)">× Reject</button>
+           <button class="btn-pending" onclick="setStatus('${escH(p.id)}','pending',this)">Back to Pending</button>`
+        : `<button class="btn-approve" onclick="setStatus('${escH(p.id)}','approved',this)"> Approve</button>
+           <button class="btn-pending" onclick="setStatus('${escH(p.id)}','pending',this)">Back to Pending</button>`;
 
       return `
         <div class="party-card ${escH(status)}" id="card-${escH(p.id)}">
@@ -199,15 +204,15 @@
           <div class="party-info">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
               <div class="party-name">${escH(p.name || 'Untitled')}</div>
-              <span class="status-badge ${escH(status)}">${status === 'pending' ? '⏳ Pending' : status === 'approved' ? '✓ Approved' : '✕ Rejected'}</span>
+              <span class="status-badge ${escH(status)}">${status === 'pending' ? 'Pending' : status === 'approved' ? ' Approved' : '× Rejected'}</span>
             </div>
             <div class="party-meta">
-              <b>Tier:</b> ${escH(p.tier || '—')} &nbsp;·&nbsp;
-              <b>Date:</b> ${escH(p.date || '—')} ${p.time ? '@ ' + escH(p.time) : ''} &nbsp;·&nbsp;
-              <b>Host:</b> ${escH(p.hostName || '—')} &nbsp;·&nbsp;
+              <b>Tier:</b> ${escH(p.tier || ' - ')} &nbsp;·&nbsp;
+              <b>Date:</b> ${escH(p.date || ' - ')} ${p.time ? '@ ' + escH(p.time) : ''} &nbsp;·&nbsp;
+              <b>Host:</b> ${escH(p.hostName || ' - ')} &nbsp;·&nbsp;
               <b>Submitted:</b> ${escH(submittedDate)}
             </div>
-            ${p.email ? `<div class="party-contact">📧 ${escH(p.email)}</div>` : ''}
+            ${p.email ? `<div class="party-contact"> ${escH(p.email)}</div>` : ''}
             ${p.desc ? `<div class="party-desc">${escH(p.desc)}</div>` : ''}
             <div class="party-actions">${actionBtns}</div>
             <div class="action-status" id="action-${escH(p.id)}"></div>

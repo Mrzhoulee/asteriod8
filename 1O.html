@@ -297,7 +297,7 @@ html, body {
 
 <!-- Registration Form -->
 <div id="registrationForm" class="registration-form">
-  <h2>🚀 Join Asteroid's Live Concert</h2>
+  <h2> Join Asteroid's Live Concert</h2>
   <p>Enter your details to access the live concert!</p>
 
 <input 
@@ -355,7 +355,7 @@ html, body {
 <!-- Social Media Handle Section -->
 <div class="social-media-handle">
   <a href="https://www.instagram.com/asteroid8net" target="_blank" rel="noopener noreferrer" class="social-link">
-    <span class="social-icon">📱</span>
+    <span class="social-icon"></span>
     <div class="social-text">
       <span class="social-label">Follow Us</span>
       <span class="social-handle">@asteroidincofficial</span>
@@ -441,11 +441,11 @@ window.submitRegistration = async function() {
 
   try {
     // Save to Firebase Realtime Database
-    console.log("💾 Saving to Firebase...");
+    console.log(" Saving to Firebase...");
     const registrationsRef = ref2(database, "CONCERTREGISTRATIONS/");
     const newRegistrationRef = push(registrationsRef);
     await set(newRegistrationRef, userData);
-    console.log("✅ Successfully saved to Firebase:", newRegistrationRef.key);
+    console.log(" Successfully saved to Firebase:", newRegistrationRef.key);
     
     // Also save to localStorage for quick access
     localStorage.setItem('concertRegistered', 'true');
@@ -453,7 +453,7 @@ window.submitRegistration = async function() {
     localStorage.setItem('concertRegistrationId', newRegistrationRef.key);
 
     // Show success message
-    message.innerText = "✅ Welcome! Loading concert...";
+    message.innerText = " Welcome! Loading concert...";
     message.style.color = "lightgreen";
 
     // Hide form and show embed after a brief delay
@@ -462,7 +462,7 @@ window.submitRegistration = async function() {
       showEmbed();
     }, 1000);
   } catch (error) {
-    console.error("❌ Error saving to Firebase:", error);
+    console.error("× Error saving to Firebase:", error);
     message.innerText = "Error saving data. Please try again.";
     message.style.color = "red";
     submitBtn.disabled = false;

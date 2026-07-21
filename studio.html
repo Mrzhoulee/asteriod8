@@ -431,7 +431,7 @@
       box-shadow: 0 2px 6px rgba(76, 175, 80, 0.35);
     }
     .studio-tutorial-step[data-status="done"] .step-bullet::after {
-      content: "✓";
+      content: "";
       font-size: 18px;
     }
     .studio-tutorial-step[data-status="done"] .step-bullet-num { display: none; }
@@ -527,10 +527,10 @@
   </style>
 </head>
 <body>
-<!-- Artist role gate — shown immediately if profileType != 'artist' -->
+<!-- Artist role gate - shown immediately if profileType != 'artist' -->
 <div id="artistRoleGate" style="display:none;position:fixed;inset:0;z-index:99999;background:#0a0a0f;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:420px;">
-    <div style="font-size:3.5rem;margin-bottom:1rem;">🎵</div>
+    <div style="font-size:3.5rem;margin-bottom:1rem;"></div>
     <h2 style="color:#ff7f50;font-size:1.6rem;font-weight:700;margin-bottom:0.75rem;">Artist Access Required</h2>
     <p style="color:rgba(255,255,255,0.75);font-size:0.97rem;line-height:1.7;margin-bottom:2rem;">
       This page is only available for <strong style="color:#ffffff;">Artist</strong> accounts.<br><br>
@@ -564,7 +564,7 @@
   <div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
     <div class="ugc-policy-card">
       <h2 id="ugcPolicyTitle">Before you continue</h2>
-      <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;">Check the box and tap Continue to accept the Terms of Service and Privacy Policy before using Asteroid. You only need to do this once on this device (saved in browser storage). Asteroid includes user-uploaded music and profiles; you can report content, block users, and reach our team at any time. <strong>App Store age rating:</strong> Apple lists Asteroid as <strong>16+</strong> in most countries and regions, and <strong>15+</strong> in Australia, Brazil, and the Republic of Korea—the badge shown on your local App Store is the one that applies to you. By continuing you confirm you meet that minimum age.</p>
+      <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;">Check the box and tap Continue to accept the Terms of Service and Privacy Policy before using Asteroid. You only need to do this once on this device (saved in browser storage). Asteroid includes user-uploaded music and profiles; you can report content, block users, and reach our team at any time. <strong>App Store age rating:</strong> Apple lists Asteroid as <strong>16+</strong> in most countries and regions, and <strong>15+</strong> in Australia, Brazil, and the Republic of Korea - the badge shown on your local App Store is the one that applies to you. By continuing you confirm you meet that minimum age.</p>
       <div class="ugc-policy-actions">
         <div class="ugc-policy-check-row" id="ugcPolicyCheckRow" role="group" aria-label="Legal acceptance">
           <input type="checkbox" id="ugcPolicyCheck" autocomplete="off" aria-describedby="ugcPolicyLegalText">
@@ -764,7 +764,7 @@
   </div>
 
   <div id="vipSuccessBox">
-    <h1 style="color: #008044; margin-top: 0;">🎉 REWARD UNLOCKED!</h1>
+    <h1 style="color: #008044; margin-top: 0;"> REWARD UNLOCKED!</h1>
     <p style="font-size: 1.1em; font-weight: bold;">You’ve successfully invited a friend!</p>
     <p>Your <b>3-Month Feature</b> is now active! Our team has been notified, and <b>we will be in touch with you via email within 48 hours</b> to coordinate your promotion.</p>
     <button onclick="document.getElementById('vipSuccessBox').style.display='none'" class="upload-btn">AWESOME!</button>
@@ -774,7 +774,7 @@
   <div id="campaignContainer">
 
     <section id="studioTutorial" class="studio-tutorial" aria-label="How feature requests work">
-      <h2 class="studio-tutorial-title"><span>✨</span> How to get featured</h2>
+      <h2 class="studio-tutorial-title"><span></span> How to get featured</h2>
       <p class="studio-tutorial-sub">Follow these 3 steps to request a feature spot on Asteroid.</p>
       <div class="studio-tutorial-steps">
         <div class="studio-tutorial-step" data-step="1" data-status="active">
@@ -806,7 +806,7 @@
 
     <div id="pendingUploadBanner" style="display:none;margin:0 auto 16px;max-width:600px;padding:16px 18px;border-radius:14px;background:linear-gradient(135deg,#fff4e0,#ffe8c2);border:2px solid #f59e0b;text-align:left;font-family:Montserrat,sans-serif;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-        <span style="font-size:22px;">🎉</span>
+        <span style="font-size:22px;"></span>
         <strong style="color:#92400e;font-size:15px;">Someone used your referral code!</strong>
       </div>
       <p style="margin:0;color:#7c2d12;font-size:13px;line-height:1.45;">Upload a song below to claim your spot in <strong>Featured Songs</strong>. You won't appear until you upload.</p>
@@ -816,14 +816,14 @@
       <h3 style="margin: 0; color: coral;">Reward Progress</h3>
       <p id="countText" style="font-weight: bold;">0 / 1 Artist Joined</p>
       <div class="bar-bg"><div id="progressBarStatus"></div></div>
-      <div id="unlockMsg">✅ UNLOCKED: 3-Month Feature Active!</div>
+      <div id="unlockMsg"> UNLOCKED: 3-Month Feature Active!</div>
       
       <p style="font-size: 0.9em;">Your Referral Code:</p>
       <input type="text" id="shareLinkInput" readonly placeholder="Loading your code...">
       <button id="copyBtn" class="upload-btn" style="width: 80px; height: 35px; font-size: 12px;">COPY</button>
 
       <div class="referral-code-panel">
-        <p class="referral-code-title">Share your code — one use only</p>
+        <p class="referral-code-title">Share your code - one use only</p>
         <input type="text" id="referralCodeDisplay" readonly placeholder="Loading your code...">
         <button id="copyCodeBtn" class="upload-btn" style="width: 110px; height: 35px; font-size: 12px;">COPY CODE</button>
         <input type="text" id="referralCodeEntry" placeholder="Enter another artist's referral code" autocomplete="off">
@@ -863,7 +863,7 @@
       <div class="upload-wrapper">
   
         <div class="upload-box" id="dropAreaBoost">
-          <p id="boostUploadText">🎵 Drag & Drop Your Audio Here</p>
+          <p id="boostUploadText"> Drag & Drop Your Audio Here</p>
           <small>or click to upload (.mp3 / .wav)</small>
         </div>
   
@@ -956,7 +956,7 @@
     boostInput.click();
   });
   
-  // Show file name when selected — only .mp3 / .wav allowed.
+  // Show file name when selected - only .mp3 / .wav allowed.
   boostInput.addEventListener("change", () => {
     if (boostInput.files.length > 0) {
       var okBoost = window.isAllowedSongFile
@@ -965,10 +965,10 @@
       if (!okBoost) {
         alert("Only MP3 or WAV audio files are allowed. Please choose an .mp3 or .wav file.");
         boostInput.value = "";
-        boostUploadText.textContent = "🎵 Drag & Drop Your Audio Here";
+        boostUploadText.textContent = " Drag & Drop Your Audio Here";
         return;
       }
-      boostUploadText.textContent = "File Selected ✅";
+      boostUploadText.textContent = "File Selected ";
     }
   });
   </script>
@@ -977,7 +977,7 @@
     <h2>Upload Your Media</h2>
   <div id="studioSignInRow" class="sign-in-row studio-account-wrap" style="margin-top: 6px; margin-bottom: 12px; display: none;">
     <div class="studio-account-card">
-      <p class="studio-account-lead">Sign in with the same account as the home page. After Apple or email login, you can finish your profile here — same form as on Asteroid Music home.</p>
+      <p class="studio-account-lead">Sign in with the same account as the home page. After Apple or email login, you can finish your profile here - same form as on Asteroid Music home.</p>
       <div class="header-sign-in-group" aria-label="Sign in options">
         <button type="button" class="header-sign-in-btn header-sign-in-apple" id="apple-sign-in" aria-label="Continue with Apple">
           <i class="fa-brands fa-apple" aria-hidden="true"></i>
@@ -1092,7 +1092,7 @@
     <input type="text" id="album" placeholder="Album Name" required><br>
     <label for="studioMarkExplicit" class="studio-explicit-option">
       <input type="checkbox" id="studioMarkExplicit" autocomplete="off">
-      <span class="studio-explicit-copy"><strong>Explicit content</strong> — check this if the track has strong language or adult themes. Listeners will see an <strong>E</strong> badge next to the title (and can hide explicit songs in settings).</span>
+      <span class="studio-explicit-copy"><strong>Explicit content</strong> - check this if the track has strong language or adult themes. Listeners will see an <strong>E</strong> badge next to the title (and can hide explicit songs in settings).</span>
     </label>
     <style>
       .upload-wrapper {
@@ -1148,7 +1148,7 @@
     <div class="upload-wrapper">
       <div class="upload-box" id="dropArea">
         <p class="upload-text" id="uploadMain">
-          🎵 Drag & Drop Your Audio Here
+           Drag & Drop Your Audio Here
         </p>
         <p class="upload-sub" id="uploadSub">
           or click to upload (.mp3 / .wav only)
@@ -1171,7 +1171,7 @@
       };
 
       function showFileName(file) {
-        uploadMain.textContent = "✅ " + file.name;
+        uploadMain.textContent = " " + file.name;
         uploadSub.textContent = "Click to change file";
         dropArea.classList.add("file-selected");
       }
@@ -1232,7 +1232,7 @@
         <span id="agreementLabel">I confirm that I own <strong id="agreementSongTitle">this song</strong> and I accept the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer" style="color: coral;">Terms of Service</a> and <a href="policy.html" target="_blank" rel="noopener noreferrer" style="color: coral;">Privacy Policy</a> of Asteroid.</span>
         </div>
     </div>
-    <button type="button" id="btn" class="upload-btn" onclick="if(!window._uploadHandlerReady){console.log('[upload] module not loaded yet — form inputs:',{title:document.getElementById('title').value,artist:document.getElementById('artist').value,album:document.getElementById('album').value,file:document.getElementById('fileInp').files[0]?.name||null,agreement:document.getElementById('agreement').checked});alert('Upload is still loading. Please wait a moment and try again, or hard-refresh (Cmd+Shift+R).');}">UPLOAD NOW</button>
+    <button type="button" id="btn" class="upload-btn" onclick="if(!window._uploadHandlerReady){console.log('[upload] module not loaded yet - form inputs:',{title:document.getElementById('title').value,artist:document.getElementById('artist').value,album:document.getElementById('album').value,file:document.getElementById('fileInp').files[0]?.name||null,agreement:document.getElementById('agreement').checked});alert('Upload is still loading. Please wait a moment and try again, or hard-refresh (Cmd+Shift+R).');}">UPLOAD NOW</button>
     <label for="uploadStatusArea" style="display:block;margin:16px auto 6px;max-width:400px;text-align:left;font-size:12px;font-weight:700;color:#333;font-family:Montserrat,sans-serif;">Upload status</label>
     <textarea id="uploadStatusArea" readonly rows="5" aria-live="polite" placeholder="Progress will show here when you upload." style="display:block;width:min(400px,92vw);max-width:400px;margin:0 auto 20px;padding:12px;font-size:13px;line-height:1.45;font-family:Montserrat,sans-serif;border-radius:12px;border:1px solid #bbb;box-sizing:border-box;background:#f8f8f8;color:#111;resize:vertical;"></textarea>
     <style>
@@ -1415,14 +1415,14 @@
       persistence: browserLocalPersistence,
       popupRedirectResolver: browserPopupRedirectResolver,
     });
-    console.log('[studio][init] initializeAuth OK — auth.currentUser:', auth.currentUser);
+    console.log('[studio][init] initializeAuth OK - auth.currentUser:', auth.currentUser);
   } catch (e) {
     const code = e && e.code ? String(e.code) : "";
     const msg = e && e.message ? String(e.message) : "";
     console.warn('[studio][init] initializeAuth threw:', code, msg);
     if (code === "auth/already-initialized" || /already.*initialized/i.test(msg)) {
       auth = getAuth(app);
-      console.log('[studio][init] Fell back to getAuth — auth.currentUser:', auth.currentUser);
+      console.log('[studio][init] Fell back to getAuth - auth.currentUser:', auth.currentUser);
     } else {
       throw e;
     }
@@ -1565,7 +1565,7 @@
       return;
     }
     if (handleRaw.length > 40 || !/^[a-z0-9_]{3,40}$/.test(handleRaw)) {
-      alert("Public username must be 3–40 characters: lowercase letters, numbers, and underscores only.");
+      alert("Public username must be 3-40 characters: lowercase letters, numbers, and underscores only.");
       if (hdlEl) hdlEl.focus();
       return;
     }
@@ -1708,7 +1708,7 @@
     }
   }
 
-  /** RTDB path segments cannot contain . # $ [ ] / — invalid keys often surface as PERMISSION_DENIED. */
+  /** RTDB path segments cannot contain . # $ [ ] / - invalid keys often surface as PERMISSION_DENIED. */
   function sanitizeRtdbPathSegment(seg) {
     const s = String(seg ?? "").replace(/[.#$\[\]/]/g, "_").trim();
     return s.length ? s : "_";
@@ -1717,7 +1717,7 @@
   function withTimeout(promise, ms, label) {
     return new Promise((resolve, reject) => {
       const t = setTimeout(() => {
-        reject(new Error(label + " timed out after " + Math.round(ms / 1000) + "s — check network or try again."));
+        reject(new Error(label + " timed out after " + Math.round(ms / 1000) + "s - check network or try again."));
       }, ms);
       Promise.resolve(promise).then(
         (v) => {
@@ -1837,7 +1837,7 @@
         return true;
       } catch (e) {
         console.warn("[studio] anonymous auth for email upload:", e.code || e.message || e);
-        // Proceed anyway — Storage rules may allow it
+        // Proceed anyway - Storage rules may allow it
         return true;
       }
     }
@@ -1854,16 +1854,16 @@
           "Could not start a Firebase session for upload. Your app sign-in is fine; Storage requires Firebase Auth.";
         if (code === "auth/operation-not-allowed") {
           msg =
-            "Enable Anonymous sign-in in Firebase: Console → Authentication → Sign-in method → Anonymous → Enable. Then try upload again.";
+            "Enable Anonymous sign-in in Firebase: Console  Authentication  Sign-in method  Anonymous  Enable. Then try upload again.";
         } else if (code) {
-          msg += " Error: " + code + (e.message ? " — " + e.message : "");
+          msg += " Error: " + code + (e.message ? " - " + e.message : "");
         }
         appendUploadStatus(msg);
         alert(msg);
         return false;
       }
     }
-    appendUploadStatus("Please sign in first — Apple or email (button above).");
+    appendUploadStatus("Please sign in first - Apple or email (button above).");
     alert("Please sign in before uploading: use “Sign in with Apple” or “Sign in with email” at the top of this page.");
     return false;
   }
@@ -1947,7 +1947,7 @@
       try {
         sessionStorage.setItem("capAuthBrowserOpened", String(Date.now()));
       } catch (e0) {}
-      console.log("[studio][auth] OAuth navigation → Capacitor Browser.open", String(url).slice(0, 200));
+      console.log("[studio][auth] OAuth navigation  Capacitor Browser.open", String(url).slice(0, 200));
       void Browser.open({ url: String(url), presentationStyle: "fullscreen" });
       return true;
     };
@@ -2009,7 +2009,7 @@
             alert(
               "Firebase: auth/unauthorized-domain\n\n" +
                 "Add this WebView’s hostname in Firebase Console:\n" +
-                "Authentication → Settings → Authorized domains\n\n" +
+                "Authentication  Settings  Authorized domains\n\n" +
                 "Hostname: " +
                 (host || "(unknown)") +
                 "\nOrigin: " +
@@ -2086,7 +2086,7 @@
       if (plat !== "ios") return false;
       const P = getAppleNativeSignInPlugin();
       if (!P || typeof P.authorize !== "function") {
-        console.log("[studio][auth] Native SignInWithApple plugin unavailable — using redirect/Browser flow");
+        console.log("[studio][auth] Native SignInWithApple plugin unavailable - using redirect/Browser flow");
         return false;
       }
       const rawNonce = buildAppleAuthRawNonce();
@@ -2281,7 +2281,7 @@
       }
     }
     // NOTE: referral UI is loaded separately via loadReferralCode(), not here.
-    // This function is sync-only — safe to call from anywhere without races.
+    // This function is sync-only - safe to call from anywhere without races.
     updateCampaignVisibility();
   }
   window.applyStudioAuthUI = applyStudioAuthUI;
@@ -2307,11 +2307,11 @@
   }
 
   let _authStateKnown = false;
-  let _referralLoadVersion = 0;   // version counter — newer calls invalidate older ones
+  let _referralLoadVersion = 0;   // version counter - newer calls invalidate older ones
 
-  console.log('[studio][init] Registering onAuthStateChanged listener — auth object:', typeof auth, '| auth.currentUser:', auth && auth.currentUser);
+  console.log('[studio][init] Registering onAuthStateChanged listener - auth object:', typeof auth, '| auth.currentUser:', auth && auth.currentUser);
   onAuthStateChanged(auth, (user) => {
-    console.log('[studio] onAuthStateChanged fired — user:', user ? (user.email || user.uid) : 'NULL (signed out)');
+    console.log('[studio] onAuthStateChanged fired - user:', user ? (user.email || user.uid) : 'NULL (signed out)');
     _authStateKnown = true;
     syncAuthUserToLocalStorage(user);
     if (user) {
@@ -2327,7 +2327,7 @@
   if (auth.currentUser) syncAuthUserToLocalStorage(auth.currentUser);
   applyStudioAuthUI();
 
-  // Poll for auth restoration — hides sign-in row as soon as Firebase session is ready
+  // Poll for auth restoration - hides sign-in row as soon as Firebase session is ready
   (function pollAuthReady() {
     let checks = 0;
     const iv = setInterval(() => {
@@ -2456,8 +2456,8 @@
               console.error("[studio] Apple redirect sign-in (native):", redirectErr);
               alert(
                 "Could not start Apple sign-in.\n\n" +
-                  "If you see 403 on Apple’s page, open Apple Developer → your Services ID → " +
-                  "Sign in with Apple → Return URLs must include exactly:\n" +
+                  "If you see 403 on Apple’s page, open Apple Developer  your Services ID  " +
+                  "Sign in with Apple  Return URLs must include exactly:\n" +
                   "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
                   "Domains must list the site you use (e.g. asteroid8.net and www.asteroid8.net)."
               );
@@ -2494,8 +2494,8 @@
           console.error("[studio] Apple redirect sign-in (native):", redirectErr);
           alert(
             "Could not start Apple sign-in.\n\n" +
-              "If you see 403 on Apple’s page, open Apple Developer → your Services ID → " +
-              "Sign in with Apple → Return URLs must include exactly:\n" +
+              "If you see 403 on Apple’s page, open Apple Developer  your Services ID  " +
+              "Sign in with Apple  Return URLs must include exactly:\n" +
               "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
               "Domains must list the site you use (e.g. asteroid8.net and www.asteroid8.net)."
           );
@@ -2576,7 +2576,7 @@
           if (localStorage.getItem(rewardKey) !== 'true') {
               if (vipBox) vipBox.style.display = 'block';
               await update(ref2(db, 'users/' + safeEmail), { eligibility: "3_MONTH_FEATURE" });
-              jsConfetti.addConfetti({ emojis: ['🎉', '🚀', '🔥'] });
+              jsConfetti.addConfetti();
               localStorage.setItem(rewardKey, 'true');
           }
       } else {
@@ -2726,7 +2726,7 @@
   }
 
   /**
-   * loadReferralCode — the ONLY function that loads/displays the referral code.
+   * loadReferralCode - the ONLY function that loads/displays the referral code.
    * Called from onAuthStateChanged, authStateReady, pollAuthReady, pageshow,
    * and visibilitychange.  Uses a version counter so that if a newer call starts
    * while an older one is awaiting RTDB, the older one silently abandons its
@@ -2736,7 +2736,7 @@
     const myVersion = ++_referralLoadVersion;
     const stale = () => myVersion !== _referralLoadVersion;
 
-    console.log('[referral-code] loadReferralCode() called — version', myVersion,
+    console.log('[referral-code] loadReferralCode() called - version', myVersion,
       '| auth.currentUser:', !!auth.currentUser,
       '| _authStateKnown:', _authStateKnown,
       '| localStorage keys:', {
@@ -2771,10 +2771,10 @@
 
     if (!key) {
       if (!_authStateKnown) {
-        console.log('[referral-code] No key and auth not yet known — waiting');
+        console.log('[referral-code] No key and auth not yet known - waiting');
         return;
       }
-      console.log('[referral-code] No key found — user is NOT signed in');
+      console.log('[referral-code] No key found - user is NOT signed in');
       setAllDisabled(true);
       if (display) { display.value = ''; display.placeholder = 'Sign in to generate your code'; }
       if (shareInput) { shareInput.value = ''; shareInput.placeholder = 'Sign in to generate code...'; }
@@ -2784,14 +2784,14 @@
 
     console.log('[referral-code] User key resolved:', key);
 
-    // User is signed in — update placeholders & enable controls immediately
+    // User is signed in - update placeholders & enable controls immediately
     if (display) display.placeholder = 'Loading your code...';
     if (shareInput) shareInput.placeholder = 'Loading your code...';
     setAllDisabled(false);
 
     // Email-only users: use static code (no RTDB write needed)
     if (!auth.currentUser && localStorage.getItem('localAuthOnly') === '1') {
-      console.log('[referral-code] localAuthOnly path — using static code');
+      console.log('[referral-code] localAuthOnly path - using static code');
       const staticCode = 'B3Z9LKY2Q7PANFR1XM';
       if (display) display.value = staticCode;
       if (shareInput) shareInput.value = staticCode;
@@ -2806,27 +2806,27 @@
         }
       } catch (e) {}
       if (stale()) return;
-      setReferralStatus('Share your code with another artist — one use only.', '');
+      setReferralStatus('Share your code with another artist - one use only.', '');
       updateStudioTutorial();
       return;
     }
 
-    // Load/generate code — try RTDB with a 5s timeout, fall back to local code
-    console.log('[referral-code] Loading code from RTDB — auth.currentUser:', !!auth.currentUser, '| key:', key);
+    // Load/generate code - try RTDB with a 5s timeout, fall back to local code
+    console.log('[referral-code] Loading code from RTDB - auth.currentUser:', !!auth.currentUser, '| key:', key);
     try {
       const rtdbTimeout = new Promise((_, rej) => setTimeout(() => rej(new Error('RTDB timeout (5s)')), 5000));
       const code = await Promise.race([ensureStudioReferralCode(), rtdbTimeout]);
-      if (stale()) { console.log('[referral-code] Version', myVersion, 'is stale after ensureStudioReferralCode — aborting'); return; }
+      if (stale()) { console.log('[referral-code] Version', myVersion, 'is stale after ensureStudioReferralCode - aborting'); return; }
       setAllDisabled(false);
       if (!code) {
-        console.warn('[referral-code] ensureStudioReferralCode returned empty — no code generated');
+        console.warn('[referral-code] ensureStudioReferralCode returned empty - no code generated');
         if (display) display.disabled = true;
         if (copyCode) copyCode.disabled = true;
         if (copyMain) copyMain.disabled = true;
       } else {
         console.log('[referral-code] Code loaded successfully:', code);
       }
-      setReferralStatus(code ? 'Share your code with another artist — one use only.' : 'Could not prepare code yet.', code ? '' : 'error');
+      setReferralStatus(code ? 'Share your code with another artist - one use only.' : 'Could not prepare code yet.', code ? '' : 'error');
     } catch (e) {
       if (stale()) return;
       console.error('[referral-code] RTDB failed or timed out:', e.message || e);
@@ -2992,7 +2992,7 @@
       key = studioReferralUserKey();
     }
     if (!key) {
-      console.log('[referral-submit] No user key — not signed in');
+      console.log('[referral-submit] No user key - not signed in');
       setReferralStatus('Sign in to submit a referral code.', 'error');
       return;
     }
@@ -3009,7 +3009,7 @@
       const idxVal = ownerSnap.exists() ? ownerSnap.val() : null;
       const ownerKey = typeof idxVal === 'string' ? idxVal : (idxVal?.ownerKey || '');
       const isUsed = typeof idxVal === 'object' && idxVal?.used === true;
-      console.log('[referral-submit] Lookup result — ownerKey:', ownerKey, '| used:', isUsed);
+      console.log('[referral-submit] Lookup result - ownerKey:', ownerKey, '| used:', isUsed);
       if (!ownerKey) {
         setReferralStatus('Code not found. Ask the artist to share a valid code.', 'error');
         return;
@@ -3171,7 +3171,7 @@
       const dbPath = `SONGS/${safeTitle}/${safeAlbum}/${safeArtist}`;
       const rtdbTimeoutMs = 45000;
       await withTimeout(update(ref2(db, dbPath), songData), rtdbTimeoutMs, "Saving song metadata");
-      console.log("✅ Song data saved to database at:", dbPath);
+      console.log(" Song data saved to database at:", dbPath);
 
       // Pin this upload as the artist's featured song so the home page Featured Songs
       // card surfaces THIS track (the one they just uploaded) the moment a fan redeems
@@ -3179,7 +3179,7 @@
       if (uploaderOwnerKey) {
         try {
           // Write-once: the featured song is the FIRST track that earned the
-          // feature. If this artist already has one pinned, DON'T overwrite it —
+          // feature. If this artist already has one pinned, DON'T overwrite it - 
           // the new upload just goes to the library.
           const existingPin = await Promise.race([
             get(ref2(db, "FEATURED_ARTIST_SONG/" + uploaderOwnerKey)),
@@ -3202,7 +3202,7 @@
               new Promise((r) => setTimeout(r, 5000)),
             ]);
           } else {
-            console.log("[studio] featured song already pinned — keeping the first one, new upload goes to library");
+            console.log("[studio] featured song already pinned - keeping the first one, new upload goes to library");
           }
         } catch (e) { console.warn("[studio] FEATURED_ARTIST_SONG write", e); }
         // Promote any pending_upload referrals for this artist to 'featured'
@@ -3250,7 +3250,7 @@
         "Saving agreement"
       );
 
-      // Firestore referral system – increment songCount & check eligibility (don’t block success UI)
+      // Firestore referral system - increment songCount & check eligibility (don’t block success UI)
       try {
         const currentUser = auth.currentUser;
         if (currentUser) {
@@ -3261,7 +3261,7 @@
       } catch (e) {
         console.warn("Referral system:", e);
       }
-      console.log("📦 Song data:", songData);
+      console.log(" Song data:", songData);
 
       appendUploadStatus("Done! Your song was uploaded and should appear on the home page shortly.");
       openUploadSuccessModal({ trackTitle: title, artist: artist });
@@ -3270,7 +3270,7 @@
       // Reset form
       document.getElementById("uploadForm").reset();
       document.getElementById("fileInp").value = "";
-      document.getElementById("uploadMain").textContent = "🎵 Drag & Drop Your Audio Here";
+      document.getElementById("uploadMain").textContent = " Drag & Drop Your Audio Here";
       document.getElementById("uploadSub").textContent = "or click to upload (.mp3 / .wav only)";
       document.getElementById("dropArea").classList.remove("file-selected");
       document.getElementById("agreement").checked = false;
@@ -3284,7 +3284,7 @@
       appendUploadStatus("Failed: " + msg);
       if (/permission|Permission/i.test(String(msg))) {
         appendUploadStatus(
-          "Realtime Database rules blocked the save. Open Firebase Console → Realtime Database → Rules and deploy the rules from this repo (database.rules.json), or ensure SONGS and AGREEMENTS allow write for signed-in users (auth != null). Email login uses anonymous Firebase auth for uploads."
+          "Realtime Database rules blocked the save. Open Firebase Console  Realtime Database  Rules and deploy the rules from this repo (database.rules.json), or ensure SONGS and AGREEMENTS allow write for signed-in users (auth != null). Email login uses anonymous Firebase auth for uploads."
         );
       }
       alert("Upload failed: " + msg);
@@ -3292,7 +3292,7 @@
   };
 
   // Robust clipboard copy that actually works inside the iOS Capacitor WebView.
-  // Order: native Capacitor Clipboard plugin → async Clipboard API → a
+  // Order: native Capacitor Clipboard plugin  async Clipboard API  a
   // temporary <textarea> + execCommand('copy') fallback.
   async function studioCopyText(text) {
     text = String(text == null ? "" : text);
@@ -3332,9 +3332,9 @@
 
   document.getElementById("copyBtn").onclick = async () => {
     const val = (document.getElementById("shareLinkInput")?.value || '').trim();
-    if (!val) { alert("Your code is still loading — try again in a moment."); return; }
+    if (!val) { alert("Your code is still loading - try again in a moment."); return; }
     const ok = await studioCopyText(val);
-    alert(ok ? "Copied! Share it with 1 artist friend." : "Couldn't copy automatically — long-press the code to copy it.");
+    alert(ok ? "Copied! Share it with 1 artist friend." : "Couldn't copy automatically - long-press the code to copy it.");
   };
 
   document.getElementById("copyCodeBtn")?.addEventListener("click", async () => {
@@ -3490,7 +3490,7 @@ boostBtn.addEventListener("click", async (e) => {
     <input type="text" id="appleOnboardingNickname" maxlength="80" placeholder="Your artist or display name" autocomplete="nickname">
     <label for="appleOnboardingHandle">Public username</label>
     <input type="text" id="appleOnboardingHandle" maxlength="40" placeholder="e.g. indie_alex" autocomplete="username" spellcheck="false" autocapitalize="off">
-    <p class="apple-onboarding-hint" style="margin:-6px 0 10px;font-size:12px;color:rgba(255,255,255,0.5);">3–40 characters: a–z, 0–9, underscore only. Your unique @handle for search and follows.</p>
+    <p class="apple-onboarding-hint" style="margin:-6px 0 10px;font-size:12px;color:rgba(255,255,255,0.5);">3-40 characters: a - z, 0-9, underscore only. Your unique @handle for search and follows.</p>
     <label>Profile type</label>
     <div class="apple-onboarding-choice-group" role="radiogroup" aria-label="Profile type">
       <label class="apple-onboarding-choice" for="appleProfileTypeArtist">
@@ -3504,7 +3504,7 @@ boostBtn.addEventListener("click", async (e) => {
         <input type="radio" id="appleProfileTypeListener" name="appleOnboardingProfileType" value="listener" checked>
         <div>
           <strong>Private / Listener</strong>
-          <span>Your profile stays private—you are not shown to others in the app.</span>
+          <span>Your profile stays private - you are not shown to others in the app.</span>
         </div>
       </label>
     </div>
@@ -3534,7 +3534,7 @@ boostBtn.addEventListener("click", async (e) => {
 <div id="uploadSuccessOverlay" class="upload-success-overlay" hidden aria-hidden="true">
   <div class="upload-success-backdrop" role="presentation" aria-hidden="true"></div>
   <div class="upload-success-modal" role="dialog" aria-modal="true" aria-labelledby="uploadSuccessHeading">
-    <div class="upload-success-icon" aria-hidden="true">🎵</div>
+    <div class="upload-success-icon" aria-hidden="true"></div>
     <h2 id="uploadSuccessHeading" class="upload-success-title">You’re all set</h2>
     <p class="upload-success-track" id="uploadSuccessTrack"></p>
     <p class="upload-success-sub" id="uploadSuccessSub"></p>
@@ -3595,7 +3595,7 @@ boostBtn.addEventListener("click", async (e) => {
 </style>
 <section id="studioFeaturedSection">
   <h2><span class="material-symbols-outlined">star</span>Featured Songs</h2>
-  <p class="studio-featured-sub">Artists featured via the referral program — with links straight to their music and socials.</p>
+  <p class="studio-featured-sub">Artists featured via the referral program - with links straight to their music and socials.</p>
   <div id="studioFeaturedContainer"></div>
   <div id="studioFeaturedEmpty">Loading featured artists…</div>
 </section>

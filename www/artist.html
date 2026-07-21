@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Artist — Asteroid</title>
+<title>Artist - Asteroid</title>
 <meta name="description" content="Listen on Asteroid.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
 <style>
@@ -47,7 +47,7 @@
     <h2 style="font-size:1.25rem;color:var(--primary);margin-bottom:.5rem">Latest track</h2>
     <div id="featuredVinyl"></div>
     <div class="ft-meta">
-      <div class="ft-title" id="ftTitle">—</div>
+      <div class="ft-title" id="ftTitle"> - </div>
       <div class="ft-hint" id="ftHint">Tap to play a 30s preview</div>
     </div>
     <audio id="ftAudio" preload="metadata"></audio>
@@ -106,7 +106,7 @@
       host.dataset.artistId = artistId;
       mountSupporterWall(host);
 
-      // Featured track — most recent Firestore song doc for this artist
+      // Featured track - most recent Firestore song doc for this artist
       try {
         const songSnap = await getDocs(query(
           collection(db, 'songs'),
@@ -134,7 +134,7 @@
               if (ftAudio.currentTime >= 30) {
                 try { ftAudio.pause(); ftAudio.currentTime = 0; } catch (_) {}
                 ctrl.stopHard();
-                document.getElementById('ftHint').textContent = '30s preview — sign up for the full track';
+                document.getElementById('ftHint').textContent = '30s preview - sign up for the full track';
               }
             });
           }

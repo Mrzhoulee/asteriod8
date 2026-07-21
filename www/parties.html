@@ -259,22 +259,22 @@
     </div>
     <div class="info-grid">
       <div class="info-card">
-        <div class="info-card-icon">🎧</div>
+        <div class="info-card-icon"></div>
         <div class="info-card-title">Listening Parties</div>
         <div class="info-card-desc">Drop your album live with fans in real time</div>
       </div>
       <div class="info-card">
-        <div class="info-card-icon">🎤</div>
+        <div class="info-card-icon"></div>
         <div class="info-card-title">Live Q&amp;A Sessions</div>
         <div class="info-card-desc">Answer fan questions live with a ticketed audience</div>
       </div>
       <div class="info-card">
-        <div class="info-card-icon">🎶</div>
+        <div class="info-card-icon"></div>
         <div class="info-card-title">Private Concerts</div>
         <div class="info-card-desc">Invite-only virtual or in-person shows for superfans</div>
       </div>
       <div class="info-card">
-        <div class="info-card-icon">💰</div>
+        <div class="info-card-icon"></div>
         <div class="info-card-title">Earn Revenue</div>
         <div class="info-card-desc">Set your own ticket price and keep the majority</div>
       </div>
@@ -291,21 +291,21 @@
   </div>
   <div class="tiers">
     <div class="tier tier--coral">
-      <div class="tier-icon">🔥</div>
+      <div class="tier-icon"></div>
       <div class="tier-name">Spark Party</div>
       <div class="tier-price">$5</div>
       <div class="tier-desc">Up to 50 fans · 1 hr · Listening party or Q&amp;A</div>
       <button class="tier-btn" onclick="selectTier('Spark Party', 5)">Host this</button>
     </div>
     <div class="tier tier--gold">
-      <div class="tier-icon">⭐</div>
+      <div class="tier-icon"></div>
       <div class="tier-name">Star Party</div>
       <div class="tier-price">$15</div>
       <div class="tier-desc">Up to 200 fans · 2 hrs · Concert + Q&amp;A combo</div>
       <button class="tier-btn" onclick="selectTier('Star Party', 15)">Host this</button>
     </div>
     <div class="tier tier--purple">
-      <div class="tier-icon">🚀</div>
+      <div class="tier-icon"></div>
       <div class="tier-name">Galaxy Party</div>
       <div class="tier-price">$40</div>
       <div class="tier-desc">Unlimited fans · Full day · Multi-artist event</div>
@@ -315,13 +315,13 @@
 
   <!-- Artist-only gate (not an artist) -->
   <div class="card" id="notArtistGate" style="display:none;text-align:center;padding:32px 20px;">
-    <div style="font-size:36px;margin-bottom:12px;">🎤</div>
+    <div style="font-size:36px;margin-bottom:12px;"></div>
     <h2 style="font-size:17px;font-weight:800;margin-bottom:8px;">Artists Only</h2>
     <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;">Only artist accounts can host an Asteroid Party.<br>Switch to Artist in your profile to get started.</p>
   </div>
   <!-- No Google email gate (is artist but hasn't connected Google) -->
   <div class="card" id="noGoogleGate" style="display:none;text-align:center;padding:32px 20px;">
-    <div style="font-size:36px;margin-bottom:12px;">🔗</div>
+    <div style="font-size:36px;margin-bottom:12px;"></div>
     <h2 style="font-size:17px;font-weight:800;margin-bottom:8px;">Google Email Required</h2>
     <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;">You need to sign in with Google to host a party.<br>Go to your profile and switch to Artist using a Google account.</p>
   </div>
@@ -354,9 +354,9 @@
         <label class="form-label">Tier</label>
         <select class="form-input" id="partyTier">
           <option value="">Select a tier…</option>
-          <option value="Spark Party">🔥 Spark Party — $5/fan</option>
-          <option value="Star Party">⭐ Star Party — $15/fan</option>
-          <option value="Galaxy Party">🚀 Galaxy Party — $40/fan</option>
+          <option value="Spark Party"> Spark Party - $5/fan</option>
+          <option value="Star Party"> Star Party - $15/fan</option>
+          <option value="Galaxy Party"> Galaxy Party - $40/fan</option>
         </select>
       </div>
       <div class="form-group">
@@ -494,7 +494,7 @@
         status: 'pending',
         submittedAt: Date.now(),
       });
-      setStatus('Party submitted! We\'ll review and confirm within 24 hours. 🎉', true);
+      setStatus('Party submitted! We\'ll review and confirm within 24 hours. ', true);
       document.getElementById('partyName').value = '';
       document.getElementById('partyDate').value = '';
       document.getElementById('partyTime').value = '';
@@ -513,7 +513,7 @@
     const listEl = document.getElementById('partiesList');
     onValue(query(ref(db, 'ASTEROID_PARTIES'), orderByChild('submittedAt'), limitToLast(20)), (snap) => {
       if (!snap.exists()) {
-        listEl.innerHTML = '<div class="party-empty">No parties yet — be the first to host one!</div>';
+        listEl.innerHTML = '<div class="party-empty">No parties yet - be the first to host one!</div>';
         return;
       }
       const items = [];
@@ -522,12 +522,12 @@
 
       listEl.innerHTML = items.map(p => {
         const d = p.date ? new Date(p.date + 'T12:00:00') : null;
-        const month = d ? d.toLocaleString('en', { month: 'short' }).toUpperCase() : '—';
-        const day   = d ? d.getDate() : '—';
+        const month = d ? d.toLocaleString('en', { month: 'short' }).toUpperCase() : ' - ';
+        const day   = d ? d.getDate() : ' - ';
         const tc = TIER_COLORS[p.tier] || { bg: '#ffffff11', border: '#ffffff33', text: '#fff' };
         const statusBadge = p.status === 'approved'
-          ? `<span style="color:#10b981;font-size:11px;font-weight:700;">✓ Confirmed</span>`
-          : `<span style="color:#f59e0b;font-size:11px;font-weight:700;">⏳ Pending</span>`;
+          ? `<span style="color:#10b981;font-size:11px;font-weight:700;"> Confirmed</span>`
+          : `<span style="color:#f59e0b;font-size:11px;font-weight:700;">Pending</span>`;
         return `
           <div class="party-card">
             <div class="party-date-box">

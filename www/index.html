@@ -114,17 +114,10 @@
       direction: ltr;
       -webkit-font-smoothing: antialiased;
     }
-  /* ── Space Background Canvas ── */
-  #space-canvas {
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    z-index: -1; pointer-events: none;
-    display: block;
-  }
+  body { background: #0e0f12; }
   </style>
 
 
-<canvas id="space-canvas" aria-hidden="true"></canvas>
 
 
 <header id="header" class="header">
@@ -153,17 +146,18 @@
   </div>
 </header>
 <style>
-/* ofc.css sets #tata { font-size: 70px } — keep now-playing readable */
+/* ofc.css sets #tata { font-size: 70px } - keep now-playing readable */
 #tata {
   font-size: 1rem !important;
   line-height: 1.35 !important;
 }
-/* Header: sign-in column + profile — no overlap (replaces absolute positioning) */
+/* Header: sign-in column + profile - no overlap (replaces absolute positioning) */
 .header {
   position: sticky;
   top: 0;
   z-index: 26000;
-  background: rgb(10, 10, 10);
+  background: #0e0f12;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
   pointer-events: auto;
   isolation: isolate;
   display: flex;
@@ -544,11 +538,10 @@
 .promote-cta-card {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(145deg, rgba(255,127,80,0.2) 0%, rgba(27,27,27,0.96) 38%, rgba(10,10,10,0.96) 100%);
-  border: 1px solid rgba(255, 127, 80, 0.35);
-  border-radius: 22px;
+  background: #15161a;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
   padding: 18px 18px 16px;
-  box-shadow: 0 18px 60px rgba(0,0,0,0.42);
   text-align: left;
 }
 .promote-cta-card::after {
@@ -559,7 +552,7 @@
   width: 190px;
   height: 190px;
   border-radius: 50%;
-  background: radial-gradient(circle at center, rgba(255,127,80,0.24) 0%, rgba(255,127,80,0) 68%);
+  background: none;
   pointer-events: none;
 }
 .promote-cta-title {
@@ -600,9 +593,9 @@
   height: 22px;
   flex: 0 0 22px;
   border-radius: 999px;
-  background: rgba(255,127,80,0.2);
-  border: 1px solid rgba(255,127,80,0.35);
-  color: #ffb08f;
+  background: #1d1f24;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #ff7f50;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -612,8 +605,8 @@
 }
 .promote-cta-btn {
   appearance: none;
-  border: 1px solid rgba(255,127,80,0.5);
-  background: linear-gradient(135deg, #ff7f50 0%, #ef5f2d 100%);
+  border: 1px solid transparent;
+  background: #ff7f50;
   color: #fff;
   font-family: "Poppins", sans-serif;
   font-weight: 700;
@@ -622,11 +615,10 @@
   border-radius: 12px;
   padding: 12px 16px;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(255,127,80,0.3);
-  transition: transform 0.15s ease, filter 0.15s ease;
+  transition: filter 0.15s ease;
 }
-.promote-cta-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
-.promote-cta-btn:active { transform: translateY(0); }
+.promote-cta-btn:hover { filter: brightness(1.08); }
+.promote-cta-btn:active { filter: brightness(0.95); }
 .promote-cta-note {
   margin-left: 10px;
   font-size: 11px;
@@ -999,14 +991,14 @@
 }
 /* ===== Album & Song Cards ===== */
 .album-card {
-  background: #111;
-  border: 1px solid rgba(255,127,80,0.2);
-  border-radius: 16px;
+  background: #15161a;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
   overflow: hidden;
   margin-bottom: 16px;
   transition: border-color 0.2s;
 }
-.album-card:hover { border-color: rgba(255,127,80,0.5); }
+.album-card:hover { border-color: rgba(255,255,255,0.16); }
 .album-cover {
   display: flex;
   align-items: center;
@@ -1015,12 +1007,14 @@
   cursor: pointer;
   transition: background 0.2s;
 }
-.album-cover:hover { background: rgba(255,127,80,0.06); }
+.album-cover:hover { background: rgba(255,255,255,0.03); }
 .album-emoji {
   width: 72px;
   height: 72px;
-  background: linear-gradient(135deg, rgba(255,127,80,0.3), rgba(255,127,80,0.1));
-  border-radius: 14px;
+  background: #1d1f24;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.4);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1303,7 +1297,7 @@
 }
 .song-row-action-labeled:hover .song-row-action-label { color: rgba(255, 255, 255, 0.85); }
 
-/* Play/pause + overflow (Material Symbols — works without Font Awesome) */
+/* Play/pause + overflow (Material Symbols - works without Font Awesome) */
 .song-transport-wrap {
   display: inline-flex;
   align-items: center;
@@ -1473,19 +1467,21 @@ html.song-overflow-menu-open {
   display: flex;
   align-items: center;
   gap: 16px;
-  background: #111;
-  border: 1px solid rgba(255,127,80,0.15);
-  border-radius: 14px;
+  background: #15161a;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
   padding: 16px 20px;
   margin-bottom: 12px;
   transition: border-color 0.2s, transform 0.2s;
 }
-.single-card:hover { border-color: rgba(255,127,80,0.45); transform: translateY(-2px); }
+.single-card:hover { border-color: rgba(255,255,255,0.16); background: #191b20; }
 .single-emoji {
   width: 56px;
   height: 56px;
-  background: rgba(255,127,80,0.15);
-  border-radius: 12px;
+  background: #1d1f24;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.4);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1776,7 +1772,7 @@ html.song-overflow-menu-open {
 .lol-mini-player.player-collapsed {
   transform: translateY(calc(100% - 44px)) !important;
 }
-/* Pill handle at top of player — visual affordance for drag */
+/* Pill handle at top of player - visual affordance for drag */
 .lol-player-handle {
   display: flex;
   align-items: center;
@@ -2106,7 +2102,7 @@ body.create-profile-active {
           </div>
           
           <div class="live-notifier">
-            [ NEW UPDATE ]🎤 Artists can go live anytime — watch live concerts instantly.
+            [ NEW UPDATE ] Artists can go live anytime - watch live concerts instantly.
           </div>
           </div>
         </nav>
@@ -2131,9 +2127,9 @@ body.create-profile-active {
 
     <!-- Slide 1: Welcome -->
     <div class="ob-slide">
-      <div class="ob-icon">🪐</div>
+      <div class="ob-icon"></div>
       <h1 class="ob-title">Welcome to <span>Asteroid</span></h1>
-      <p class="ob-desc">Music discovery that feels human again. No ads, no algorithms deciding what you hear — just real artists, real fans, and real connection.</p>
+      <p class="ob-desc">Music discovery that feels human again. No ads, no algorithms deciding what you hear - just real artists, real fans, and real connection.</p>
       <p class="ob-desc ob-desc-last" style="font-size:13px; color:rgba(255,255,255,0.5);">Community-first. Always free to listen.</p>
       <div class="ob-bottom">
         <div class="ob-dots-row">
@@ -2145,23 +2141,23 @@ body.create-profile-active {
 
     <!-- Slide 2: Why Asteroid -->
     <div class="ob-slide">
-      <div class="ob-icon">✨</div>
+      <div class="ob-icon"></div>
       <h1 class="ob-title">Why <span>Asteroid</span>?</h1>
       <div class="ob-features">
         <div class="ob-feat">
-          <div class="ob-feat-icon">🚫</div>
+          <div class="ob-feat-icon"></div>
           <div class="ob-feat-text"><strong>Zero Ads, Ever</strong><span>No interruptions. Just music the way it should be.</span></div>
         </div>
         <div class="ob-feat">
-          <div class="ob-feat-icon">🤝</div>
+          <div class="ob-feat-icon"></div>
           <div class="ob-feat-text"><strong>Community-Driven Discovery</strong><span>Find music through real people, not pay-to-win algorithms.</span></div>
         </div>
         <div class="ob-feat">
-          <div class="ob-feat-icon">🎤</div>
+          <div class="ob-feat-icon"></div>
           <div class="ob-feat-text"><strong>Live Concerts</strong><span>Watch artists perform live and interact in real time.</span></div>
         </div>
         <div class="ob-feat">
-          <div class="ob-feat-icon">🚀</div>
+          <div class="ob-feat-icon"></div>
           <div class="ob-feat-text"><strong>Artists Grow Organically</strong><span>No promotion spend. Growth through participation.</span></div>
         </div>
       </div>
@@ -2175,19 +2171,19 @@ body.create-profile-active {
 
     <!-- Slide 3: Explore features + CTA -->
     <div class="ob-slide">
-      <div class="ob-icon">🎶</div>
+      <div class="ob-icon"></div>
       <h1 class="ob-title">Ready to <span>explore</span>?</h1>
       <div class="ob-features">
         <div class="ob-feat" onclick="finishOnboarding()" style="cursor:pointer">
-          <div class="ob-feat-icon">📚</div>
+          <div class="ob-feat-icon"></div>
           <div class="ob-feat-text"><strong>Song Library</strong><span>Browse and play music from independent artists worldwide.</span></div>
         </div>
         <div class="ob-feat" onclick="finishOnboarding('studio.html')" style="cursor:pointer">
-          <div class="ob-feat-icon">🎙️</div>
-          <div class="ob-feat-text"><strong>Upload Your Music</strong><span>Share your songs with the community — free, no limits.</span></div>
+          <div class="ob-feat-icon"></div>
+          <div class="ob-feat-text"><strong>Upload Your Music</strong><span>Share your songs with the community - free, no limits.</span></div>
         </div>
         <div class="ob-feat" onclick="finishOnboarding('lively.html')" style="cursor:pointer">
-          <div class="ob-feat-icon">🎪</div>
+          <div class="ob-feat-icon"></div>
           <div class="ob-feat-text"><strong>Live Concerts</strong><span>Join live sessions, react, chat, and discover new artists.</span></div>
         </div>
       </div>
@@ -2294,20 +2290,20 @@ body.create-profile-active {
   var tourSteps = [
     {
       target: "ab",
-      icon: "📚",
+      icon: "",
       title: "Song Library",
-      desc: "This is where all uploaded songs live. Browse, search, and play music from independent artists around the world — no ads, no limits.",
+      desc: "This is where all uploaded songs live. Browse, search, and play music from independent artists around the world - no ads, no limits.",
     },
     {
       target: "hot-tracks",
       fallback: "asteroidLeaderboard",
-      icon: "🔥",
+      icon: "",
       title: "Trending Songs of the Month",
       desc: "See what the community is listening to right now. The most-played songs this month are ranked here in real time.",
     },
     {
       target: "discover-modes",
-      icon: "🎭",
+      icon: "",
       title: "Discover by Mood",
       desc: "Pick how you're feeling and let Asteroid find the perfect tracks. Discovery based on community, not algorithms.",
     },
@@ -2315,7 +2311,7 @@ body.create-profile-active {
       target: "tour-live-concerts-nav",
       fallback: "tour-live-concerts",
       fallback2: "sidebar",
-      icon: "🎪",
+      icon: "",
       title: "Online live concerts",
       desc: "Watch: tap Concerts in the bottom bar (or Live Concerts Menu in the sidebar on larger layouts), then choose a room to watch.\n\nHost: on that Live Concerts page, tap Create Live Stream, sign in if asked, and follow the prompts to start your own broadcast.",
     },
@@ -2395,7 +2391,7 @@ body.create-profile-active {
 <div id="logoutModal" class="logout-modal">
   <div class="logout-modal-box">
     <div class="logout-modal-header">
-      <div class="logout-modal-icon">🚪</div>
+      <div class="logout-modal-icon"></div>
       <div>
         <h2 class="logout-modal-title">Sign out?</h2>
         <p class="logout-modal-subtitle">You are currently signed in.</p>
@@ -2453,7 +2449,7 @@ body.create-profile-active {
     <input type="text" id="appleOnboardingNickname" maxlength="80" placeholder="Your artist or display name" autocomplete="nickname">
     <label for="appleOnboardingHandle">Public username</label>
     <input type="text" id="appleOnboardingHandle" maxlength="40" placeholder="e.g. indie_alex" autocomplete="username" spellcheck="false" autocapitalize="off">
-    <p class="apple-onboarding-hint" style="margin:-6px 0 10px;font-size:12px;color:rgba(255,255,255,0.5);">3–40 characters: a–z, 0–9, underscore only. This is your unique @handle for search and follows.</p>
+    <p class="apple-onboarding-hint" style="margin:-6px 0 10px;font-size:12px;color:rgba(255,255,255,0.5);">3-40 characters: a - z, 0-9, underscore only. This is your unique @handle for search and follows.</p>
     <label>Profile type</label>
     <div class="apple-onboarding-choice-group" role="radiogroup" aria-label="Profile type">
       <label class="apple-onboarding-choice" for="appleProfileTypeArtist">
@@ -2467,12 +2463,12 @@ body.create-profile-active {
         <input type="radio" id="appleProfileTypeListener" name="appleOnboardingProfileType" value="listener" checked onchange="document.getElementById('artistGoogleNote').style.display='none'">
         <div>
           <strong>Private / Listener</strong>
-          <span>Your profile stays private—you are not shown to others in the app.</span>
+          <span>Your profile stays private - you are not shown to others in the app.</span>
         </div>
       </label>
       <div id="artistGoogleNote" style="display:none;align-items:center;gap:10px;padding:10px 12px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.3);border-radius:10px;margin-top:6px;">
         <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#4285F4" d="M44.5 20H24v8.5h11.7C34.2 33.3 29.6 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8.1 3.1l6-6C34.4 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.5-4z"/></svg>
-        <span style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.4;">Artist profiles require a <strong style="color:#4285f4">Google account</strong> verification — a sign-in window will open after you tap Save.</span>
+        <span style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.4;">Artist profiles require a <strong style="color:#4285f4">Google account</strong> verification - a sign-in window will open after you tap Save.</span>
       </div>
     </div>
     <p class="apple-onboarding-hint" style="margin:8px 0 0;font-size:12px;color:rgba(255,255,255,0.55);line-height:1.45;">Public shows you in the app; private keeps you private.</p>
@@ -2502,7 +2498,7 @@ body.create-profile-active {
 <div id="deleteAccountModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:3000; align-items:center; justify-content:center; padding:20px; flex-direction:column;">
   <div style="background:#0a0a0a; color:#fff; padding:28px 32px; border-radius:20px; width:100%; max-width:400px; border:1px solid rgba(255,80,80,0.4); box-shadow:0 24px 48px rgba(0,0,0,0.6); font-family:'Poppins',sans-serif;">
     <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-      <div style="width:44px; height:44px; border-radius:50%; background:rgba(255,80,80,0.2); display:flex; align-items:center; justify-content:center; font-size:20px;">⚠️</div>
+      <div style="width:44px; height:44px; border-radius:50%; background:rgba(255,80,80,0.2); display:flex; align-items:center; justify-content:center; font-size:20px;"></div>
       <div>
         <h2 style="margin:0; font-size:20px; font-weight:600; color:#ff5050; font-family:'Montserrat',sans-serif;">Delete Account?</h2>
         <p style="margin:4px 0 0; font-size:13px; color:rgba(255,255,255,0.7);">This action is permanent and cannot be undone.</p>
@@ -2661,7 +2657,7 @@ body.create-profile-active {
 </div>
 
     <style>
-      /* ===== Featured Section — coral/black/white ===== */
+      /* ===== Featured Section - coral/black/white ===== */
 #featuredSection {
   margin: 48px 0;
   padding: 24px 0;
@@ -2870,7 +2866,7 @@ body.create-profile-active {
 .featuredCard.featuredCard--modern .ftd-btn--play:hover { background: #ff9670; }
     </style>
     <section id="featuredSection">
-      <h2>🔥 Featured Songs</h2>
+      <h2> Featured Songs</h2>
       <p style="text-align:center;color:rgba(255,255,255,0.55);font-size:13px;margin:-6px 0 14px;">Artists whose referral codes have been used show up here.</p>
 
       <div id="featuredContainer">
@@ -2954,22 +2950,21 @@ body.create-profile-active {
       .charts-cta-card {
         display: flex; align-items: center; gap: 16px;
         padding: 18px 20px; border-radius: 18px;
-        background: linear-gradient(135deg, rgba(255,127,80,0.12), rgba(255,127,80,0.04));
-        border: 1px solid rgba(255,127,80,0.28);
+        background: #15161a;
+        border: 1px solid rgba(255,255,255,0.08);
         text-decoration: none; color: #fff;
-        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        transition: border-color 0.2s, background 0.2s;
       }
       .charts-cta-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 28px rgba(255,127,80,0.18);
-        border-color: rgba(255,127,80,0.55);
+        background: #191b20;
+        border-color: rgba(255,255,255,0.16);
       }
       .charts-cta-icon {
-        width: 52px; height: 52px; border-radius: 14px;
-        background: linear-gradient(135deg, #ff7f50, #ff5722);
+        width: 52px; height: 52px; border-radius: 12px;
+        background: #1d1f24; border: 1px solid rgba(255,255,255,0.06);
         display: flex; align-items: center; justify-content: center; flex-shrink: 0;
       }
-      .charts-cta-icon .material-symbols-outlined { font-size: 28px; color: #fff; }
+      .charts-cta-icon .material-symbols-outlined { font-size: 28px; color: #ff7f50; }
       .charts-cta-body { flex: 1; min-width: 0; }
       .charts-cta-title { margin: 0 0 3px; font-size: 16px; font-weight: 700; font-family: 'Montserrat', sans-serif; color: #fff; }
       .charts-cta-sub { margin: 0; font-size: 12px; color: rgba(255,255,255,0.68); font-family: 'Poppins', sans-serif; }
@@ -3708,12 +3703,12 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 <br>
         <h2 class="section-title">Songs that You Don’t Want to Miss</h2>
 
-	<h3>ⓘ Songs might take a few moments to load before playing since there is a problem with the configuration</h3>
+	<h3>Songs might take a few moments to load before playing since there is a problem with the configuration</h3>
 
 <div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
   <div class="ugc-policy-card">
     <h2 id="ugcPolicyTitle">Before you continue</h2>
-    <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;">Check the box and tap Continue to accept the Terms of Service and Privacy Policy before using Asteroid. You only need to do this once on this device (saved in browser storage). Asteroid includes user-uploaded music and profiles; you can report content, block users, and reach our team at any time. <strong>App Store age rating:</strong> Apple lists Asteroid as <strong>16+</strong> in most countries and regions, and <strong>15+</strong> in Australia, Brazil, and the Republic of Korea—the badge shown on your local App Store is the one that applies to you. By continuing you confirm you meet that minimum age.</p>
+    <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;">Check the box and tap Continue to accept the Terms of Service and Privacy Policy before using Asteroid. You only need to do this once on this device (saved in browser storage). Asteroid includes user-uploaded music and profiles; you can report content, block users, and reach our team at any time. <strong>App Store age rating:</strong> Apple lists Asteroid as <strong>16+</strong> in most countries and regions, and <strong>15+</strong> in Australia, Brazil, and the Republic of Korea - the badge shown on your local App Store is the one that applies to you. By continuing you confirm you meet that minimum age.</p>
     <div class="ugc-policy-actions">
       <div class="ugc-policy-check-row" id="ugcPolicyCheckRow" role="group" aria-label="Legal acceptance">
         <input type="checkbox" id="ugcPolicyCheck" autocomplete="off" aria-describedby="ugcPolicyLegalText">
@@ -4280,7 +4275,7 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 
   <div class="search-box">
     <input type="text" placeholder="Search artists, songs or albums..." class="search-input" id="searchInput">
-    <img src="—Pngtree—vector search icon_3783210.png" alt="Search" class="search-icon">
+    <img src=" - Pngtree - vector search icon_3783210.png" alt="Search" class="search-icon">
   </div>
   <center>  <div id="result"></div>
   </center>
@@ -4363,11 +4358,11 @@ setInterval(flySanta, 10000);
 </button>
 
 <div class="lol lol-mini-player" id="lolMiniPlayer" style="position: fixed; width: 100%; bottom: 0; left: 0; z-index: 9999;">
-  <!-- Pill handle — also taps to collapse/expand -->
+  <!-- Pill handle - also taps to collapse/expand -->
   <div class="lol-player-handle" onclick="window._togglePlayerCollapse()" aria-label="Toggle player" role="button" tabindex="0">
     <div class="lol-player-handle-pill"></div>
   </div>
-  <!-- Queue popup — slides up from above the player -->
+  <!-- Queue popup - slides up from above the player -->
   <div id="queuePopup" aria-label="Queue" style="
     position: absolute; bottom: 100%; left: 0; right: 0;
     background: #0e0e0e; border-top: 1px solid rgba(255,127,80,0.25);
@@ -4380,7 +4375,7 @@ setInterval(flySanta, 10000);
       <span style="color:#ff7f50;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;font-family:'Poppins',sans-serif;">
         <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;margin-right:4px;">queue_music</span>Up Next
       </span>
-      <button onclick="window._toggleQueue()" aria-label="Close queue" style="background:none;border:none;color:rgba(255,255,255,0.45);cursor:pointer;font-size:18px;line-height:1;padding:2px 4px;">✕</button>
+      <button onclick="window._toggleQueue()" aria-label="Close queue" style="background:none;border:none;color:rgba(255,255,255,0.45);cursor:pointer;font-size:18px;line-height:1;padding:2px 4px;">×</button>
     </div>
     <div id="queues" style="display:flex;flex-direction:column;gap:6px;min-height:24px;"></div>
     <p id="queueEmptyMsg" style="color:rgba(255,255,255,0.3);font-size:12px;font-family:'Poppins',sans-serif;margin:0;display:none;">No songs in queue yet.</p>
@@ -4707,7 +4702,7 @@ setPersistence(auth, browserLocalPersistence).catch((e) => console.warn("[auth p
 try {
   if (typeof window.Capacitor !== "undefined" && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
     console.info(
-      "[auth] WebView origin (must be in Firebase → Authentication → Authorized domains if you use redirect/OAuth):",
+      "[auth] WebView origin (must be in Firebase  Authentication  Authorized domains if you use redirect/OAuth):",
       typeof location !== "undefined" ? location.origin : "?"
     );
   }
@@ -4799,7 +4794,7 @@ function whenElementReady(id, callback, retries = 10) {
   // Clears stale dynamic cards, then kicks off a new inject per ownerKey.
   // The generation counter ensures late-resolving promises from old renders
   // don't append cards after the container has already been refreshed.
-  // ONLY referred artists (FEATURE_REFERRAL_REQUESTS) appear — FEATURED_ARTIST_SONG
+  // ONLY referred artists (FEATURE_REFERRAL_REQUESTS) appear - FEATURED_ARTIST_SONG
   // is just a song-cache for those referred artists, not a source of cards.
   function _mergeAndRender() {
     const gen = ++_renderGen;
@@ -4815,14 +4810,14 @@ function whenElementReady(id, callback, retries = 10) {
     const container = document.getElementById('featuredContainer');
     if (!container) return;
 
-    // Lightweight reads first — only fetch SONGS if the pinned entry is missing.
+    // Lightweight reads first - only fetch SONGS if the pinned entry is missing.
     Promise.all([
       get(ref2(database, 'FEATURED_SOCIAL_LINKS/' + ownerKey)).catch(() => null),
       get(ref2(database, 'PROFILES/' + ownerKey)).catch(() => null),
       get(ref2(database, 'REFERRAL_CODES_BY_USER/' + ownerKey)).catch(() => null),
       get(ref2(database, 'FEATURED_ARTIST_SONG/' + ownerKey)).catch(() => null)
     ]).then(async ([linkSnap, profileSnap, codeSnap, pinnedSnap]) => {
-      if (gen !== _renderGen) return; // stale render — a newer one is in charge
+      if (gen !== _renderGen) return; // stale render - a newer one is in charge
 
       const socialData = (linkSnap && linkSnap.exists()) ? linkSnap.val() : {};
       const savedLinks = Array.isArray(socialData.links) ? socialData.links.filter(Boolean) : [];
@@ -4857,7 +4852,7 @@ function whenElementReady(id, callback, retries = 10) {
         } catch (e) { /* localStorage unavailable */ }
 
         let song = null;
-        // 1. Honour the pinned song first — no heavy SONGS read needed.
+        // 1. Honour the pinned song first - no heavy SONGS read needed.
         if (pinnedSnap && pinnedSnap.exists()) {
           const pinned = pinnedSnap.val() || {};
           if (pinned.fileInp) {
@@ -4923,7 +4918,7 @@ function whenElementReady(id, callback, retries = 10) {
               }
             }
             // Feature the FIRST song the artist uploaded (oldest-first). This stays
-            // stable as they upload more — new tracks go to the library, not the card.
+            // stable as they upload more - new tracks go to the library, not the card.
             allMatches.sort((a, b) => a.__created - b.__created);
             const top = allMatches[0] || null;
             if (top) {
@@ -4985,7 +4980,7 @@ function whenElementReady(id, callback, retries = 10) {
                  <button class="ftd-btn ftd-btn--play" type="button"><span class="material-symbols-outlined">play_arrow</span>Play</button>
                </div>
              </div>`
-          : `<div class="ftd-track ftd-track--empty">No track uploaded yet — check back soon.</div>`;
+          : `<div class="ftd-track ftd-track--empty">No track uploaded yet - check back soon.</div>`;
 
         card.innerHTML = `
           <div class="ftd-cover" style="${avatarImg ? `background-image:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.85)), url('${esc(avatarImg)}');` : ''}">
@@ -5022,7 +5017,7 @@ function whenElementReady(id, callback, retries = 10) {
       }).catch((e) => { console.warn('[featured]', e); });
   }
 
-  // Listener 1: FEATURED_ARTIST_SONG — auto-pinned by ArtistDashboard + studio upload.
+  // Listener 1: FEATURED_ARTIST_SONG - auto-pinned by ArtistDashboard + studio upload.
   onValue(
     ref2(database, 'FEATURED_ARTIST_SONG'),
     (snap) => {
@@ -5033,7 +5028,7 @@ function whenElementReady(id, callback, retries = 10) {
     (err) => { console.warn('[featured] FEATURED_ARTIST_SONG onValue error:', err && (err.message || err)); }
   );
 
-  // Listener 2: FEATURE_REFERRAL_REQUESTS — real-time so referred artists appear
+  // Listener 2: FEATURE_REFERRAL_REQUESTS - real-time so referred artists appear
   // the moment a fan enters their code, without waiting for a page refresh.
   onValue(
     ref2(database, 'FEATURE_REFERRAL_REQUESTS'),
@@ -5428,7 +5423,7 @@ window.__songOverflowQueueFromDataset = function (btn) {
   } catch (eQ) {}
 };
 
-/** REST PUT fallback for PLAYLISTS — guarantees the save lands in Firebase even when the SDK is asleep. */
+/** REST PUT fallback for PLAYLISTS - guarantees the save lands in Firebase even when the SDK is asleep. */
 function _restSavePlaylistEntry(uid, sid, payload) {
   try {
     fetch(RTDB_BASE + "/PLAYLISTS/" + uid + "/" + sid + ".json", {
@@ -5517,7 +5512,7 @@ window.__saveSongToPersonalPlaylistFromDataset = function (btn) {
           sdkResult
             .then(function () { console.log("[playlist] SDK saved:", sid); })
             .catch(function (err) {
-              console.warn("[playlist] SDK save failed — falling back to REST:", err && (err.code || err.message));
+              console.warn("[playlist] SDK save failed - falling back to REST:", err && (err.code || err.message));
               _restSavePlaylistEntry(uid, sid, fbPayload);
             });
         } else {
@@ -5528,7 +5523,7 @@ window.__saveSongToPersonalPlaylistFromDataset = function (btn) {
       console.warn("[playlist-firebase] SDK threw:", eFbPl);
     }
     if (!fbWroteViaSdk && uid) {
-      console.warn("[playlist] SDK globals missing — using REST");
+      console.warn("[playlist] SDK globals missing - using REST");
       _restSavePlaylistEntry(uid, sid, fbPayload);
     }
 
@@ -5653,8 +5648,6 @@ window.refreshDiscoveryPanels = function (songsData) {
 function renderSongsFromData(songsData) {
   if (!songsData || typeof songsData !== "object") return "<p style='text-align:center;color:#ccc;padding:20px;'>No songs yet. Upload from the studio!</p>";
 
-  const albumEmojis = ["🎵","🎶","🎸","🎹","🎺","🎷","🥁","🎻","🪗","🎤","🪘","🪕","💿","📀","🔊","🎧","🎼","🪇","🎙️","🎚️"];
-  function pickEmoji(name) { let h = 0; for (let i = 0; i < name.length; i++) h = ((h << 5) - h + name.charCodeAt(i)) | 0; return albumEmojis[Math.abs(h) % albumEmojis.length]; }
   function esc(s) { return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
   function escQ(s) { return (s || "").replace(/'/g,"\\'"); }
   function explicitBadge(s) {
@@ -5769,7 +5762,7 @@ function renderSongsFromData(songsData) {
         });
         html += `<div class="sssh single-card" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="">
           <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}"${explicitDataAttr(s)} playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
-          <div class="single-emoji">${pickEmoji(s.title)}</div>
+          <div class="single-emoji"><span class="material-symbols-outlined" style="font-size:26px;">music_note</span></div>
           <div class="single-info">
             <div class="single-title-row">${explicitBadge(s)}<div class="single-title">${t}</div></div>
             <div class="single-artist">${a}</div>
@@ -5783,11 +5776,10 @@ function renderSongsFromData(songsData) {
       });
     } else {
       const artists = [...new Set(songs.map(s => s.artist || "Unknown"))].join(", ");
-      const emoji = pickEmoji(key);
       const albumId = "album_" + key.replace(/[^a-zA-Z0-9]/g, "_");
       html += `<div class="album-card" data-album="${esc(key).toLowerCase()}">
         <div class="album-cover" onclick="document.getElementById('${albumId}').classList.toggle('album-open')">
-          <div class="album-emoji">${emoji}</div>
+          <div class="album-emoji"><span class="material-symbols-outlined" style="font-size:30px;">album</span></div>
           <div class="album-meta">
             <div class="album-name">${esc(key)}</div>
             <div class="album-artist">${esc(artists)}</div>
@@ -5806,7 +5798,7 @@ function renderSongsFromData(songsData) {
 
 function fetchSongsViaREST() {
   if (songsReceived) return;
-  console.log("🔄 REST fallback: fetching SONGS...");
+  console.log(" REST fallback: fetching SONGS...");
   fetch(RTDB_BASE + "/SONGS.json").then(r => r.json()).then(songsData => {
     songsReceived = true;
     globalSongsData = songsData;
@@ -5821,16 +5813,16 @@ function fetchSongsViaREST() {
       if (typeof window.refreshDiscoveryPanels === "function") window.refreshDiscoveryPanels(songsData);
       if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
     });
-    console.log("✅ REST fallback: SONGS loaded");
+    console.log(" REST fallback: SONGS loaded");
   }).catch(err => {
-    console.error("❌ REST fallback SONGS failed:", err);
+    console.error("× REST fallback SONGS failed:", err);
     whenElementReady("ab", (ab) => { ab.innerHTML = "<p style='text-align:center;color:#ff6b6b;padding:20px;'>Unable to load songs. Check your network.</p>"; });
   });
 }
 
 function fetchTrendingViaREST() {
   if (trendingReceived) return;
-  console.log("🔄 REST fallback: fetching songplayed...");
+  console.log(" REST fallback: fetching songplayed...");
   fetch(RTDB_BASE + "/songplayed.json").then(r => r.json()).then(data67 => {
     trendingReceived = true;
     const msg = "<p style='text-align: center; color: #ccc; padding: 20px;'>No trending songs this month yet. Start playing songs!</p>";
@@ -5844,19 +5836,19 @@ function fetchTrendingViaREST() {
     const sorted = Object.entries(matches).sort((a, b) => b[1] - a[1]);
     whenElementReady("asteroidLeaderboard", (leaderboard) => {
       leaderboard.innerHTML = sorted.length === 0 ? msg : sorted.map(([title, count], i) =>
-        `<div style="padding: 1rem; margin: 0.5rem 0; background: rgba(255, 127, 80, 0.1); border-left: 4px solid #ff7f50; border-radius: 8px;"><h3 style="margin: 0; color: #ff7f50; font-size: 1.1rem;"><span style="font-size: 1.5rem; margin-right: 0.5rem;">${i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "🎵"}</span>${title} <span style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">(${count} ${count === 1 ? "play" : "plays"})</span></h3></div>`
+        `<div style="padding: 1rem; margin: 0.5rem 0; background: rgba(255, 127, 80, 0.1); border-left: 4px solid #ff7f50; border-radius: 8px;"><h3 style="margin: 0; color: #ff7f50; font-size: 1.1rem;"><span style="font-size: 1.5rem; margin-right: 0.5rem;">${i === 0 ? "1st" : i === 1 ? "2nd" : i === 2 ? "3rd" : ""}</span>${title} <span style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">(${count} ${count === 1 ? "play" : "plays"})</span></h3></div>`
       ).join("");
     });
-    console.log("✅ REST fallback: trending loaded");
+    console.log(" REST fallback: trending loaded");
   }).catch(err => {
-    console.error("❌ REST fallback trending failed:", err);
+    console.error("× REST fallback trending failed:", err);
     whenElementReady("asteroidLeaderboard", lb => { lb.innerHTML = "<p style='text-align: center; color: #ff6b6b; padding: 20px;'>Unable to load trending. Check your network.</p>"; });
   });
 }
 
 // Immediate loading placeholders
-whenElementReady("ab", (ab) => { ab.innerHTML = "<p style='text-align:center;color:rgba(255,255,255,0.7);padding:20px;'>⏳ Loading songs...</p>"; });
-whenElementReady("asteroidLeaderboard", (lb) => { lb.innerHTML = "<p style='text-align: center; color: rgba(255,255,255,0.7); padding: 20px;'>⏳ Loading trending...</p>"; });
+whenElementReady("ab", (ab) => { ab.innerHTML = "<p style='text-align:center;color:rgba(255,255,255,0.7);padding:20px;'>Loading songs...</p>"; });
+whenElementReady("asteroidLeaderboard", (lb) => { lb.innerHTML = "<p style='text-align: center; color: rgba(255,255,255,0.7); padding: 20px;'>Loading trending...</p>"; });
 
 // ── Daily 75-song picker ──────────────────────────────────────────────────
 // Deterministic seeded shuffle keyed to YYYY-MM-DD so today's list is
@@ -5866,7 +5858,7 @@ function _dailySeed() {
   return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
 }
 function _seededRand(seed) {
-  // mulberry32 — fast, good distribution
+  // mulberry32 - fast, good distribution
   return function () {
     seed |= 0; seed = seed + 0x6D2B79F5 | 0;
     var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
@@ -5890,7 +5882,7 @@ function flattenSongsData(data) {
 }
 function getDailyPick(songsData, n) {
   const all = flattenSongsData(songsData);
-  if (all.length <= n) return null; // fewer than limit — show all
+  if (all.length <= n) return null; // fewer than limit - show all
   const rand = _seededRand(_dailySeed());
   const shuffled = all.slice();
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -5903,7 +5895,7 @@ function getDailyPick(songsData, n) {
 // ── Daily balanced discovery picker ────────────────────────────────────────
 // Chooses N songs for the whole day (deterministic per YYYY-MM-DD, so the set is
 // stable for 24h and rotates the next day) and spreads the slots EQUALLY across
-// every uploading artist so each artist gets fair daily exposure — not just
+// every uploading artist so each artist gets fair daily exposure - not just
 // whoever uploaded the most. This is the "recommended" library ordering.
 function _songOwnerKey(s) {
   // Group by uploader identity first, then fall back to artist name.
@@ -5915,7 +5907,7 @@ function _songOwnerKey(s) {
 }
 function getDailyBalancedPick(songsData, n) {
   const all = flattenSongsData(songsData);
-  if (all.length <= n) return null; // fewer than limit — show all
+  if (all.length <= n) return null; // fewer than limit - show all
   const rand = _seededRand(_dailySeed());
   const shuffle = (arr) => {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -5967,13 +5959,13 @@ function flatListToSongsData(list) {
 // SONGS: Load immediately on Firebase init (reference display script)
 let globalSongsData = null;
 let sorg = [];
-console.log("🔵 Setting up SONGS listener (runs on Firebase init)...");
+console.log(" Setting up SONGS listener (runs on Firebase init)...");
 onValue(ref2(database, "SONGS/"), (snapshot) => {
   songsReceived = true;
   const songsData = snapshot.val();
-  console.log("📥 SONGS from Firebase:", songsData);
+  console.log(" SONGS from Firebase:", songsData);
   if (!songsData) {
-    console.log("❌ No songs in database yet");
+    console.log("× No songs in database yet");
     whenElementReady("ab", (ab) => { ab.innerHTML = "<p style='text-align:center;color:#ccc;padding:20px;'>No songs yet. Upload from the studio!</p>"; });
     globalSongsData = null;
     window.__asteroidSongsDataForDiscovery = null;
@@ -5987,7 +5979,7 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
   const renderData = dailyList ? flatListToSongsData(dailyList) : songsData;
   const html = renderSongsFromData(renderData);
   const songCount = html ? (html.match(/class="sssh"/g) || []).length : 0;
-  console.log("✅ Songs rendered:", songCount, dailyList ? "(daily pick of 100, balanced across artists)" : "(all songs)");
+  console.log(" Songs rendered:", songCount, dailyList ? "(daily pick of 100, balanced across artists)" : "(all songs)");
   whenElementReady("ab", (ab) => {
     const extra = document.getElementById("artists-grid-8");
     ab.innerHTML = html + (extra ? extra.innerHTML : "");
@@ -5997,11 +5989,11 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
   });
 }, (error) => {
   songsReceived = true;
-  console.error("❌ Firebase error loading SONGS:", error);
+  console.error("× Firebase error loading SONGS:", error);
   whenElementReady("ab", (ab) => { ab.innerHTML = "<p style='text-align:center;color:#ff6b6b;padding:20px;'>Error loading songs. Check your connection and try again.</p>"; });
   if (typeof window.refreshDiscoveryPanels === "function") window.refreshDiscoveryPanels(null);
 });
-console.log("✅ SONGS listener attached");
+console.log(" SONGS listener attached");
 
 window.turnToCoral = function() { const t = document.getElementById("tata"); if (t) t.style.color = "coral"; };
 
@@ -6079,7 +6071,7 @@ function logListenEngagement(el) {
         });
       }
     } else if (title) {
-      console.warn("[Fan plays] Skipped — song has no uploader field. Re-upload from Studio or add uploader on the track in the database.");
+      console.warn("[Fan plays] Skipped - song has no uploader field. Re-upload from Studio or add uploader on the track in the database.");
     }
     const upd = window.firebaseUpdate;
     const lastKey = window.__lastJourneyKey;
@@ -6231,7 +6223,7 @@ function _loadGlobalFromCard(card) {
 window.playLibraryTrack = function (tid) {
   const card = document.getElementById("song_" + tid);
   if (!card) return;
-  // Read title from MULTIPLE sources — dataset may be empty if attr was malformed
+  // Read title from MULTIPLE sources - dataset may be empty if attr was malformed
   let cardTitle = (card.dataset.displayTitle || "").trim();
   if (!cardTitle) {
     // Fallback: pull from inner .song-row-title text
@@ -6253,20 +6245,20 @@ window.playLibraryTrack = function (tid) {
   const g = _loadGlobalFromCard(card);
   if (!g) return;
   try { if (window.currentPlaying && window.currentPlaying !== g && typeof window.currentPlaying.pause === "function") window.currentPlaying.pause(); } catch (_) {}
-  // Record play directly with the card title — no dependency on gaga_global.dataset
+  // Record play directly with the card title - no dependency on gaga_global.dataset
   if (cardTitle) {
     if (typeof window.recordSongPlay === "function") {
       try { window.recordSongPlay(cardTitle); }
       catch (recErr) {
-        console.warn("[playLibraryTrack] recordSongPlay threw — using REST fallback:", recErr);
+        console.warn("[playLibraryTrack] recordSongPlay threw - using REST fallback:", recErr);
         _restRecordSongPlay(cardTitle);
       }
     } else {
-      console.warn("[playLibraryTrack] recordSongPlay missing — using REST fallback");
+      console.warn("[playLibraryTrack] recordSongPlay missing - using REST fallback");
       _restRecordSongPlay(cardTitle);
     }
   } else {
-    console.warn("[playLibraryTrack] could not resolve title from card — skipped recording");
+    console.warn("[playLibraryTrack] could not resolve title from card - skipped recording");
   }
   if (window.actual1) window.actual1('gaga_global');
   logListenEngagement(g);
@@ -6286,7 +6278,7 @@ window.playLibraryTrack = function (tid) {
   if (window.turnToCoral) window.turnToCoral();
   var p = g.play();
   if (p && typeof p.then === "function") p.catch(function () {
-    if (tata) { tata.textContent = ""; var err = document.createElement("span"); err.style.cssText = "color:#ffb4a2;font-size:13px;"; err.textContent = "Still loading — tap play again in a moment."; tata.appendChild(err); }
+    if (tata) { tata.textContent = ""; var err = document.createElement("span"); err.style.cssText = "color:#ffb4a2;font-size:13px;"; err.textContent = "Still loading - tap play again in a moment."; tata.appendChild(err); }
   });
 };
 
@@ -6296,7 +6288,7 @@ window.pauseLibraryTrack = function (tid) {
   try { g.pause(); } catch (e) {}
 };
 
-// REST fallback for songplayed write — works even if Firebase SDK push fails for any reason.
+// REST fallback for songplayed write - works even if Firebase SDK push fails for any reason.
 function _restRecordSongPlay(title) {
   try {
     const cleanTitle = String(title || "").trim();
@@ -6326,7 +6318,7 @@ function _restRecordSongPlay(title) {
 window.recordSongPlay = function (title) {
   try {
     const cleanTitle = String(title || "").trim();
-    if (!cleanTitle) { console.warn("[recordSongPlay] empty title — skipped"); return; }
+    if (!cleanTitle) { console.warn("[recordSongPlay] empty title - skipped"); return; }
     const db = getDatabase(app);
     const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
     const ofctime = month[new Date().getMonth()];
@@ -6351,7 +6343,7 @@ window.recordSongPlay = function (title) {
     if (authUid)    payload.playerUid  = authUid;
 
     const result = push(ref2(db, "songplayed"), payload);
-    console.log("[recordSongPlay] pushed:", cleanTitle, "→", ofctime, "by:", playerKey || playerName || "(anon)");
+    console.log("[recordSongPlay] pushed:", cleanTitle, "", ofctime, "by:", playerKey || playerName || "(anon)");
     if (result && typeof result.then === "function") {
       result.catch(err => console.error("[recordSongPlay] push failed:", err && (err.code || err.message || err)));
     }
@@ -6372,7 +6364,7 @@ window.actual1 = function (audioDomId) {
     tata.textContent = "";
     const sp = document.createElement("span");
     sp.style.cssText = "color:coral;font-weight:600;display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;";
-    sp.appendChild(document.createTextNode("🎵 NOW PLAYING: "));
+    sp.appendChild(document.createTextNode(" NOW PLAYING: "));
     if (g && g.dataset && g.dataset.explicit === "1") {
       const badge = document.createElement("span"); badge.className = "explicit-badge"; badge.title = "Explicit"; badge.textContent = "E"; sp.appendChild(badge);
     }
@@ -6447,7 +6439,7 @@ window.handleKKK = function() {
   if (hp && typeof hp.then === "function") hp.catch(function () {});
   window.currentPlaying = g;
   const tata = document.getElementById("tata");
-  if (tata) tata.innerHTML = "<font color='coral'>🎵 NOW PLAYING: " + song.title + "</font>";
+  if (tata) tata.innerHTML = "<font color='coral'> NOW PLAYING: " + song.title + "</font>";
 };
 
 // Make Firebase functions globally available for use in regular script tags
@@ -6556,7 +6548,7 @@ function resetSignOutUI() {
 }
 
 window.doSignOut = function () {
-  console.log("[doSignOut] Starting sign out — clearing storage FIRST");
+  console.log("[doSignOut] Starting sign out - clearing storage FIRST");
 
   nukeLocalStorage();
   try { currentFirebaseUser = null; } catch (e) {}
@@ -6635,7 +6627,7 @@ window.doDeleteAccount = async function(statusCallback) {
 /** True when this device still has a saved session (matches profile / follow helpers). */
 function hasRememberedAppSession() {
   try {
-    // Identity presence IS the proof of a remembered session — the boolean
+    // Identity presence IS the proof of a remembered session - the boolean
     // flags (asteroidSignedInBefore / isLoggedIn / localAuthOnly) race behind
     // identity writes during Apple-redirect resume. Sign-out paths clear the
     // identity keys, so this is still safe.
@@ -6688,7 +6680,7 @@ try {
   window.addEventListener("asteroid:auth-changed", function () {
     try { syncHeaderSignInGroupFromStorage(); } catch (e) {}
   });
-  // Backstop poll for the first 10 seconds after page load — iOS WebView
+  // Backstop poll for the first 10 seconds after page load - iOS WebView
   // sometimes restores the Firebase session 1-3s after DOMContentLoaded;
   // popup/redirect Apple flows can also resolve late. A short poll guarantees
   // the button hides as soon as identity becomes available.
@@ -7088,10 +7080,10 @@ function loadNotes() {
 
 console.log("hello 2236");
 // Load trending songs of the month with real-time updates
-console.log('🔵 Setting up trending songs listener...');
-console.log('🔵 Database available:', !!database);
+console.log(' Setting up trending songs listener...');
+console.log(' Database available:', !!database);
 if (!database) {
-  console.error('❌ Database not initialized!');
+  console.error('× Database not initialized!');
 } else {
 const songRef = ref2(database, 'songplayed');
 
@@ -7101,18 +7093,18 @@ onValue(songRef, (snapshot2) => {
   try {
     const data67 = snapshot2.val();  // all songs
     if (!data67) {
-      console.log("⚠️ No song plays data found");
+      console.log(" No song plays data found");
       whenElementReady("asteroidLeaderboard", (lb) => { lb.innerHTML = "<p style='text-align: center; color: #ccc; padding: 20px;'>No trending songs this month yet. Start playing songs!</p>"; });
       return;
     }
 
     const list67 = Object.values(data67);
-    console.log("✅ Song plays data received:", list67.length, "plays");
-    console.log("📊 Song plays data:", data67);
+    console.log(" Song plays data received:", list67.length, "plays");
+    console.log(" Song plays data:", data67);
 
     const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
     const currentMonth = monthNames[new Date().getMonth()];
-    console.log("📅 Current month:", currentMonth);
+    console.log(" Current month:", currentMonth);
 
     // Filter and count songs for current month
     const currentMonthPlays = list67.filter(song => {
@@ -7120,7 +7112,7 @@ onValue(songRef, (snapshot2) => {
       return songMonth.toLowerCase() === currentMonth.toLowerCase();
     });
 
-    console.log("🎵 Current month plays:", currentMonthPlays.length);
+    console.log(" Current month plays:", currentMonthPlays.length);
 
   // Count occurrences for current month
   const matches = {};
@@ -7131,7 +7123,7 @@ onValue(songRef, (snapshot2) => {
 
   // Sort by number of plays
   const sorted = Object.entries(matches).sort((a, b) => b[1] - a[1]);
-    console.log("🔥 Trending songs sorted:", sorted);
+    console.log(" Trending songs sorted:", sorted);
 
   // Display leaderboard (use whenElementReady for iOS WebView timing)
   whenElementReady("asteroidLeaderboard", (leaderboard) => {
@@ -7147,7 +7139,7 @@ onValue(songRef, (snapshot2) => {
       songDiv.style.cssText = "padding: 1rem; margin: 0.5rem 0; background: rgba(255, 127, 80, 0.1); border-left: 4px solid #ff7f50; border-radius: 8px;";
       songDiv.innerHTML = `
         <h3 style="margin: 0; color: #ff7f50; font-size: 1.1rem;">
-          <span style="font-size: 1.5rem; margin-right: 0.5rem;">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🎵'}</span>
+          <span style="font-size: 1.5rem; margin-right: 0.5rem;">${index === 0 ? '1st' : index === 1 ? '2nd' : index === 2 ? '3rd' : ''}</span>
           ${title} <span style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">(${count} ${count === 1 ? 'play' : 'plays'})</span>
         </h3>
       `;
@@ -7155,12 +7147,12 @@ onValue(songRef, (snapshot2) => {
     });
   });
   } catch (error) {
-    console.error("❌ Error loading trending songs:", error);
+    console.error("× Error loading trending songs:", error);
     whenElementReady("asteroidLeaderboard", (lb) => { lb.innerHTML = "<p style='text-align: center; color: #ff6b6b; padding: 20px;'>Error loading trending songs. Please refresh the page.</p>"; });
   }
   }, (error) => {
     trendingReceived = true;
-    console.error("❌ Firebase error loading trending songs:", error);
+    console.error("× Firebase error loading trending songs:", error);
     whenElementReady("asteroidLeaderboard", (lb) => { lb.innerHTML = "<p style='text-align: center; color: #ff6b6b; padding: 20px;'>Error connecting to database. Please check your connection.</p>"; });
   });
 }
@@ -7212,7 +7204,7 @@ function openLogoutModal(user) {
   if (artistBtn) artistBtn.style.display = isArtist ? "none" : "flex";
   if (listenerBtn) listenerBtn.style.display = isArtist ? "" : "none";
 
-  // Follower / following counts — only for artists
+  // Follower / following counts - only for artists
   const statsEl = document.getElementById('logoutFollowerStats');
   if (statsEl) {
     statsEl.innerHTML = '';
@@ -7299,7 +7291,7 @@ if (!window.__roleSwitchTapFix) {
   }, { capture: true, passive: false });
 }
 
-// --- DELETE ACCOUNT (fully self-contained — uses REST API, no module imports needed) ---
+// --- DELETE ACCOUNT (fully self-contained - uses REST API, no module imports needed) ---
 function openDeleteAccountModal() {
   closeLogoutModal();
   var modal = document.getElementById("deleteAccountModal");
@@ -7350,13 +7342,13 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
         btn.textContent = "Delete my account";
         btn.disabled = false;
       } else {
-        showStatus("Error — clearing local data...", "#ff9900");
+        showStatus("Error - clearing local data...", "#ff9900");
         ["email","CurrentUser","fullName","asteroidSignedInBefore","pfp","emailKey","name","isLoggedIn","userEmail","userName","localAuthOnly"].forEach(function(k) { localStorage.removeItem(k); });
         setTimeout(function() { window.location.reload(); }, 1500);
       }
     });
   } else {
-    showStatus("Firebase not ready — clearing local data...", "#ff9900");
+    showStatus("Firebase not ready - clearing local data...", "#ff9900");
     ["email","CurrentUser","fullName","asteroidSignedInBefore","pfp","emailKey","name","isLoggedIn","userEmail","userName","localAuthOnly"].forEach(function(k) { localStorage.removeItem(k); });
     setTimeout(function() { window.location.reload(); }, 1500);
   }
@@ -7489,7 +7481,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               let result;
               if (currentUser) {
                 result = await linkWithPopup(currentUser, googleProvider).catch(async (e) => {
-                  // Already linked or credential-already-in-use — just sign in to confirm
+                  // Already linked or credential-already-in-use - just sign in to confirm
                   if (e.code === "auth/credential-already-in-use" || e.code === "auth/provider-already-linked" || e.code === "auth/email-already-in-use") {
                     const cred = GoogleAuthProvider.credentialFromError(e);
                     if (cred) return await signInWithCredential(auth, cred);
@@ -7635,10 +7627,10 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             try {
               try { sessionStorage.setItem("_switchToArtistPending", "1"); } catch (_) {}
               await window._signInWithGoogleForArtist(key);
-              // Popup succeeded — clear the flag.
+              // Popup succeeded - clear the flag.
               try { sessionStorage.removeItem("_switchToArtistPending"); } catch (_) {}
 
-              // OPEN THE FORM IMMEDIATELY — don't make the user wait for the DB write.
+              // OPEN THE FORM IMMEDIATELY - don't make the user wait for the DB write.
               // The PROFILES role write fires in the background. If it fails, the
               // user can retry (the role flip on submit will overwrite anyway).
               localStorage.setItem("profileType", "artist");
@@ -7683,7 +7675,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               const lBtn = document.getElementById("switchToListenerBtn");
               if (aBtn) aBtn.style.display = "flex";
               if (lBtn) lBtn.style.display = "none";
-              // Hide follower stats — listeners don't show these
+              // Hide follower stats - listeners don't show these
               const fStatsEl = document.getElementById('logoutFollowerStats');
               if (fStatsEl) { fStatsEl.innerHTML = ''; fStatsEl.style.display = 'none'; }
             } catch (e) {
@@ -7769,7 +7761,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               try {
                 sessionStorage.setItem("capAuthBrowserOpened", String(Date.now()));
               } catch (e0) {}
-              console.log("[auth] OAuth navigation → Capacitor Browser.open", String(url).slice(0, 200));
+              console.log("[auth] OAuth navigation  Capacitor Browser.open", String(url).slice(0, 200));
               void Browser.open({ url: String(url), presentationStyle: "fullscreen" });
               return true;
             };
@@ -7831,9 +7823,9 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                       "Firebase: auth/unauthorized-domain\n\n" +
                         "The app WebView origin must be https://localhost (not ionic://).\n\n" +
                         "1. Rebuild the iOS app after cap sync (capacitor.config uses iosScheme: https).\n" +
-                        "2. Firebase Console → Authentication → Settings → Authorized domains → ensure localhost is listed.\n" +
-                        "3. Google Cloud Console → APIs & Services → Credentials → your Web OAuth client → " +
-                        "Authorized JavaScript origins → add https://localhost\n\n" +
+                        "2. Firebase Console  Authentication  Settings  Authorized domains  ensure localhost is listed.\n" +
+                        "3. Google Cloud Console  APIs & Services  Credentials  your Web OAuth client  " +
+                        "Authorized JavaScript origins  add https://localhost\n\n" +
                         "Current origin: " + (o || "(unknown)")
                     );
                   }
@@ -7906,7 +7898,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               if (plat !== "ios") return false;
               const P = getAppleNativeSignInPlugin();
               if (!P || typeof P.authorize !== "function") {
-                console.log("[auth] Native SignInWithApple plugin unavailable — using redirect/Browser flow");
+                console.log("[auth] Native SignInWithApple plugin unavailable - using redirect/Browser flow");
                 return false;
               }
               const rawNonce = buildAppleAuthRawNonce();
@@ -7982,8 +7974,8 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                     alert(
                       "Sign in with Apple returned Apple error 1000 (often “unknown” / not available).\n\n" +
                         "Checklist:\n" +
-                        "• Xcode → target App → Signing & Capabilities → Sign in with Apple is ON\n" +
-                        "• Simulator: Settings app → sign in with an Apple ID\n" +
+                        "• Xcode  target App  Signing & Capabilities  Sign in with Apple is ON\n" +
+                        "• Simulator: Settings app  sign in with an Apple ID\n" +
                         "• Prefer a real device for Apple testing\n\n" +
                         "The app will try browser sign-in next; that needs Firebase authorized domains (see separate alert if it fails)."
                     );
@@ -8120,7 +8112,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               return;
             }
             if (handleRaw.length > 40 || !/^[a-z0-9_]{3,40}$/.test(handleRaw)) {
-              alert("Public username must be 3–40 characters: lowercase letters, numbers, and underscores only.");
+              alert("Public username must be 3-40 characters: lowercase letters, numbers, and underscores only.");
               if (hdlEl) hdlEl.focus();
               return;
             }
@@ -8371,7 +8363,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
           async function handleAppleAuthRedirect(url) {
             if (!url || url === _lastAppleRedirectIndex) return;
             _lastAppleRedirectIndex = url;
-            console.log("⚡️ handleAppleAuthRedirect (index)", { url });
+            console.log(" handleAppleAuthRedirect (index)", { url });
 
             const params = new URLSearchParams(String(url).split("?")[1] || "");
             const appleIdToken = params.get("appleIdToken") || "";
@@ -8392,7 +8384,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             const fullName = params.get("name") || "";
             const uid = params.get("uid") || "";
             const photo = params.get("photo") || "";
-            console.log("⚡️ Apple sign-in user info (index):", { email, fullName, uid });
+            console.log(" Apple sign-in user info (index):", { email, fullName, uid });
 
             const appleAccountId = (uid || email || "").trim();
             if (appleAccountId) {
@@ -8481,7 +8473,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                       alert(
                         "Could not start Apple sign-in.\n\n" +
                           "A 403 on Apple’s page usually means Return URL / domain mismatch:\n" +
-                          "Apple Developer → Services ID → Sign in with Apple → Return URLs must include exactly:\n" +
+                          "Apple Developer  Services ID  Sign in with Apple  Return URLs must include exactly:\n" +
                           "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
                           "Web domains must include your live hostname (e.g. asteroid8.net and www.asteroid8.net)."
                       );
@@ -8510,14 +8502,14 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                       if (error && error.code === "auth/operation-not-allowed") {
                         alert(
                           "Sign in with Apple is not enabled for this app in Firebase.\n\n" +
-                            "Open Firebase Console → Authentication → Sign-in method → Apple → Enable, " +
+                            "Open Firebase Console  Authentication  Sign-in method  Apple  Enable, " +
                             "and complete Apple’s Services ID / key setup. Add your site to Authorized domains."
                         );
                       } else if (error) {
                         alert(
                           "Could not start Apple sign-in.\n\n" +
                             "A 403 on Apple’s page usually means Return URL / domain mismatch:\n" +
-                            "Apple Developer → Services ID → Sign in with Apple → Return URLs must include exactly:\n" +
+                            "Apple Developer  Services ID  Sign in with Apple  Return URLs must include exactly:\n" +
                             "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
                             "Web domains must include your live hostname (e.g. asteroid8.net and www.asteroid8.net)."
                         );
@@ -8537,7 +8529,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                   alert(
                     "Could not start Apple sign-in.\n\n" +
                       "A 403 on Apple’s page usually means Return URL / domain mismatch:\n" +
-                      "Apple Developer → Services ID → Sign in with Apple → Return URLs must include exactly:\n" +
+                      "Apple Developer  Services ID  Sign in with Apple  Return URLs must include exactly:\n" +
                       "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
                       "Web domains must include your live hostname (e.g. asteroid8.net and www.asteroid8.net)."
                   );
@@ -8548,7 +8540,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                 .then((result) => handleSignInSuccess(result, hadPreviousUser))
                 .catch(async (error) => {
                   const code = error && error.code ? String(error.code) : "";
-                  // If the user already has a session, swallow popup errors silently —
+                  // If the user already has a session, swallow popup errors silently - 
                   // they're already signed in, this attempt was probably an accidental tap.
                   if (typeof hasRememberedAppSession === "function" && hasRememberedAppSession()) {
                     console.warn("Apple sign-in: ignored (already signed in):", code);
@@ -8567,14 +8559,14 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                   if (error && error.code === "auth/operation-not-allowed") {
                     alert(
                       "Sign in with Apple is not enabled for this app in Firebase.\n\n" +
-                        "Open Firebase Console → Authentication → Sign-in method → Apple → Enable, " +
+                        "Open Firebase Console  Authentication  Sign-in method  Apple  Enable, " +
                         "and complete Apple’s Services ID / key setup. Add your site to Authorized domains."
                     );
                   } else if (error) {
                     alert(
                       "Could not start Apple sign-in.\n\n" +
                         "A 403 on Apple’s page usually means Return URL / domain mismatch:\n" +
-                        "Apple Developer → Services ID → Sign in with Apple → Return URLs must include exactly:\n" +
+                        "Apple Developer  Services ID  Sign in with Apple  Return URLs must include exactly:\n" +
                         "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
                         "Web domains must include your live hostname (e.g. asteroid8.net and www.asteroid8.net)."
                     );
@@ -8730,8 +8722,8 @@ console.log('1171')
     <div class="song-info">
       <img id="songImg" src="" alt="">
       <div class="song-details">
-        <div id="songTitle" class="song-title">—</div>
-        <div id="artistName" class="artist-name">—</div>
+        <div id="songTitle" class="song-title"> - </div>
+        <div id="artistName" class="artist-name"> - </div>
       </div>
     </div>
 
@@ -8762,8 +8754,8 @@ console.log('1171')
 
     var songTitleElement = document.getElementById("songTitle");
     var artistNameElement = document.getElementById("artistName");
-    if (songTitleElement) songTitleElement.textContent = typeof songTitle !== "undefined" ? songTitle : "—";
-    if (artistNameElement) artistNameElement.textContent = typeof artistName !== "undefined" ? artistName : "—";
+    if (songTitleElement) songTitleElement.textContent = typeof songTitle !== "undefined" ? songTitle : " - ";
+    if (artistNameElement) artistNameElement.textContent = typeof artistName !== "undefined" ? artistName : " - ";
     //songImgElement.src = songImgSrc;
     //audio.src = songUrl;
 
@@ -9065,7 +9057,7 @@ console.log('1171')
       // redirect, Google, email) localStorage flips. Listen on `storage` (fires
       // for cross-tab writes) AND on a custom 'asteroid:auth-changed' event we
       // dispatch ourselves. Also poll for the first 30s after the modal opens
-      // — covers Apple redirect resume where getRedirectResult lands AFTER the
+      // - covers Apple redirect resume where getRedirectResult lands AFTER the
       // user has already reopened the artist card.
       let _featuredFollowPollTimer = null;
       function _featuredFollowKeepFresh() {
@@ -9087,7 +9079,7 @@ console.log('1171')
         }
       });
       window.addEventListener("asteroid:auth-changed", _featuredFollowKeepFresh);
-      // Start a short poll whenever the modal opens — handles same-tab writes
+      // Start a short poll whenever the modal opens - handles same-tab writes
       // that don't trigger the storage event.
       const _origOpenObs = overlay;
       const _modalObserver = new MutationObserver(function () {
@@ -9299,8 +9291,8 @@ console.log('1171')
       addName(p.fullName);
       addName(p.name);
       addName(userData.fullName);
-      if (!nameVariants.length) return true; // No name on profile — accept the upload.
-      if (!songArtistLc) return true; // Song has no artist tag — fall back to uploader.
+      if (!nameVariants.length) return true; // No name on profile - accept the upload.
+      if (!songArtistLc) return true; // Song has no artist tag - fall back to uploader.
       return nameVariants.some(n => n === songArtistLc || songArtistLc.includes(n) || n.includes(songArtistLc));
     }
 
@@ -9345,7 +9337,7 @@ console.log('1171')
       try {
         if (window.firebaseAuth && window.firebaseAuth.currentUser) return true;
       } catch (e) {}
-      // Presence of an identity in localStorage IS the proof of sign-in —
+      // Presence of an identity in localStorage IS the proof of sign-in - 
       // the boolean signedFlag is just a stale-flag tracker that races behind
       // the actual identity writes during Apple redirect resume. Don't gate
       // on it. (Sign-out paths clear the identity keys, so we're still safe.)
@@ -9538,7 +9530,7 @@ console.log('1171')
       try {
         const db = getDb();
         if (!db) {
-          console.warn("[users] Database handle not ready — trying REST");
+          console.warn("[users] Database handle not ready - trying REST");
           if (usersGrid) {
             usersGrid.innerHTML = `<div class="empty-state" style="color: rgba(255,255,255,0.55); padding: 2rem;">
               <p>Loading users…</p>
@@ -10076,7 +10068,7 @@ console.log('1171')
         const k = profileBlockBtn.dataset.targetKey;
         if (!k) return;
         const msg =
-          "Do you want to block this user—and block their posts, songs, and comments—on this device?\n\n" +
+          "Do you want to block this user - and block their posts, songs, and comments - on this device?\n\n" +
           "OK: hide their profile from your Artists list, hide their uploads from your library and discovery, and hide thank-you notes they left while signed in (anonymous-only notes cannot be tied to an account).\n\n" +
           "Cancel: go back without blocking.";
         if (!confirm(msg)) return;
@@ -10359,736 +10351,6 @@ console.log('1171')
 <script src="js/miniplayer.js" defer></script>
 <script src="js/referral-deeplink.js" defer></script>
 
-<!-- ═══════════════════════════════════════════════════════════
-     SPACE BACKGROUND v2 — physically-based planets, stars, comets
-     ═══════════════════════════════════════════════════════════ -->
-<script>
-(function () {
-  'use strict';
-  const CV = document.getElementById('space-canvas');
-  if (!CV) return;
-  const CX = CV.getContext('2d');
-
-  /* ─── state ─── */
-  let W = 0, H = 0, DPR = 1;
-  let scrollY = 0;
-  let time = 0;
-  let nextComet = 5000;
-  const comets = [];
-
-  /* ─── parallax depth per layer (0=far … 3=near) ─── */
-  const PAR = [0.04, 0.12, 0.28, 0.52];
-
-  /* ─── entity pools ─── */
-  const stars = [], nebulae = [], planets = [], rocks = [];
-
-  /* ══════════════════════════════════════════════════
-     BUILD — called on resize
-  ══════════════════════════════════════════════════ */
-  function build() {
-    buildStars();
-    buildNebulae();
-    buildPlanets();
-    buildRocks();
-  }
-
-  /* ─── Stars ─── */
-  function buildStars() {
-    stars.length = 0;
-    const mob = W < 768;
-    const cfg = [
-      { count: mob?180:520, rMin:0.3, rMax:0.9,  opMin:0.18, opMax:0.55, twMin:0.006, twMax:0.018, layer:0, colors:['#ffffff','#fffaf4','#f4f8ff'] },
-      { count: mob? 90:240, rMin:0.6, rMax:1.4,  opMin:0.35, opMax:0.75, twMin:0.012, twMax:0.030, layer:1, colors:['#ffffff','#fff5e0','#e0eeff'] },
-      { count: mob? 40:100, rMin:1.0, rMax:2.0,  opMin:0.55, opMax:0.95, twMin:0.020, twMax:0.045, layer:2, colors:['#ffffff','#ffeedd','#ddf0ff','#ffe8cc'] },
-      { count: mob? 12: 28, rMin:1.8, rMax:3.0,  opMin:0.70, opMax:1.00, twMin:0.025, twMax:0.060, layer:3, colors:['#ffffff','#fffbe6','#ffe0b0','#b0d8ff'] },
-    ];
-    const totalH = H * 2.8;
-    cfg.forEach(c => {
-      for (let i = 0; i < c.count; i++) {
-        const r = c.rMin + Math.random() * (c.rMax - c.rMin);
-        stars.push({
-          x:       Math.random() * W,
-          y:       Math.random() * totalH,
-          r,
-          baseOp:  c.opMin + Math.random() * (c.opMax - c.opMin),
-          twPhase: Math.random() * Math.PI * 2,
-          twSpeed: c.twMin + Math.random() * (c.twMax - c.twMin),
-          layer:   c.layer,
-          col:     c.colors[Math.floor(Math.random() * c.colors.length)],
-          // large "hero" stars get a cross-glow
-          glow:    r > 2.2 && Math.random() > 0.35,
-        });
-      }
-    });
-  }
-
-  /* ─── Nebulae ─── */
-  function buildNebulae() {
-    nebulae.length = 0;
-    /* Very dark, barely-visible wisps */
-    const defs = [
-      { cx:0.78, cy:0.20, rx:W*0.50, ry:H*0.42, r:130, R:100, G:45,  B:230, op:0.032 },
-      { cx:0.12, cy:0.60, rx:W*0.44, ry:H*0.36, r:120, R: 22, G:60,  B:200, op:0.026 },
-      { cx:0.50, cy:0.90, rx:W*0.55, ry:H*0.38, r:130, R:200, G:40,  B:120, op:0.020 },
-      { cx:0.26, cy:0.10, rx:W*0.32, ry:H*0.26, r:110, R: 45, G:140, B:255, op:0.018 },
-    ];
-    defs.forEach(d => nebulae.push({ x: d.cx*W, y: d.cy*H, rx: d.rx, ry: d.ry, r: d.r, R: d.R, G: d.G, B: d.B, op: d.op }));
-  }
-
-  /* ─── Planets ─── */
-  function buildPlanets() {
-    planets.length = 0;
-    const mob = W < 768;
-    planets.push(
-      /* ── Saturn: ringed gas giant (upper-right) ── */
-      { x: W*0.83, y: H*0.25, r: mob?54:100,
-        type: 'saturn', atmColor:[255,168,80], atmAlpha:0.18,
-        driftX:0.010, driftY:0.005, phase:0.0, layer:1 },
-      /* ── Neptune-like ice giant (left) ── */
-      { x: W*0.11, y: H*0.38, r: mob?36:66,
-        type: 'ice',   atmColor:[60,160,255],  atmAlpha:0.20,
-        driftX:0.007, driftY:0.012, phase:1.6, layer:2 },
-      /* ── Mars-like rocky (lower right) ── */
-      { x: W*0.72, y: H*0.74, r: mob?20:33,
-        type: 'rocky', atmColor:[220,90,50],   atmAlpha:0.14,
-        driftX:0.016, driftY:-0.006, phase:3.0, layer:3 },
-      /* ── Alien exotic (small, upper-center) ── */
-      { x: W*0.38, y: H*0.07, r: mob?15:24,
-        type: 'alien', atmColor:[170,60,255],  atmAlpha:0.18,
-        driftX:-0.009, driftY:0.004, phase:0.8, layer:0 },
-    );
-  }
-
-  /* ─── Rocks / Asteroids ─── */
-  /* Build an organic asteroid silhouette using two sine-frequency layers
-     so the outline has large lumps AND small bumps — no straight polygon edges */
-  function mkAsteroidVerts(numV, amp1, amp2, freq1, freq2, ph1, ph2) {
-    const v = [];
-    for (let i = 0; i < numV; i++) {
-      const a = (i / numV) * Math.PI * 2;
-      const r = 1.0
-        + amp1 * Math.sin(a * freq1 + ph1)
-        + amp2 * Math.sin(a * freq2 + ph2)
-        + (Math.random() - 0.5) * 0.04;   // tiny micro-jitter
-      v.push([Math.cos(a) * Math.max(0.35, r), Math.sin(a) * Math.max(0.35, r)]);
-    }
-    return v;
-  }
-
-  function buildRocks() {
-    rocks.length = 0;
-    const mob = W < 768;
-    const count = mob ? 12 : 22;
-    for (let i = 0; i < count; i++) {
-      const size  = 7 + Math.random() * (mob ? 20 : 34);
-      const layer = Math.floor(Math.random() * 4);
-      /* real asteroids: near-black charcoal with a faint warm/cool tint */
-      const hue = Math.random() > 0.5 ? 25 + Math.random() * 20   /* warm rocky */
-                                      : 200 + Math.random() * 40;  /* cool stony */
-      const sat = 4  + Math.random() * 6;
-      const baseLit = 10 + Math.random() * 8;   /* 10-18 % lightness — very dark */
-
-      /* organic silhouette: 18-26 verts, two-frequency bumps */
-      const numV  = 18 + Math.floor(Math.random() * 8);
-      const amp1  = 0.12 + Math.random() * 0.18;   /* large-scale lumps  */
-      const amp2  = 0.04 + Math.random() * 0.08;   /* small-scale bumps  */
-      const freq1 = 2   + Math.floor(Math.random() * 3);
-      const freq2 = 5   + Math.floor(Math.random() * 4);
-      const verts = mkAsteroidVerts(numV, amp1, amp2, freq1, freq2,
-                                    Math.random() * Math.PI * 2,
-                                    Math.random() * Math.PI * 2);
-
-      /* craters — only on larger rocks, placed randomly inside shape */
-      const numCraters = size > 12 ? 2 + Math.floor(Math.random() * 3) : 1;
-      const craters = [];
-      for (let c = 0; c < numCraters; c++) {
-        const ca = Math.random() * Math.PI * 2;
-        const cd = 0.10 + Math.random() * 0.36;
-        const cr = 0.07 + Math.random() * 0.14;
-        craters.push({ ox: Math.cos(ca) * cd, oy: Math.sin(ca) * cd, r: cr });
-      }
-
-      rocks.push({
-        x: Math.random() * W,
-        y: Math.random() * H * 2.5,
-        size, layer, hue, sat, baseLit, verts, craters,
-        angle:    Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.006,
-        driftX:   (Math.random() - 0.5) * 0.13,
-        driftY:   (Math.random() - 0.5) * 0.06,
-      });
-    }
-  }
-
-  /* ══════════════════════════════════════════════════
-     DRAW helpers
-  ══════════════════════════════════════════════════ */
-
-  /* Pitch-black space + barely-visible nebula wisps */
-  function drawBackground() {
-    CX.fillStyle = '#00000a';
-    CX.fillRect(0, 0, W, H);
-    /* Extremely faint nebula clouds */
-    CX.save();
-    CX.globalCompositeOperation = 'screen';
-    for (const n of nebulae) {
-      CX.save();
-      CX.translate(n.x, n.y);
-      CX.scale(n.rx / n.r, n.ry / n.r);
-      const g = CX.createRadialGradient(0, 0, 0, 0, 0, n.r);
-      g.addColorStop(0,   `rgba(${n.R},${n.G},${n.B},${n.op})`);
-      g.addColorStop(0.45,`rgba(${n.R},${n.G},${n.B},${n.op * 0.35})`);
-      g.addColorStop(1,   `rgba(${n.R},${n.G},${n.B},0)`);
-      CX.fillStyle = g;
-      CX.beginPath(); CX.arc(0, 0, n.r, 0, Math.PI * 2); CX.fill();
-      CX.restore();
-    }
-    CX.restore();
-  }
-
-  function drawStars(t) {
-    const totalH = H * 2.8;
-    CX.save();
-    for (const s of stars) {
-      const dy = -(scrollY * PAR[s.layer]);
-      const sy = ((s.y + dy) % totalH + totalH) % totalH;
-      if (sy > H + 6) continue;
-      const tw  = 0.62 + Math.sin(s.twPhase + t * s.twSpeed) * 0.36;
-      const op  = Math.min(1, s.baseOp * tw);
-      CX.globalAlpha = op;
-      CX.fillStyle   = s.col;
-      CX.beginPath(); CX.arc(s.x, sy, s.r, 0, Math.PI * 2); CX.fill();
-      if (s.glow && op > 0.55) {
-        const len = s.r * (3.0 + tw * 1.6);
-        CX.globalAlpha = op * 0.42;
-        CX.strokeStyle = s.col;
-        CX.lineWidth   = s.r * 0.48;
-        CX.lineCap     = 'round';
-        CX.beginPath(); CX.moveTo(s.x-len, sy);       CX.lineTo(s.x+len, sy);       CX.stroke();
-        CX.beginPath(); CX.moveTo(s.x,     sy-len);   CX.lineTo(s.x,     sy+len);   CX.stroke();
-        CX.beginPath(); CX.moveTo(s.x-len*0.58, sy-len*0.58); CX.lineTo(s.x+len*0.58, sy+len*0.58); CX.stroke();
-        CX.beginPath(); CX.moveTo(s.x+len*0.58, sy-len*0.58); CX.lineTo(s.x-len*0.58, sy+len*0.58); CX.stroke();
-      }
-    }
-    CX.globalAlpha = 1;
-    CX.restore();
-  }
-
-  /* ─────────────────────────────────────────────────
-     PLANET RENDERING — physically-based approach
-     Light source: upper-left  lx ≈ -0.55  ly ≈ -0.65
-  ───────────────────────────────────────────────── */
-
-  /* Apply sphere shading over any clipped base texture */
-  function applySphereShading(x, y, r) {
-    /* Shadow pass — large dark radial from shadow side */
-    const shX = x + r * 0.44, shY = y + r * 0.18;
-    const sh = CX.createRadialGradient(shX, shY, 0, shX - r*0.08, shY - r*0.08, r * 1.18);
-    sh.addColorStop(0,    'rgba(0,0,6,0.97)');
-    sh.addColorStop(0.22, 'rgba(0,0,4,0.82)');
-    sh.addColorStop(0.52, 'rgba(0,0,2,0.30)');
-    sh.addColorStop(0.78, 'rgba(0,0,0,0.05)');
-    sh.addColorStop(1,    'rgba(0,0,0,0)');
-    CX.fillStyle = sh; CX.fillRect(x-r, y-r, r*2, r*2);
-
-    /* Specular highlight — small bright glint on lit side */
-    const spX = x - r*0.33, spY = y - r*0.33;
-    const sp = CX.createRadialGradient(spX, spY, 0, spX, spY, r * 0.52);
-    sp.addColorStop(0,   'rgba(255,255,255,0.19)');
-    sp.addColorStop(0.28,'rgba(255,255,255,0.06)');
-    sp.addColorStop(1,   'rgba(255,255,255,0)');
-    CX.fillStyle = sp; CX.fillRect(x-r, y-r, r*2, r*2);
-  }
-
-  /* Gas giant: turbulent animated bands + storm oval */
-  function drawGasGiant(x, y, r, t, cfg) {
-    /* Base warm dark tone */
-    const base = CX.createRadialGradient(x - r*0.2, y - r*0.2, 0, x, y, r);
-    base.addColorStop(0, cfg.baseLight);
-    base.addColorStop(1, cfg.baseDark);
-    CX.fillStyle = base; CX.fillRect(x-r, y-r, r*2, r*2);
-
-    /* Animated turbulent bands */
-    for (const band of cfg.bands) {
-      const cy = y + band.yf * r;
-      const bh = band.hf * r;
-      const ts = t * band.speed + band.off;
-      CX.beginPath();
-      /* top turbulent edge */
-      let first = true;
-      for (let px = x - r; px <= x + r + 2; px += 2) {
-        const ty = cy - bh + Math.sin(px * 0.055 + ts) * r * 0.022
-                           + Math.sin(px * 0.110 - ts * 0.6) * r * 0.011;
-        if (first) { CX.moveTo(px, ty); first = false; } else CX.lineTo(px, ty);
-      }
-      /* bottom turbulent edge (reverse) */
-      for (let px = x + r; px >= x - r - 2; px -= 2) {
-        const ty = cy + bh + Math.sin(px * 0.055 + ts + 1.4) * r * 0.018
-                           + Math.sin(px * 0.095 + ts * 0.5) * r * 0.009;
-        CX.lineTo(px, ty);
-      }
-      CX.closePath();
-      CX.fillStyle = band.col;
-      CX.globalAlpha = band.op || 1;
-      CX.fill();
-    }
-    CX.globalAlpha = 1;
-
-    /* Storm oval (Great Spot) */
-    if (cfg.storm) {
-      const { sx, sy: syo, rw, rh, col } = cfg.storm;
-      CX.save();
-      CX.translate(x + sx * r, y + syo * r);
-      CX.scale(rw * r, rh * r);
-      const sg = CX.createRadialGradient(0, 0, 0, 0, 0, 1);
-      sg.addColorStop(0,   col[0]);
-      sg.addColorStop(0.45, col[1]);
-      sg.addColorStop(0.75, col[2]);
-      sg.addColorStop(1,   'rgba(0,0,0,0)');
-      CX.fillStyle = sg;
-      CX.beginPath(); CX.arc(0, 0, 1, 0, Math.PI*2); CX.fill();
-      CX.restore();
-    }
-  }
-
-  /* Ice giant: deep blue with methane shimmer + faint bands */
-  function drawIceGiant(x, y, r, t) {
-    const base = CX.createRadialGradient(x - r*0.22, y - r*0.22, r*0.05, x + r*0.1, y + r*0.1, r*1.05);
-    base.addColorStop(0,    '#8dd4f8');
-    base.addColorStop(0.18, '#3898e0');
-    base.addColorStop(0.50, '#1858b8');
-    base.addColorStop(0.82, '#0c3880');
-    base.addColorStop(1,    '#061838');
-    CX.fillStyle = base; CX.fillRect(x-r, y-r, r*2, r*2);
-    /* faint cloud bands */
-    const iceBands = [
-      { yf:-0.50, hf:0.08, col:'rgba(160,220,255,0.13)', speed:0.04, off:0.0 },
-      { yf:-0.15, hf:0.06, col:'rgba(100,180,255,0.10)', speed:0.03, off:1.2 },
-      { yf: 0.30, hf:0.07, col:'rgba(140,200,255,0.12)', speed:0.05, off:2.4 },
-    ];
-    for (const b of iceBands) {
-      const cy = y + b.yf * r, bh = b.hf * r, ts = t * b.speed + b.off;
-      CX.beginPath();
-      let f = true;
-      for (let px = x-r; px <= x+r+2; px += 2) {
-        const ty = cy - bh + Math.sin(px*0.05+ts)*r*0.015 + Math.sin(px*0.09-ts*0.7)*r*0.007;
-        if (f) { CX.moveTo(px,ty); f=false; } else CX.lineTo(px,ty);
-      }
-      for (let px = x+r; px >= x-r-2; px -= 2) {
-        CX.lineTo(px, cy + bh + Math.sin(px*0.05+ts+1.2)*r*0.012);
-      }
-      CX.closePath(); CX.fillStyle = b.col; CX.fill();
-    }
-    /* methane edge shimmer */
-    const limb = CX.createRadialGradient(x, y, r*0.78, x, y, r);
-    limb.addColorStop(0, 'rgba(0,0,0,0)');
-    limb.addColorStop(1, 'rgba(60,200,255,0.22)');
-    CX.fillStyle = limb; CX.fillRect(x-r, y-r, r*2, r*2);
-    /* dark storm spot */
-    CX.save();
-    CX.translate(x + r*0.18, y - r*0.22);
-    CX.scale(r*0.14, r*0.09);
-    const dsg = CX.createRadialGradient(0,0,0,0,0,1);
-    dsg.addColorStop(0, 'rgba(5,10,40,0.80)');
-    dsg.addColorStop(0.5,'rgba(10,20,60,0.40)');
-    dsg.addColorStop(1,  'rgba(0,0,0,0)');
-    CX.fillStyle = dsg; CX.beginPath(); CX.arc(0,0,1,0,Math.PI*2); CX.fill();
-    CX.restore();
-  }
-
-  /* Rocky planet: iron oxide surface + polar cap + craters */
-  function drawRocky(x, y, r) {
-    const base = CX.createRadialGradient(x - r*0.25, y - r*0.25, r*0.05, x + r*0.08, y + r*0.06, r);
-    base.addColorStop(0,    '#d86040');
-    base.addColorStop(0.30, '#b84828');
-    base.addColorStop(0.65, '#8c3018');
-    base.addColorStop(1,    '#3e100a');
-    CX.fillStyle = base; CX.fillRect(x-r, y-r, r*2, r*2);
-    /* terrain variation blobs */
-    const patches = [
-      {ox:-0.30, oy: 0.10, pr:0.32, col:'rgba(165,70,35,0.28)'},
-      {ox: 0.15, oy: 0.25, pr:0.26, col:'rgba(100,35,18,0.22)'},
-      {ox:-0.10, oy:-0.30, pr:0.22, col:'rgba(180,88,45,0.20)'},
-    ];
-    for (const p2 of patches) {
-      const pg = CX.createRadialGradient(x+p2.ox*r, y+p2.oy*r, 0, x+p2.ox*r, y+p2.oy*r, p2.pr*r);
-      pg.addColorStop(0, p2.col); pg.addColorStop(1,'rgba(0,0,0,0)');
-      CX.fillStyle = pg; CX.fillRect(x-r, y-r, r*2, r*2);
-    }
-    /* craters */
-    const craters = [
-      {ox:-0.25, oy: 0.20, cr:0.12},
-      {ox: 0.30, oy:-0.05, cr:0.09},
-      {ox:-0.05, oy: 0.38, cr:0.07},
-      {ox: 0.10, oy:-0.32, cr:0.11},
-    ];
-    for (const c of craters) {
-      const cx2 = x + c.ox*r, cy2 = y + c.oy*r, cr = c.cr*r;
-      /* dark floor */
-      const cf = CX.createRadialGradient(cx2, cy2, 0, cx2, cy2, cr);
-      cf.addColorStop(0,'rgba(20,6,4,0.72)'); cf.addColorStop(0.7,'rgba(40,12,8,0.35)'); cf.addColorStop(1,'rgba(0,0,0,0)');
-      CX.fillStyle = cf; CX.beginPath(); CX.arc(cx2, cy2, cr, 0, Math.PI*2); CX.fill();
-      /* rim highlight */
-      CX.strokeStyle = 'rgba(200,120,80,0.22)'; CX.lineWidth = cr * 0.18;
-      CX.beginPath(); CX.arc(cx2 - cr*0.06, cy2 - cr*0.06, cr * 0.92, 0, Math.PI*2); CX.stroke();
-    }
-    /* polar ice cap */
-    const ice = CX.createRadialGradient(x, y - r*0.72, 0, x, y - r*0.72, r*0.42);
-    ice.addColorStop(0,    'rgba(230,240,255,0.90)');
-    ice.addColorStop(0.45, 'rgba(200,220,255,0.45)');
-    ice.addColorStop(1,    'rgba(180,200,240,0)');
-    CX.fillStyle = ice; CX.fillRect(x-r, y-r, r*2, r*2);
-    /* thin atmosphere haze */
-    const atm = CX.createRadialGradient(x, y, r*0.82, x, y, r);
-    atm.addColorStop(0, 'rgba(0,0,0,0)');
-    atm.addColorStop(1, 'rgba(255,140,80,0.14)');
-    CX.fillStyle = atm; CX.fillRect(x-r, y-r, r*2, r*2);
-  }
-
-  /* Exotic alien planet: deep violet with aurora bands */
-  function drawAlien(x, y, r, t) {
-    const base = CX.createRadialGradient(x - r*0.22, y - r*0.22, 0, x + r*0.05, y + r*0.05, r);
-    base.addColorStop(0,    '#b060ff');
-    base.addColorStop(0.35, '#6820c0');
-    base.addColorStop(0.70, '#380880');
-    base.addColorStop(1,    '#100028');
-    CX.fillStyle = base; CX.fillRect(x-r, y-r, r*2, r*2);
-    /* aurora shimmer bands */
-    const aurBands = [
-      {yf:-0.30, hf:0.06, col:'rgba(160,100,255,0.22)', speed:0.06, off:0.0 },
-      {yf: 0.05, hf:0.05, col:'rgba(200,80,255,0.18)',  speed:0.05, off:1.8 },
-      {yf: 0.40, hf:0.05, col:'rgba(120,200,255,0.14)', speed:0.04, off:3.2 },
-    ];
-    for (const b of aurBands) {
-      const cy = y + b.yf * r, bh = b.hf * r, ts = t * b.speed + b.off;
-      CX.beginPath();
-      let f = true;
-      for (let px = x-r; px <= x+r+2; px += 2) {
-        const ty = cy - bh + Math.sin(px*0.07+ts)*r*0.018;
-        if (f) { CX.moveTo(px,ty); f=false; } else CX.lineTo(px,ty);
-      }
-      for (let px = x+r; px >= x-r-2; px -= 2) CX.lineTo(px, cy + bh + Math.sin(px*0.07+ts+1.0)*r*0.014);
-      CX.closePath(); CX.fillStyle = b.col; CX.fill();
-    }
-    /* edge glow */
-    const eg = CX.createRadialGradient(x, y, r*0.80, x, y, r);
-    eg.addColorStop(0,'rgba(0,0,0,0)'); eg.addColorStop(1,'rgba(180,60,255,0.28)');
-    CX.fillStyle = eg; CX.fillRect(x-r, y-r, r*2, r*2);
-  }
-
-  /* Saturn-style multi-layer rings */
-  function drawRingsHalf(x, y, r, tilt, topHalf) {
-    CX.save();
-    CX.translate(x, y);
-    CX.scale(1, tilt);
-    /* ring layers: [inner_frac, outer_frac, R, G, B, opacity] */
-    const layers = [
-      [1.08, 1.24,  190, 160, 100,  0.20],   /* C ring */
-      [1.24, 1.62,  228, 200, 152,  0.72],   /* B ring */
-      [1.62, 1.65,    8,   8,  12,  0.90],   /* Cassini division */
-      [1.65, 1.92,  210, 182, 138,  0.58],   /* A ring */
-      [1.93, 2.02,  170, 148, 108,  0.22],   /* F ring */
-    ];
-    const startA = topHalf ? Math.PI : 0;
-    const endA   = topHalf ? Math.PI * 2 : Math.PI;
-    for (const [ri_f, ro_f, R, G, B, op] of layers) {
-      const ri = r * ri_f, ro = r * ro_f;
-      const rg = CX.createRadialGradient(0, 0, ri, 0, 0, ro);
-      rg.addColorStop(0,    `rgba(${R},${G},${B},0)`);
-      rg.addColorStop(0.12, `rgba(${R},${G},${B},${op * 0.75})`);
-      rg.addColorStop(0.50, `rgba(${R},${G},${B},${op})`);
-      rg.addColorStop(0.88, `rgba(${R},${G},${B},${op * 0.80})`);
-      rg.addColorStop(1,    `rgba(${R},${G},${B},0)`);
-      CX.fillStyle = rg;
-      CX.beginPath();
-      CX.arc(0, 0, ro, startA, endA);
-      CX.arc(0, 0, ri, endA, startA, true);
-      CX.closePath(); CX.fill();
-    }
-    CX.restore();
-  }
-
-  /* Atmosphere glow halo outside planet disk */
-  function drawAtmGlow(x, y, r, R, G, B, alpha) {
-    const g = CX.createRadialGradient(x, y, r * 0.88, x, y, r * 1.75);
-    g.addColorStop(0,   `rgba(${R},${G},${B},${alpha})`);
-    g.addColorStop(0.45,`rgba(${R},${G},${B},${alpha * 0.30})`);
-    g.addColorStop(1,   `rgba(${R},${G},${B},0)`);
-    CX.fillStyle = g;
-    CX.beginPath(); CX.arc(x, y, r * 1.75, 0, Math.PI*2); CX.fill();
-  }
-
-  /* Draw one planet completely */
-  function drawPlanet(p, t) {
-    const { x, y, r, type } = p;
-
-    /* atm glow behind everything */
-    drawAtmGlow(x, y, r, p.atmColor[0], p.atmColor[1], p.atmColor[2], p.atmAlpha);
-
-    /* back rings */
-    if (type === 'saturn') drawRingsHalf(x, y, r, 0.22, false);
-
-    /* sphere */
-    CX.save();
-    CX.beginPath(); CX.arc(x, y, r, 0, Math.PI*2); CX.clip();
-
-    if (type === 'saturn') {
-      drawGasGiant(x, y, r, t, {
-        baseLight: '#e8b060', baseDark: '#3c1808',
-        bands: [
-          {yf:-0.82, hf:0.10, col:'#dda050', op:0.95, speed:0.025, off:0.0},
-          {yf:-0.62, hf:0.08, col:'#c07830', op:0.90, speed:0.030, off:1.1},
-          {yf:-0.46, hf:0.14, col:'#e8aa68', op:0.88, speed:0.022, off:2.2},
-          {yf:-0.28, hf:0.09, col:'#b86820', op:0.92, speed:0.035, off:0.7},
-          {yf:-0.12, hf:0.16, col:'#d49040', op:0.90, speed:0.020, off:3.0},
-          {yf: 0.10, hf:0.08, col:'#c07030', op:0.88, speed:0.028, off:1.5},
-          {yf: 0.25, hf:0.14, col:'#e0a050', op:0.86, speed:0.024, off:2.8},
-          {yf: 0.46, hf:0.10, col:'#b86028', op:0.90, speed:0.032, off:0.3},
-          {yf: 0.64, hf:0.12, col:'#cc8838', op:0.85, speed:0.026, off:1.9},
-          {yf: 0.82, hf:0.10, col:'#a05018', op:0.88, speed:0.030, off:3.5},
-        ],
-        storm: { sx:-0.18, sy:0.12, rw:0.22, rh:0.14,
-          col:['rgba(255,220,160,0.85)','rgba(230,160,80,0.55)','rgba(0,0,0,0)'] },
-      });
-    } else if (type === 'ice') {
-      drawIceGiant(x, y, r, t);
-    } else if (type === 'rocky') {
-      drawRocky(x, y, r);
-    } else if (type === 'alien') {
-      drawAlien(x, y, r, t);
-    }
-
-    applySphereShading(x, y, r);
-    CX.restore();
-
-    /* front rings */
-    if (type === 'saturn') drawRingsHalf(x, y, r, 0.22, true);
-  }
-
-  function drawPlanets(t) {
-    for (const p of planets) {
-      const dy = -(scrollY * PAR[p.layer]);
-      const drift = 18 + p.r * 0.14;
-      const px = p.x + Math.sin(p.phase + t * p.driftX) * drift * 0.55;
-      const py = p.y + dy + Math.cos(p.phase + t * p.driftY) * drift * 0.35;
-      if (py + p.r * 2.5 < 0 || py - p.r * 2.5 > H) continue;
-      drawPlanet({ ...p, x: px, y: py }, t);
-    }
-  }
-
-  /* Draw the asteroid silhouette path using quadratic bezier midpoints
-     so the outline is smooth + organic rather than a sharp polygon */
-  function traceAsteroid(v, size) {
-    CX.beginPath();
-    for (let i = 0; i < v.length; i++) {
-      const cur  = v[i];
-      const next = v[(i + 1) % v.length];
-      const mx   = (cur[0] + next[0]) * 0.5 * size;
-      const my   = (cur[1] + next[1]) * 0.5 * size;
-      if (i === 0) CX.moveTo(mx, my);
-      CX.quadraticCurveTo(cur[0] * size, cur[1] * size, mx, my);
-    }
-    CX.closePath();
-  }
-
-  function drawRocks() {
-    const totalH = H * 2.5;
-    for (const rk of rocks) {
-      rk.angle += rk.rotSpeed;
-      rk.x = ((rk.x + rk.driftX + W)      % W)      ;
-      rk.y = ((rk.y + rk.driftY + totalH)  % totalH) ;
-      const dy = -(scrollY * PAR[rk.layer]);
-      const sy = ((rk.y + dy) % totalH + totalH) % totalH;
-      if (sy > H + rk.size * 2.5 || sy < -rk.size * 2.5) continue;
-
-      const S = rk.size;
-      CX.save();
-      CX.translate(rk.x, sy);
-      CX.rotate(rk.angle);
-
-      /* ── 1. Clip everything to the organic silhouette ── */
-      traceAsteroid(rk.verts, S);
-      CX.save();
-      CX.clip();
-
-      /* ── 2. Flat dark base fill ── */
-      CX.fillStyle = `hsl(${rk.hue},${rk.sat}%,${rk.baseLit}%)`;
-      CX.fillRect(-S * 1.6, -S * 1.6, S * 3.2, S * 3.2);
-
-      /* ── 3. Diffuse lit side — directional light from upper-left ── */
-      const litG = CX.createRadialGradient(
-        -S * 0.38, -S * 0.38, 0,
-         S * 0.05,  S * 0.05, S * 1.45);
-      litG.addColorStop(0,    `hsl(${rk.hue},${rk.sat+4}%,${rk.baseLit + 26}%)`);
-      litG.addColorStop(0.30, `hsl(${rk.hue},${rk.sat+2}%,${rk.baseLit + 14}%)`);
-      litG.addColorStop(0.65, `hsl(${rk.hue},${rk.sat}%,  ${rk.baseLit +  4}%)`);
-      litG.addColorStop(1,    'rgba(0,0,0,0)');
-      CX.fillStyle = litG;
-      CX.fillRect(-S * 1.6, -S * 1.6, S * 3.2, S * 3.2);
-
-      /* ── 4. Shadow — deep darkness on lower-right ── */
-      const shG = CX.createRadialGradient(
-        S * 0.42, S * 0.22, 0,
-        S * 0.12, S * 0.06, S * 1.22);
-      shG.addColorStop(0,    'rgba(0,0,0,0.92)');
-      shG.addColorStop(0.22, 'rgba(0,0,0,0.72)');
-      shG.addColorStop(0.52, 'rgba(0,0,0,0.28)');
-      shG.addColorStop(0.80, 'rgba(0,0,0,0.05)');
-      shG.addColorStop(1,    'rgba(0,0,0,0)');
-      CX.fillStyle = shG;
-      CX.fillRect(-S * 1.6, -S * 1.6, S * 3.2, S * 3.2);
-
-      /* ── 5. Surface colour variation patches ── */
-      for (let p = 0; p < 4; p++) {
-        const px = Math.sin(p * 2.19 + rk.hue * 0.08) * S * 0.38;
-        const py = Math.cos(p * 1.73 + rk.sat * 0.12) * S * 0.32;
-        const pr = (0.14 + p * 0.07) * S;
-        const pG = CX.createRadialGradient(px, py, 0, px, py, pr);
-        const dl = p % 2 === 0 ? -5 : 3;
-        pG.addColorStop(0, `hsla(${rk.hue},${rk.sat}%,${rk.baseLit + dl}%,0.35)`);
-        pG.addColorStop(1, 'rgba(0,0,0,0)');
-        CX.fillStyle = pG;
-        CX.fillRect(-S * 1.6, -S * 1.6, S * 3.2, S * 3.2);
-      }
-
-      /* ── 6. Craters ── */
-      for (const cr of rk.craters) {
-        const dist = Math.sqrt(cr.ox * cr.ox + cr.oy * cr.oy);
-        if (dist + cr.r > 0.82) continue;   /* skip craters near the edge */
-        const cx2 = cr.ox * S, cy2 = cr.oy * S, cr2 = cr.r * S;
-
-        /* dark bowl */
-        const cG = CX.createRadialGradient(cx2, cy2, 0, cx2, cy2, cr2);
-        cG.addColorStop(0,    'rgba(0,0,0,0.80)');
-        cG.addColorStop(0.55, 'rgba(0,0,0,0.40)');
-        cG.addColorStop(0.85, 'rgba(0,0,0,0.10)');
-        cG.addColorStop(1,    'rgba(0,0,0,0)');
-        CX.fillStyle = cG;
-        CX.beginPath(); CX.arc(cx2, cy2, cr2, 0, Math.PI * 2); CX.fill();
-
-        /* lit rim arc (upper-left catches the light) */
-        CX.save();
-        CX.strokeStyle = `hsl(${rk.hue},${rk.sat+4}%,${rk.baseLit + 20}%)`;
-        CX.globalAlpha = 0.38;
-        CX.lineWidth   = cr2 * 0.20;
-        CX.lineCap     = 'round';
-        CX.beginPath();
-        CX.arc(cx2 - cr2 * 0.08, cy2 - cr2 * 0.08,
-               cr2 * 0.84, Math.PI * 1.05, Math.PI * 2.05);
-        CX.stroke();
-        CX.restore();
-      }
-
-      CX.restore(); /* end clip */
-
-      /* ── 7. Thin ambient rim on the shadow edge ── */
-      traceAsteroid(rk.verts, S);
-      CX.strokeStyle = `hsl(${rk.hue},${rk.sat}%,${rk.baseLit + 10}%)`;
-      CX.globalAlpha = 0.18;
-      CX.lineWidth   = S * 0.055;
-      CX.stroke();
-      CX.globalAlpha = 1;
-
-      CX.restore();
-    }
-  }
-
-  function drawComets(t) {
-    /* spawn */
-    if (t > nextComet) {
-      nextComet = t + 5000 + Math.random() * 9000;
-      const fromRight = Math.random() > 0.5;
-      comets.push({
-        x: fromRight ? W + 30 : -30,
-        y: H * (0.05 + Math.random() * 0.55),
-        vx: (fromRight ? -1 : 1) * (2.8 + Math.random() * 4.5),
-        vy: (Math.random() - 0.3) * 1.8,
-        life: 0,
-        maxLife: 70 + Math.random() * 55,
-        len: 130 + Math.random() * 180,
-        col: Math.random() > 0.4 ? '#ffffff' : (Math.random() > 0.5 ? '#fffbe8' : '#c8e8ff'),
-      });
-    }
-    CX.save();
-    for (let i = comets.length - 1; i >= 0; i--) {
-      const c = comets[i];
-      c.x += c.vx; c.y += c.vy; c.life++;
-      const progress = c.life / c.maxLife;
-      const op = progress < 0.15 ? progress / 0.15 : progress > 0.75 ? 1 - (progress - 0.75) / 0.25 : 1;
-      if (c.life >= c.maxLife) { comets.splice(i, 1); continue; }
-
-      const angle = Math.atan2(c.vy, c.vx);
-      CX.save();
-      CX.translate(c.x, c.y);
-      CX.rotate(angle);
-      /* tail gradient */
-      const tg = CX.createLinearGradient(-c.len, 0, 8, 0);
-      tg.addColorStop(0,   `rgba(255,255,255,0)`);
-      tg.addColorStop(0.6, `rgba(200,220,255,${op*0.18})`);
-      tg.addColorStop(0.85,`rgba(255,255,255,${op*0.55})`);
-      tg.addColorStop(1,   `rgba(255,255,255,${op*0.90})`);
-      CX.strokeStyle = tg; CX.lineWidth = 2.2; CX.lineCap = 'round';
-      CX.beginPath(); CX.moveTo(-c.len, 0); CX.lineTo(0, 0); CX.stroke();
-      /* glow head */
-      CX.globalAlpha = op * 0.85;
-      const hg = CX.createRadialGradient(0, 0, 0, 0, 0, 5);
-      hg.addColorStop(0, c.col); hg.addColorStop(0.4, 'rgba(200,220,255,0.6)'); hg.addColorStop(1, 'rgba(0,0,0,0)');
-      CX.fillStyle = hg; CX.beginPath(); CX.arc(0, 0, 5, 0, Math.PI*2); CX.fill();
-      CX.restore();
-    }
-    CX.globalAlpha = 1;
-    CX.restore();
-  }
-
-  /* ══════════════════════════════════════════════════
-     MAIN LOOP
-  ══════════════════════════════════════════════════ */
-  let _lastT = 0;
-  function loop(ts) {
-    requestAnimationFrame(loop);
-    if (document.hidden) return;
-    const dt = Math.min(ts - _lastT, 50); // cap delta (tab backgrounding)
-    _lastT = ts;
-    time += dt * 0.001; // seconds
-
-    scrollY = window.scrollY || 0;
-
-    CX.save();
-    CX.scale(DPR, DPR);
-
-    drawBackground();
-    drawStars(time);
-    drawRocks(time);
-    drawPlanets(time);
-    drawComets(time * 1000);
-
-    CX.restore();
-  }
-
-  /* ══════════════════════════════════════════════════
-     RESIZE
-  ══════════════════════════════════════════════════ */
-  let _resizeTimer;
-  function resize() {
-    DPR = Math.min(window.devicePixelRatio || 1, 2);
-    W   = window.innerWidth;
-    H   = window.innerHeight;
-    CV.width  = Math.round(W * DPR);
-    CV.height = Math.round(H * DPR);
-    CV.style.width  = W + 'px';
-    CV.style.height = H + 'px';
-    build();
-  }
-
-  window.addEventListener('resize', () => {
-    clearTimeout(_resizeTimer);
-    _resizeTimer = setTimeout(resize, 180);
-  });
-
-  resize();
-  requestAnimationFrame(loop);
-})();
-</script>
 
 </body>
 </html>

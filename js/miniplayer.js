@@ -1,6 +1,6 @@
 /* Shared mini-player for Asteroid pages.
    Sticky bottom bar + a queue popup window (black/coral theme).
-   Single audio element — prevents two songs playing at once by
+   Single audio element - prevents two songs playing at once by
    pausing other <audio> elements and swapping window.currentPlaying.
    Exposes window.AsteroidPlayer = { play, enqueue, next, pause, toggle, openQueue, closeQueue, state }.
 */
@@ -80,16 +80,16 @@
           result
             .then(() => console.log('[miniplayer] PLAYLISTS SDK saved:', sid))
             .catch(err => {
-              console.warn('[miniplayer] SDK save failed — REST fallback:', err && (err.code || err.message));
+              console.warn('[miniplayer] SDK save failed - REST fallback:', err && (err.code || err.message));
               restPlaylistPut(uid, sid, payload);
             });
         }
         return;
       }
-      console.warn('[miniplayer] SDK globals missing — REST fallback for PLAYLISTS');
+      console.warn('[miniplayer] SDK globals missing - REST fallback for PLAYLISTS');
       restPlaylistPut(uid, sid, payload);
     } catch (e) {
-      console.warn('[miniplayer] firebaseSaveToPlaylist threw — REST fallback:', e);
+      console.warn('[miniplayer] firebaseSaveToPlaylist threw - REST fallback:', e);
       try {
         const uid2 = currentUserKey();
         if (uid2 && song && song.url) restPlaylistPut(uid2, songIdFromUrl(song.url), { title: song.title || 'Untitled', artist: song.artist || 'Unknown artist', src: song.url, imageUrl: song.imageUrl || '', addedAt: Date.now(), source: 'queue' });
@@ -108,7 +108,7 @@
         const result = rmFn(refFn(db, 'PLAYLISTS/' + uid + '/' + sid));
         if (result && typeof result.then === 'function') {
           result.catch(err => {
-            console.warn('[miniplayer] SDK remove failed — REST fallback:', err);
+            console.warn('[miniplayer] SDK remove failed - REST fallback:', err);
             restPlaylistDelete(uid, sid);
           });
         }
@@ -116,7 +116,7 @@
       }
       restPlaylistDelete(uid, sid);
     } catch (e) {
-      console.warn('[miniplayer] firebaseRemoveFromPlaylist threw — REST fallback:', e);
+      console.warn('[miniplayer] firebaseRemoveFromPlaylist threw - REST fallback:', e);
       try { const uid2 = currentUserKey(); if (uid2 && song && song.url) restPlaylistDelete(uid2, songIdFromUrl(song.url)); } catch (_) {}
     }
   }
@@ -273,9 +273,9 @@
     bar.innerHTML = `
       <div class="amp-progress"><div class="amp-progress-bar"></div></div>
       <div class="amp-row">
-        <div class="amp-art" data-el="art">♪</div>
+        <div class="amp-art" data-el="art"></div>
         <div class="amp-meta">
-          <div class="amp-title" data-el="title">—</div>
+          <div class="amp-title" data-el="title"> - </div>
           <div class="amp-sub" data-el="sub">Nothing playing</div>
         </div>
         <button class="amp-btn" data-act="toggle" aria-label="Play/pause">
@@ -375,7 +375,7 @@
       }
     }
     if (!current) return;
-    const initial = (current.title || '?').toString().trim().charAt(0).toUpperCase() || '♪';
+    const initial = (current.title || '?').toString().trim().charAt(0).toUpperCase() || '';
     if (current.imageUrl) {
       els.art.innerHTML = `<img src="${esc(current.imageUrl)}" alt="">`;
     } else {
@@ -389,7 +389,7 @@
   function renderPopup() {
     if (!popup) return;
     if (current) {
-      const initial = (current.title || '?').toString().trim().charAt(0).toUpperCase() || '♪';
+      const initial = (current.title || '?').toString().trim().charAt(0).toUpperCase() || '';
       const artHtml = current.imageUrl
         ? `<img src="${esc(current.imageUrl)}" alt="">`
         : esc(initial);
@@ -415,7 +415,7 @@
       return;
     }
     els.popupList.innerHTML = queue.map((q, i) => {
-      const initial = (q.title || '?').toString().trim().charAt(0).toUpperCase() || '♪';
+      const initial = (q.title || '?').toString().trim().charAt(0).toUpperCase() || '';
       const artHtml = q.imageUrl ? `<img src="${esc(q.imageUrl)}" alt="">` : esc(initial);
       return `
         <div class="aqp-item">
@@ -488,7 +488,7 @@
         window.recordSongPlay(title);
         return;
       }
-      // Dedup window — same as index.html's recorder
+      // Dedup window - same as index.html's recorder
       const monthArr = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       const ofctime = monthArr[new Date().getMonth()];
       const now = Date.now();
@@ -510,16 +510,16 @@
         console.log('[miniplayer] pushed to songplayed:', title, 'by:', payload.playerKey || payload.playerName || '(anon)');
         if (result && typeof result.then === 'function') {
           result.catch(err => {
-            console.error('[miniplayer] SDK push failed — using REST:', err && (err.code || err.message || err));
+            console.error('[miniplayer] SDK push failed - using REST:', err && (err.code || err.message || err));
             restPushSongplayed(title);
           });
         }
         return;
       }
-      console.warn('[miniplayer] Firebase globals missing — using REST fallback', { db: !!db, refFn: !!refFn, pushFn: !!pushFn });
+      console.warn('[miniplayer] Firebase globals missing - using REST fallback', { db: !!db, refFn: !!refFn, pushFn: !!pushFn });
       restPushSongplayed(title);
     } catch (e) {
-      console.error('[miniplayer] recordPlayToTrending threw — using REST:', e);
+      console.error('[miniplayer] recordPlayToTrending threw - using REST:', e);
       try { const t = (song && song.title || '').toString().trim(); if (t) restPushSongplayed(t); } catch (_) {}
     }
   }
@@ -568,7 +568,7 @@
       playSong(queue.shift());
       return;
     }
-    // No manual queue — ask the host page for the next song (autoplay).
+    // No manual queue - ask the host page for the next song (autoplay).
     if (autoplayProvider && current) {
       try {
         const nx = autoplayProvider(current);

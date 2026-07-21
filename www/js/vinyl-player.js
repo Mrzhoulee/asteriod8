@@ -1,4 +1,4 @@
-// Skeuomorphic vinyl record player — vanilla JS + CSS, no deps.
+// Skeuomorphic vinyl record player - vanilla JS + CSS, no deps.
 // Drop a container into any page, mount with mountVinylPlayer(el, opts),
 // and either pass an HTMLAudioElement (opts.audio) or call setPlaying(bool).
 // Pure CSS for the visuals; Web Animations API for the spin so we can ramp
@@ -187,7 +187,7 @@ const STYLES = `
   border-radius: 0 0 2px 2px;
 }
 
-/* Subtle label glow when playing — implies sound */
+/* Subtle label glow when playing - implies sound */
 .vinyl-player.is-playing .vp-label {
   animation: vp-label-glow 2.4s ease-in-out infinite alternate;
 }

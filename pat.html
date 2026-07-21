@@ -178,7 +178,7 @@
     .song-delete:hover { color: #f87171; background: rgba(248,113,113,0.1); }
     .song-delete .material-symbols-outlined { font-size: 20px; }
 
-    /* Audio element (hidden — we use global player if available, else this) */
+    /* Audio element (hidden - we use global player if available, else this) */
     audio.song-audio { display: none; }
 
     /* ── Bottom nav ── */
@@ -287,7 +287,7 @@
         .then(function (remote) {
           if (!remote || typeof remote !== 'object') {
             console.log('[pat] Firebase playlist empty for', uid);
-            render(); // clears any "Loading…" placeholder → correct empty state
+            render(); // clears any "Loading…" placeholder  correct empty state
             return;
           }
           var local = getPlaylist();
@@ -310,12 +310,12 @@
           var merged = Object.keys(bySrc).map(function (k) { return bySrc[k]; });
           var pk = playlistStorageKey();
           try { localStorage.setItem(pk, JSON.stringify(merged)); } catch (e) {}
-          console.log('[pat] Firebase sync: pulled', Object.keys(remote).length, '— added', added, 'new');
+          console.log('[pat] Firebase sync: pulled', Object.keys(remote).length, ' - added', added, 'new');
           render();
         })
         .catch(function (err) {
           console.warn('[pat] Firebase sync failed:', err && (err.message || err));
-          // One retry — iOS WebViews occasionally drop the first request on cold start.
+          // One retry - iOS WebViews occasionally drop the first request on cold start.
           if (attempt < 1) {
             return new Promise(function (res) { setTimeout(res, 1200); })
               .then(function () { return syncPlaylistFromFirebase(attempt + 1); });
@@ -448,7 +448,7 @@
       if (local.length) {
         render();
       } else {
-        // Nothing cached locally yet — show a loading state while we pull this
+        // Nothing cached locally yet - show a loading state while we pull this
         // account's playlist from Firebase (e.g. fresh install / new device).
         var container = document.getElementById('playlist');
         if (container) {

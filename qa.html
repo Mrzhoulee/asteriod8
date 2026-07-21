@@ -181,7 +181,7 @@
 
   if (_notifGranted && _fcmToken) {
     notifCheck.checked = true;
-    notifStatus.textContent = '✓ Notifications are on';
+    notifStatus.textContent = ' Notifications are on';
   } else if (Notification && Notification.permission === 'denied') {
     notifCheck.disabled = true;
     document.getElementById('notifRow').style.opacity = '0.4';
@@ -221,13 +221,13 @@
     try {
       const token = (await getCapacitorToken()) || (await getWebPushToken());
       if (!token) {
-        notifStatus.textContent = 'Permission denied — you won\'t be notified.';
+        notifStatus.textContent = 'Permission denied - you won\'t be notified.';
         notifCheck.checked = false;
         return null;
       }
       _fcmToken = token;
       localStorage.setItem('_fcmToken', token);
-      notifStatus.textContent = '✓ You\'ll be notified when answered.';
+      notifStatus.textContent = ' You\'ll be notified when answered.';
       return token;
     } catch (e) {
       console.warn('[qa] token error', e);
@@ -267,16 +267,16 @@
       platform: (window.Capacitor ? 'ios' : 'web'),
     };
 
-    // Write via SDK, but don't hang on a stalled iOS websocket — fall back to REST PUT.
+    // Write via SDK, but don't hang on a stalled iOS websocket - fall back to REST PUT.
     const ok = await writeQuestion(key, payload);
 
     if (ok) {
       document.getElementById('questionText').value = '';
-      submitBtn.textContent = 'Question sent! ✓';
+      submitBtn.textContent = 'Question sent! ';
       // Refresh the list over REST so the new question shows even if onValue is dead.
       fetchQAListViaRest();
     } else {
-      submitBtn.textContent = 'Could not send — try again';
+      submitBtn.textContent = 'Could not send - try again';
     }
     submitBtn.disabled = false;
     setTimeout(() => { submitBtn.textContent = 'Submit question'; }, 3000);
@@ -321,7 +321,7 @@
     if (!listEl) return;
     items = (items || []).filter(q => q && q.question);
     if (!items.length) {
-      listEl.innerHTML = '<div class="qa-empty">No questions yet — be the first to ask!</div>';
+      listEl.innerHTML = '<div class="qa-empty">No questions yet - be the first to ask!</div>';
       return;
     }
     items.sort((a, b) => (b.ts || 0) - (a.ts || 0)); // newest first
@@ -342,7 +342,7 @@
     if (!obj || typeof obj !== 'object') return [];
     return Object.keys(obj).map(k => ({ id: k, ...obj[k] }));
   }
-  // REST pull — reliable on the iOS WebView, and used to refresh after a submit.
+  // REST pull - reliable on the iOS WebView, and used to refresh after a submit.
   function fetchQAListViaRest() {
     if (!artistKey) return;
     fetch(REST_BASE + '/ARTIST_QA/' + encodeURIComponent(artistKey) + '.json', { cache: 'no-store' })

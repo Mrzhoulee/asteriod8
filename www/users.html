@@ -302,7 +302,7 @@
         <p class="user-follow-hint" id="modalFollowHint">Their posts will show up under “From artists you follow” on your home page.</p>
       </div>
       <a id="modalQALink" href="#" style="display:none;margin-top:12px;padding:11px;text-align:center;background:rgba(255,122,89,0.1);border:1px solid rgba(255,122,89,0.25);border-radius:12px;color:#ff7a59;font-weight:700;font-size:13px;text-decoration:none;font-family:Montserrat,sans-serif;">
-        <span style="vertical-align:middle;margin-right:6px;">💬</span> Ask a question
+        <span style="vertical-align:middle;margin-right:6px;"></span> Ask a question
       </a>
       <div class="user-songs" id="modalStoriesSection" style="display:none;">
         <div class="user-songs-title">Stories</div>
@@ -352,7 +352,7 @@
     window.firebaseAuth = auth;
 
     const RTDB_BASE_USERS = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
-    // REST GET wrapper — bypasses the SDK WebSocket so a stalled realtime
+    // REST GET wrapper - bypasses the SDK WebSocket so a stalled realtime
     // connection can't leave reads hanging forever. Returns parsed JSON or null.
     function restGet(path) {
       const url = RTDB_BASE_USERS + '/' + String(path || '').replace(/^\//, '') + '.json';
@@ -513,7 +513,7 @@
         }
         // Build the set of names the profile actually identifies as. A song's
         // song.artist must match one of these, otherwise the uploader email
-        // alone is NOT enough — uploaders sometimes upload tracks on behalf of
+        // alone is NOT enough - uploaders sometimes upload tracks on behalf of
         // someone else (e.g., admin uploading SwainWaves tracks under their
         // own email). Without this guard those tracks wrongly land on the
         // uploader's profile.
@@ -543,7 +543,7 @@
               if (!uploaderMatches) continue;
               // Second filter: song.artist must match one of the profile's display names.
               // Skip this filter only when the profile has no name variants at all
-              // (extremely rare — empty profile). Keys/folder names like artistKeyInner
+              // (extremely rare - empty profile). Keys/folder names like artistKeyInner
               // also count as a match (some legacy tracks store the artist there).
               const songArtistLc = String(s.artist || '').trim().toLowerCase();
               const folderArtistLc = String(artistKeyInner || '').replace(/_/g, ' ').trim().toLowerCase();
@@ -811,7 +811,7 @@
     let _renderedFromCache = false;
     let _restRendered = false;
 
-    // REST first — bypasses the WebSocket entirely, so a flaky/slow
+    // REST first - bypasses the WebSocket entirely, so a flaky/slow
     // realtime connection can't leave the page hanging on a blank screen.
     function loadUsersViaREST() {
       const url = 'https://asteroid-cdc13-default-rtdb.firebaseio.com/PROFILES.json';
@@ -836,7 +836,7 @@
       _renderedFromCache = false;
       _restRendered = false;
 
-      // Kick off REST immediately — usually completes in 1-2s and unblocks the UI.
+      // Kick off REST immediately - usually completes in 1-2s and unblocks the UI.
       loadUsersViaREST().catch(err => {
         console.warn('[users] REST load failed:', err && (err.message || err));
         // Only show the error wall if the SDK also hasn't rendered yet.
@@ -846,7 +846,7 @@
       });
 
       // SDK onValue runs in parallel for live updates (new sign-ups, profile edits).
-      // No timeout-driven error wall here anymore — REST already covers initial paint.
+      // No timeout-driven error wall here anymore - REST already covers initial paint.
       try {
         onValue(ref(db, 'PROFILES'), (snap) => {
           if (!snap.exists()) {
