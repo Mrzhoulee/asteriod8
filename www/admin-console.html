@@ -281,7 +281,7 @@ hr.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; 
 <script type="module">
 import { initializeApp, getApps, getApp }
   from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+import { getAuth, signInAnonymously, onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { getDatabase, ref, get, set, remove, update, query, limitToFirst, orderByKey }
   from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
@@ -315,36 +315,24 @@ let fsCurCol = null;
 let _pendingUname = null;
 
 // ─── Auth ────────────────────────────────────────────────────
-// Admin account email — not sensitive (just a Firebase Auth identifier).
-// Credentials (username + password) are stored only in Firebase Auth.
-const _ACCT = 'console.admin@asteroid8.net';
+// Client-side gate: the password is strong and only its SHA-256 hash ships in
+// source (never the plaintext). After the gate we sign in anonymously
+// (best-effort) so auth-gated writes (SONGS, Firestore) keep working.
+const _ADMIN_HASH = 'a9dcf718db82cb18f4612ed70683b0bf29022fadbf219b3def471e8425d68e76';
+async function _sha256Hex(s) {
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(s)));
+  return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
+}
 
-onAuthStateChanged(auth, async user => {
-  me = user;
-  if (user) {
-    // On a fresh login verify the entered username matches the stored displayName.
-    if (_pendingUname !== null) {
-      if (user.displayName !== _pendingUname) {
-        _pendingUname = null;
-        await signOut(auth);
-        const err = document.getElementById('lErr');
-        if (err) err.textContent = 'Invalid credentials.';
-        const btn = document.getElementById('lBtn');
-        if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
-        return;
-      }
-      _pendingUname = null;
-    }
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminApp').style.display = 'block';
-    const sbUser = document.getElementById('sbUser');
-    if (sbUser) sbUser.textContent = user.displayName || user.email;
-    go('dashboard');
-  } else {
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('adminApp').style.display = 'none';
-  }
-});
+onAuthStateChanged(auth, u => { me = u; });
+
+function _showConsole() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'block';
+  const sbUser = document.getElementById('sbUser');
+  if (sbUser) sbUser.textContent = 'admin';
+  go('dashboard');
+}
 
 window.doLogin = async () => {
   const uname = document.getElementById('lUname').value.trim();
@@ -354,20 +342,27 @@ window.doLogin = async () => {
   err.textContent = '';
   if (!uname || !pw) { err.textContent = 'Enter username and password.'; return; }
   btn.disabled = true; btn.textContent = 'Signing in…';
-  _pendingUname = uname;
-  try {
-    await signInWithEmailAndPassword(auth, _ACCT, pw);
-  } catch(e) {
-    _pendingUname = null;
-    err.textContent = 'Invalid credentials.';
-    btn.disabled = false; btn.textContent = 'Sign In';
-  }
+  const ok = (await _sha256Hex(uname + ':' + pw)) === _ADMIN_HASH;
+  if (!ok) { err.textContent = 'Invalid credentials.'; btn.disabled = false; btn.textContent = 'Sign In'; return; }
+  try { sessionStorage.setItem('_consoleAuthed', '1'); } catch(_) {}
+  try { await signInAnonymously(auth); } catch(_) {}   // best-effort; ignore if disabled
+  _showConsole();
 };
 
-window.doSignOut = () => signOut(auth);
+window.doSignOut = () => {
+  try { sessionStorage.removeItem('_consoleAuthed'); } catch(_) {}
+  try { signOut(auth); } catch(_) {}
+  location.reload();
+};
 
 document.getElementById('lUname').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('lPw').focus(); });
 document.getElementById('lPw').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+
+// Restore the session within this tab.
+if (sessionStorage.getItem('_consoleAuthed') === '1') {
+  try { signInAnonymously(auth).catch(() => {}); } catch(_) {}
+  _showConsole();
+}
 
 // ─── Nav ─────────────────────────────────────────────────────
 window.go = function(section, params={}) {
@@ -899,23 +894,38 @@ async function renderFR() {
     const data = snap.val()||{};
     const entries = Object.entries(data).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
     if (!entries.length) { document.getElementById('frWrap').innerHTML='<div class="empty">No feature requests</div>'; return; }
-    const rows = entries.map(([k,v]) => `<tr>
+    const _stColor = { accepted: '#3ddc84', rejected: '#f87171', pending: '#f5a623' };
+    const rows = entries.map(([k,v]) => {
+      const st = v.status || 'pending';
+      const c = _stColor[st] || '#9aa0a6';
+      return `<tr>
       <td style="max-width:220px;white-space:normal">${escH((v.title||'—').slice(0,80))}</td>
       <td>${escH(v.category||'—')}</td>
       <td>${escH(v.authorName||'—')}</td>
       <td style="max-width:200px;white-space:normal;font-size:12px;color:var(--muted)">${escH((v.description||'').slice(0,80))}${(v.description||'').length>80?'…':''}</td>
+      <td><span style="display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;text-transform:capitalize;color:${c};background:${c}1f;border:1px solid ${c}55">${escH(st)}</span></td>
       <td class="mono">${fmtTs(v.createdAt)}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-xs btn-ghost" onclick="goDb('FEATURE_REQUESTS/${safePath(k)}')">Edit</button>
+        <button class="btn btn-xs" style="color:#3ddc84" onclick="setFRStatus('${safePath(k)}','accepted')">Accept</button>
+        <button class="btn btn-xs" style="color:#f87171" onclick="setFRStatus('${safePath(k)}','rejected')">Reject</button>
+        <button class="btn btn-xs btn-ghost" onclick="setFRStatus('${safePath(k)}','pending')">Pending</button>
         <button class="btn btn-xs btn-red" onclick="delDb('FEATURE_REQUESTS/${safePath(k)}')">Del</button>
       </td>
-    </tr>`).join('');
+    </tr>`; }).join('');
     document.getElementById('frWrap').innerHTML = `<div class="table-wrap"><table>
-      <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Description</th><th>Date</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Description</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>`;
   } catch(e) { document.getElementById('frWrap').innerHTML=`<div class="err-msg">${escH(e.message)}</div>`; }
 }
+
+window.setFRStatus = async function(k, status) {
+  try {
+    await update(ref(rtdb,`FEATURE_REQUESTS/${k}`), { status, reviewedAt: Date.now() });
+    toast(`Request ${status} ✓`, 'success');
+    renderFR();
+  } catch(e) { toast('Error: '+e.message, 'error'); }
+};
 
 // ══════════════════════════════════════════════════════════════
 // SUBASTROIDS

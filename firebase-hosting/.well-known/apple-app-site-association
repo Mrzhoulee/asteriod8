@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "ZAPY8N6Y2F.com.asteroid.asteroidinc8",
+        "paths": ["/r/*", "/t/*", "/u/*"]
+      }
+    ]
+  }
+}

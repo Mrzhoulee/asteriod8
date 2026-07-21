@@ -6,5 +6,11 @@
 	<array>
 		<string>Default</string>
 	</array>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:asteroid-cdc13.firebaseapp.com</string>
+		<string>applinks:www.asteroid8.net</string>
+		<string>applinks:asteroid8.net</string>
+	</array>
 </dict>
 </plist>

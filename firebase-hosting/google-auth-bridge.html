@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Sign-In — Asteroid</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0a0a0a;
+      color: #fff;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .box { text-align: center; padding: 24px; max-width: 320px; }
+    .spinner {
+      width: 36px; height: 36px; margin: 0 auto 16px;
+      border: 3px solid rgba(255,127,80,0.25);
+      border-top-color: #ff7f50;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    p { margin: 0; font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="spinner" aria-hidden="true"></div>
+    <p id="status">Connecting to Google…</p>
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import {
+      getAuth,
+      getRedirectResult,
+      signInWithRedirect,
+      GoogleAuthProvider,
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+      authDomain: "asteroid-cdc13.firebaseapp.com",
+      databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+      projectId: "asteroid-cdc13",
+      storageBucket: "asteroid-cdc13.appspot.com",
+      messagingSenderId: "793353824502",
+      appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+      measurementId: "G-GV72TMNNGR",
+    };
+
+    const params = new URLSearchParams(location.search);
+    const returnScheme = params.get("return") || "asteroid://google-auth";
+    const statusEl = document.getElementById("status");
+
+    function goBack(extra) {
+      const q = new URLSearchParams(extra || {});
+      const sep = returnScheme.includes("?") ? "&" : "?";
+      location.replace(returnScheme + sep + q.toString());
+    }
+
+    function fail(msg, code) {
+      if (statusEl) statusEl.textContent = msg || "Sign-in failed.";
+      goBack({ error: code || "google-auth-failed" });
+    }
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    provider.addScope("email");
+    provider.addScope("profile");
+
+    try {
+      const result = await getRedirectResult(auth);
+      if (result && result.user) {
+        const cred = GoogleAuthProvider.credentialFromResult(result);
+        const idToken = cred && cred.idToken ? cred.idToken : "";
+        const accessToken = cred && cred.accessToken ? cred.accessToken : "";
+        if (!idToken) {
+          fail("Missing Google token.", "missing-id-token");
+        } else {
+          if (statusEl) statusEl.textContent = "Returning to Asteroid…";
+          goBack({
+            ok: "1",
+            idToken,
+            accessToken: accessToken || "",
+            email: result.user.email || "",
+            uid: result.user.uid || "",
+          });
+        }
+      } else {
+        if (statusEl) statusEl.textContent = "Opening Google sign-in…";
+        await signInWithRedirect(auth, provider);
+      }
+    } catch (e) {
+      console.error("[google-auth-bridge]", e);
+      fail((e && e.message) || "Google sign-in failed.", (e && e.code) || "google-auth-error");
+    }
+  </script>
+</body>
+</html>
