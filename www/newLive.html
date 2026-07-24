@@ -111,15 +111,14 @@
       .go-live-btn {
         width: 100%;
         display: flex; align-items: center; justify-content: center; gap: 9px;
-        background: linear-gradient(90deg, #ff3b3b, #ff7a3b);
-        color: #fff; padding: 16px 20px; border-radius: 16px; border: none;
+        background: #ff7f50;
+        color: #fff; padding: 16px 20px; border-radius: 14px; border: none;
         font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 16px;
         cursor: pointer; letter-spacing: 0.2px;
-        box-shadow: 0 10px 26px rgba(255,80,60,0.35);
-        transition: transform 0.12s, box-shadow 0.15s, opacity 0.15s;
+        transition: filter 0.15s, opacity 0.15s;
       }
-      .go-live-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(255,80,60,0.45); }
-      .go-live-btn:active { transform: scale(0.99); }
+      .go-live-btn:hover { filter: brightness(1.08); }
+      .go-live-btn:active { filter: brightness(0.95); }
       .go-live-btn .material-symbols-outlined { font-size: 22px; }
 
       .concert-live-btn {
@@ -159,7 +158,6 @@
   <div class="wrap">
 
     <div class="live-hero">
-      <span class="live-badge"><span class="dot"></span> Go Live</span>
       <h1>Start your live concert</h1>
       <p>Stream from YouTube Live, collect donations, and chat with fans in real time.</p>
     </div>

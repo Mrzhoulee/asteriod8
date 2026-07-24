@@ -3699,8 +3699,6 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
 <center>
   
 <br>
-        <h2 class="section-title">Songs that You Don’t Want to Miss</h2>
-
 	<h3>Songs might take a few moments to load before playing since there is a problem with the configuration</h3>
 
 <div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
@@ -4291,16 +4289,28 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
       </section>
 
       <style>
-        .t50-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:8px 0 14px; flex-wrap:wrap; }
-        .t50-title { font-family:'Montserrat',sans-serif; font-size:20px; font-weight:800; color:#fff; letter-spacing:-0.02em; }
-        .t50-sub { font-size:12.5px; color:rgba(255,255,255,0.55); margin-top:3px; }
-        .t50-refresh { display:inline-flex; align-items:center; gap:6px; background:#15161a; border:1px solid rgba(255,255,255,0.1); color:#ff7f50; font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; padding:9px 16px; border-radius:10px; cursor:pointer; transition:border-color .15s, background .15s; }
+        #ab { max-width:640px; margin:28px auto 90px; padding:0 16px; text-align:left; }
+        .t50-header { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin:0 0 16px; }
+        .t50-title { font-family:'Montserrat',sans-serif; font-size:20px; font-weight:800; color:#fff; letter-spacing:-0.02em; line-height:1.2; }
+        .t50-sub { font-size:12.5px; color:rgba(255,255,255,0.55); margin-top:4px; }
+        .t50-refresh { display:inline-flex; align-items:center; gap:6px; flex-shrink:0; background:#15161a; border:1px solid rgba(255,255,255,0.12); color:#ff7f50; font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; padding:9px 15px; border-radius:10px; cursor:pointer; transition:border-color .15s,background .15s; }
         .t50-refresh:hover { border-color:rgba(255,127,80,0.5); background:#191b20; }
-        .t50-list { display:flex; flex-direction:column; gap:2px; }
-        .t50-play-btn { background:none; border:none; color:#ff7f50; font-size:16px; cursor:pointer; padding:6px 10px; border-radius:8px; line-height:1; }
-        .t50-play-btn:hover { background:rgba(255,127,80,0.12); }
+        .t50-refresh .material-symbols-outlined { font-size:18px; }
+        .t50-list { background:#15161a; border:1px solid rgba(255,255,255,0.07); border-radius:14px; overflow:hidden; }
+        .t50-row { display:flex; align-items:center; gap:12px; padding:10px 14px; text-align:left; }
+        .t50-row + .t50-row { border-top:1px solid rgba(255,255,255,0.06); }
+        .t50-row:hover { background:rgba(255,255,255,0.035); }
+        .t50-rank { width:22px; text-align:center; font-size:13px; font-weight:700; color:rgba(255,255,255,0.4); flex-shrink:0; }
+        .t50-info { flex:1 1 auto; min-width:0; }
+        .t50-name { font-size:14px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:6px; }
+        .t50-artist { font-size:12px; color:rgba(255,255,255,0.5); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+        .t50-actions { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+        .t50-play { width:36px; height:36px; border-radius:50%; border:none; background:#ff7f50; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:filter .15s,transform .1s; }
+        .t50-play:hover { filter:brightness(1.08); }
+        .t50-play:active { transform:scale(0.94); }
+        .t50-play svg { width:15px; height:15px; margin-left:1px; }
       </style>
-      <div id="ab" style="margin-bottom: 100px;"></div>
+      <div id="ab"></div>
 
       <section id="becauseYouLikedSection" class="because-you-liked" aria-live="polite">
         <h2 class="because-head">Because you liked <span id="becauseYouLikedSeed"></span></h2>
@@ -5086,7 +5096,7 @@ function applySongSearch() {
     const textMatch = queryWords.every((word) =>
       title.includes(word) || artist.includes(word) || album.includes(word)
     );
-    song.style.display = textMatch ? "block" : "none";
+    song.style.display = textMatch ? "" : "none";
   });
 
   document.querySelectorAll("#ab .album-card").forEach((albumCard) => {
@@ -5725,14 +5735,14 @@ function renderSongsFromData(songsData) {
       reportArtist: esc(s.artist),
       reportUploader: up,
     });
-    return `<div class="sssh song-row" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="${al.toLowerCase()}" data-src="${url}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}"${explicitDataAttr(s)}>
-      <div class="song-row-num">${idx + 1}</div>
-      <div class="song-row-info" onclick="playT50(${idx})" style="cursor:pointer">
-        <div class="song-row-title-row">${explicitBadge(s)}<span class="song-row-title">${t}</span></div>
-        <span class="song-row-artist">${a}</span>
+    return `<div class="sssh t50-row" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="${al.toLowerCase()}" data-src="${url}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}"${explicitDataAttr(s)}>
+      <div class="t50-rank">${idx + 1}</div>
+      <div class="t50-info" onclick="playT50(${idx})" style="cursor:pointer">
+        <div class="t50-name">${explicitBadge(s)}<span>${t}</span></div>
+        <div class="t50-artist">${a}</div>
       </div>
-      <div class="song-row-actions">
-        <button type="button" class="t50-play-btn" onclick="playT50(${idx})" aria-label="Play">&#9654;</button>
+      <div class="t50-actions">
+        <button type="button" class="t50-play" onclick="playT50(${idx})" aria-label="Play ${t}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
         ${overflow}
       </div>
     </div>`;
@@ -5743,7 +5753,7 @@ function renderSongsFromData(songsData) {
         <div class="t50-title">Top 50 Recommended for you today</div>
         <div class="t50-sub">Fresh picks — shown equally to every listener</div>
       </div>
-      <button type="button" class="t50-refresh" onclick="refreshTop50()"><span class="material-symbols-outlined" style="font-size:18px;vertical-align:-4px">refresh</span> Refresh</button>
+      <button type="button" class="t50-refresh" onclick="refreshTop50()"><span class="material-symbols-outlined">refresh</span> Refresh</button>
     </div>
     <div class="t50-list">${rows}</div>`;
 }

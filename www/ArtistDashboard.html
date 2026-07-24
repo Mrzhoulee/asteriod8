@@ -51,7 +51,7 @@
 
         .dashboard-header h1 {
             font-size: 2rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: var(--primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -324,7 +324,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: var(--primary);
             color: white;
         }
 
@@ -370,7 +370,7 @@
             height: 120px;
             border-radius: 50%;
             margin: 0 auto 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -492,7 +492,7 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: var(--primary);
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
@@ -808,7 +808,7 @@
         .qa-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
         .qa-header-left { display:flex; align-items:center; gap:10px; }
         .qa-header-title { font-size:20px; font-weight:800; color:var(--text-primary); letter-spacing:-0.3px; }
-        .qa-new-badge { background:linear-gradient(135deg,#ff7a59,#ff4e2a); color:#fff; font-size:10px; font-weight:800; padding:3px 9px; border-radius:20px; letter-spacing:0.04em; text-transform:uppercase; }
+        .qa-new-badge { background:#ff7f50; color:#fff; font-size:10px; font-weight:800; padding:3px 9px; border-radius:20px; letter-spacing:0.04em; text-transform:uppercase; }
         .qa-share-btn { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--primary); background:rgba(255,127,80,0.1); border:1px solid rgba(255,127,80,0.25); border-radius:20px; padding:7px 14px; text-decoration:none; transition:background 0.18s, border-color 0.18s; }
         .qa-share-btn:hover { background:rgba(255,127,80,0.18); border-color:rgba(255,127,80,0.5); }
 
@@ -831,7 +831,7 @@
         .qa-answer-input { background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.1); border-radius:12px; color:var(--text-primary); font-family:inherit; font-size:13px; padding:12px 14px; resize:none; min-height:72px; outline:none; transition:border-color 0.18s; width:100%; box-sizing:border-box; }
         .qa-answer-input:focus { border-color:var(--primary); background:rgba(255,127,80,0.04); }
         .qa-answer-footer { display:flex; align-items:center; justify-content:flex-end; }
-        .qa-answer-submit { padding:10px 22px; background:linear-gradient(135deg,#ff7a59,#ff4e2a); color:#fff; border:none; border-radius:12px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.18s, transform 0.15s; letter-spacing:0.02em; }
+        .qa-answer-submit { padding:10px 22px; background:#ff7f50; color:#fff; border:none; border-radius:12px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.18s, transform 0.15s; letter-spacing:0.02em; }
         .qa-answer-submit:hover { opacity:0.9; transform:translateY(-1px); }
         .qa-answer-submit:active { transform:translateY(0); }
         .qa-answer-submit:disabled { opacity:0.45; cursor:not-allowed; transform:none; }
@@ -1424,9 +1424,9 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     <div class="qa-header-title">Fan Q&amp;A</div>
                     <span id="qaTabBadge" class="qa-new-badge" style="display:none;"></span>
                 </div>
-                <a id="qaTabShareLink" href="qa.html" target="_blank" class="qa-share-btn">
+                <button type="button" id="qaTabShareLink" class="qa-share-btn" onclick="shareQaLink(this)">
                     <i class="fas fa-share-alt"></i> Share your Q&amp;A page
-                </a>
+                </button>
             </div>
             <div id="qaTabList" style="display:flex;flex-direction:column;gap:14px;">
                 <p style="color:rgba(255,255,255,0.3);font-size:13px;padding:8px 0;">Loading questions…</p>
@@ -1765,6 +1765,8 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                 // Oldest-first: feature the FIRST song the artist uploaded.
                 matches.sort((a, b) => (Number(a.s.createdAt) || 0) - (Number(b.s.createdAt) || 0));
                 const top = matches[0];
+                // Featured songs expire after 30 days — don't auto-pin an older upload.
+                if (!top.s.createdAt || (Date.now() - Number(top.s.createdAt)) > 30 * 24 * 60 * 60 * 1000) return;
                 await set(ref(database, 'FEATURED_ARTIST_SONG/' + emailKey), {
                     title: top.s.title || '',
                     album: top.s.album || '',
@@ -1856,7 +1858,15 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             const listEl = document.getElementById('qaTabList');
             const badge = document.getElementById('qaTabBadge');
             const shareLink = document.getElementById('qaTabShareLink');
-            if (shareLink) shareLink.href = 'qa.html?artist=' + encodeURIComponent(artistKey);
+            if (shareLink) shareLink.dataset.qaUrl = 'https://www.asteroid8.net/qa.html?artist=' + encodeURIComponent(artistKey);
+            window.shareQaLink = function (btn) {
+              const url = (btn && btn.dataset && btn.dataset.qaUrl) || 'https://www.asteroid8.net/qa.html';
+              const orig = btn.innerHTML;
+              const flash = (m) => { btn.innerHTML = m; setTimeout(() => { btn.innerHTML = orig; }, 1600); };
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => flash('<i class="fas fa-check"></i> Link copied!'), () => window.prompt('Copy your Q&A link:', url));
+              } else { window.prompt('Copy your Q&A link:', url); }
+            };
 
             function timeAgo(ts) {
                 const d = Math.floor((Date.now() - ts) / 1000);
