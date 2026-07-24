@@ -252,6 +252,7 @@ hr.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; 
       <div class="nav-item" data-s="fs-songs"><span class="ni">🎼</span> Songs (FS)</div>
       <div class="nav-item" data-s="fs-featurequeue"><span class="ni">📋</span> Feature Queue</div>
       <div class="nav-item" data-s="fs-founding"><span class="ni">⭐</span> Founding Supporters</div>
+      <div class="nav-item" data-s="auth-users"><span class="ni">🔑</span> Auth Users</div>
 
       <div class="sb-bottom">
         <div style="font-size:11px;color:var(--faint);padding:0 8px 8px" id="sbUser"></div>
@@ -281,7 +282,7 @@ hr.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; 
 <script type="module">
 import { initializeApp, getApps, getApp }
   from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged, signOut }
+import { getAuth, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { getDatabase, ref, get, set, remove, update, query, limitToFirst, orderByKey }
   from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
@@ -319,6 +320,8 @@ let _pendingUname = null;
 // source (never the plaintext). After the gate we sign in anonymously
 // (best-effort) so auth-gated writes (SONGS, Firestore) keep working.
 const _ADMIN_HASH = 'a9dcf718db82cb18f4612ed70683b0bf29022fadbf219b3def471e8425d68e76';
+const _ADMIN_EMAIL = 'console.admin@asteroid8.net';
+const _FN_BASE = 'https://us-central1-asteroid-cdc13.cloudfunctions.net';
 async function _sha256Hex(s) {
   const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(s)));
   return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
@@ -345,7 +348,9 @@ window.doLogin = async () => {
   const ok = (await _sha256Hex(uname + ':' + pw)) === _ADMIN_HASH;
   if (!ok) { err.textContent = 'Invalid credentials.'; btn.disabled = false; btn.textContent = 'Sign In'; return; }
   try { sessionStorage.setItem('_consoleAuthed', '1'); } catch(_) {}
-  try { await signInAnonymously(auth); } catch(_) {}   // best-effort; ignore if disabled
+  // Sign into Firebase Auth as the admin (persists) so privileged endpoints work.
+  try { await signInWithEmailAndPassword(auth, _ADMIN_EMAIL, pw); }
+  catch(_) { try { await signInAnonymously(auth); } catch(__) {} }
   _showConsole();
 };
 
@@ -358,9 +363,8 @@ window.doSignOut = () => {
 document.getElementById('lUname').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('lPw').focus(); });
 document.getElementById('lPw').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
 
-// Restore the session within this tab.
+// Restore the session within this tab (the Firebase Auth session persists on its own).
 if (sessionStorage.getItem('_consoleAuthed') === '1') {
-  try { signInAnonymously(auth).catch(() => {}); } catch(_) {}
   _showConsole();
 }
 
@@ -385,6 +389,7 @@ window.go = function(section, params={}) {
     case 'fs-songs':    return renderFs('songs');
     case 'fs-featurequeue': return renderFs('featureQueue');
     case 'fs-founding': return renderFs('founding_supporters');
+    case 'auth-users':  return renderAuthUsers();
     default: renderDash();
   }
 };
@@ -925,6 +930,176 @@ window.setFRStatus = async function(k, status) {
     toast(`Request ${status} ✓`, 'success');
     renderFR();
   } catch(e) { toast('Error: '+e.message, 'error'); }
+};
+
+// ══════════════════════════════════════════════════════════════
+// AUTH USERS (Firebase Authentication — via Admin SDK function)
+// ══════════════════════════════════════════════════════════════
+let _authUsers = [];
+let _auFilter = 'all';
+
+async function renderAuthUsers() {
+  setHTML(`
+    <div class="ph"><div class="ph-title">Auth Users</div><div class="ph-sub">Firebase Authentication</div></div>
+    <div id="auSummary" style="margin-bottom:12px;color:var(--muted);font-size:13px"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+      <button class="btn btn-sm btn-ghost" onclick="auFilter('all')">All</button>
+      <button class="btn btn-sm btn-ghost" onclick="auFilter('google')">Google</button>
+      <button class="btn btn-sm btn-ghost" onclick="auFilter('apple')">Apple</button>
+      <button class="btn btn-sm btn-ghost" onclick="auFilter('both')">Google + Apple</button>
+      <button class="btn btn-sm btn-ghost" onclick="auFilter('password')">Email</button>
+      <span style="flex:1"></span>
+      <button class="btn btn-sm" onclick="auAdd()">+ Add User</button>
+      <button class="btn btn-sm" onclick="document.getElementById('auImportFile').click()">Import</button>
+      <button class="btn btn-sm" onclick="auExport('csv')">Export CSV</button>
+      <button class="btn btn-sm" onclick="auExport('json')">Export JSON</button>
+      <input type="file" id="auImportFile" accept=".json,.csv" style="display:none" onchange="if(this.files[0])window._auHandleImport(this.files[0]);this.value='';">
+    </div>
+    <div id="auWrap"><div class="loading"><div class="spinner"></div> Loading…</div></div>
+  `);
+  try {
+    const user = auth.currentUser;
+    if (!user || user.isAnonymous) throw new Error('Not signed in as the admin Firebase account. Create it (see setup) and log in again.');
+    const token = await user.getIdToken();
+    const r = await fetch(_FN_BASE + '/adminListUsers', { headers: { Authorization: 'Bearer ' + token } });
+    if (!r.ok) { let m=''; try { m=(await r.json()).error; } catch(_){} throw new Error(m || ('HTTP '+r.status)); }
+    const data = await r.json();
+    _authUsers = data.users || [];
+    const s = data.summary || {};
+    const el = document.getElementById('auSummary');
+    if (el) el.textContent = `${s.total||0} users · ${s.google||0} Google · ${s.apple||0} Apple · ${s.both||0} Google+Apple · ${s.email||0} email`;
+    _auRender();
+  } catch(e) { document.getElementById('auWrap').innerHTML = `<div class="err-msg">${escH(e.message)}</div>`; }
+}
+
+window.auFilter = function(f) { _auFilter = f; _auRender(); };
+
+function _auMatch(u) {
+  switch (_auFilter) {
+    case 'google':   return u.google && !u.apple;
+    case 'apple':    return u.apple && !u.google;
+    case 'both':     return u.google && u.apple;
+    case 'password': return u.password && !u.google && !u.apple;
+    default:         return true;
+  }
+}
+
+function _auProviderTags(u) {
+  const t = [];
+  if (u.google)   t.push('<span style="color:#4285f4;font-weight:700">Google</span>');
+  if (u.apple)    t.push('<span style="color:#ddd;font-weight:700">Apple</span>');
+  if (u.password) t.push('<span style="color:#f5a623;font-weight:700">Email</span>');
+  return t.join(' + ') || '<span style="color:var(--muted)">—</span>';
+}
+
+function _auRender() {
+  const list = _authUsers.filter(_auMatch);
+  const wrap = document.getElementById('auWrap');
+  if (!wrap) return;
+  if (!list.length) { wrap.innerHTML = '<div class="empty">No matching users</div>'; return; }
+  const rows = list.map(u => `<tr>
+    <td>${escH(u.email || '—')}</td>
+    <td>${escH(u.displayName || '—')}</td>
+    <td style="white-space:nowrap">${_auProviderTags(u)}</td>
+    <td class="mono" style="font-size:11px">${escH(u.uid)}</td>
+    <td class="mono">${u.lastSignIn ? new Date(u.lastSignIn).toLocaleDateString() : '—'}</td>
+    <td>${u.disabled ? '<span style="color:var(--red)">disabled</span>' : '<span style="color:#3ddc84">active</span>'}</td>
+    <td style="white-space:nowrap">
+      ${u.disabled
+        ? `<button class="btn btn-xs" style="color:#3ddc84" onclick="auAct('enable','${escH(u.uid)}')">Unban</button>`
+        : `<button class="btn btn-xs" style="color:#f5a623" onclick="auAct('disable','${escH(u.uid)}')">Ban</button>`}
+      <button class="btn btn-xs btn-ghost" onclick="auAct('revoke','${escH(u.uid)}')">Kick</button>
+      <button class="btn btn-xs btn-red" onclick="auAct('delete','${escH(u.uid)}')">Delete</button>
+    </td>
+  </tr>`).join('');
+  wrap.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Email</th><th>Name</th><th>Provider</th><th>UID</th><th>Last sign-in</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+window.auExport = function(fmt) {
+  const list = _authUsers.filter(_auMatch);
+  if (!list.length) { toast('Nothing to export', 'error'); return; }
+  let blob, name;
+  if (fmt === 'csv') {
+    const esc = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
+    const head = ['email','displayName','providers','google','apple','password','disabled','created','lastSignIn'];
+    const lines = [head.join(',')].concat(list.map(u => head.map(k => esc(Array.isArray(u[k]) ? u[k].join('|') : u[k])).join(',')));
+    blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    name = `asteroid-auth-users-${_auFilter}.csv`;
+  } else {
+    blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' });
+    name = `asteroid-auth-users-${_auFilter}.json`;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast(`Exported ${list.length} users`, 'success');
+};
+
+// ── User management (delete / ban / kick / add / import) ────────
+async function _auPost(body) {
+  const user = auth.currentUser;
+  if (!user || user.isAnonymous) throw new Error('Not signed in as the admin account.');
+  const token = await user.getIdToken();
+  const r = await fetch(_FN_BASE + '/adminAuthAction', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body),
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
+  return data;
+}
+
+window.auAct = async function(action, uid) {
+  const u = _authUsers.find(x => x.uid === uid);
+  const who = u ? (u.email || u.uid) : uid;
+  const verb = { delete:'delete', disable:'ban', enable:'unban', revoke:'kick (force re-login)' }[action] || action;
+  if (!confirm(`${verb.charAt(0).toUpperCase() + verb.slice(1)} ${who}?`)) return;
+  try { await _auPost({ action, uid }); toast(`${verb} ✓`, 'success'); renderAuthUsers(); }
+  catch(e) { toast('Error: ' + e.message, 'error'); }
+};
+
+window.auAdd = function() {
+  openModal('Add User', `
+    <div style="margin-bottom:12px"><label class="fi-label">Email</label><input class="fi" id="auNewEmail" placeholder="user@example.com" style="width:100%"></div>
+    <div style="margin-bottom:12px"><label class="fi-label">Password</label><input class="fi" id="auNewPw" placeholder="min 6 characters" style="width:100%"></div>
+    <div><label class="fi-label">Display name (optional)</label><input class="fi" id="auNewName" style="width:100%"></div>
+  `, async () => {
+    const email = document.getElementById('auNewEmail').value.trim();
+    const password = document.getElementById('auNewPw').value;
+    const displayName = document.getElementById('auNewName').value.trim();
+    if (!email || !password) { toast('Email + password required', 'error'); return; }
+    try { await _auPost({ action:'create', email, password, displayName }); toast('User created ✓', 'success'); window.closeModal(); renderAuthUsers(); }
+    catch(e) { toast('Error: ' + e.message, 'error'); }
+  }, 'Create');
+};
+
+window._auHandleImport = async function(file) {
+  try {
+    const text = await file.text();
+    let users;
+    if (/\.json$/i.test(file.name)) {
+      const parsed = JSON.parse(text);
+      users = Array.isArray(parsed) ? parsed : (parsed.users || []);
+    } else {
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
+      const head = (lines.shift() || '').split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+      users = lines.map(l => {
+        const cols = l.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+        const o = {}; head.forEach((h, i) => o[h] = cols[i]); return o;
+      });
+    }
+    users = (users || []).filter(u => u && u.email);
+    if (!users.length) { toast('No rows with an email found', 'error'); return; }
+    if (!confirm(`Import ${users.length} user(s)? Rows without a password get a random one.`)) return;
+    const data = await _auPost({ action:'import', users });
+    const ok = (data.results || []).filter(r => r.ok).length;
+    const fail = (data.results || []).length - ok;
+    toast(`Imported ${ok}${fail ? ', ' + fail + ' failed' : ''}`, fail ? 'error' : 'success');
+    renderAuthUsers();
+  } catch(e) { toast('Import error: ' + e.message, 'error'); }
 };
 
 // ══════════════════════════════════════════════════════════════

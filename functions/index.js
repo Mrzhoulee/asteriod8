@@ -98,6 +98,11 @@ exports.scheduledMilestones = referrals.scheduledMilestones;
 const artistProfile = require('./artist-profile');
 exports.artistProfile = artistProfile.artistProfile;
 
+// Admin console — Firebase Auth user management (Admin SDK, admin-guarded)
+const adminUsers = require('./admin-users');
+exports.adminListUsers = adminUsers.adminListUsers;
+exports.adminAuthAction = adminUsers.adminAuthAction;
+
 const migrate = require('./migrate-referrals');
 exports.migrateReferralCountsRtdbToFirestore = migrate.migrateReferralCountsRtdbToFirestore;
 
