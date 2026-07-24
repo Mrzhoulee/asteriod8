@@ -1930,9 +1930,7 @@ html.song-overflow-menu-open {
     line-height: 1.2;
   }
   #artists {
-    margin: 72px 0 10px !important;
-    padding-top: 18px !important;
-    min-height: 180px;
+    display: none !important;
   }
   #artists-grid-8 {
     display: block !important;
@@ -4292,7 +4290,17 @@ transform:translate(-50%, -50%); background:white; padding:20px; border:1px soli
         <div id="followedNoticesMount"></div>
       </section>
 
-      <div id="ab" style="margin-bottom: 100px;">      <button width="100%" height="500">Go to the next song</button></div>
+      <style>
+        .t50-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:8px 0 14px; flex-wrap:wrap; }
+        .t50-title { font-family:'Montserrat',sans-serif; font-size:20px; font-weight:800; color:#fff; letter-spacing:-0.02em; }
+        .t50-sub { font-size:12.5px; color:rgba(255,255,255,0.55); margin-top:3px; }
+        .t50-refresh { display:inline-flex; align-items:center; gap:6px; background:#15161a; border:1px solid rgba(255,255,255,0.1); color:#ff7f50; font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; padding:9px 16px; border-radius:10px; cursor:pointer; transition:border-color .15s, background .15s; }
+        .t50-refresh:hover { border-color:rgba(255,127,80,0.5); background:#191b20; }
+        .t50-list { display:flex; flex-direction:column; gap:2px; }
+        .t50-play-btn { background:none; border:none; color:#ff7f50; font-size:16px; cursor:pointer; padding:6px 10px; border-radius:8px; line-height:1; }
+        .t50-play-btn:hover { background:rgba(255,127,80,0.12); }
+      </style>
+      <div id="ab" style="margin-bottom: 100px;"></div>
 
       <section id="becauseYouLikedSection" class="because-you-liked" aria-live="polite">
         <h2 class="because-head">Because you liked <span id="becauseYouLikedSeed"></span></h2>
@@ -4380,7 +4388,7 @@ setInterval(flySanta, 10000);
     <div id="queues" style="display:flex;flex-direction:column;gap:6px;min-height:24px;"></div>
     <p id="queueEmptyMsg" style="color:rgba(255,255,255,0.3);font-size:12px;font-family:'Poppins',sans-serif;margin:0;display:none;">No songs in queue yet.</p>
   </div>
-  <audio id="gaga_global" playsinline preload="none"
+  <audio id="gaga_global" playsinline preload="auto"
     onplay="if(window._expandPlayer)window._expandPlayer();if(window.actual1)window.actual1('gaga_global')"
     onended="if(window.handleKKK)window.handleKKK()">
   </audio>
@@ -4754,7 +4762,7 @@ function whenElementReady(id, callback, retries = 10) {
   let _referralKeys = new Set(); // ownerKeys from FEATURE_REFERRAL_REQUESTS (status=featured)
   let featuredLiveOk = false;
 
-  const _FEATURED_TTL_MS = 90 * 24 * 60 * 60 * 1000; // 3 months
+  const _FEATURED_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
   function _ownerKeysFromPinnedObj(v) {
     const s = new Set();
@@ -4927,7 +4935,7 @@ function whenElementReady(id, callback, retries = 10) {
               // Only runs when no song was pinned yet, so it's effectively write-once.
               try {
                 const viewerKey = (localStorage.getItem('emailKey') || '').trim();
-                if (viewerKey && viewerKey === ownerKey) {
+                if (viewerKey && viewerKey === ownerKey && top.__created && (Date.now() - Number(top.__created)) <= 30 * 24 * 60 * 60 * 1000) {
                   set(ref2(database, 'FEATURED_ARTIST_SONG/' + ownerKey), {
                     title: top.title || '',
                     album: top.album || '',
@@ -5685,30 +5693,25 @@ function renderSongsFromData(songsData) {
       : "<p style='text-align:center;color:rgba(255,255,255,0.65);padding:20px;'>No songs to show (blocked or hidden).</p>";
   }
 
-  const albumMap = {};
-  visibleSongs.forEach(s => {
-    const rawAlbum = (s.album || "").trim();
-    const key = (!rawAlbum || rawAlbum.toLowerCase() === "single" || rawAlbum.toLowerCase() === "singles") ? "__single__" : rawAlbum;
-    if (!albumMap[key]) albumMap[key] = [];
-    albumMap[key].push(s);
-  });
-
-  let nextGagaId = 0;
-  function allocTid() {
-    return "p" + nextGagaId++;
-  }
-
   function primaryMoodForSong(s) {
     const m = s.mood || s.primaryMood || (Array.isArray(s.moods) && s.moods.length ? s.moods[0] : "");
     return String(m || "").trim();
   }
 
-  function songRow(s, idx) {
-    const t = esc(s.title), a = esc(s.artist), al = esc(s.album), url = (s.fileInp || "").replace(/"/g,"&quot;");
-    const tid = allocTid();
+  // ── Fair shuffle (Fisher–Yates): every song has an equal chance, so exposure
+  //    is even across all listeners — no pinning, no pay-to-win. Refresh re-rolls. ──
+  const pool = visibleSongs.slice();
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  const top = pool.slice(0, 50);
+  window.__top50 = top;
+
+  const rows = top.map((s, idx) => {
+    const t = esc(s.title), a = esc(s.artist), al = esc(s.album || ""), url = (s.fileInp || "").replace(/"/g,"&quot;");
     const mood = primaryMoodForSong(s);
     const up = esc(songUploaderRaw(s));
-    const transport = songTransportIconsHtml(tid);
     const overflow = songOverflowActionsHtml({
       queueFileRaw: s.fileInp,
       queueTitleRaw: s.title,
@@ -5722,78 +5725,27 @@ function renderSongsFromData(songsData) {
       reportArtist: esc(s.artist),
       reportUploader: up,
     });
-    return `<div id="song_${tid}" class="sssh song-row" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="${al.toLowerCase()}" data-src="${url}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}"${explicitDataAttr(s)}>
+    return `<div class="sssh song-row" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="${al.toLowerCase()}" data-src="${url}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}"${explicitDataAttr(s)}>
       <div class="song-row-num">${idx + 1}</div>
-      <div class="song-row-info">
+      <div class="song-row-info" onclick="playT50(${idx})" style="cursor:pointer">
         <div class="song-row-title-row">${explicitBadge(s)}<span class="song-row-title">${t}</span></div>
         <span class="song-row-artist">${a}</span>
       </div>
       <div class="song-row-actions">
-        ${transport}
+        <button type="button" class="t50-play-btn" onclick="playT50(${idx})" aria-label="Play">&#9654;</button>
         ${overflow}
       </div>
     </div>`;
-  }
+  }).join("");
 
-  let html = "";
-  const albumKeys = Object.keys(albumMap).sort((a, b) => (a === "__single__" ? 1 : b === "__single__" ? -1 : albumMap[b].length - albumMap[a].length));
-
-  albumKeys.forEach(key => {
-    const songs = albumMap[key];
-    if (key === "__single__" || songs.length === 1) {
-      songs.forEach((s, i) => {
-        const t = esc(s.title), a = esc(s.artist), url = (s.fileInp || "").replace(/"/g,"&quot;");
-        const tid = allocTid();
-        const mood = primaryMoodForSong(s);
-        const up = esc(songUploaderRaw(s));
-        const transportSingle = songTransportIconsHtml(tid);
-        const overflowSingle = songOverflowActionsHtml({
-          queueFileRaw: s.fileInp,
-          queueTitleRaw: s.title,
-          playlistArtistRaw: s.artist || "",
-          blockFile: esc(s.fileInp),
-          blockTitle: esc(s.title),
-          notrecFile: esc(s.fileInp),
-          notrecTitle: esc(s.title),
-          reportFile: esc(s.fileInp),
-          reportTitle: esc(s.title),
-          reportArtist: esc(s.artist),
-          reportUploader: up,
-        });
-        html += `<div class="sssh single-card" data-title="${t.toLowerCase()}" data-artist="${a.toLowerCase()}" data-album="">
-          <audio id="gaga_${tid}" data-display-title="${esc(s.title)}" data-display-artist="${esc(s.artist)}" data-display-album="${esc(s.album || "")}" data-mood="${esc(mood)}" data-uploader="${up}"${explicitDataAttr(s)} playsinline onplay="actual1('gaga_${tid}')" onended="handleKKK()" preload="metadata"><source src="${url}" type="audio/mpeg"></audio>
-          <div class="single-emoji"><span class="material-symbols-outlined" style="font-size:26px;">music_note</span></div>
-          <div class="single-info">
-            <div class="single-title-row">${explicitBadge(s)}<div class="single-title">${t}</div></div>
-            <div class="single-artist">${a}</div>
-            <div class="single-badge">Single</div>
-          </div>
-          <div class="single-actions">
-            ${transportSingle}
-            ${overflowSingle}
-          </div>
-        </div>`;
-      });
-    } else {
-      const artists = [...new Set(songs.map(s => s.artist || "Unknown"))].join(", ");
-      const albumId = "album_" + key.replace(/[^a-zA-Z0-9]/g, "_");
-      html += `<div class="album-card" data-album="${esc(key).toLowerCase()}">
-        <div class="album-cover" onclick="document.getElementById('${albumId}').classList.toggle('album-open')">
-          <div class="album-emoji"><span class="material-symbols-outlined" style="font-size:30px;">album</span></div>
-          <div class="album-meta">
-            <div class="album-name">${esc(key)}</div>
-            <div class="album-artist">${esc(artists)}</div>
-            <div class="album-count">${songs.length} track${songs.length > 1 ? "s" : ""}</div>
-          </div>
-          <span class="material-symbols-outlined album-chevron">expand_more</span>
-        </div>
-        <div class="album-tracks" id="${albumId}">
-          ${songs.map((s, i) => songRow(s, i)).join("")}
-        </div>
-      </div>`;
-    }
-  });
-  return html;
+  return `<div class="t50-header">
+      <div>
+        <div class="t50-title">Top 50 Recommended for you today</div>
+        <div class="t50-sub">Fresh picks — shown equally to every listener</div>
+      </div>
+      <button type="button" class="t50-refresh" onclick="refreshTop50()"><span class="material-symbols-outlined" style="font-size:18px;vertical-align:-4px">refresh</span> Refresh</button>
+    </div>
+    <div class="t50-list">${rows}</div>`;
 }
 
 function fetchSongsViaREST() {
@@ -5808,7 +5760,7 @@ function fetchSongsViaREST() {
     const html = renderSongsFromData(renderData);
     whenElementReady("ab", (ab) => {
       const extra = document.getElementById("artists-grid-8");
-      ab.innerHTML = html + (extra ? extra.innerHTML : "");
+      ab.innerHTML = html;
       applySongSearch();
       if (typeof window.refreshDiscoveryPanels === "function") window.refreshDiscoveryPanels(songsData);
       if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
@@ -5982,7 +5934,7 @@ onValue(ref2(database, "SONGS/"), (snapshot) => {
   console.log(" Songs rendered:", songCount, dailyList ? "(daily pick of 100, balanced across artists)" : "(all songs)");
   whenElementReady("ab", (ab) => {
     const extra = document.getElementById("artists-grid-8");
-    ab.innerHTML = html + (extra ? extra.innerHTML : "");
+    ab.innerHTML = html;
     applySongSearch();
     if (typeof window.refreshDiscoveryPanels === "function") window.refreshDiscoveryPanels(songsData);
     if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
@@ -6002,11 +5954,19 @@ window.refreshLibraryAfterBlock = function () {
   const html = renderSongsFromData(globalSongsData);
   whenElementReady("ab", function (ab) {
     const extra = document.getElementById("artists-grid-8");
-    ab.innerHTML = html + (extra ? extra.innerHTML : "");
+    ab.innerHTML = html;
     applySongSearch();
     if (typeof window.refreshDiscoveryPanels === "function") window.refreshDiscoveryPanels(globalSongsData);
     if (typeof window.applyFeaturedArtistBlocksToDom === "function") window.applyFeaturedArtistBlocksToDom();
   });
+};
+
+window.playT50 = function (i) {
+  const s = (window.__top50 || [])[i];
+  if (s && window.playRecommendedSong) window.playRecommendedSong({ fileInp: s.fileInp, title: s.title, artist: s.artist, album: s.album || "", mood: s.mood || "", uploader: s.uploader || "" });
+};
+window.refreshTop50 = function () {
+  if (typeof window.refreshLibraryAfterBlock === "function") window.refreshLibraryAfterBlock();
 };
 
 window.__lastPlayMeta = null;
@@ -6193,6 +6153,8 @@ window.playRecommendedSong = function (song) {
   g.dataset.mood = String(song.mood || song.primaryMood || (Array.isArray(song.moods) && song.moods[0] ? song.moods[0] : "") || "");
   g.dataset.uploader = String(song.uploader || "");
   if (songShowsExplicitBadge(song)) g.dataset.explicit = "1"; else delete g.dataset.explicit;
+  var _tt = document.getElementById("tata");
+  if (_tt) _tt.textContent = "Loading…";
   g.src = song.fileInp;
   g.load();
   var p = g.play();

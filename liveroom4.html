@@ -17,18 +17,19 @@
 
 <body class="concert-page">
     <style>
-        body.concert-page { margin:0; min-height:100vh; background: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255,127,80,0.12), transparent 55%), #0a0a0f; color:#ececec; font-family:'Montserrat',system-ui,sans-serif; }
+        body.concert-page { margin:0; min-height:100vh; background:#0e0f12; color:#ececec; font-family:'Montserrat',system-ui,sans-serif; }
         .cr-shell { max-width: 1180px; margin: 0 auto; padding: 12px 14px 100px; box-sizing: border-box; }
         .cr-room-head { display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
-        .cr-room-head h1 { margin:0; font-size:1.35rem; font-weight:800; background:linear-gradient(135deg,#ff7f50,#ffb347); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .cr-back { color:#ff7f50; text-decoration:none; font-size:14px; font-weight:600; }
-        .cr-back:hover { text-decoration:underline; }
+        .cr-room-head { padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.07); }
+        .cr-room-head h1 { margin:0; font-size:1.5rem; font-weight:800; color:#fff; letter-spacing:-0.02em; }
+        .cr-back { display:inline-flex; align-items:center; gap:5px; color:rgba(255,255,255,0.7); text-decoration:none; font-size:13px; font-weight:600; padding:7px 13px; border:1px solid rgba(255,255,255,0.1); border-radius:9px; }
+        .cr-back:hover { color:#fff; border-color:rgba(255,255,255,0.22); }
         .cr-grid { display:grid; grid-template-columns: 1fr; gap:18px; }
         @media (min-width: 900px) { .cr-grid { grid-template-columns: 1fr 340px; align-items:start; } }
-        .cr-stage { background: rgba(255,255,255,0.03); border:1px solid rgba(255,127,80,0.2); border-radius:20px; padding:16px; box-shadow:0 12px 40px rgba(0,0,0,0.35); }
+        .cr-stage { background:#15161a; border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:16px; }
         .cr-aside { display:flex; flex-direction:column; gap:14px; }
-        .cr-panel { background: rgba(18,18,22,0.95); border:1px solid rgba(255,127,80,0.25); border-radius:16px; padding:14px; box-shadow:0 8px 28px rgba(0,0,0,0.4); }
-        .cr-panel h3 { margin:0 0 10px; font-size:15px; color:#ff7f50; font-weight:700; }
+        .cr-panel { background:#15161a; border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:16px; }
+        .cr-panel h3 { margin:0 0 10px; font-size:15px; color:#fff; font-weight:700; }
         .cr-panel .cr-hint { font-size:12px; color:rgba(255,255,255,0.45); margin:0 0 10px; line-height:1.4; }
         #concertChatList { max-height: 240px; overflow-y: auto; margin-bottom:10px; padding:8px; background:#0e0e12; border-radius:12px; border:1px solid rgba(255,255,255,0.06); }
         .cr-msg { margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.06); }
@@ -38,18 +39,17 @@
         .cr-chat-row { display:flex; flex-direction:column; gap:8px; }
         .cr-chat-row input { width:100%; box-sizing:border-box; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:#121218; color:#fff; font-size:14px; }
         .cr-chat-row input:focus { outline:none; border-color:#ff7f50; }
-        .cr-btn-send { align-self:flex-end; padding:10px 20px; border:none; border-radius:10px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,#ff7f50,#e85d2c); color:#fff; font-size:13px; }
-        .cr-btn-send:active { transform:scale(0.98); }
+        .cr-btn-send { align-self:flex-end; padding:10px 22px; border:none; border-radius:10px; font-weight:700; cursor:pointer; background:#ff7f50; color:#fff; font-size:13px; transition:filter .15s; }
+        .cr-btn-send:hover { filter:brightness(1.08); }
+        .cr-btn-send:active { filter:brightness(0.95); }
         #concertStickyList { max-height: 200px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
-        .cr-sticky{display:flex;align-items:flex-start;gap:8px;background:linear-gradient(145deg, rgba(255,127,80,0.12), rgba(255,180,100,0.06)); border:1px solid rgba(255,127,80,0.25); border-radius:12px; padding:10px 12px; font-size:13px; line-height:1.45; color:#f5f5f5; }
+        .cr-sticky{display:flex;align-items:flex-start;gap:8px;background:#1d1f24; border:1px solid rgba(255,255,255,0.08); border-left:3px solid #ff7f50; border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.45; color:#f5f5f5; }
         .explicit-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;font-size:10px;font-weight:800;letter-spacing:0.03em;color:#1a1a1a;background:linear-gradient(145deg,#ff9a6b,#ff7f50);border-radius:4px;flex-shrink:0;line-height:1;margin-top:2px;}
-        .big-icons{
-            font-size: 75px;
-        }
+        .big-icons{ font-size: 22px; }
 
-        .huck:hover{
-            background-color: darkgrey;
-        }
+        .huck { display:inline-flex; align-items:center; gap:8px; margin:0 auto 16px; padding:11px 22px; border:1px solid rgba(248,113,113,0.4); border-radius:12px; background:rgba(248,113,113,0.12); color:#f87171; font-family:'Montserrat',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:background .15s; }
+        .huck:hover{ background:rgba(248,113,113,0.22); }
+        .huck .material-symbols-outlined{ font-size:22px; }
 
 /* 1. The Container (Card Style) */
 #banGlocks {
@@ -98,7 +98,7 @@
 
     /* Styling for the Tick Button */
 .tick-btn {
-    background: linear-gradient(90deg, #ff3b3b, #ff7a3b); /* Matches your theme */
+    background: #ff7f50;
     color: white;
     border: none;
     border-radius: 12px;
@@ -152,11 +152,8 @@
   <div class="cr-grid">
     <div class="cr-stage cr-stage-stack">
 
-<button id="tuck" onclick="document.getElementById('banGlocks').style.display = 'block';" class="huck" style="border-radius: 12.5%; display: none;" type="button">
-    <div style="color: darkred">
-        <span class="material-symbols-outlined big-icons">stop_circle</span> 
-        <h1><font face="Montserrat"><div style="align-items: center;">End <br> Stream</div></font></h1>
-    </div>
+<button id="tuck" onclick="document.getElementById('banGlocks').style.display = 'block';" class="huck" style="display: none;" type="button">
+    <span class="material-symbols-outlined">stop_circle</span> End stream
 </button>
 <br>
 <br>

@@ -165,6 +165,8 @@ export async function initFollowedArtistSongs() {
                 if (!featSnap.exists()) continue;
                 const s = featSnap.val();
                 if (!s || !s.fileInp) continue;
+                // Featured songs expire after 30 days.
+                if (s.uploadedAt && (Date.now() - Number(s.uploadedAt)) > 30 * 24 * 60 * 60 * 1000) continue;
                 const artistLabel = profileName || s.artist || s.uploaderName || artistId;
                 matches.push({
                   ownerKey: ak,
