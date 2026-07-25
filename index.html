@@ -9932,8 +9932,7 @@ console.log('1171')
               reportArtist: a,
               reportUploader: up,
             });
-            html += `<div class="profile-modal-song-row">
-  <audio id="gaga_${tid}" data-display-title="${t}" data-display-artist="${a}" data-display-album="${al}" data-mood="${m}" data-uploader="${up}"${exPm} playsinline preload="metadata"><source src="${urlAttr}" type="audio/mpeg"></audio>
+            html += `<div class="profile-modal-song-row" id="song_${tid}" data-src="${urlAttr}" data-display-title="${t}" data-display-artist="${a}" data-display-album="${al}" data-mood="${m}" data-uploader="${up}"${exPm}>
   <div class="profile-modal-song-info">
     <span class="profile-modal-song-title">${ebPm}<span class="profile-modal-song-title-text">${t}</span></span>
     <span class="profile-modal-song-meta">${a}${albumPlain ? " · " + al : ""}</span>
