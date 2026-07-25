@@ -217,6 +217,7 @@
 </head>
 <body>
   <script src="auth.js"></script>
+  <script src="js/miniplayer.js" defer></script>
 
   <div class="topbar">
     <a href="index.html" class="topbar-back">
@@ -346,6 +347,15 @@
     }
 
     function playSong(row, src, title, artist) {
+      // Prefer the shared miniplayer bar (js/miniplayer.js) so a player shows on this page
+      if (window.AsteroidPlayer && typeof window.AsteroidPlayer.play === 'function') {
+        window.AsteroidPlayer.play({ url: src, title: title, artist: artist });
+        if (currentRow) currentRow.classList.remove('playing');
+        currentRow = row;
+        row.classList.add('playing');
+        patSetVinyl(true);
+        return;
+      }
       // Prefer global player from index.html if available
       if (window.playRecommendedSong) {
         window.playRecommendedSong({ fileInp: src, title: title, artist: artist });
