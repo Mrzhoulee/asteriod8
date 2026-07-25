@@ -91,11 +91,6 @@
     <div class="ask-name-row">
       <input class="ask-name" id="askerName" type="text" placeholder="Your name (optional)" maxlength="60" />
     </div>
-    <div class="notif-row" id="notifRow">
-      <input type="checkbox" id="notifCheck" />
-      <label for="notifCheck">Notify me when the artist answers (requires notification permission)</label>
-    </div>
-    <div class="notif-status" id="notifStatus"></div>
     <button class="ask-submit" id="submitBtn">Submit question</button>
   </div>
 
@@ -173,75 +168,6 @@
   const savedName = localStorage.getItem('qaAskerName') || localStorage.getItem('fullName') || '';
   if (savedName) document.getElementById('askerName').value = savedName;
 
-  // ── FCM token state ──
-  let _fcmToken = localStorage.getItem('_fcmToken') || '';
-  let _notifGranted = Notification && Notification.permission === 'granted';
-  const notifCheck = document.getElementById('notifCheck');
-  const notifStatus = document.getElementById('notifStatus');
-
-  if (_notifGranted && _fcmToken) {
-    notifCheck.checked = true;
-    notifStatus.textContent = ' Notifications are on';
-  } else if (Notification && Notification.permission === 'denied') {
-    notifCheck.disabled = true;
-    document.getElementById('notifRow').style.opacity = '0.4';
-    notifStatus.textContent = 'Notifications blocked in settings';
-  }
-
-  // ── notification registration ──
-  async function getCapacitorToken() {
-    // Capacitor PushNotifications (iOS native)
-    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications) {
-      const PN = window.Capacitor.Plugins.PushNotifications;
-      const { receive: permResult } = await PN.requestPermissions();
-      if (permResult !== 'granted' && permResult !== 'prompt-with-rationale') return null;
-      return new Promise((resolve) => {
-        PN.addListener('registration', (data) => resolve(data.value));
-        PN.addListener('registrationError', () => resolve(null));
-        PN.register();
-      });
-    }
-    return null;
-  }
-
-  async function getWebPushToken() {
-    if (!('Notification' in window) || !('serviceWorker' in navigator)) return null;
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return null;
-    const { getMessaging, getToken } = await import("https://www.gstatic.com/firebasejs/10.14.0/firebase-messaging.js");
-    const messaging = getMessaging(app);
-    const swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-    const token = await getToken(messaging, { vapidKey: VAPID, serviceWorkerRegistration: swReg });
-    return token || null;
-  }
-
-  async function ensureToken() {
-    if (_fcmToken) return _fcmToken;
-    notifStatus.textContent = 'Requesting permission…';
-    try {
-      const token = (await getCapacitorToken()) || (await getWebPushToken());
-      if (!token) {
-        notifStatus.textContent = 'Permission denied - you won\'t be notified.';
-        notifCheck.checked = false;
-        return null;
-      }
-      _fcmToken = token;
-      localStorage.setItem('_fcmToken', token);
-      notifStatus.textContent = ' You\'ll be notified when answered.';
-      return token;
-    } catch (e) {
-      console.warn('[qa] token error', e);
-      notifStatus.textContent = 'Could not enable notifications.';
-      notifCheck.checked = false;
-      return null;
-    }
-  }
-
-  notifCheck.addEventListener('change', async () => {
-    if (notifCheck.checked) await ensureToken();
-    else notifStatus.textContent = '';
-  });
-
   // ── submit question ──
   const submitBtn = document.getElementById('submitBtn');
   submitBtn.addEventListener('click', async () => {
@@ -250,9 +176,6 @@
     if (!questionText) { alert('Please enter a question.'); return; }
     submitBtn.disabled = true;
     submitBtn.textContent = 'Submitting…';
-
-    let fcmToken = null;
-    if (notifCheck.checked) fcmToken = await ensureToken();
 
     const askerName = document.getElementById('askerName').value.trim() || 'Anonymous';
     if (askerName !== 'Anonymous') localStorage.setItem('qaAskerName', askerName);
@@ -263,7 +186,7 @@
       askerName,
       askerKey: localStorage.getItem('emailKey') || localStorage.getItem('CurrentUser') || '',
       ts: Date.now(),
-      fcmToken: fcmToken || '',
+      fcmToken: '',
       platform: (window.Capacitor ? 'ios' : 'web'),
     };
 
@@ -331,7 +254,7 @@
         <div class="qa-meta">${escHtml(q.askerName || 'Anonymous')} · ${timeAgo(q.ts)}</div>
         ${q.answer
           ? `<div class="qa-answer-wrap">
-              <div class="qa-answer-label"><span class="material-symbols-outlined" style="font-size:14px">mic</span> Artist replied</div>
+              <div class="qa-answer-label">Artist replied</div>
               <div class="qa-answer-text">${escHtml(q.answer)}</div>
              </div>`
           : `<span class="qa-unanswered-badge">Awaiting answer</span>`
@@ -348,10 +271,11 @@
     fetch(REST_BASE + '/ARTIST_QA/' + encodeURIComponent(artistKey) + '.json', { cache: 'no-store' })
       .then(r => r.ok ? r.json() : null)
       .then(obj => { _qaListLoaded = true; renderQAItems(itemsFromObj(obj)); })
-      .catch(() => {});
+      .catch(() => { if (!_qaListLoaded) renderQAItems([]); });
   }
 
   if (artistKey) {
+    fetchQAListViaRest();
     onValue(query(ref(db, 'ARTIST_QA/' + artistKey), orderByChild('ts'), limitToLast(50)), (snap) => {
       _qaListLoaded = true;
       const items = [];
