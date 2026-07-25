@@ -216,6 +216,13 @@ export function mountThankYouStickies(db, profileKey, els) {
   if (!safeKey) return () => {};
 
   const stickiesRef = ref(db, "PROFILE_STICKIES/" + safeKey + "/notes");
+  const REST_BASE = "https://asteroid-cdc13-default-rtdb.firebaseio.com";
+  function loadStickiesViaRest() {
+    fetch(REST_BASE + "/PROFILE_STICKIES/" + encodeURIComponent(safeKey) + "/notes.json", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((obj) => { if (obj) { lastProfileStickyVal = obj; renderProfileThankYouList(); } })
+      .catch(() => {});
+  }
 
   let lastProfileStickyVal = null;
   function renderProfileThankYouList() {
@@ -224,8 +231,10 @@ export function mountThankYouStickies(db, profileKey, els) {
       list.innerHTML = '<p class="profile-sticky-empty">No thank-you notes yet.</p>';
       return;
     }
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
     const sorted = Object.entries(v)
       .map(([id, n]) => ({ id, ...n }))
+      .filter((n) => (n.ts || 0) >= monthStart) // thank-you notes reset each calendar month
       .sort((a, b) => (b.ts || 0) - (a.ts || 0));
     const rows = filterStickyNotesByBlocklist(sorted).slice(0, 40);
     if (!rows.length) {
@@ -251,6 +260,7 @@ export function mountThankYouStickies(db, profileKey, els) {
     lastProfileStickyVal = snap.val();
     renderProfileThankYouList();
   });
+  loadStickiesViaRest(); // reliable on the iOS WebView where the SDK websocket is often dead
   const onBlocklistChanged = () => renderProfileThankYouList();
   window.addEventListener("asteroid-blocklist-changed", onBlocklistChanged);
 
@@ -267,7 +277,16 @@ export function mountThankYouStickies(db, profileKey, els) {
       isExplicit: textContainsAppendixExplicit(trimmed),
     };
     if (authorKey) payload.authorKey = authorKey;
-    push(stickiesRef, payload);
+    const newRef = push(stickiesRef, payload);
+    // REST PUT fallback so the note saves + shows even when the SDK websocket is dead (iOS WebView).
+    try {
+      const pid = newRef && newRef.key;
+      if (pid) {
+        fetch(REST_BASE + "/PROFILE_STICKIES/" + encodeURIComponent(safeKey) + "/notes/" + pid + ".json", {
+          method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+        }).then(loadStickiesViaRest).catch(() => {});
+      }
+    } catch (_) {}
     if (input) input.value = "";
   }
 

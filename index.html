@@ -10122,16 +10122,16 @@ console.log('1171')
         signInFn();
         return;
       }
-      try {
-        await setFn(refFn(db, 'FOLLOWS/' + artistKey + '/' + viewerKey), true);
-        await setFn(refFn(db, 'FOLLOWING/' + viewerKey + '/' + artistKey), true);
-        btn.textContent = 'Following';
-        btn.disabled = true;
-        btn.dataset.mode = 'follow';
-      } catch (e) {
-        console.error(e);
-        alert('Could not follow right now.');
-      }
+      // Fire the SDK write (may hang on the iOS WebView) AND a REST PUT (reliable),
+      // and update the UI immediately rather than awaiting a possibly-dead socket.
+      try { setFn(refFn(db, 'FOLLOWS/' + artistKey + '/' + viewerKey), true); } catch (e) {}
+      try { setFn(refFn(db, 'FOLLOWING/' + viewerKey + '/' + artistKey), true); } catch (e) {}
+      const _rb = 'https://asteroid-cdc13-default-rtdb.firebaseio.com';
+      fetch(_rb + '/FOLLOWS/' + encodeURIComponent(artistKey) + '/' + encodeURIComponent(viewerKey) + '.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: 'true' }).catch(function () {});
+      fetch(_rb + '/FOLLOWING/' + encodeURIComponent(viewerKey) + '/' + encodeURIComponent(artistKey) + '.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: 'true' }).catch(function () {});
+      btn.textContent = 'Following';
+      btn.disabled = true;
+      btn.dataset.mode = 'follow';
     };
 
     if (!window.__followButtonsTapFix) {
