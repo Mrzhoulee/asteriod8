@@ -1168,7 +1168,7 @@
                 <i class="fas fa-bolt"></i> Stories
             </button>
             <button class="tab-btn" onclick="switchTab('grow', event)">
-                <i class="fas fa-share-alt"></i> Grow
+                Grow
             </button>
 
         </div>
@@ -1425,7 +1425,7 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
                     <span id="qaTabBadge" class="qa-new-badge" style="display:none;"></span>
                 </div>
                 <button type="button" id="qaTabShareLink" class="qa-share-btn" onclick="shareQaLink(this)">
-                    <i class="fas fa-share-alt"></i> Share your Q&amp;A page
+                    Share your Q&amp;A page
                 </button>
             </div>
             <div id="qaTabList" style="display:flex;flex-direction:column;gap:14px;">
@@ -1859,13 +1859,23 @@ type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
             const badge = document.getElementById('qaTabBadge');
             const shareLink = document.getElementById('qaTabShareLink');
             if (shareLink) shareLink.dataset.qaUrl = 'https://www.asteroid8.net/qa.html?artist=' + encodeURIComponent(artistKey);
-            window.shareQaLink = function (btn) {
+            window.shareQaLink = async function (btn) {
               const url = (btn && btn.dataset && btn.dataset.qaUrl) || 'https://www.asteroid8.net/qa.html';
               const orig = btn.innerHTML;
               const flash = (m) => { btn.innerHTML = m; setTimeout(() => { btn.innerHTML = orig; }, 1600); };
-              if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(url).then(() => flash('<i class="fas fa-check"></i> Link copied!'), () => window.prompt('Copy your Q&A link:', url));
-              } else { window.prompt('Copy your Q&A link:', url); }
+              let ok = false;
+              try {
+                const Cap = window.Capacitor;
+                if (Cap && Cap.Plugins && Cap.Plugins.Clipboard && Cap.Plugins.Clipboard.write) { await Cap.Plugins.Clipboard.write({ string: url }); ok = true; }
+              } catch (_) {}
+              if (!ok) { try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(url); ok = true; } } catch (_) {} }
+              if (!ok) {
+                try {
+                  const ta = document.createElement('textarea'); ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.focus(); ta.select();
+                  ok = document.execCommand('copy'); document.body.removeChild(ta);
+                } catch (_) {}
+              }
+              if (ok) flash('Link copied!'); else window.prompt('Copy your Q&A link:', url);
             };
 
             function timeAgo(ts) {
@@ -3787,14 +3797,17 @@ async function loadGrowTab() {
         document.getElementById('ilSub').textContent =
           `Share this with fans - they auto-follow you on signup. ${d.referral_count || 0} supporters so far.`;
       } else {
-        document.getElementById('ilInput').value = ' - ';
-        document.getElementById('ilSub').innerHTML =
-          'Enable referrals to get your invite link. <button id="ilEnable" style="margin-left:.5rem;background:#10b981;color:#fff;border:none;padding:.4rem .8rem;border-radius:6px;cursor:pointer">Enable</button>';
-        document.getElementById('ilEnable').addEventListener('click', async () => {
+        document.getElementById('ilInput').value = 'Setting up your link…';
+        document.getElementById('ilSub').textContent = 'Preparing your invite link…';
+        // Auto-enable — no button. onSnapshot re-fires and shows the link once set.
+        try {
           const cur = (await getDoc(userRef)).data() || {};
           const slug = cur.slug || await _ilChooseUniqueSlug(cur.username || user.displayName || user.email || 'artist');
           await updateDoc(userRef, { slug, is_referral_eligible: true });
-        });
+        } catch (e) {
+          console.warn('[invite] auto-enable failed', e);
+          document.getElementById('ilSub').textContent = 'Could not set up your invite link right now.';
+        }
       }
     });
 

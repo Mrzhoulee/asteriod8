@@ -13,8 +13,7 @@ service cloud.firestore {
                     && !request.resource.data.diff(resource.data).affectedKeys()
                        .hasAny(['referral_count', 'signup_order_for_artist',
                                 'referred_by_artist_id', 'tier',
-                                'partnerStatus', 'equityEligible',
-                                'is_referral_eligible', 'slug']);
+                                'partnerStatus', 'equityEligible']);
       allow delete: if request.auth != null && request.auth.uid == userId;
     }
 
