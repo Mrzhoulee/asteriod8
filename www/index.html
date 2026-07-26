@@ -7361,6 +7361,16 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               sessionStorage.removeItem("_googleArtistRedirectPending");
               localStorage.setItem("profileType", "artist");
               localStorage.removeItem("appleOnboardingDone");
+              // Reflect the new Artist role on the role buttons right away (they don't
+              // re-render on their own until the menu is reopened).
+              try {
+                var _aBtn = document.getElementById("switchToArtistBtn");
+                var _lBtn = document.getElementById("switchToListenerBtn");
+                if (_aBtn) _aBtn.style.display = "none";
+                if (_lBtn) _lBtn.style.display = "";
+                var _gcd = document.getElementById("gcd");
+                if (_gcd && /continue with google|switch to artist/i.test(_gcd.textContent || "")) _gcd.textContent = "Signed in";
+              } catch (_) {}
               closeLogoutModal();
               if (typeof window.openAppleOnboardingModal === "function") window.openAppleOnboardingModal();
               const ekKey = localStorage.getItem("emailKey") || localStorage.getItem("CurrentUser") || "";
