@@ -3406,7 +3406,7 @@ async function loadGrowTab() {
   } catch (_) {}
 
   // 2. Display the link
-  const link = `https://asteroid8.net/join?ref=${_refCode}`;
+  const link = `https://www.asteroid8.net/join.html?ref=${_refCode}`;
   const inp = document.getElementById('refLinkInput');
   if (inp) inp.value = link;
 
@@ -3786,40 +3786,9 @@ async function loadGrowTab() {
 
   onAuthStateChanged(_ilAuth, async (user) => {
     if (!user) return;
-    const card = _ilEnsureMounted();
-    const userRef = doc(_ilDb,'users',user.uid);
-
-    onSnapshot(userRef, async (snap) => {
-      const d = snap.data() || {};
-      card.classList.add('show');
-      if (d.slug && d.is_referral_eligible){
-        document.getElementById('ilInput').value = `https://www.asteroid8.net/r/${d.slug}`;
-        document.getElementById('ilSub').textContent =
-          `Share this with fans - they auto-follow you on signup. ${d.referral_count || 0} supporters so far.`;
-      } else {
-        document.getElementById('ilInput').value = 'Setting up your link…';
-        document.getElementById('ilSub').textContent = 'Preparing your invite link…';
-        // Auto-enable — no button. onSnapshot re-fires and shows the link once set.
-        try {
-          const cur = (await getDoc(userRef)).data() || {};
-          const slug = cur.slug || await _ilChooseUniqueSlug(cur.username || user.displayName || user.email || 'artist');
-          await updateDoc(userRef, { slug, is_referral_eligible: true });
-        } catch (e) {
-          console.warn('[invite] auto-enable failed', e);
-          document.getElementById('ilSub').textContent = 'Could not set up your invite link right now.';
-        }
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      if (e.target.id !== 'ilCopy') return;
-      const v = document.getElementById('ilInput').value;
-      if (!v || v === ' - ') return;
-      navigator.clipboard.writeText(v).then(() => {
-        const b = e.target; b.classList.add('ok'); b.textContent = 'Copied!';
-        setTimeout(() => { b.classList.remove('ok'); b.textContent = 'Copy link'; }, 1500);
-      });
-    });
+    // Invite link now uses the RTDB referral code (the "Invite artists to Asteroid"
+    // card in the Grow tab). The old Firestore slug card is removed because this
+    // project's Firestore is in Datastore mode (no Firestore SDK / rules).
 
     // ─── Inbox UI (milestones + future notifications) ──────────────
     mountInbox(user.uid);
