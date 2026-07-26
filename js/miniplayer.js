@@ -538,13 +538,19 @@
 
   function playSong(song) {
     ensureUI();
-    if (!song || !song.url) return;
+    var srcUrl = song && (song.url || song.src || song.fileInp || '');
+    if (!song || !srcUrl) return;
+    song.url = srcUrl;
+    // Show the bar + song info INSTANTLY - don't wait for the audio to buffer.
+    current = song;
+    render();
+    renderPopup();
     recordPlayToTrending(song);
     if (audio) {
       try { audio.pause(); } catch (e) {}
       audio.src = '';
     }
-    audio = new Audio(song.url);
+    audio = new Audio(srcUrl);
     audio.preload = 'auto';
     audio.addEventListener('ended', () => { next(); });
     audio.addEventListener('play', () => { render(); renderPopup(); });
@@ -554,17 +560,16 @@
       els.progress.style.width = ((audio.currentTime / audio.duration) * 100) + '%';
     });
     pauseOtherAudio(audio);
-    current = song;
     audio.play().catch(() => {});
-    render();
-    renderPopup();
   }
 
   function play(song) { playSong(song); }
 
   function enqueue(song) {
     ensureUI();
-    if (!song || !song.url) return;
+    var srcUrl = song && (song.url || song.src || song.fileInp || '');
+    if (!song || !srcUrl) return;
+    song.url = srcUrl;
     firebaseSaveToPlaylist(song);
     if (!current) {
       playSong(song);
