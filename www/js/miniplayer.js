@@ -139,7 +139,7 @@
       #asteroid-miniplayer.open { display: block; }
       /* Pages without a bottom nav can override via body[data-amp-nobottomnav] */
       body[data-amp-nobottomnav] #asteroid-miniplayer { bottom: env(safe-area-inset-bottom, 0px); }
-      .amp-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
+      .amp-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; box-sizing: border-box; max-width: 100%; overflow: hidden; }
       .amp-art {
         width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0;
         background: linear-gradient(135deg, #ff7f50, #e66a3a);
@@ -151,7 +151,7 @@
       .amp-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
       .amp-sub { font-size: 11px; color: rgba(255,255,255,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .amp-btn {
-        width: 38px; height: 38px; border-radius: 50%;
+        width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
         border: 1px solid rgba(255,127,80,0.5);
         background: rgba(255,127,80,0.12); color: #fff;
         display: flex; align-items: center; justify-content: center;
@@ -169,7 +169,19 @@
       .amp-queue-badge[hidden] { display: none; }
       .amp-progress { height: 3px; background: rgba(255,255,255,0.1); position: relative; overflow: hidden; }
       .amp-progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff7f50, #e66a3a); transition: width 0.2s linear; }
-      @media (max-width: 480px) { .amp-row { padding: 6px 10px; gap: 8px; } .amp-art { width: 36px; height: 36px; } }
+      @media (max-width: 480px) {
+        .amp-row { padding: 6px 8px; gap: 6px; }
+        .amp-art { width: 34px; height: 34px; font-size: 14px; }
+        .amp-btn { width: 34px; height: 34px; }
+        .amp-btn .material-symbols-outlined, .amp-btn .material-icons { font-size: 19px; }
+        .amp-title { font-size: 12px; }
+        .amp-sub { font-size: 10px; }
+      }
+      @media (max-width: 360px) {
+        .amp-row { gap: 4px; padding: 6px; }
+        .amp-btn { width: 32px; height: 32px; }
+        .amp-btn .material-symbols-outlined, .amp-btn .material-icons { font-size: 18px; }
+      }
 
       /* Queue popup */
       #asteroid-queue-popup {
