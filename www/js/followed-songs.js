@@ -252,10 +252,13 @@ export async function initFollowedArtistSongs() {
           const m = rows[i];
           const payload = { url: m.src, src: m.src, title: m.title, artist: m.displayArtist, imageUrl: m.imageUrl };
           row.querySelector('[data-action="play"]').addEventListener("click", () => {
-            if (window.AsteroidPlayer) window.AsteroidPlayer.play(payload);
+            // Route through the same player as library/featured songs so the title shows on the visible mini-player.
+            if (window.playRecommendedSong) window.playRecommendedSong({ fileInp: m.src, title: m.title, artist: m.displayArtist, album: m.album || "" });
+            else if (window.AsteroidPlayer) window.AsteroidPlayer.play(payload);
           });
           row.querySelector('[data-action="queue"]').addEventListener("click", () => {
-            if (window.AsteroidPlayer) window.AsteroidPlayer.enqueue(payload);
+            if (window.queuemusic) window.queuemusic(m.src, m.title);
+            else if (window.AsteroidPlayer) window.AsteroidPlayer.enqueue(payload);
           });
         });
       } catch (e) {

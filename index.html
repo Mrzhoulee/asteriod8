@@ -1765,7 +1765,6 @@ html.song-overflow-menu-open {
 .lol-mini-player {
   box-sizing: border-box !important;
   max-width: 100vw !important;
-  overflow: hidden !important;
   flex-direction: column !important;
   align-items: stretch !important;
   gap: 10px !important;
@@ -4421,7 +4420,11 @@ setInterval(flySanta, 10000);
 <script>
 (function () {
   let queueOpen = false;
+  let _queueToggleTs = 0;
   window._toggleQueue = function () {
+    const now = Date.now();
+    if (now - _queueToggleTs < 350) return; // ignore double-fire (iPad touch + synthesized click)
+    _queueToggleTs = now;
     const popup = document.getElementById('queuePopup');
     const btn = document.getElementById('queueToggleBtn');
     if (!popup) return;
