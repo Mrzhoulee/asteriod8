@@ -4409,7 +4409,7 @@ setInterval(flySanta, 10000);
   </div>
   <audio id="gaga_global" playsinline preload="auto"
     onplay="if(window._expandPlayer)window._expandPlayer();if(window.actual1)window.actual1('gaga_global')"
-    onended="if(window.handleKKK)window.handleKKK()">
+    onended="if(window.__playNext)window.__playNext()">
   </audio>
   <div class="lol-main-row">
     <div id="miniVinyl" data-vinyl data-size="xs" data-audio="#gaga_global" data-label-color="#ff7f50" style="--vinyl-size:46px;flex-shrink:0;margin-right:12px;"></div>
@@ -6361,43 +6361,49 @@ window.actual1 = function (audioDomId) {
 window.jkjk = window.jkjk || [];
 window.ujk = window.ujk || [];
 
-window.queuemusic = function(fileInp, title) {
-  const queueDock = document.getElementById("queues");
-  const tata = document.getElementById("tata");
-  window.jkjk.push(fileInp);
-  window.ujk.push(title);
-  const el = document.createElement("div");
-  el.innerText = title;
-  el.style.cssText = "font-size:12px;margin:3px 0;color:white;padding:4px 8px;border:1px solid coral;border-radius:999px;background:rgba(255,127,80,0.1);white-space:nowrap;";
-  if (queueDock) {
-    queueDock.appendChild(el);
+// Single source of truth for "what plays next": queued songs first, then a random one.
+// gaga_global's onended calls this, so every song (library / featured / queued) advances the same way.
+window.__playNext = function () {
+  var g = document.getElementById("gaga_global");
+  if (!g) return;
+  if (window.jkjk && window.jkjk.length > 0) {
+    var src = window.jkjk.shift();
+    var title = (window.ujk && window.ujk.length ? window.ujk.shift() : "") || "";
+    var queueDock = document.getElementById("queues");
+    if (queueDock) { var first = queueDock.querySelector("div"); if (first) first.remove(); }
     if (typeof window._updateQueueBadge === "function") window._updateQueueBadge();
     if (typeof window._updateQueueEmpty === "function") window._updateQueueEmpty();
-  }
-  function processQueue() {
-    if (window.jkjk.length === 0) { if (tata) tata.innerHTML = '<font color="coral">SELECT A SONG</font>'; return; }
-    if (window.pauseAllLibraryAudioExcept) window.pauseAllLibraryAudioExcept(null);
-    const g = document.getElementById("gaga_global");
-    if (!g) return;
-    if (window.currentPlaying && window.currentPlaying !== g) try { window.currentPlaying.pause(); } catch (e) {}
-    g.src = window.jkjk[0];
-    g.dataset.displayTitle = window.ujk[0] || "";
+    if (window.pauseAllLibraryAudioExcept) window.pauseAllLibraryAudioExcept(g);
+    g.dataset.displayTitle = title;
     delete g.dataset.displayArtist;
+    delete g.dataset.explicit;
+    g.src = src;
     g.load();
     window.currentPlaying = g;
-    var qp = g.play();
-    if (qp && typeof qp.then === "function") qp.catch(function () {});
-    if (tata) tata.innerHTML = '<div style="color:white;font-weight:bold;">Now Playing: ' + window.ujk[0] + '</div>';
-    g.onended = function() {
-      g.onended = null;
-      window.jkjk.shift();
-      window.ujk.shift();
-      if (queueDock) { const first = queueDock.querySelector("div"); if (first) first.remove(); if (typeof window._updateQueueBadge === "function") window._updateQueueBadge(); if (typeof window._updateQueueEmpty === "function") window._updateQueueEmpty(); }
-      if (window.jkjk.length > 0) processQueue(); else { if (tata) tata.innerHTML = '<font color="coral">SELECT A SONG</font>'; g.removeAttribute("src"); }
-    };
+    var p = g.play();
+    if (p && typeof p.then === "function") p.catch(function () {});
+    return;
   }
-  if (typeof window.currentPlaying === "undefined" || !window.currentPlaying || window.currentPlaying.paused) processQueue();
-  else window.currentPlaying.onended = processQueue;
+  // Nothing queued -> keep playback going with a random song (radio behaviour).
+  if (typeof window.handleKKK === "function") window.handleKKK();
+};
+
+window.queuemusic = function (fileInp, title) {
+  if (!fileInp) return;
+  window.jkjk.push(fileInp);
+  window.ujk.push(title || "");
+  var queueDock = document.getElementById("queues");
+  if (queueDock) {
+    var el = document.createElement("div");
+    el.innerText = title || "";
+    el.style.cssText = "font-size:12px;margin:3px 0;color:white;padding:4px 8px;border:1px solid coral;border-radius:999px;background:rgba(255,127,80,0.1);white-space:nowrap;";
+    queueDock.appendChild(el);
+  }
+  if (typeof window._updateQueueBadge === "function") window._updateQueueBadge();
+  if (typeof window._updateQueueEmpty === "function") window._updateQueueEmpty();
+  // If nothing is currently playing, start the queue immediately.
+  var g = document.getElementById("gaga_global");
+  if (g && (!g.currentSrc || g.paused || g.ended)) window.__playNext();
 };
 
 window.handleKKK = function() {
