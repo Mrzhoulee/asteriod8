@@ -1906,6 +1906,27 @@ html.song-overflow-menu-open {
   }
 }
 .artists-section { display: block; overflow: visible; gap: 16px; scroll-behavior: smooth; white-space: normal; }
+/* OG Artists: the horizontal list must scroll on its own, not drag the whole page (every screen size) */
+#artists-grid-8 {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  padding-bottom: 8px;
+  box-sizing: border-box;
+}
+#artists-grid-8 .artists-grid,
+#artists-grid-8 .horizontal-scroll {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 14px;
+  min-width: max-content;
+}
+#artists-grid-8 .artist-card { flex: 0 0 auto; }
+html, body { overflow-x: hidden; max-width: 100%; }
 /* Keep featured artists/songs visible on iPad-sized layouts */
 @media screen and (min-width: 769px) and (max-width: 1366px) {
   #artists,
