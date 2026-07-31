@@ -10276,6 +10276,8 @@ console.log('1171')
   padding: 20px 18px 150px !important;
 }
 .mobile-nav-item {
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -10283,14 +10285,20 @@ console.log('1171')
   text-decoration: none;
   color: rgba(255,255,255,0.5);
   font-family: 'Poppins', sans-serif;
-  font-size: 11px;
+  font-size: clamp(9px, 2.6vw, 11px);
   font-weight: 500;
-  padding: 4px 12px;
+  padding: 4px 3px;
   border-radius: 10px;
   transition: color 0.2s, background 0.2s;
 }
+.mobile-nav-item span:not(.material-symbols-outlined) {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .mobile-nav-item .material-symbols-outlined {
-  font-size: 24px;
+  font-size: clamp(20px, 5.5vw, 24px);
 }
 .mobile-nav-item:hover,
 .mobile-nav-item.mobile-nav-active {
