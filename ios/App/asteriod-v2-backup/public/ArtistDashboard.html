@@ -1,0 +1,2442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Dashboard - Asteroid</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff7f50;
+            --primary-dark: #ff6347;
+            --bg-dark: #0a0a0f;
+            --bg-darker: #050508;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--card-border);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            top: 2px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(255, 127, 80, 0.2);
+            border-color: var(--primary);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-change.positive {
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        .analytics-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .songs-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .song-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+
+        .song-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+        }
+
+        .song-info {
+            flex: 1;
+        }
+
+        .song-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .song-artist {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .song-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .song-stat {
+            text-align: center;
+        }
+
+        .song-stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .song-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .creator-poll-duo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        @media (max-width: 720px) {
+            .creator-poll-duo { grid-template-columns: 1fr; }
+        }
+        .creator-poll-cell {
+            border: 2px solid rgba(255,127,80,0.35);
+            border-radius: 10px;
+            padding: 8px;
+            overflow: hidden;
+            background: rgba(0,0,0,0.2);
+        }
+        .creator-poll-cell .home-poll-embed iframe {
+            width: 100%;
+            height: 152px;
+            border: 0;
+            border-radius: 8px;
+        }
+        .creator-poll-cell .home-poll-embed--sc iframe { height: 120px; }
+
+        /* Profile Customization */
+        .profile-editor {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .theme-option {
+            position: relative;
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .theme-option:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-option.selected {
+            border-color: var(--primary);
+        }
+
+        .theme-preview {
+            height: 100px;
+            background: linear-gradient(135deg, var(--theme-primary, #ff7f50), var(--theme-secondary, #ff6347));
+        }
+
+        .theme-name {
+            padding: 0.5rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 127, 80, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .preview-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .profile-preview {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--preview-bg, var(--bg-darker));
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--card-border);
+        }
+
+        .preview-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .preview-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border: 4px solid var(--card-border);
+        }
+
+        .preview-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-bio {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-socials {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            padding: 0.5rem 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Profile Picture Upload */
+        .profile-picture-section {
+            margin-bottom: 2rem;
+        }
+
+        .profile-picture-container {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-picture-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--card-border);
+            background: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-picture-preview:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .profile-picture-preview img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-picture-upload {
+            flex: 1;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .premium-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .default-icon-notice {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Users List */
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .user-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .user-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(255, 127, 80, 0.2);
+            border-color: var(--primary);
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            object-fit: cover;
+            border: 3px solid var(--card-border);
+            background: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--text-secondary);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .user-email {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        .user-role {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(255, 127, 80, 0.2);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: var(--primary);
+        }
+
+        .user-card {
+            cursor: pointer;
+        }
+
+        /* Profile Modal */
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .profile-modal.active {
+            display: flex;
+        }
+
+        .profile-modal-content {
+            background: var(--bg-darker);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .profile-modal-header {
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--card-border);
+            position: relative;
+        }
+
+        .profile-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .profile-modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-modal-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            border: 4px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--text-secondary);
+            overflow: hidden;
+            background: var(--card-bg);
+        }
+
+        .profile-modal-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-modal-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-modal-bio {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-top: 1rem;
+        }
+
+        .profile-modal-body {
+            padding: 2rem;
+        }
+
+        .profile-modal-section {
+            margin-bottom: 2rem;
+        }
+
+        .profile-modal-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .profile-modal-socials {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .profile-modal-social-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .profile-modal-social-link:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .profile-modal-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .profile-modal-info-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .profile-modal-info-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-modal-info-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .song-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .song-stats {
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .theme-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-chart-line"></i> Artist Dashboard</h1>
+            <div>
+                <button class="btn btn-secondary" onclick="window.location.href='index.html'">
+                    <i class="fas fa-home"></i> Back to Home
+                </button>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('analytics')">
+                <i class="fas fa-chart-bar"></i> Analytics
+            </button>
+            <button class="tab-btn" onclick="switchTab('profile')">
+                <i class="fas fa-user-edit"></i> Customize Profile
+            </button>
+            <button class="tab-btn" onclick="switchTab('users')">
+                <i class="fas fa-users"></i> All Users
+            </button>
+            <button class="tab-btn" onclick="switchTab('subasteroids')">
+                <i class="fas fa-rocket"></i> SubAsteroids
+            </button>
+            <button class="tab-btn" onclick="switchTab('creator')">
+                <i class="fas fa-wand-magic-sparkles"></i> Creator tools
+            </button>
+            
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics-tab" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Plays (This Month)</div>
+                    <div class="stat-value" id="totalPlays">0</div>
+                    <div class="stat-change" id="playsChange">
+                        <i class="fas fa-calendar"></i> <span id="currentMonthName">Loading...</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">All Time Plays</div>
+                    <div class="stat-value" id="allTimePlays">0</div>
+                    <div class="stat-change">
+                        <i class="fas fa-chart-line"></i> Total
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Top Song</div>
+                    <div class="stat-value" id="topSong" style="font-size: 1.5rem;">-</div>
+                    <div class="stat-change" id="topSongPlays">0 plays</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Profile Views</div>
+                    <div class="stat-value" id="profileViews">0</div>
+                    <div class="stat-change">All time</div>
+                </div>
+            </div>
+
+            <div class="analytics-section">
+                <h2 class="section-title">
+                    <i class="fas fa-music"></i> Song Performance (All Time)
+                </h2>
+                <div id="songsList" class="songs-list">
+                    <div class="loading">Loading analytics...</div>
+                </div>
+            </div>
+
+            <div class="analytics-section">
+                <h2 class="section-title">
+                    <i class="fas fa-calendar-alt"></i> Monthly Plays Breakdown
+                </h2>
+                <div id="monthlyBreakdown" class="songs-list">
+                    <div class="loading">Loading monthly data...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Customization Tab -->
+        <div id="profile-tab" class="tab-content">
+            <div class="profile-editor">
+                <h2 class="section-title">
+                    <i class="fas fa-palette"></i> Customize Your Profile
+                </h2>
+
+                <form id="profileForm">
+                    <div class="form-group profile-picture-section">
+                        <label class="form-label">Profile Picture</label>
+                        <div class="profile-picture-container">
+                            <div class="profile-picture-preview" id="profilePicturePreview" onclick="document.getElementById('profilePictureInput').click()">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="profile-picture-upload">
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('profilePictureInput').click()">
+                                        <i class="fas fa-upload"></i> Upload Picture
+                                    </button>
+                                </div>
+                                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
+                                    Click the preview or button to upload a new profile picture
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Artist Name / Nickname</label>
+                        <input type="text" id="profileNickname" class="form-input" placeholder="Your artist name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Public username (unique, one-time)</label>
+                        <input type="text" id="profilePublicUsername" class="form-input" placeholder="e.g. lunar_beats" maxlength="40" autocomplete="username">
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.35rem;">3–40 chars: letters, numbers, underscores only. Once saved, it stays yours; cannot be taken by someone else.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Bio / Description</label>
+                        <textarea id="profileBio" class="form-textarea" placeholder="Tell your fans about yourself..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Profile Theme</label>
+                        <div class="theme-selector" id="themeSelector">
+                            <div class="theme-option" data-theme="coral" onclick="selectTheme('coral')">
+                                <div class="theme-preview" style="--theme-primary: #ff7f50; --theme-secondary: #ff6347;"></div>
+                                <div class="theme-name">Coral</div>
+                            </div>
+                            <div class="theme-option" data-theme="purple" onclick="selectTheme('purple')">
+                                <div class="theme-preview" style="--theme-primary: #8b5cf6; --theme-secondary: #7c3aed;"></div>
+                                <div class="theme-name">Purple</div>
+                            </div>
+                            <div class="theme-option" data-theme="blue" onclick="selectTheme('blue')">
+                                <div class="theme-preview" style="--theme-primary: #3b82f6; --theme-secondary: #2563eb;"></div>
+                                <div class="theme-name">Blue</div>
+                            </div>
+                            <div class="theme-option" data-theme="green" onclick="selectTheme('green')">
+                                <div class="theme-preview" style="--theme-primary: #10b981; --theme-secondary: #059669;"></div>
+                                <div class="theme-name">Green</div>
+                            </div>
+                            <div class="theme-option" data-theme="red" onclick="selectTheme('red')">
+                                <div class="theme-preview" style="--theme-primary: #ef4444; --theme-secondary: #dc2626;"></div>
+                                <div class="theme-name">Red</div>
+                            </div>
+                            <div class="theme-option" data-theme="dark" onclick="selectTheme('dark')">
+                                <div class="theme-preview" style="--theme-primary: #1f2937; --theme-secondary: #111827;"></div>
+                                <div class="theme-name">Dark</div>
+                            </div>
+                        </div>
+                    </div>
+Donation Box Embed Code
+                    <input class="form-input" id="tinp"
+type="text" placeholder="Enter your DonorBox iframe embed code or URL"/>
+<h3>ⓘ Paste your full DonorBox iframe embed code, or just enter the donation page URL and it will be displayed in an iframe</h3>
+
+                    <button type="button" class="btn btn-primary" onclick="saveProfile()">
+                        <i class="fas fa-save"></i> Save Profile
+                    </button>
+                </form>
+            </div>
+
+            <div class="preview-section">
+                <h2 class="section-title">
+                    <i class="fas fa-eye"></i> Profile Preview
+                </h2>
+                <div class="profile-preview" id="profilePreview">
+                    <div class="preview-header">
+                        <div class="preview-avatar" id="previewAvatar">🎵</div>
+                        <div class="preview-name" id="previewName">Your Artist Name</div>
+                        <div class="preview-bio" id="previewBio">Your bio will appear here...</div>
+                        <div class="preview-socials" id="prevTin">Your donation box wil appear here...</div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Users Tab -->
+        <div id="users-tab" class="tab-content">
+            <div class="analytics-section">
+                <h2 class="section-title">
+                    <i class="fas fa-users"></i> All Users
+                </h2>
+                <div id="usersList" class="users-grid">
+                    <div class="loading">Loading users...</div>
+                </div>
+            </div>
+        </div>
+        <!-- SubAsteroids Tab -->
+<div id="subasteroids-tab" class="tab-content">
+    <div class="analytics-section">
+        <h2 class="section-title">
+            
+            <i class="fas fa-rocket"></i> Post Into Any SubAsteroid
+        </h2>
+
+        <input type="text" id="subName" class="form-input" placeholder="SubAsteroid name (example: edm)">
+        <input type="text" id="subSongTitle" class="form-input" placeholder="Post Title" style="margin-top:0.5rem;">
+        <textarea id="subSongDesc" class="form-textarea" placeholder="Description" style="margin-top:0.5rem;"></textarea>
+        <input type="text" id="subSongURL" class="form-input" placeholder="Song URL (optional)" style="margin-top:0.5rem;">
+
+        <button class="btn btn-primary" style="margin-top:1rem;" onclick="postToSubAsteroid()">
+            <i class="fas fa-paper-plane"></i> Post
+        </button>
+    </div>
+
+    <div class="analytics-section" style="margin-top:2rem;">
+        <h2 class="section-title">
+            <i class="fas fa-fire"></i> SubAsteroid Feed
+        </h2>
+        <div id="subFeed" class="songs-list">
+            <div class="loading">Loading posts...</div>
+        </div>
+    </div>
+</div>
+
+        <!-- Creator tools (fans, journeys, polls, follow) -->
+        <div id="creator-tab" class="tab-content">
+            <div class="analytics-section">
+                <h2 class="section-title"><i class="fas fa-heart"></i> First 100 fans (listeners)</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">
+                    Built from plays logged on the home library when your <code>uploader</code> email matches this account. Unsigned listeners appear as “Anonymous”.
+                </p>
+                <div id="creatorFansList" class="songs-list"><div class="loading">Open this tab after sign-in to load fans…</div></div>
+            </div>
+            <div class="analytics-section">
+                <h2 class="section-title"><i class="fas fa-file-signature"></i> Upload agreements (your uploads)</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Rows from AGREEMENTS where the email matches you (checkbox + upload on Studio).</p>
+                <div id="creatorAgreementsList" class="songs-list"><div class="loading">Loading…</div></div>
+            </div>
+            <div class="analytics-section">
+                <h2 class="section-title"><i class="fas fa-route"></i> Listen journey (before → your song)</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">What people played right before one of your tracks, and what they played after (from LISTEN_JOURNEYS).</p>
+                <div id="creatorJourneysList" class="songs-list"><div class="loading">Loading…</div></div>
+            </div>
+            <div class="analytics-section">
+                <h2 class="section-title"><i class="fas fa-poll"></i> Artist vs artist poll</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Preview links: YouTube, Spotify, SoundCloud, Apple Music, or direct MP3. Fans vote <strong>once per week</strong> per account/device. Polls <strong>auto-close after 7 days</strong> and each artist can publish <strong>one battle every 3 months</strong>.</p>
+                <div class="form-group">
+                    <label class="form-label">Duo theme (your side vs theirs)</label>
+                    <select id="pollThemePreset" class="form-input">
+                        <option value="blue_red">Blue vs red</option>
+                        <option value="coral_navy">Coral vs navy</option>
+                        <option value="purple_gold">Purple vs gold</option>
+                        <option value="teal_rose">Teal vs rose</option>
+                        <option value="green_slate">Green vs slate</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Other artist name</label>
+                    <input type="text" id="pollArtistB" class="form-input" placeholder="Artist B">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Your preview URL</label>
+                    <input type="text" id="pollUrlA" class="form-input" placeholder="Spotify / YouTube / SoundCloud / MP3…">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Their preview URL</label>
+                    <input type="text" id="pollUrlB" class="form-input" placeholder="Spotify / YouTube / SoundCloud / MP3…">
+                </div>
+                <button type="button" class="btn btn-primary" id="pollCreateBtn"><i class="fas fa-plus"></i> Publish poll</button>
+                <div id="creatorPollsList" class="songs-list" style="margin-top: 1.5rem;"><div class="loading">No polls yet.</div></div>
+            </div>
+            <div class="analytics-section">
+                <h2 class="section-title"><i class="fas fa-bell"></i> Followers &amp; updates</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">
+                    When fans follow you, your posts show up on their home feed. Use this to announce a new song, a show, or anything you want your followers to see.
+                </p>
+                <div id="creatorFollowStatus" style="color: var(--text-secondary); margin-bottom: 12px;"></div>
+
+                <div class="form-group">
+                    <label class="form-label">Post an update to your followers</label>
+                    <textarea id="creatorNoticeText" class="form-input" rows="3" maxlength="800" placeholder="e.g. New single &quot;Midnight Drive&quot; is out now — link in my profile!"></textarea>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.35rem;">
+                        Tip: when you drop a new song, write a short update here. Everyone who follows you will see it on their home feed the next time they open the app. (Max 800 characters. You need a saved public username before you can post.)
+                    </p>
+                </div>
+                <button type="button" class="btn btn-primary" id="creatorPostNoticeBtn"><i class="fas fa-bullhorn"></i> Post update</button>
+                <div id="creatorPostNoticeStatus" style="color: var(--text-secondary); margin-top: 10px; font-size: 0.9rem;"></div>
+
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label class="form-label">Follow another artist by username</label>
+                    <input type="text" id="creatorFollowUsername" class="form-input" placeholder="e.g. lunar_beats" maxlength="40" autocomplete="off">
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.35rem;">Their posts will then appear on your home feed too. They need a saved public username.</p>
+                </div>
+                <button type="button" class="btn btn-primary" id="creatorFollowUserBtn"><i class="fas fa-user-plus"></i> Follow this user</button>
+                <p style="color: var(--text-secondary); margin-top: 12px; font-size: 0.9rem;">Don't have a public username yet? Set one under <strong>Customize Profile</strong> first.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="profile-modal">
+        <div class="profile-modal-content" id="profileModalContent">
+            <div class="profile-modal-header" id="profileModalHeader">
+                <button class="profile-modal-close" onclick="closeProfileModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="profile-modal-avatar" id="profileModalAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-modal-name" id="profileModalName">User Name</div>
+                <div class="profile-modal-bio" id="profileModalBio">No bio available</div>
+            </div>
+            <div class="profile-modal-body">
+                <div class="profile-modal-section">
+                    <div class="profile-modal-section-title">
+                        <i class="fas fa-info-circle"></i> Profile Information
+                    </div>
+                    <div class="profile-modal-info" id="profileModalInfo">
+                        <div class="profile-modal-info-item">
+                            <div class="profile-modal-info-label">Role</div>
+                            <div class="profile-modal-info-value" id="profileModalRole">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getDatabase, ref, get, set, update, onValue, query, orderByChild, equalTo, limitToLast, push, increment } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+        import { pollPreviewMarkup } from "./js/home-polls.js";
+
+        const POLL_THEME_PRESETS = {
+            blue_red: { colorA: "#2563eb", colorB: "#dc2626" },
+            coral_navy: { colorA: "#ff7f50", colorB: "#1e3a5f" },
+            purple_gold: { colorA: "#7c3aed", colorB: "#d97706" },
+            teal_rose: { colorA: "#0d9488", colorB: "#e11d48" },
+            green_slate: { colorA: "#16a34a", colorB: "#475569" }
+        };
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+            authDomain: "asteroid-cdc13.firebaseapp.com",
+            databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+            projectId: "asteroid-cdc13",
+            storageBucket: "asteroid-cdc13.appspot.com",
+            messagingSenderId: "793353824502",
+            appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+            measurementId: "G-GV72TMNNGR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+
+        const sanitizeEmail = (email) => (email || "").replace(/[.#$[\]]/g, '_');
+
+        async function pinFeaturedArtistSong(emailKey, signedInEmail) {
+            if (!emailKey) return;
+            const emailVariants = new Set();
+            const addVariant = (e) => {
+                if (!e) return;
+                emailVariants.add(e);
+                emailVariants.add(sanitizeEmail(e));
+                emailVariants.add(sanitizeEmail(e.toLowerCase()));
+            };
+            addVariant(signedInEmail);
+            addVariant((localStorage.getItem('email') || '').trim());
+            addVariant((localStorage.getItem('artemail') || '').trim());
+            addVariant(emailKey);
+            try {
+                const songsSnap = await get(ref(database, 'SONGS'));
+                if (!songsSnap.exists()) return;
+                const all = songsSnap.val();
+                const matches = [];
+                for (const titleKey in all) {
+                    for (const albumKey in all[titleKey]) {
+                        for (const artistKeyInner in all[titleKey][albumKey]) {
+                            const s = all[titleKey][albumKey][artistKeyInner];
+                            if (!s || !s.fileInp) continue;
+                            const ownerOnSong = String(s.uploaderOwnerKey || '').trim();
+                            const up = String(s.uploader || '').trim();
+                            const ownerKeyMatch = ownerOnSong && ownerOnSong === emailKey;
+                            const uploaderMatch = up && (
+                                emailVariants.has(up) ||
+                                emailVariants.has(sanitizeEmail(up)) ||
+                                emailVariants.has(sanitizeEmail(up.toLowerCase()))
+                            );
+                            if (ownerKeyMatch || uploaderMatch) {
+                                matches.push({ s, songPath: 'SONGS/' + titleKey + '/' + albumKey + '/' + artistKeyInner });
+                            }
+                        }
+                    }
+                }
+                if (!matches.length) return;
+                matches.sort((a, b) => (Number(b.s.createdAt) || 0) - (Number(a.s.createdAt) || 0));
+                const top = matches[0];
+                await set(ref(database, 'FEATURED_ARTIST_SONG/' + emailKey), {
+                    title: top.s.title || '',
+                    album: top.s.album || '',
+                    artist: top.s.artist || '',
+                    fileInp: top.s.fileInp,
+                    uploader: top.s.uploader || '',
+                    uploaderName: top.s.uploaderName || '',
+                    songPath: top.songPath,
+                    uploadedAt: Number(top.s.createdAt) || Date.now(),
+                });
+                console.log('[autopin] FEATURED_ARTIST_SONG pinned:', top.songPath);
+            } catch (e) {
+                console.warn('[autopin] failed', e);
+            }
+        }
+
+        function fanEngagementKeyVariants(raw) {
+            const s = String(raw || "").trim();
+            if (!s) return [];
+            const k1 = sanitizeEmail(s);
+            const k2 = sanitizeEmail(s.toLowerCase());
+            return k1 === k2 ? (k1 ? [k1] : []) : [k1, k2].filter(Boolean);
+        }
+        function engagementPathKeyHome(raw) {
+            return String(raw || "").trim().toLowerCase().replace(/[.#$[\]]/g, "_");
+        }
+        function collectFanEngagementReadKeys() {
+            const set = new Set();
+            const add = (raw) => {
+                fanEngagementKeyVariants(raw).forEach((k) => set.add(k));
+                const h = engagementPathKeyHome(raw);
+                if (h) set.add(h);
+            };
+            add(currentUserEmail);
+            add(localStorage.getItem("artemail"));
+            add(localStorage.getItem("email"));
+            add(localStorage.getItem("CurrentUser"));
+            try {
+                const u = auth.currentUser;
+                if (u) {
+                    add(u.email);
+                    add(u.uid);
+                }
+            } catch (e) {}
+            if (currentEmailKey) set.add(currentEmailKey);
+            return [...set].filter(Boolean);
+        }
+
+        let currentUserEmail = null;
+        let currentEmailKey = null;
+        let selectedTheme = 'coral';
+        let isPremiumUser = true;
+        let allUsersData = []; // Store all users data for modal access
+
+        // Tab switching
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            
+            // Load social accounts when switching to social tab
+            if (tabName === 'creator' && currentEmailKey) {
+                loadCreatorTools();
+            }
+        };
+
+        async function loadCreatorTools() {
+            const safe = currentEmailKey;
+            const fansEl = document.getElementById('creatorFansList');
+            const agrEl = document.getElementById('creatorAgreementsList');
+            const jouEl = document.getElementById('creatorJourneysList');
+            const pollsEl = document.getElementById('creatorPollsList');
+            if (!safe) {
+                if (fansEl) fansEl.innerHTML = '<div class="empty-state">Sign in to view creator tools.</div>';
+                return;
+            }
+
+            try {
+                const readKeys = collectFanEngagementReadKeys();
+                const fanRows = [];
+                const seenEventIds = new Set();
+                for (const k of readKeys) {
+                    const feSnap = await get(ref(database, 'FAN_ENGAGEMENT/' + k + '/events'));
+                    if (!feSnap.exists()) continue;
+                    feSnap.forEach((c) => {
+                        if (seenEventIds.has(c.key)) return;
+                        seenEventIds.add(c.key);
+                        fanRows.push({ id: c.key, ...c.val() });
+                    });
+                }
+                fanRows.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+                const seen = new Set();
+                let unique = [];
+                for (const r of fanRows) {
+                    const k = (r.listenerEmail || r.label || 'anon') + '|' + (r.songTitle || '');
+                    if (seen.has(k)) continue;
+                    seen.add(k);
+                    unique.push(r);
+                    if (unique.length >= 100) break;
+                }
+                if (unique.length === 0) {
+                    const ljKeys = [...new Set(collectFanEngagementReadKeys())];
+                    for (const k of ljKeys) {
+                        if (!k) continue;
+                        try {
+                            const jq = query(
+                                ref(database, 'LISTEN_JOURNEYS'),
+                                orderByChild('uploaderKey'),
+                                equalTo(k),
+                                limitToLast(80)
+                            );
+                            const ljSnap = await get(jq);
+                            if (!ljSnap.exists()) continue;
+                            ljSnap.forEach((c) => {
+                                const v = c.val();
+                                if (!v || !v.playedTitle) return;
+                                const dk = (v.listenerEmail || v.listenerLabel || 'anon') + '|' + (v.playedTitle || '');
+                                if (seen.has(dk)) return;
+                                seen.add(dk);
+                                unique.push({
+                                    label: v.listenerLabel || 'Anonymous',
+                                    songTitle: v.playedTitle,
+                                    anonymous: !v.listenerEmail,
+                                    cameFromTitle: v.prevTitle || null,
+                                    ts: v.ts || 0
+                                });
+                            });
+                        } catch (e2) {
+                            console.warn('Creator tools: LISTEN_JOURNEYS fan fallback', k, e2);
+                        }
+                    }
+                    unique.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+                    unique = unique.slice(0, 100);
+                }
+                if (fansEl) {
+                    fansEl.innerHTML = unique.length
+                        ? unique.map((r) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(r.label || 'Anonymous')}</div><div class="song-artist">${r.anonymous ? 'Anonymous listener' : 'Signed in'} · ${escapeHtml(r.songTitle || '')}</div></div><div class="song-stats"><span class="song-stat-value" style="font-size:0.85rem;">${r.cameFromTitle ? 'From: ' + escapeHtml(r.cameFromTitle) : '—'}</span></div></div>`).join('')
+                        : '<div class="empty-state">No fan plays yet. Open <strong>www/ArtistDashboard.html</strong> if your site lives under <code>www/</code>. Tracks need <code>uploader</code> on each song. This list merges <code>FAN_ENGAGEMENT</code> and <code>LISTEN_JOURNEYS</code> for your email and user id.</div>';
+                }
+            } catch (e) {
+                console.error('Creator tools: FAN_ENGAGEMENT', e);
+                if (fansEl) {
+                    fansEl.innerHTML = '<div class="empty-state">Could not load fan plays. Deploy latest <code>database.rules.json</code> (includes <code>FAN_ENGAGEMENT</code>) with <code>firebase deploy --only database</code>, then hard-refresh.</div>';
+                }
+            }
+
+            try {
+                const agSnap = await get(ref(database, 'AGREEMENTS'));
+                const agreements = [];
+                const me = String(currentUserEmail || '').trim().toLowerCase();
+                if (agSnap.exists()) {
+                    agSnap.forEach((c) => {
+                        const v = c.val();
+                        if (v && String(v.email || '').trim().toLowerCase() === me) {
+                            agreements.push(v);
+                        }
+                    });
+                }
+                if (agrEl) {
+                    agrEl.innerHTML = agreements.length
+                        ? agreements.map((v) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(v.songTitle || '')}</div><div class="song-artist">${escapeHtml(v.artistName || '')} · ${escapeHtml(v.albumName || '')}</div>${v.name ? `<div class="song-artist" style="margin-top:4px;font-size:0.85rem;opacity:0.9;">${escapeHtml(v.name || '')}</div>` : ''}</div><div class="song-stats"><span class="song-stat-label">${v.acceptedAt ? new Date(v.acceptedAt).toLocaleString() : ''}</span></div></div>`).join('')
+                        : `<div class="empty-state">No agreement rows for this account yet. Upload a track in Studio with the agreement box checked using the same account you use to sign in here.</div>`;
+                }
+            } catch (e) {
+                console.error('Creator tools: AGREEMENTS', e);
+                if (agrEl) agrEl.innerHTML = '<div class="empty-state">Could not load agreements (rules or network).</div>';
+            }
+
+            try {
+                const journeys = [];
+                const ajSnap = await get(ref(database, 'ARTIST_JOURNEYS/' + safe));
+                if (ajSnap.exists()) {
+                    ajSnap.forEach((c) => {
+                        const v = c.val();
+                        if (v) journeys.push({ id: c.key, ...v });
+                    });
+                }
+                if (journeys.length === 0) {
+                    try {
+                        const jq = query(
+                            ref(database, 'LISTEN_JOURNEYS'),
+                            orderByChild('uploaderKey'),
+                            equalTo(safe),
+                            limitToLast(200)
+                        );
+                        const ljSnap = await get(jq);
+                        if (ljSnap.exists()) {
+                            ljSnap.forEach((c) => {
+                                const v = c.val();
+                                if (v) journeys.push({ id: c.key, ...v });
+                            });
+                        }
+                    } catch (inner) {
+                        console.warn('Creator tools: legacy LISTEN_JOURNEYS query', inner);
+                    }
+                }
+                journeys.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+                if (jouEl) {
+                    jouEl.innerHTML = journeys.length
+                        ? journeys.slice(0, 120).map((j) => `<div class="song-item"><div class="song-info"><div class="song-title">${escapeHtml(j.playedTitle || '')}</div><div class="song-artist">Before: ${escapeHtml(j.prevTitle || '—')} · After: ${escapeHtml(j.nextTitle || '—')}</div></div><div class="song-stats"><span class="song-stat-label">${j.listenerLabel ? escapeHtml(j.listenerLabel) : ''}</span></div></div>`).join('')
+                        : '<div class="empty-state">No journey rows yet. New plays from the home library are mirrored here automatically. Older data may appear after a successful indexed query once rules are deployed.</div>';
+                }
+            } catch (e) {
+                console.error('Creator tools: journeys', e);
+                if (jouEl) {
+                    jouEl.innerHTML = '<div class="empty-state">Could not load journeys. Deploy latest <code>database.rules.json</code> (includes <code>ARTIST_JOURNEYS</code>) and run <code>firebase deploy --only database</code>, then refresh.</div>';
+                }
+            }
+
+            try {
+                const polSnap = await get(ref(database, 'ARTIST_POLLS'));
+                const mine = [];
+                if (polSnap.exists()) {
+                    polSnap.forEach((c) => {
+                        const v = c.val();
+                        if (v && v.ownerKey === safe) mine.push({ id: c.key, ...v });
+                    });
+                }
+                mine.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                if (pollsEl) {
+                    if (!mine.length) {
+                        pollsEl.innerHTML = '<div class="empty-state">Create a poll above.</div>';
+                    } else {
+                        let pollsHtml = '';
+                        for (const p of mine) {
+                            let ca = 0;
+                            let cb = 0;
+                            try {
+                                const vSnap = await get(ref(database, 'ARTIST_POLLS/' + p.id + '/votes'));
+                                if (vSnap.exists()) {
+                                    vSnap.forEach((c) => {
+                                        const s = (c.val() && c.val().side) || '';
+                                        if (s === 'a') ca++;
+                                        else if (s === 'b') cb++;
+                                    });
+                                }
+                            } catch (ve) {
+                                console.warn(ve);
+                            }
+                            const pidJs = String(p.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                            const cA = p.colorA || '#2563eb';
+                            const cB = p.colorB || '#dc2626';
+                            const POLL_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+                            const createdAt = Number(p.createdAt) || 0;
+                            const ageMs = createdAt ? Date.now() - createdAt : 0;
+                            const closed = createdAt && ageMs >= POLL_LIFETIME_MS;
+                            const daysLeft = createdAt ? Math.max(0, Math.ceil((POLL_LIFETIME_MS - ageMs) / (24 * 60 * 60 * 1000))) : 7;
+                            const statusLabel = closed
+                                ? `<span style="color:#f87171;font-weight:600;">Closed · past 7 days</span>`
+                                : `<span style="color:#10b981;font-weight:600;">Active · closes in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</span>`;
+                            const voteButtons = closed
+                                ? `<span style="color:var(--text-secondary);font-size:0.85rem;">Voting closed · final ${ca} vs ${cb}</span>`
+                                : `<button type="button" class="btn btn-secondary" onclick="window.castPollVote('${pidJs}','a')" style="background:${escapeHtml(cA)};border:none;">Vote you (${ca})</button><button type="button" class="btn btn-secondary" onclick="window.castPollVote('${pidJs}','b')" style="background:${escapeHtml(cB)};border:none;">Vote ${escapeHtml(p.artistBName || 'them')} (${cb})</button>`;
+                            pollsHtml += `<div class="song-item creator-poll-row"><div class="song-info"><div class="song-title">You vs ${escapeHtml(p.artistBName || '')}</div><div style="font-size:0.85rem;margin:4px 0 8px;">${statusLabel}</div><div class="creator-poll-duo" style="--pa:${escapeHtml(cA)};--pb:${escapeHtml(cB)};"><div class="creator-poll-cell" style="border-color:${escapeHtml(cA)}">${pollPreviewMarkup(p.songUrlA)}</div><div class="creator-poll-cell" style="border-color:${escapeHtml(cB)}">${pollPreviewMarkup(p.songUrlB)}</div></div><div class="song-stats" style="flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;">${voteButtons}</div></div></div>`;
+                        }
+                        pollsEl.innerHTML = pollsHtml;
+                    }
+                }
+            } catch (e) {
+                console.error('Creator tools: ARTIST_POLLS', e);
+                if (pollsEl) pollsEl.innerHTML = '<div class="empty-state">Could not load polls.</div>';
+            }
+
+            try {
+                const fs = document.getElementById('creatorFollowStatus');
+                if (fs && safe) {
+                    const folSnap = await get(ref(database, 'FOLLOWS/' + safe));
+                    let n = 0;
+                    if (folSnap.exists()) folSnap.forEach(() => { n++; });
+                    fs.textContent = n === 0 ? 'No followers recorded yet under FOLLOWS/' + safe + '.' : n + ' follower(s) under FOLLOWS/' + safe + '.';
+                }
+            } catch (fe) {
+                console.warn('Creator tools: follower count', fe);
+            }
+        }
+
+        function escapeHtml(s) {
+            if (s == null) return '';
+            const d = document.createElement('div');
+            d.textContent = String(s);
+            return d.innerHTML;
+        }
+
+        const POLL_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+        window.castPollVote = async function (pollId, side) {
+            let vid = sanitizeEmail((currentUserEmail || '').trim() || (localStorage.getItem('email') || '').trim());
+            if (!vid) {
+                let pk = localStorage.getItem('pollVoterKey');
+                if (!pk) {
+                    pk = 'pv_' + Math.random().toString(36).slice(2) + Date.now();
+                    localStorage.setItem('pollVoterKey', pk);
+                }
+                vid = sanitizeEmail(pk);
+            }
+            const POLL_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+            try {
+                const metaSnap = await get(ref(database, 'ARTIST_POLLS/' + pollId + '/createdAt'));
+                const created = metaSnap.exists() ? Number(metaSnap.val()) : 0;
+                if (created && Date.now() - created >= POLL_LIFETIME_MS) {
+                    alert('This poll has closed (7-day limit reached).');
+                    return;
+                }
+            } catch (e) { /* non-fatal */ }
+            const voteRef = ref(database, 'ARTIST_POLLS/' + pollId + '/votes/' + vid);
+            const now = Date.now();
+            try {
+                const snap = await get(voteRef);
+                if (snap.exists()) {
+                    const prev = snap.val();
+                    const t = prev && typeof prev.ts === 'number' ? prev.ts : 0;
+                    if (now - t < POLL_WEEK_MS) {
+                        const days = Math.max(1, Math.ceil((POLL_WEEK_MS - (now - t)) / (24 * 60 * 60 * 1000)));
+                        alert('You can vote again in about ' + days + ' day(s).');
+                        return;
+                    }
+                }
+                await set(voteRef, { side: side, ts: now });
+                loadCreatorTools();
+            } catch (e) {
+                console.error(e);
+                alert('Could not record vote (wait a week to change vote, or check network / rules).');
+            }
+        };
+
+        const POLL_CREATE_COOLDOWN_MS = 90 * 24 * 60 * 60 * 1000; // 3 months
+
+        document.getElementById('pollCreateBtn')?.addEventListener('click', async () => {
+            if (!currentEmailKey) {
+                alert('Sign in first.');
+                return;
+            }
+            const artistBName = (document.getElementById('pollArtistB')?.value || '').trim();
+            const songUrlA = (document.getElementById('pollUrlA')?.value || '').trim();
+            const songUrlB = (document.getElementById('pollUrlB')?.value || '').trim();
+            const themeKey = (document.getElementById('pollThemePreset')?.value || 'blue_red').trim();
+            const colors = POLL_THEME_PRESETS[themeKey] || POLL_THEME_PRESETS.blue_red;
+            if (!artistBName || !songUrlA || !songUrlB) {
+                alert('Fill all poll fields.');
+                return;
+            }
+
+            // Rate-limit: one poll per artist every 3 months.
+            try {
+                const existingSnap = await get(ref(database, 'ARTIST_POLLS'));
+                if (existingSnap.exists()) {
+                    const now = Date.now();
+                    let mostRecent = 0;
+                    existingSnap.forEach((c) => {
+                        const v = c.val();
+                        if (v && v.ownerKey === currentEmailKey && Number(v.createdAt) > mostRecent) {
+                            mostRecent = Number(v.createdAt);
+                        }
+                    });
+                    if (mostRecent && now - mostRecent < POLL_CREATE_COOLDOWN_MS) {
+                        const daysLeft = Math.max(1, Math.ceil((POLL_CREATE_COOLDOWN_MS - (now - mostRecent)) / (24 * 60 * 60 * 1000)));
+                        alert('You can only publish one battle poll every 3 months. Try again in about ' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + '.');
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('poll cooldown check failed', e);
+            }
+
+            const pid = 'poll_' + Date.now();
+            try {
+                await set(ref(database, 'ARTIST_POLLS/' + pid), {
+                    ownerKey: currentEmailKey,
+                    ownerEmail: currentUserEmail,
+                    artistBName,
+                    songUrlA,
+                    songUrlB,
+                    colorA: colors.colorA,
+                    colorB: colors.colorB,
+                    themePreset: themeKey,
+                    labelA: 'You',
+                    labelB: artistBName,
+                    createdAt: Date.now()
+                });
+                document.getElementById('pollArtistB').value = '';
+                document.getElementById('pollUrlA').value = '';
+                document.getElementById('pollUrlB').value = '';
+                loadCreatorTools();
+            } catch (e) {
+                console.error(e);
+                alert('Could not save poll (rules?)');
+            }
+        });
+
+        document.getElementById('creatorPostNoticeBtn')?.addEventListener('click', async () => {
+            const statusEl = document.getElementById('creatorPostNoticeStatus');
+            const setStatus = (msg, ok) => {
+                if (!statusEl) return;
+                statusEl.textContent = msg || '';
+                statusEl.style.color = ok ? '#10b981' : 'var(--text-secondary)';
+            };
+            if (!currentEmailKey) {
+                setStatus('Sign in first.', false);
+                return;
+            }
+            const textarea = document.getElementById('creatorNoticeText');
+            const text = (textarea?.value || '').trim();
+            if (!text) {
+                setStatus('Write something first.', false);
+                return;
+            }
+            if (text.length > 800) {
+                setStatus('Message is too long (max 800 characters).', false);
+                return;
+            }
+            try {
+                const noticesRef = ref(database, 'ARTIST_NOTICES/' + currentEmailKey);
+                await push(noticesRef, {
+                    text,
+                    ts: Date.now(),
+                    ownerKey: currentEmailKey
+                });
+                textarea.value = '';
+                setStatus('Posted! Followers will see this on their home feed.', true);
+            } catch (e) {
+                console.error('post notice failed', e);
+                setStatus('Could not post. Make sure you have a public profile and try again.', false);
+            }
+        });
+
+        document.getElementById('creatorFollowUserBtn')?.addEventListener('click', async () => {
+            if (!currentEmailKey) {
+                alert('Sign in first.');
+                return;
+            }
+            const raw = (document.getElementById('creatorFollowUsername')?.value || '').trim().toLowerCase();
+            const normalized = raw.replace(/[^a-z0-9_]/g, '');
+            if (!normalized || normalized.length < 3) {
+                alert('Enter a valid public username (letters, numbers, underscores; 3–40 characters).');
+                return;
+            }
+            // Use the same key index.html + followed-notices.js read from, so follows written here appear in the reader's feed.
+            const viewerKey = currentEmailKey || (localStorage.getItem('emailKey') || '').trim() || sanitizeEmail(localStorage.getItem('CurrentUser') || localStorage.getItem('email') || currentUserEmail || '');
+            if (!viewerKey) {
+                alert('Could not resolve your account. Sign in again.');
+                return;
+            }
+            try {
+                const regSnap = await get(ref(database, 'USERNAME_REGISTRY/' + normalized));
+                if (!regSnap.exists()) {
+                    alert('That username is not registered yet.');
+                    return;
+                }
+                const targetKey = String(regSnap.val() || '').trim();
+                if (!targetKey) {
+                    alert('Invalid registry entry.');
+                    return;
+                }
+                if (targetKey === viewerKey) {
+                    alert('You cannot follow yourself.');
+                    return;
+                }
+                await set(ref(database, 'FOLLOWS/' + targetKey + '/' + viewerKey), true);
+                await set(ref(database, 'FOLLOWING/' + viewerKey + '/' + targetKey), true);
+                document.getElementById('creatorFollowUsername').value = '';
+                await loadCreatorTools();
+            } catch (e) {
+                console.error(e);
+                alert('Could not complete follow. Check network and database rules.');
+            }
+        });
+
+        // Theme selection
+        window.selectTheme = function(theme) {
+            selectedTheme = theme;
+            document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`[data-theme="${theme}"]`).classList.add('selected');
+            updatePreview();
+        };
+
+        // Update profile preview
+        function updatePreview() {
+            const nickname = document.getElementById('profileNickname').value || 'Your Artist Name';
+            const bio = document.getElementById('profileBio').value || 'Your bio will appear here...';
+            const tin = document.getElementById("tinp").value || 'Your Donation Box will appear here';
+            document.getElementById('previewName').textContent = nickname;
+            document.getElementById('previewBio').textContent = bio;
+            document.getElementById("prevTin").textContent = tin;
+            
+            // Update theme colors
+            const themes = {
+                coral: { primary: '#ff7f50', secondary: '#ff6347' },
+                purple: { primary: '#8b5cf6', secondary: '#7c3aed' },
+                blue: { primary: '#3b82f6', secondary: '#2563eb' },
+                green: { primary: '#10b981', secondary: '#059669' },
+                red: { primary: '#ef4444', secondary: '#dc2626' },
+                dark: { primary: '#1f2937', secondary: '#111827' }
+            };
+            
+            const theme = themes[selectedTheme] || themes.coral;
+            document.getElementById('profilePreview').style.setProperty('--preview-bg', `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`);
+        }
+
+        // Handle profile picture upload
+        document.getElementById('profilePictureInput').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image size must be less than 5MB.');
+                return;
+            }
+
+            try {
+                // Show loading
+                const preview = document.getElementById('profilePicturePreview');
+                preview.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                // Upload to Firebase Storage
+                const imageRef = storageRef(storage, `profile-pictures/${currentEmailKey}/${Date.now()}_${file.name}`);
+                await uploadBytes(imageRef, file);
+                const downloadURL = await getDownloadURL(imageRef);
+
+                // Update preview
+                preview.innerHTML = `<img src="${downloadURL}" alt="Profile Picture">`;
+
+                // Update preview avatar in profile preview section
+                const previewAvatar = document.getElementById('previewAvatar');
+                if (previewAvatar) {
+                    previewAvatar.innerHTML = `<img src="${downloadURL}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                }
+
+                // Save URL to profile
+                const profileRef = ref(database, 'PROFILES/' + currentEmailKey);
+                await update(profileRef, { profilePicture: downloadURL });
+
+                alert('Profile picture uploaded successfully!');
+            } catch (error) {
+                console.error('Error uploading profile picture:', error);
+                alert('Error uploading profile picture. Please try again.');
+                // Reset to default
+                updateProfilePicturePreview(null);
+            }
+        });
+
+        // Update profile picture preview
+        function updateProfilePicturePreview(imageUrl) {
+            const preview = document.getElementById('profilePicturePreview');
+            if (imageUrl) {
+                preview.innerHTML = `<img src="${imageUrl}" alt="Profile Picture">`;
+            } else {
+                preview.innerHTML = '<i class="fas fa-user"></i>';
+            }
+        }
+
+        // Show profile modal
+        window.showProfileModal = function(userIndex) {
+            const userData = allUsersData[userIndex];
+            if (!userData) return;
+
+            const modal = document.getElementById('profileModal');
+            const modalContent = document.getElementById('profileModalContent');
+            const modalHeader = document.getElementById('profileModalHeader');
+            
+            const displayName = userData.profile?.nickname || userData.fullName || userData.email || userData.id || 'User';
+            const role = userData.role || 'User';
+            const profilePicture = userData.profile?.profilePicture || null;
+            
+            // Set profile picture
+            const avatar = document.getElementById('profileModalAvatar');
+            if (profilePicture) {
+                avatar.innerHTML = `<img src="${profilePicture}" alt="${displayName}">`;
+            } else {
+                avatar.innerHTML = '<i class="fas fa-user"></i>';
+            }
+
+            // Set name
+            document.getElementById('profileModalName').textContent = displayName;
+
+            // Set bio
+            const bio = userData.profile?.bio || 'No bio available';
+            document.getElementById('profileModalBio').textContent = bio;
+
+            document.getElementById('profileModalRole').textContent = role;
+
+            // Apply theme color
+            const themes = {
+                coral: { primary: '#ff7f50', secondary: '#ff6347' },
+                purple: { primary: '#8b5cf6', secondary: '#7c3aed' },
+                blue: { primary: '#3b82f6', secondary: '#2563eb' },
+                green: { primary: '#10b981', secondary: '#059669' },
+                red: { primary: '#ef4444', secondary: '#dc2626' },
+                dark: { primary: '#1f2937', secondary: '#111827' }
+            };
+
+            const theme = themes[userData.profile?.theme || 'coral'] || themes.coral;
+            modalHeader.style.background = `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`;
+            modalContent.style.borderColor = theme.primary;
+
+            // Show modal
+            modal.classList.add('active');
+        };
+
+        // Close profile modal
+        window.closeProfileModal = function() {
+            document.getElementById('profileModal').classList.remove('active');
+        };
+
+        // Close modal when clicking outside
+        document.getElementById('profileModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeProfileModal();
+            }
+        });
+
+        // Save profile
+        window.saveProfile = async function() {
+            if (!currentEmailKey) {
+                alert('Please sign in to save your profile.');
+                return;
+            }
+
+            let tino = tinp && tinp.value ? tinp.value.trim() : null
+            const profileData = {
+                nickname: document.getElementById('profileNickname').value || null,
+                bio: document.getElementById('profileBio').value || null,
+                theme: selectedTheme,
+                donorbox: tino || null,
+                updatedAt: new Date().toISOString()
+            };
+
+            try {
+                const profileRef = ref(database, 'PROFILES/' + currentEmailKey);
+                const prevSnap = await get(profileRef);
+                const prevProf = prevSnap.exists() ? prevSnap.val() : {};
+                const rawUsername = (document.getElementById('profilePublicUsername') && document.getElementById('profilePublicUsername').value) || '';
+                const normalized = rawUsername.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+                if (rawUsername.trim() && (normalized.length < 3 || normalized.length > 40)) {
+                    alert('Public username must be 3–40 characters (letters, numbers, underscores only).');
+                    return;
+                }
+                const locked = prevProf.publicUsername ? String(prevProf.publicUsername).toLowerCase() : '';
+                if (locked) {
+                    profileData.publicUsername = prevProf.publicUsername;
+                    const unEl = document.getElementById('profilePublicUsername');
+                    if (unEl) unEl.value = prevProf.publicUsername;
+                } else if (normalized) {
+                    const regRef = ref(database, 'USERNAME_REGISTRY/' + normalized);
+                    const regSnap = await get(regRef);
+                    const owner = regSnap.exists() ? regSnap.val() : null;
+                    if (owner && owner !== currentEmailKey) {
+                        alert('That username is already taken. Pick another.');
+                        return;
+                    }
+                    if (!owner) {
+                        await set(regRef, currentEmailKey);
+                    }
+                    profileData.publicUsername = normalized;
+                }
+
+                await update(profileRef, profileData);
+                alert('Profile saved successfully!');
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                alert('Error saving profile. Please try again.');
+            }
+        };
+
+        // Load analytics (songplayed is global; tolerate bad rows and missing DOM nodes)
+        async function loadAnalytics() {
+            if (!currentEmailKey) return;
+
+            const songsList = document.getElementById('songsList');
+            const monthlyBreakdown = document.getElementById('monthlyBreakdown');
+            const emptySong = '<div class="empty-state"><i class="fas fa-music"></i><p>No song plays yet</p></div>';
+            const emptyMonth = '<div class="empty-state"><i class="fas fa-calendar"></i><p>No monthly data available</p></div>';
+            const errSong = (detail) =>
+                `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading analytics</p>${detail ? `<p style="font-size:0.85rem;opacity:0.85;margin-top:8px;">${escapeHtml(detail)}</p>` : ''}</div>`;
+            const errMonth = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading monthly data</p></div>';
+
+            function setStat(id, text) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = text;
+            }
+
+            const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const currentMonth = MONTH_NAMES[new Date().getMonth()];
+            const currentYear = new Date().getFullYear();
+
+            try {
+                const songplaysRef = ref(database, 'songplayed');
+                const snapshot = await get(songplaysRef);
+                const playsRaw = snapshot.exists() ? snapshot.val() : null;
+
+                const songCounts = {};
+                const monthlyPlays = {};
+                let currentMonthCount = 0;
+                let totalCount = 0;
+
+                if (playsRaw != null && typeof playsRaw === 'object') {
+                    const rows = Array.isArray(playsRaw) ? playsRaw : Object.values(playsRaw);
+                    rows.forEach((play) => {
+                        if (play == null || typeof play !== 'object') return;
+                        const songTitle = String(play.title2 != null ? play.title2 : play.title != null ? play.title : 'Unknown').trim() || 'Unknown';
+                        const playMonth = play.ofctime != null && String(play.ofctime).trim() !== '' ? String(play.ofctime).trim() : 'Unknown';
+                        if (!songCounts[songTitle]) songCounts[songTitle] = 0;
+                        songCounts[songTitle]++;
+                        totalCount++;
+                        if (!monthlyPlays[playMonth]) monthlyPlays[playMonth] = 0;
+                        monthlyPlays[playMonth]++;
+                        if (playMonth === currentMonth) currentMonthCount++;
+                    });
+                }
+
+                setStat('totalPlays', currentMonthCount.toLocaleString());
+                setStat('currentMonthName', currentMonth + ' ' + currentYear);
+                setStat('allTimePlays', totalCount.toLocaleString());
+
+                let topSong = '-';
+                let topSongPlays = 0;
+                Object.entries(songCounts).forEach(([song, count]) => {
+                    if (count > topSongPlays) {
+                        topSongPlays = count;
+                        topSong = song;
+                    }
+                });
+                const topStr = typeof topSong === 'string' ? topSong : String(topSong);
+                setStat('topSong', topStr.length > 20 ? topStr.substring(0, 20) + '...' : topStr);
+                setStat('topSongPlays', topSongPlays + ' plays');
+
+                let viewCount = 0;
+                try {
+                    const profileViewsRef = ref(database, 'PROFILEVIEWS/' + currentEmailKey);
+                    const viewsSnapshot = await get(profileViewsRef);
+                    if (viewsSnapshot.exists()) {
+                        const v = viewsSnapshot.val();
+                        viewCount = typeof v === 'number' ? v : parseInt(String(v), 10) || 0;
+                    }
+                } catch (pvErr) {
+                    console.warn('Profile views unavailable (deploy PROFILEVIEWS rules):', pvErr);
+                }
+                setStat('profileViews', Number.isFinite(viewCount) ? viewCount.toLocaleString() : '0');
+
+                if (!songsList || !monthlyBreakdown) return;
+
+                if (totalCount === 0) {
+                    songsList.innerHTML = emptySong;
+                    monthlyBreakdown.innerHTML = emptyMonth;
+                    return;
+                }
+
+                const sortedSongs = Object.entries(songCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 10);
+
+                songsList.innerHTML =
+                    sortedSongs.length === 0
+                        ? emptySong
+                        : sortedSongs
+                              .map(
+                                  ([song, count]) => `
+                    <div class="song-item">
+                        <div class="song-info">
+                            <div class="song-title">${escapeHtml(song)}</div>
+                        </div>
+                        <div class="song-stats">
+                            <div class="song-stat">
+                                <div class="song-stat-value">${count}</div>
+                                <div class="song-stat-label">Plays</div>
+                            </div>
+                        </div>
+                    </div>`
+                              )
+                              .join('');
+
+                const monthOrder = MONTH_NAMES;
+                const sortedMonths = Object.entries(monthlyPlays).sort((a, b) => {
+                    const aIndex = monthOrder.indexOf(a[0]);
+                    const bIndex = monthOrder.indexOf(b[0]);
+                    if (aIndex !== -1 && bIndex !== -1) return bIndex - aIndex;
+                    return b[1] - a[1];
+                });
+
+                monthlyBreakdown.innerHTML =
+                    sortedMonths.length === 0
+                        ? emptyMonth
+                        : sortedMonths
+                              .map(([month, count]) => {
+                                  const isCurrentMonth = month === currentMonth;
+                                  return `
+                            <div class="song-item" style="${isCurrentMonth ? 'border-color: var(--primary); background: rgba(255, 127, 80, 0.1);' : ''}">
+                                <div class="song-info">
+                                    <div class="song-title">${escapeHtml(month)} ${isCurrentMonth ? '<span style="color: var(--primary); font-size: 0.75rem;">(Current)</span>' : ''}</div>
+                                    <div class="song-artist">Total plays for this month</div>
+                                </div>
+                                <div class="song-stats">
+                                    <div class="song-stat">
+                                        <div class="song-stat-value">${count}</div>
+                                        <div class="song-stat-label">Plays</div>
+                                    </div>
+                                </div>
+                            </div>`;
+                              })
+                              .join('');
+            } catch (error) {
+                const code = error && error.code ? String(error.code) : '';
+                const msg = error && error.message ? String(error.message) : String(error);
+                console.error('Error loading analytics:', error);
+                const detail = [code, msg].filter(Boolean).join(' · ');
+                if (songsList) songsList.innerHTML = errSong(detail);
+                if (monthlyBreakdown) monthlyBreakdown.innerHTML = errMonth;
+            }
+        }
+
+        // Load profile data
+        async function loadProfile() {
+            if (!currentEmailKey) return;
+
+            try {
+                const profileRef = ref(database, 'PROFILES/' + currentEmailKey);
+                const snapshot = await get(profileRef);
+                
+                if (snapshot.exists()) {
+                    const profile = snapshot.val();
+                    
+                    document.getElementById('profileNickname').value = profile.nickname || '';
+                    const pu = document.getElementById('profilePublicUsername');
+                    if (pu) {
+                        pu.value = profile.publicUsername || '';
+                        pu.disabled = !!profile.publicUsername;
+                    }
+                    document.getElementById('profileBio').value = profile.bio || '';
+                    document.getElementById("tinp").value = profile.donorbox || '';
+                    
+                    if (profile.theme) {
+                        selectedTheme = profile.theme;
+                        selectTheme(profile.theme);
+                    }
+
+                    // Load profile picture
+                    if (profile.profilePicture) {
+                        updateProfilePicturePreview(profile.profilePicture);
+                        const previewAvatar = document.getElementById('previewAvatar');
+                        if (previewAvatar) {
+                            previewAvatar.innerHTML = `<img src="${profile.profilePicture}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                        }
+                    } else {
+                        updateProfilePicturePreview(null);
+                    }
+                    
+                    updatePreview();
+                } else {
+                    const pu = document.getElementById('profilePublicUsername');
+                    if (pu) {
+                        pu.value = '';
+                        pu.disabled = false;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        // Load all users from /PROFILES
+        async function loadAllUsers() {
+            try {
+                const profilesRef = ref(database, 'PROFILES/');
+                const snapshot = await get(profilesRef);
+                
+                const usersList = document.getElementById('usersList');
+                
+                if (!snapshot.exists()) {
+                    usersList.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
+                    return;
+                }
+
+                const profiles = snapshot.val();
+                const resolveProfileType = (user) => {
+                    const explicitType = (user?.profile?.profileType || "").toString().toLowerCase();
+                    if (explicitType === "artist" || explicitType === "listener") return explicitType;
+                    const explicitVisibility = (user?.profile?.profileVisibility || "").toString().toLowerCase();
+                    if (explicitVisibility === "public") return "artist";
+                    if (explicitVisibility === "private") return "listener";
+                    const roleText = (user?.role || user?.profile?.role || "").toString().toLowerCase();
+                    if (roleText.includes("artist")) return "artist";
+                    if (roleText.includes("listener")) return "listener";
+                    return "listener";
+                };
+                const profilesArray = Object.entries(profiles)
+                    .map(([key, value]) => ({
+                        emailKey: key,
+                        profile: value
+                    }))
+                    .filter((item) => resolveProfileType({ profile: item.profile, role: null }) === "artist");
+
+                if (profilesArray.length === 0) {
+                    usersList.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
+                    return;
+                }
+
+                // Get additional user data (email, role) and premium status for each profile
+                const usersWithProfiles = await Promise.all(profilesArray.map(async (item) => {
+                    const emailKey = item.emailKey;
+                    
+                    // Try to get user data from CONCERTUSERS or other sources
+                    let userEmail = null;
+                    let userRole = null;
+                    let userFullName = null;
+                    
+                    // Check CONCERTUSERS for email/role
+                    const concertUsersRef = ref(database, 'CONCERTUSERS/');
+                    const concertUsersSnapshot = await get(concertUsersRef);
+                    if (concertUsersSnapshot.exists()) {
+                        const concertUsers = concertUsersSnapshot.val();
+                        const userEntry = Object.values(concertUsers).find(u => {
+                            const uEmailKey = sanitizeEmail(u.email || '');
+                            return uEmailKey === emailKey;
+                        });
+                        if (userEntry) {
+                            userEmail = userEntry.email;
+                            userRole = userEntry.role;
+                        }
+                    }
+                    
+                    // Check if premium
+                    const premiumRef = ref(database, 'PREMIUM/' + emailKey);
+                    const premiumSnapshot = await get(premiumRef);
+                    const premium = premiumSnapshot.exists() ? premiumSnapshot.val() : null;
+                    const isPremium = premium && (premium.ITG === true || premium.ITG === "true");
+
+                    return {
+                        emailKey: emailKey,
+                        email: userEmail || emailKey.replace(/_/g, '.'),
+                        role: userRole || 'User',
+                        fullName: userFullName,
+                        profile: item.profile,
+                        isPremium: isPremium
+                    };
+                }));
+
+                // Store users data globally for modal access
+                allUsersData = usersWithProfiles;
+
+                usersList.innerHTML = usersWithProfiles.map((user, index) => {
+                    const displayName = user.profile?.nickname || user.fullName || user.email || user.id || 'User';
+                    const role = user.role || 'User';
+                    const profilePicture = (user.isPremium && user.profile?.profilePicture) 
+                        ? user.profile.profilePicture 
+                        : null;
+
+                    return `
+                        <div class="user-card" onclick="showProfileModal(${index})">
+                            <div class="user-avatar">
+                                ${profilePicture 
+                                    ? `<img src="${profilePicture}" alt="${displayName}">` 
+                                    : '<i class="fas fa-user"></i>'
+                                }
+                            </div>
+                            <div class="user-name">${displayName}</div>
+                            <div class="user-role">${role}</div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('usersList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading users</p></div>';
+            }
+        }
+
+        // Initialize
+        onAuthStateChanged(auth, async (user) => {
+          try {
+            // Match index.html getViewerFollowKeyForFollow(): prefer the canonical emailKey
+            // that index.html wrote to localStorage, then CurrentUser (stable per-provider id;
+            // Firebase uid for Apple users so relay emails never create a second PROFILES/<key>).
+            const storedEmailKey = (localStorage.getItem("emailKey") || "").trim();
+            const storedCurrentUser = (localStorage.getItem("CurrentUser") || "").trim();
+            const storedEmail = (localStorage.getItem("email") || "").trim();
+            const accountId =
+              storedCurrentUser ||
+              storedEmail ||
+              (user && (user.email || (user.providerData && user.providerData[0] && user.providerData[0].email) || user.uid)) ||
+              localStorage.getItem("artemail") ||
+              null;
+
+            if (!storedEmailKey && !accountId) {
+                    window.location.href = "index.html";
+              return;
+            }
+
+                currentUserEmail = accountId || storedEmailKey || "";
+                currentEmailKey = storedEmailKey || sanitizeEmail(accountId);
+
+                if (currentUserEmail) localStorage.setItem("artemail", currentUserEmail);
+
+                // Self-heal for the Featured Songs card on the home page: pin this
+                // artist's most recent upload (matched by uploaderOwnerKey, then
+                // uploader email) to FEATURED_ARTIST_SONG/<currentEmailKey> so the
+                // home loader can surface it instantly without bridging.
+                pinFeaturedArtistSong(currentEmailKey, currentUserEmail).catch((e) => console.warn('[autopin]', e));
+
+                await loadAnalytics();
+                await loadProfile();
+                await loadAllUsers();
+
+                // Set up real-time listeners
+                const songplaysRef = ref(database, 'songplayed');
+                onValue(songplaysRef, () => loadAnalytics());
+
+                const profilesRef = ref(database, 'PROFILES/');
+                onValue(profilesRef, () => loadAllUsers());
+          } catch (error) {
+            console.error("Error checking premium status:", error);
+                window.location.href = "index.html";
+          }
+        });
+
+        // Update preview on input
+        document.getElementById('profileNickname').addEventListener('input', updatePreview);
+        document.getElementById('profileBio').addEventListener('input', updatePreview);
+
+        // =============================
+// SUBASTEROID COMMUNITY SYSTEM
+// =============================
+
+window.postToSubAsteroid = async function () {
+
+const sub = document.getElementById("subName").value
+    .toLowerCase()
+    .replace(/\s/g, "");
+
+const title = document.getElementById("subSongTitle").value;
+const desc = document.getElementById("subSongDesc").value;
+const url = document.getElementById("subSongURL").value;
+
+if (!sub || !title) {
+    alert("SubAsteroid, title and URL required.");
+    return;
+}
+
+const postRef = push(ref(database, "subAsteroids/" + sub + "/posts"));
+
+await set(postRef, {
+    artist: auth.currentUser?.email || "Unknown Artist",
+    title: title,
+    description: desc,
+    songURL: url,
+    createdAt: Date.now(),
+    planes: 0
+});
+
+alert("Posted into " + sub + " 🪐");
+
+document.getElementById("subSongTitle").value = "";
+document.getElementById("subSongDesc").value = "";
+document.getElementById("subSongURL").value = "";
+};
+
+
+// Paper Plane
+window.sendPlaneToSub = function (sub, postId) {
+
+update(ref(database, "subAsteroids/" + sub + "/posts/" + postId), {
+    planes: increment(1)
+});
+
+};
+
+
+// Comment
+window.commentOnSub = async function (sub, postId) {
+
+const input = document.getElementById("comment_" + postId);
+const text = input.value;
+
+if (!text) return;
+
+const commentRef = push(
+    ref(database, "subAsteroids/" + sub + "/posts/" + postId + "/comments")
+);
+
+await set(commentRef, {
+    user: auth.currentUser?.email || "User",
+    text: text,
+    createdAt: Date.now()
+});
+
+input.value = "";
+};
+
+
+// Live Feed
+onValue(ref(database, "subAsteroids"), (snapshot) => {
+
+const data = snapshot.val();
+const feed = document.getElementById("subFeed");
+
+if (!feed) return;
+
+feed.innerHTML = "";
+
+if (!data) {
+    feed.innerHTML = "<div class='loading'>No posts yet.</div>";
+    return;
+}
+
+Object.keys(data).forEach(sub => {
+
+    if (!data[sub].posts) return;
+
+    Object.keys(data[sub].posts)
+        .sort((a,b) =>
+            data[sub].posts[b].createdAt -
+            data[sub].posts[a].createdAt
+        )
+        .forEach(postId => {
+
+            const post = data[sub].posts[postId];
+
+            const postDiv = document.createElement("div");
+            postDiv.className = "song-item";
+
+            postDiv.innerHTML = `
+                <div class="song-title">${post.title}</div>
+                <div class="song-plays">Sub: ${sub}</div>
+                <div class="song-plays">By: ${post.artist}</div>
+                <div style="margin:0.5rem 0;">${post.description || ""}</div>
+                <a href="${post.songURL}" target="_blank" style="color:var(--primary-color);">
+                    🎵 Listen to Song
+                </a>
+
+                <div style="margin-top:1rem;">
+                    ✈ ${post.planes || 0}
+                    <button class="btn btn-secondary"
+                        onclick="sendPlaneToSub('${sub}','${postId}')">
+                        Send Plane
+                    </button>
+                </div>
+
+                <div style="margin-top:1rem;">
+                    <input id="comment_${postId}" class="form-input" placeholder="Write comment">
+                    <button class="btn btn-secondary"
+                        onclick="commentOnSub('${sub}','${postId}')">
+                        Comment
+                    </button>
+                </div>
+
+                <div id="comments_${postId}" style="margin-top:0.5rem;"></div>
+            `;
+
+            feed.appendChild(postDiv);
+
+            // Load comments live
+            onValue(
+                ref(database, "subAsteroids/" + sub + "/posts/" + postId + "/comments"),
+                (commentSnap) => {
+
+                    const commentData = commentSnap.val();
+                    const commentDiv = document.getElementById("comments_" + postId);
+
+                    if (!commentDiv) return;
+
+                    commentDiv.innerHTML = "";
+
+                    if (!commentData) return;
+
+                    Object.values(commentData).forEach(c => {
+                        commentDiv.innerHTML +=
+                            `<div class="song-plays"><strong>${c.user}:</strong> ${c.text}</div>`;
+                    });
+
+                }
+            );
+
+        });
+
+});
+
+});
+
+    </script>
+
+<nav class="mobile-nav">
+  <a href="index.html" class="mobile-nav-item">
+    <span class="material-symbols-outlined">home</span>
+    <span>Home</span>
+  </a>
+  <a href="lively.html" class="mobile-nav-item">
+    <span class="material-symbols-outlined">mic</span>
+    <span>Concerts</span>
+  </a>
+  <a href="studio.html" class="mobile-nav-item">
+    <span class="material-symbols-outlined">upload</span>
+    <span>Upload</span>
+  </a>
+  <a href="pat.html" class="mobile-nav-item">
+    <span class="material-symbols-outlined">queue_music</span>
+    <span>Playlist</span>
+  </a>
+  <a href="ArtistDashboard.html" class="mobile-nav-item mobile-nav-active">
+    <span class="material-symbols-outlined">dashboard</span>
+    <span>Dashboard</span>
+  </a>
+</nav>
+
+<style>
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  z-index: 99999;
+  background: #0a0a0a;
+  border-top: 1px solid rgba(255,127,80,0.25);
+  padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+  justify-content: space-around;
+  align-items: center;
+}
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  color: rgba(255,255,255,0.5);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 10px;
+  transition: color 0.2s, background 0.2s;
+}
+.mobile-nav-item .material-symbols-outlined {
+  font-size: 24px;
+}
+.mobile-nav-item:hover,
+.mobile-nav-item.mobile-nav-active {
+  color: #ff7f50;
+}
+.mobile-nav-item.mobile-nav-active {
+  background: rgba(255,127,80,0.1);
+}
+@media screen and (max-width: 3840px) {
+  body { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+  .mobile-nav { display: flex !important; }
+}
+</style>
+</body>
+</html>

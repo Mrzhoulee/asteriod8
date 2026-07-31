@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Q&A · Asteroid</title>
+  <link rel="icon" href="favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    :root { --coral: #ff7a59; --dark: #020617; --card: #0f172a; --border: rgba(255,255,255,0.08); }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--dark); color: #fff; font-family: Montserrat, sans-serif; min-height: 100vh; }
+
+    /* ── nav ── */
+    .topbar { display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: rgba(2,6,23,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
+    .topbar-back { background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: Montserrat, sans-serif; font-size: 14px; font-weight: 600; opacity: 0.7; }
+    .topbar-back:hover { opacity: 1; }
+    .topbar-title { font-size: 16px; font-weight: 700; }
+    .topbar-artist { font-size: 13px; color: var(--coral); font-weight: 600; margin-left: 4px; }
+
+    /* ── layout ── */
+    .page { max-width: 640px; margin: 0 auto; padding: 24px 16px 120px; }
+
+    /* ── artist hero ── */
+    .artist-hero { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding: 18px; background: var(--card); border-radius: 16px; border: 1px solid var(--border); }
+    .artist-hero-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--coral); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; color: #fff; flex-shrink: 0; overflow: hidden; }
+    .artist-hero-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .artist-hero-name { font-size: 18px; font-weight: 700; }
+    .artist-hero-sub { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+
+    /* ── ask box ── */
+    .ask-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 28px; }
+    .ask-card h2 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+    .ask-textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; color: #fff; font-family: Montserrat, sans-serif; font-size: 14px; padding: 12px; resize: vertical; min-height: 80px; outline: none; transition: border-color 0.2s; }
+    .ask-textarea:focus { border-color: var(--coral); }
+    .ask-name-row { display: flex; gap: 10px; margin-top: 10px; }
+    .ask-name { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; color: #fff; font-family: Montserrat, sans-serif; font-size: 13px; padding: 10px 12px; outline: none; transition: border-color 0.2s; }
+    .ask-name:focus { border-color: var(--coral); }
+    .notif-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 12px; background: rgba(255,122,89,0.08); border-radius: 10px; border: 1px solid rgba(255,122,89,0.2); cursor: pointer; }
+    .notif-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--coral); cursor: pointer; }
+    .notif-row label { font-size: 12px; color: rgba(255,255,255,0.75); cursor: pointer; line-height: 1.4; }
+    .notif-status { font-size: 11px; color: var(--coral); margin-top: 4px; min-height: 16px; }
+    .ask-submit { width: 100%; margin-top: 14px; padding: 13px; background: var(--coral); color: #fff; border: none; border-radius: 12px; font-family: Montserrat, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+    .ask-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Q&A list ── */
+    .qa-list-header { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 14px; }
+    .qa-empty { text-align: center; color: rgba(255,255,255,0.35); font-size: 14px; padding: 40px 0; }
+    .qa-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+    .qa-question { font-size: 14px; font-weight: 600; line-height: 1.5; margin-bottom: 6px; }
+    .qa-meta { font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 12px; }
+    .qa-answer-wrap { border-top: 1px solid var(--border); padding-top: 12px; margin-top: 4px; }
+    .qa-answer-label { font-size: 11px; color: var(--coral); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .qa-answer-text { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.85); }
+    .qa-unanswered-badge { display: inline-block; font-size: 10px; color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.06); border-radius: 6px; padding: 2px 7px; margin-top: 4px; }
+
+    /* ── loading ── */
+    .state-msg { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.4); font-size: 14px; }
+
+    /* ── mobile nav ── */
+    nav.mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(2,6,23,0.97); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 0 env(safe-area-inset-bottom,0); z-index: 100; }
+    .mobile-nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: rgba(255,255,255,0.45); font-size: 10px; font-weight: 600; text-decoration: none; padding: 4px 12px; }
+    .mobile-nav-item .material-symbols-outlined { font-size: 22px; }
+    .mobile-nav-item.mobile-nav-active { color: var(--coral); }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="topbar-back" onclick="history.back()">
+    <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span> Back
+  </button>
+  <span class="topbar-title">Q&amp;A</span>
+  <span class="topbar-artist" id="topbarArtistName"></span>
+</div>
+
+<div class="page">
+  <div class="artist-hero" id="artistHero" style="display:none">
+    <div class="artist-hero-avatar" id="heroAvatar"></div>
+    <div>
+      <div class="artist-hero-name" id="heroName"></div>
+      <div class="artist-hero-sub">Ask me anything</div>
+    </div>
+  </div>
+
+  <!-- Ask form -->
+  <div class="ask-card" id="askCard">
+    <h2>Leave a question</h2>
+    <textarea class="ask-textarea" id="questionText" placeholder="What would you like to ask?" maxlength="500"></textarea>
+    <div class="ask-name-row">
+      <input class="ask-name" id="askerName" type="text" placeholder="Your name (optional)" maxlength="60" />
+    </div>
+    <div class="notif-row" id="notifRow">
+      <input type="checkbox" id="notifCheck" />
+      <label for="notifCheck">Notify me when the artist answers (requires notification permission)</label>
+    </div>
+    <div class="notif-status" id="notifStatus"></div>
+    <button class="ask-submit" id="submitBtn">Submit question</button>
+  </div>
+
+  <!-- Q&A list -->
+  <div class="qa-list-header">Questions &amp; Answers</div>
+  <div id="qaList"><div class="state-msg">Loading…</div></div>
+</div>
+
+<nav class="mobile-nav">
+  <a href="index.html" class="mobile-nav-item"><span class="material-symbols-outlined">home</span><span>Home</span></a>
+  <a href="studio.html" class="mobile-nav-item"><span class="material-symbols-outlined">mic</span><span>Studio</span></a>
+  <a href="users.html" class="mobile-nav-item mobile-nav-active"><span class="material-symbols-outlined">group</span><span>Artists</span></a>
+  <a href="pat.html" class="mobile-nav-item"><span class="material-symbols-outlined">queue_music</span><span>Playlist</span></a>
+  <a href="charts.html" class="mobile-nav-item"><span class="material-symbols-outlined">leaderboard</span><span>Charts</span></a>
+</nav>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+  import { getDatabase, ref, push, set, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+
+  const FC = {
+    apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+    authDomain: "asteroid-cdc13.firebaseapp.com",
+    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+    projectId: "asteroid-cdc13",
+    storageBucket: "asteroid-cdc13.appspot.com",
+    messagingSenderId: "793353824502",
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7"
+  };
+  const VAPID = "BL9j8VcXPanjQUt2M5XQbNqIXhqtL6PixhVNyfKcVIpINxeWfhDqKB3Z_pnzy-amdWsXUIVpqN2nVE8kttZAYJk";
+
+  const app = getApps().length ? getApp() : initializeApp(FC);
+  const db = getDatabase(app);
+
+  // ── parse artist key from URL ──
+  const params = new URLSearchParams(location.search);
+  const artistKey = (params.get('artist') || '').trim();
+  if (!artistKey) {
+    document.getElementById('qaList').innerHTML = '<div class="state-msg">No artist specified.</div>';
+    document.getElementById('askCard').style.display = 'none';
+  }
+
+  // ── load artist profile for hero ──
+  if (artistKey) {
+    onValue(ref(db, 'PROFILES/' + artistKey), (snap) => {
+      const p = snap.val() || {};
+      const name = p.nickname || p.fullName || p.displayName || 'Artist';
+      document.getElementById('topbarArtistName').textContent = name;
+      document.getElementById('heroName').textContent = name;
+      const avatarEl = document.getElementById('heroAvatar');
+      const pic = p.profilePicture || p.profileImage || p.photoURL || '';
+      avatarEl.innerHTML = pic
+        ? `<img src="${escHtml(pic)}" alt="${escHtml(name)}">`
+        : escHtml(name.charAt(0).toUpperCase());
+      document.getElementById('artistHero').style.display = 'flex';
+    }, { onlyOnce: true });
+  }
+
+  // ── pre-fill name from localStorage ──
+  const savedName = localStorage.getItem('qaAskerName') || localStorage.getItem('fullName') || '';
+  if (savedName) document.getElementById('askerName').value = savedName;
+
+  // ── FCM token state ──
+  let _fcmToken = localStorage.getItem('_fcmToken') || '';
+  let _notifGranted = Notification && Notification.permission === 'granted';
+  const notifCheck = document.getElementById('notifCheck');
+  const notifStatus = document.getElementById('notifStatus');
+
+  if (_notifGranted && _fcmToken) {
+    notifCheck.checked = true;
+    notifStatus.textContent = '✓ Notifications are on';
+  } else if (Notification && Notification.permission === 'denied') {
+    notifCheck.disabled = true;
+    document.getElementById('notifRow').style.opacity = '0.4';
+    notifStatus.textContent = 'Notifications blocked in settings';
+  }
+
+  // ── notification registration ──
+  async function getCapacitorToken() {
+    // Capacitor PushNotifications (iOS native)
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications) {
+      const PN = window.Capacitor.Plugins.PushNotifications;
+      const { receive: permResult } = await PN.requestPermissions();
+      if (permResult !== 'granted' && permResult !== 'prompt-with-rationale') return null;
+      return new Promise((resolve) => {
+        PN.addListener('registration', (data) => resolve(data.value));
+        PN.addListener('registrationError', () => resolve(null));
+        PN.register();
+      });
+    }
+    return null;
+  }
+
+  async function getWebPushToken() {
+    if (!('Notification' in window) || !('serviceWorker' in navigator)) return null;
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return null;
+    const { getMessaging, getToken } = await import("https://www.gstatic.com/firebasejs/10.14.0/firebase-messaging.js");
+    const messaging = getMessaging(app);
+    const swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    const token = await getToken(messaging, { vapidKey: VAPID, serviceWorkerRegistration: swReg });
+    return token || null;
+  }
+
+  async function ensureToken() {
+    if (_fcmToken) return _fcmToken;
+    notifStatus.textContent = 'Requesting permission…';
+    try {
+      const token = (await getCapacitorToken()) || (await getWebPushToken());
+      if (!token) {
+        notifStatus.textContent = 'Permission denied — you won\'t be notified.';
+        notifCheck.checked = false;
+        return null;
+      }
+      _fcmToken = token;
+      localStorage.setItem('_fcmToken', token);
+      notifStatus.textContent = '✓ You\'ll be notified when answered.';
+      return token;
+    } catch (e) {
+      console.warn('[qa] token error', e);
+      notifStatus.textContent = 'Could not enable notifications.';
+      notifCheck.checked = false;
+      return null;
+    }
+  }
+
+  notifCheck.addEventListener('change', async () => {
+    if (notifCheck.checked) await ensureToken();
+    else notifStatus.textContent = '';
+  });
+
+  // ── submit question ──
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.addEventListener('click', async () => {
+    if (!artistKey) return;
+    const questionText = document.getElementById('questionText').value.trim();
+    if (!questionText) { alert('Please enter a question.'); return; }
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+
+    let fcmToken = null;
+    if (notifCheck.checked) fcmToken = await ensureToken();
+
+    const askerName = document.getElementById('askerName').value.trim() || 'Anonymous';
+    if (askerName !== 'Anonymous') localStorage.setItem('qaAskerName', askerName);
+
+    const qRef = push(ref(db, 'ARTIST_QA/' + artistKey));
+    await set(qRef, {
+      question: questionText,
+      askerName,
+      askerKey: localStorage.getItem('emailKey') || localStorage.getItem('CurrentUser') || '',
+      ts: Date.now(),
+      fcmToken: fcmToken || '',
+      platform: (window.Capacitor ? 'ios' : 'web'),
+    });
+
+    document.getElementById('questionText').value = '';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Question sent! ✓';
+    setTimeout(() => { submitBtn.textContent = 'Submit question'; }, 3000);
+  });
+
+  // ── load Q&A list ──
+  function escHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s == null ? '' : String(s);
+    return d.innerHTML;
+  }
+  function timeAgo(ts) {
+    const d = Math.floor((Date.now() - ts) / 1000);
+    if (d < 60) return 'just now';
+    if (d < 3600) return Math.floor(d / 60) + 'm ago';
+    if (d < 86400) return Math.floor(d / 3600) + 'h ago';
+    return Math.floor(d / 86400) + 'd ago';
+  }
+
+  if (artistKey) {
+    onValue(query(ref(db, 'ARTIST_QA/' + artistKey), orderByChild('ts'), limitToLast(50)), (snap) => {
+      const listEl = document.getElementById('qaList');
+      if (!snap.exists()) {
+        listEl.innerHTML = '<div class="qa-empty">No questions yet — be the first to ask!</div>';
+        return;
+      }
+      const items = [];
+      snap.forEach((child) => items.push({ id: child.key, ...child.val() }));
+      items.reverse(); // newest first
+      listEl.innerHTML = items.map(q => `
+        <div class="qa-card">
+          <div class="qa-question">${escHtml(q.question)}</div>
+          <div class="qa-meta">${escHtml(q.askerName || 'Anonymous')} · ${timeAgo(q.ts)}</div>
+          ${q.answer
+            ? `<div class="qa-answer-wrap">
+                <div class="qa-answer-label"><span class="material-symbols-outlined" style="font-size:14px">mic</span> Artist replied</div>
+                <div class="qa-answer-text">${escHtml(q.answer)}</div>
+               </div>`
+            : `<span class="qa-unanswered-badge">Awaiting answer</span>`
+          }
+        </div>`).join('');
+    });
+  }
+</script>
+</body>
+</html>

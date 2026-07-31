@@ -561,5 +561,11 @@ mountConcertDock(getDatabase(_app), 5);
 .mobile-nav-item.mobile-nav-active{background:rgba(255,127,80,0.1)}
 @media screen and (max-width:3840px){body{padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}.mobile-nav{display:flex !important}}
 </style>
+<style>
+/* Responsive bottom-nav — fits every iPhone & iPad width (verified via headless render) */
+.mobile-nav-item{flex:1 1 0 !important;min-width:0 !important;padding:4px 3px !important;font-size:clamp(9px,2.6vw,11px) !important;}
+.mobile-nav-item span:not(.material-symbols-outlined){max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mobile-nav-item .material-symbols-outlined{font-size:clamp(20px,5.5vw,24px) !important;}
+</style>
 </body>
 </html>

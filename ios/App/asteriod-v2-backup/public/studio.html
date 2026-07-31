@@ -1,0 +1,3759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Asteroid Teams Media Studio</title>
+  <style>
+    body { background-color: antiquewhite; font-family: "Montserrat", sans-serif; margin: 0; padding: 20px; text-align: center; }
+    .upload-btn { width: 130px; height: 45px; background-color: coral; color: black; border-radius: 10px; cursor: pointer; border: none; font-weight: bold; margin: 10px; }
+    .sign-in-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; }
+    /* Same sign-in column pattern as index.html (dark card on studio’s light page) */
+    .studio-account-card {
+      box-sizing: border-box;
+      max-width: 280px;
+      margin: 0 auto 20px;
+      padding: 18px 16px 16px;
+      border-radius: 16px;
+      background: linear-gradient(165deg, #1c1c1c 0%, #0e0e0e 100%);
+      border: 1px solid rgba(255, 127, 80, 0.35);
+      text-align: center;
+    }
+    .studio-account-lead {
+      margin: 0 0 14px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.72);
+    }
+    .studio-account-card .header-sign-in-group {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      min-width: 0;
+    }
+    .studio-account-card .header-sign-in-btn {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      line-height: 1.35;
+      width: 100%;
+      max-width: 240px;
+      margin: 0 auto;
+    }
+    .studio-account-card .header-sign-in-apple {
+      background: #fff;
+      color: #111;
+      border: 1px solid rgba(0, 0, 0, 0.14);
+    }
+    .studio-account-card .header-sign-in-apple #gcd {
+      font-size: 13px;
+      color: #111;
+    }
+    .studio-account-card .header-email-login {
+      display: inline-block;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+      padding: 6px 0 0;
+    }
+    .studio-account-card .header-email-login:hover {
+      color: #ff7f50;
+      text-decoration: underline;
+    }
+    .studio-account-card #apple-sign-in {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .apple-onboarding-modal { display: none; position: fixed; inset: 0; z-index: 3500; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+    .apple-onboarding-box { background: #0a0a0a; color: #fff; max-width: 440px; width: 100%; border-radius: 20px; border: 1px solid rgba(255,127,80,0.35); padding: 24px 22px; font-family: 'Poppins', sans-serif; box-sizing: border-box; max-height: 92vh; overflow-y: auto; }
+    .apple-onboarding-box h2 { margin: 0 0 6px; font-family: 'Montserrat', sans-serif; font-size: 20px; color: #fff; }
+    .apple-onboarding-sub { margin: 0 0 16px; font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.45; }
+    .apple-onboarding-box label { display: block; font-size: 11px; color: rgba(255,255,255,0.55); margin: 10px 0 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .apple-onboarding-box input { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: #fff; font-size: 14px; font-family: 'Poppins', sans-serif; }
+    .apple-onboarding-box input::placeholder { color: rgba(255,255,255,0.35); }
+    .apple-onboarding-choice-group { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 6px; }
+    .apple-onboarding-choice { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04); }
+    .apple-onboarding-choice input[type="radio"] { margin-top: 2px; width: auto; }
+    .apple-onboarding-choice strong { display: block; font-size: 13px; color: #fff; font-family: 'Montserrat', sans-serif; }
+    .apple-onboarding-choice span { display: block; font-size: 12px; color: rgba(255,255,255,0.68); line-height: 1.4; }
+    .apple-onboarding-optional { font-size: 12px; color: rgba(255,127,80,0.9); margin: 18px 0 6px; font-weight: 600; }
+    .apple-onboarding-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+    .apple-onboarding-actions button { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 10px; cursor: pointer; border: none; }
+    .apple-onboarding-save { background: linear-gradient(135deg, #ff7f50, #e85d2c); color: #fff; }
+    .apple-onboarding-skip { background: transparent; color: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.2) !important; }
+    #studioSignInRow.studio-signin-row--hidden { display: none !important; }
+    #studioTopBar.studio-topbar--visible {
+      display: block !important;
+      padding-top: max(8px, env(safe-area-inset-top, 0px));
+      padding-right: max(8px, env(safe-area-inset-right, 0px));
+      box-sizing: border-box;
+    }
+    .studio-explicit-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 14px auto 16px;
+      max-width: 400px;
+      padding: 12px 14px;
+      text-align: left;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .studio-explicit-option input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: #ff7f50;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .studio-explicit-option .studio-explicit-copy {
+      font-family: "Poppins", sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+      color: #1a1a1a;
+      font-weight: 500;
+    }
+    .studio-explicit-option .studio-explicit-copy strong {
+      color: #c44a1a;
+    }
+    
+    /* CAMPAIGN UI */
+    #campaignContainer { display: none; margin-bottom: 30px; border-bottom: 2px dashed #ccc; padding-bottom: 20px; }
+    .tutorial-box { background: white; border: 3px solid #00ff88; padding: 20px; border-radius: 15px; max-width: 600px; margin: 0 auto 20px auto; text-align: left; }
+    .progress-box { background: #fff3e0; border: 2px solid coral; padding: 20px; border-radius: 15px; max-width: 500px; margin: 0 auto; }
+    
+    .bar-bg { height: 20px; width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; overflow: hidden; border: 1px solid #bbb; }
+    #progressBarStatus { height: 100%; width: 0%; background: linear-gradient(90deg, #00ff88, #008044); transition: width 0.5s ease; }
+    
+    .alertBox { background-color: lightcoral; padding: 15px; visibility: hidden; border-radius: 10px; margin: 10px auto; width: 80%; }
+    input { margin: 8px; padding: 12px; width: 80%; max-width: 400px; border-radius: 8px; border: 1px solid #ccc; }
+    #unlockMsg { color: #008044; font-weight: bold; display: none; margin-top: 10px; }
+    .referral-code-panel { margin-top: 16px; padding-top: 14px; border-top: 1px dashed rgba(0,0,0,0.2); }
+    .referral-code-title { margin: 0 0 8px; font-weight: 700; color: #1f2937; }
+    .referral-code-status { min-height: 20px; font-size: 12px; font-weight: 600; color: #374151; margin-top: 6px; }
+    .referral-code-status.error { color: #b91c1c; }
+    .referral-code-status.ok { color: #0f766e; }
+    #referralComplete { display: none; margin-top: 16px; padding: 18px; border-radius: 12px; background: linear-gradient(135deg, #e6fff0, #f0fdf4); border: 2px solid #22c55e; text-align: center; }
+    #referralComplete h3 { margin: 0 0 6px; color: #15803d; font-size: 16px; }
+    #referralComplete p { margin: 0 0 14px; color: #166534; font-size: 13px; }
+    .social-links-form { text-align: left; }
+    .social-links-form label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 4px; margin-top: 10px; }
+    .social-links-form input { width: 100%; max-width: 100%; margin: 0; padding: 10px; font-size: 13px; box-sizing: border-box; }
+    .social-links-form button { margin-top: 12px; padding: 10px 20px; background: #22c55e; color: #fff; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
+    .social-links-form button:hover { background: #16a34a; }
+    #socialLinksSaved { display: none; margin-top: 8px; font-size: 12px; font-weight: 600; color: #15803d; }
+
+    /* SUCCESS MODAL */
+    #vipSuccessBox { display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 4px solid #00ff88; padding: 30px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.5); z-index: 1000; max-width: 400px; }
+
+    /* Upload complete message (studio) */
+    .upload-success-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 20000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(20px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+      box-sizing: border-box;
+    }
+    .upload-success-overlay[hidden] {
+      display: none !important;
+    }
+    .upload-success-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: rgba(10, 10, 10, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .upload-success-modal {
+      position: relative;
+      z-index: 1;
+      max-width: 400px;
+      width: 100%;
+      background: linear-gradient(165deg, #1c1c1c 0%, #0e0e0e 100%);
+      border: 1px solid rgba(255, 127, 80, 0.45);
+      border-radius: 22px;
+      padding: 32px 26px 26px;
+      box-shadow:
+        0 28px 90px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+        0 0 40px rgba(255, 127, 80, 0.12);
+      text-align: center;
+      color: #fff;
+      font-family: "Montserrat", sans-serif;
+    }
+    .upload-success-icon {
+      font-size: 52px;
+      line-height: 1;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 4px 12px rgba(255, 127, 80, 0.35));
+    }
+    .upload-success-title {
+      margin: 0 0 14px;
+      font-size: 22px;
+      font-weight: 800;
+      color: #ff7f50;
+      letter-spacing: -0.02em;
+    }
+    .upload-success-track {
+      margin: 0 0 6px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+    .upload-success-sub {
+      margin: 0 0 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .upload-success-body {
+      margin: 0 0 26px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.78);
+    }
+    .upload-success-btn {
+      width: 100%;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff7f50, #e85d2c);
+      color: #fff;
+      box-shadow: 0 10px 28px rgba(255, 127, 80, 0.38);
+      transition: filter 0.2s ease, transform 0.15s ease;
+    }
+    .upload-success-btn:hover {
+      filter: brightness(1.07);
+    }
+    .upload-success-btn:active {
+      transform: scale(0.98);
+    }
+    .ugc-policy-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483000;
+      background: rgba(0, 0, 0, 0.94);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .ugc-policy-overlay.is-visible { display: flex; }
+    .ugc-policy-card {
+      max-width: 440px;
+      width: min(100%, 440px);
+      box-sizing: border-box;
+      background: #121212;
+      border: 1px solid rgba(255, 127, 80, 0.4);
+      border-radius: 16px;
+      padding: 24px;
+      color: #eee;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .ugc-policy-card h2 { margin: 0 0 12px; font-size: 18px; color: #fff; font-family: 'Montserrat', sans-serif; text-align: center; }
+    .ugc-policy-card a {
+      color: #ff9a6e;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      position: relative;
+      z-index: 3;
+      cursor: pointer;
+      pointer-events: auto;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: rgba(255, 127, 80, 0.25);
+    }
+    .ugc-policy-actions { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
+    .ugc-policy-check-row {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 12px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      cursor: pointer;
+      text-align: left;
+    }
+    .ugc-policy-check-row input[type="checkbox"] {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin: 2px 0 0 0;
+      cursor: pointer;
+    }
+    .ugc-policy-check-text {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.92);
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .ugc-policy-continue {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 16px;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      background: #ffffff;
+      color: #111827;
+      font-family: inherit;
+    }
+    .ugc-policy-continue:hover:not(:disabled) {
+      background: #f3f4f6;
+    }
+    .ugc-policy-continue:disabled {
+      cursor: not-allowed;
+      background: #4b5563;
+      color: #e5e7eb;
+      border-color: #374151;
+    }
+
+    /* ---- Studio tutorial guide ---- */
+    .studio-tutorial {
+      max-width: 640px;
+      margin: 0 auto 24px;
+      padding: 22px 20px 18px;
+      background: linear-gradient(135deg, #fff1e3 0%, #ffe0c2 100%);
+      border-radius: 18px;
+      border: 2px solid #ff6b35;
+      box-shadow: 0 6px 24px rgba(255, 107, 53, 0.18);
+      text-align: left;
+      font-family: "Poppins", sans-serif;
+    }
+    .studio-tutorial-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      font-family: "Montserrat", sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      color: #ff5722;
+      margin: 0 0 6px;
+      letter-spacing: 0.3px;
+    }
+    .studio-tutorial-sub {
+      text-align: center;
+      font-size: 13px;
+      color: #7a4a2a;
+      margin: 0 0 18px;
+      font-weight: 500;
+    }
+    .studio-tutorial-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .studio-tutorial-step {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 14px;
+      border: 2px solid rgba(255, 107, 53, 0.12);
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .studio-tutorial-step[data-status="done"] {
+      background: linear-gradient(135deg, #e4f8e6 0%, #c8efca 100%);
+      border-color: #4caf50;
+      opacity: 0.95;
+    }
+    .studio-tutorial-step[data-status="active"] {
+      background: linear-gradient(135deg, #fff6e5 0%, #ffe3a6 100%);
+      border-color: #ff9800;
+      box-shadow: 0 4px 14px rgba(255, 152, 0, 0.2);
+      transform: translateY(-1px);
+    }
+    .studio-tutorial-step[data-status="active"]::before {
+      content: "";
+      position: absolute;
+      left: -2px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 70%;
+      background: #ff9800;
+      border-radius: 4px;
+    }
+    .step-bullet {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #ff6b35;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 15px;
+      font-family: "Montserrat", sans-serif;
+      box-shadow: 0 2px 6px rgba(255, 107, 53, 0.3);
+    }
+    .studio-tutorial-step[data-status="done"] .step-bullet {
+      background: #4caf50;
+      box-shadow: 0 2px 6px rgba(76, 175, 80, 0.35);
+    }
+    .studio-tutorial-step[data-status="done"] .step-bullet::after {
+      content: "✓";
+      font-size: 18px;
+    }
+    .studio-tutorial-step[data-status="done"] .step-bullet-num { display: none; }
+    .step-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .step-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2b2b2b;
+      line-height: 1.2;
+    }
+    .step-desc {
+      font-size: 12.5px;
+      color: #6b6b6b;
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+    .step-badge {
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .studio-tutorial-step[data-status="active"] .step-badge {
+      background: #ff9800;
+      color: #fff;
+    }
+    .studio-tutorial-step[data-status="done"] .step-badge {
+      background: #4caf50;
+      color: #fff;
+    }
+    .studio-tutorial-step[data-status="pending"] .step-badge {
+      background: rgba(0, 0, 0, 0.08);
+      color: #888;
+    }
+    @media (max-width: 520px) {
+      .studio-tutorial { padding: 18px 14px 14px; }
+      .studio-tutorial-title { font-size: 17px; }
+      .studio-tutorial-step { padding: 12px 12px; gap: 10px; }
+      .step-bullet { width: 30px; height: 30px; font-size: 13px; }
+      .step-title { font-size: 14px; }
+      .step-desc { font-size: 12px; }
+      .step-badge { font-size: 10px; padding: 3px 8px; }
+    }
+
+    /* ---- Referral success popup ---- */
+    .referral-success-overlay {
+      position: fixed; inset: 0; z-index: 99999;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.55);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .referral-success-overlay.visible {
+      opacity: 1; pointer-events: auto;
+    }
+    .referral-success-card {
+      background: #fff; border-radius: 20px;
+      padding: 36px 28px 28px; text-align: center;
+      max-width: 340px; width: 90%;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+      transform: scale(0.85); transition: transform 0.3s ease;
+    }
+    .referral-success-overlay.visible .referral-success-card {
+      transform: scale(1);
+    }
+    .referral-success-icon {
+      font-size: 48px; margin-bottom: 12px;
+    }
+    .referral-success-title {
+      font-size: 20px; font-weight: 800; color: #008044; margin: 0 0 8px;
+    }
+    .referral-success-msg {
+      font-size: 14px; color: #555; line-height: 1.5; margin: 0 0 20px;
+    }
+    .referral-success-close {
+      display: inline-block; padding: 10px 32px;
+      border: none; border-radius: 30px; cursor: pointer;
+      font-weight: 700; font-size: 14px; color: #fff;
+      background: linear-gradient(135deg, #00c853, #008044);
+      transition: transform 0.2s;
+    }
+    .referral-success-close:hover { transform: scale(1.05); }
+
+    .bar-bg.bar-success #progressBarStatus {
+      background: linear-gradient(90deg, #00e676, #00c853, #008044) !important;
+    }
+    /* Q&A inbox */
+    .qa-inbox-card { background: #0f172a; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; }
+    .qa-inbox-q { font-size: 14px; font-weight: 600; line-height: 1.5; margin-bottom: 4px; color: #fff; }
+    .qa-inbox-meta { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+    .qa-inbox-answered { border-top: 1px solid rgba(255,255,255,0.07); padding-top: 12px; margin-top: 4px; }
+    .qa-inbox-answered-label { font-size: 11px; color: #00e676; font-weight: 700; margin-bottom: 6px; }
+    .qa-inbox-answered-text { font-size: 13px; color: rgba(255,255,255,0.75); }
+    .qa-answer-form { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.07); padding-top: 12px; }
+    .qa-answer-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-family: Montserrat, sans-serif; font-size: 13px; padding: 10px 12px; resize: vertical; min-height: 60px; outline: none; }
+    .qa-answer-input:focus { border-color: #ff7a59; }
+    .qa-answer-submit { align-self: flex-end; padding: 9px 18px; background: #ff7a59; color: #fff; border: none; border-radius: 10px; font-family: Montserrat, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .qa-answer-submit:disabled { opacity: 0.5; }
+  </style>
+</head>
+<body>
+  <div id="referralSuccessOverlay" class="referral-success-overlay" role="dialog" aria-modal="true" aria-label="Referral submitted">
+    <div class="referral-success-card">
+      <div class="referral-success-icon">&#127881;</div>
+      <h2 class="referral-success-title">Referral Submitted!</h2>
+      <p class="referral-success-msg">You entered the code successfully. The artist who shared it will appear in <strong>Featured Songs</strong> once they upload a track.</p>
+      <button type="button" class="referral-success-close" id="referralSuccessCloseBtn">Got it</button>
+    </div>
+  </div>
+  <div id="ugcPolicyOverlay" class="ugc-policy-overlay" aria-modal="true" role="dialog" aria-labelledby="ugcPolicyTitle">
+    <div class="ugc-policy-card">
+      <h2 id="ugcPolicyTitle">Before you continue</h2>
+      <p style="margin:0 0 12px;color:rgba(255,255,255,0.75);font-size:13px;">Check the box and tap Continue to accept the Terms of Service and Privacy Policy before using Asteroid. You only need to do this once on this device (saved in browser storage). Asteroid includes user-uploaded music and profiles; you can report content, block users, and reach our team at any time. <strong>App Store age rating:</strong> Apple lists Asteroid as <strong>16+</strong> in most countries and regions, and <strong>15+</strong> in Australia, Brazil, and the Republic of Korea—the badge shown on your local App Store is the one that applies to you. By continuing you confirm you meet that minimum age.</p>
+      <div class="ugc-policy-actions">
+        <div class="ugc-policy-check-row" id="ugcPolicyCheckRow" role="group" aria-label="Legal acceptance">
+          <input type="checkbox" id="ugcPolicyCheck" autocomplete="off" aria-describedby="ugcPolicyLegalText">
+          <span class="ugc-policy-check-text" id="ugcPolicyLegalText">I agree to the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer" onclick="return window.openAsteroidLegalPageFromClick(event, 'Asteroid%20Terms.html');">Terms of Service</a> (including rules for user content) and the <a href="policy.html" target="_blank" rel="noopener noreferrer" onclick="return window.openAsteroidLegalPageFromClick(event, 'policy.html');">Privacy Policy</a>.</span>
+        </div>
+        <div class="ugc-policy-check-row" id="ugcExplicitCheckRow" role="group" aria-label="Content preference">
+          <input type="checkbox" id="ugcHideExplicitCheck" autocomplete="off" aria-describedby="ugcHideExplicitText">
+          <span class="ugc-policy-check-text" id="ugcHideExplicitText">Hide explicit content (recommended for younger listeners).</span>
+        </div>
+        <button type="button" class="ugc-policy-continue" id="ugcPolicyContinue" disabled>Continue to Asteroid</button>
+        <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.5);text-align:center;">Questions: <a href="mailto:asteroidcontactbussiness@gmail.com?subject=Asteroid%20app%20-%20moderation">asteroidcontactbussiness@gmail.com</a></p>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function () {
+    window.openAsteroidLegalPageFromClick = function (ev, path) {
+      try {
+        if (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        }
+      } catch (e0) {}
+      var rel = String(path || "").trim();
+      if (!rel) return false;
+      var url = "";
+      try {
+        url = new URL(rel, window.location.href).href;
+      } catch (e1) {
+        url = rel;
+      }
+      var isCap =
+        window.Capacitor &&
+        typeof window.Capacitor.isNativePlatform === "function" &&
+        window.Capacitor.isNativePlatform();
+      if (isCap) {
+        var pubBase = "https://www.asteroid8.net/";
+        try {
+          var pu = new URL(url);
+          var needRewrite =
+            pu.protocol === "ionic:" ||
+            pu.protocol === "capacitor:" ||
+            pu.protocol === "file:";
+          if (needRewrite) {
+            url = pubBase + rel.replace(/^\/+/, "");
+          }
+        } catch (eRew) {
+          try {
+            url = pubBase + rel.replace(/^\/+/, "");
+          } catch (eFb) {}
+        }
+      }
+      try {
+        if (isCap) {
+          var C = window.Capacitor;
+          var P = C.Plugins || {};
+          var Br = P.Browser;
+          if (Br && typeof Br.open === "function") {
+            void Br.open({ url: url, presentationStyle: "fullscreen" });
+            return false;
+          }
+          if (typeof C.nativePromise === "function") {
+            void C.nativePromise("Browser", "open", { url: url, presentationStyle: "fullscreen" });
+            return false;
+          }
+        }
+      } catch (e2) {}
+      try {
+        window.open(url, "_blank", "noopener,noreferrer");
+      } catch (e3) {
+        try {
+          window.location.href = url;
+        } catch (e4) {}
+      }
+      return false;
+    };
+    function ugcEventTargetIsInsideAnchor(target) {
+      var n = target;
+      while (n) {
+        if (n.nodeType === 1 && n.tagName && String(n.tagName).toLowerCase() === "a") return true;
+        n = n.parentNode;
+      }
+      return false;
+    }
+    window.__ugcEventTargetIsInsideAnchor = ugcEventTargetIsInsideAnchor;
+    var UGC_KEY = "asteroidUgcPolicyAccepted";
+    var LEGAL_FIRST_KEY = "asteroidTermsPrivacyAccepted";
+    function legalFirstVisitDone() {
+      return localStorage.getItem(LEGAL_FIRST_KEY) === "v1";
+    }
+    try {
+      window.__asteroidLegalFirstVisitDone = legalFirstVisitDone;
+    } catch (eExpose) {}
+    function ensureUgcGateDefaultCopy() {
+      var t = document.getElementById("ugcPolicyTitle");
+      var b = document.getElementById("ugcPolicyContinue");
+      if (t && b && !window.__ugcAppleGateDefaults) {
+        window.__ugcAppleGateDefaults = { title: t.textContent, btn: b.textContent };
+      }
+    }
+    function showFirstVisitLegalGateIfNeeded() {
+      if (legalFirstVisitDone()) return;
+      ensureUgcGateDefaultCopy();
+      var ov = document.getElementById("ugcPolicyOverlay");
+      var chk = document.getElementById("ugcPolicyCheck");
+      var btn = document.getElementById("ugcPolicyContinue");
+      try {
+        delete window.__appleUgcPendingRunner;
+      } catch (e0) {}
+      restoreUgcAppleGateCopy();
+      if (chk) chk.checked = false;
+      if (btn) btn.disabled = true;
+      if (ov) ov.classList.add("is-visible");
+    }
+    function restoreUgcAppleGateCopy() {
+      var d = window.__ugcAppleGateDefaults;
+      if (!d) return;
+      var t = document.getElementById("ugcPolicyTitle");
+      var b = document.getElementById("ugcPolicyContinue");
+      if (t && d.title) t.textContent = d.title;
+      if (b && d.btn) b.textContent = d.btn;
+    }
+    function dismissAppleUgcGate() {
+      try { delete window.__appleUgcPendingRunner; } catch (e) {}
+      restoreUgcAppleGateCopy();
+      var ov = document.getElementById("ugcPolicyOverlay");
+      var chk = document.getElementById("ugcPolicyCheck");
+      var btn = document.getElementById("ugcPolicyContinue");
+      if (ov) ov.classList.remove("is-visible");
+      if (chk) chk.checked = false;
+      if (btn) btn.disabled = true;
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+      var ov = document.getElementById("ugcPolicyOverlay");
+      var chk = document.getElementById("ugcPolicyCheck");
+      var btn = document.getElementById("ugcPolicyContinue");
+      if (ov) {
+        ov.addEventListener("click", function (e) {
+          if (e.target === ov && typeof window.__appleUgcPendingRunner === "function") dismissAppleUgcGate();
+        });
+      }
+      if (chk && btn) {
+        var checkRow = document.getElementById("ugcPolicyCheckRow");
+        if (checkRow) {
+          checkRow.addEventListener("click", function (e) {
+            if (e.target === chk) return;
+            if (typeof window.__ugcEventTargetIsInsideAnchor === "function" && window.__ugcEventTargetIsInsideAnchor(e.target)) return;
+            e.preventDefault();
+            chk.checked = !chk.checked;
+            chk.dispatchEvent(new Event("change", { bubbles: true }));
+          });
+        }
+        chk.addEventListener("change", function () {
+          btn.disabled = !chk.checked;
+        });
+        btn.addEventListener("click", function () {
+          if (!chk || !chk.checked) return;
+          var runner = window.__appleUgcPendingRunner;
+          if (typeof runner === "function") {
+            try { delete window.__appleUgcPendingRunner; } catch (e2) {}
+            localStorage.setItem(UGC_KEY, "v1");
+            localStorage.setItem(LEGAL_FIRST_KEY, "v1");
+            ov.classList.remove("is-visible");
+            chk.checked = false;
+            btn.disabled = true;
+            restoreUgcAppleGateCopy();
+            void runner();
+            return;
+          }
+          localStorage.setItem(UGC_KEY, "v1");
+          localStorage.setItem(LEGAL_FIRST_KEY, "v1");
+          ov.classList.remove("is-visible");
+        });
+      }
+      showFirstVisitLegalGateIfNeeded();
+      var agRow = document.getElementById("agreementLabelRow");
+      var agChk = document.getElementById("agreement");
+      if (agRow && agChk) {
+        agRow.addEventListener("click", function (e) {
+          if (e.target === agChk) return;
+          if (e.target.closest && e.target.closest("a")) return;
+          e.preventDefault();
+          agChk.checked = !agChk.checked;
+        });
+      }
+    });
+  })();
+  </script>
+  <script src="auth.js"></script>
+  <script>
+    if (typeof window.setCreateProfileMode !== "function") {
+      window.setCreateProfileMode = function () {};
+    }
+  </script>
+  <div id="studioTopBar" style="display:none;text-align:right;margin:0 auto 12px;max-width:640px;">
+    <button type="button" onclick="if(window.authLogout)authLogout()" style="background:#111;color:#ff7f50;border:1px solid #ff7f50;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-family:inherit;">Sign out</button>
+  </div>
+
+  <div id="vipSuccessBox">
+    <h1 style="color: #008044; margin-top: 0;">🎉 REWARD UNLOCKED!</h1>
+    <p style="font-size: 1.1em; font-weight: bold;">You’ve successfully invited a friend!</p>
+    <p>Your <b>3-Month Feature</b> is now active! Our team has been notified, and <b>we will be in touch with you via email within 48 hours</b> to coordinate your promotion.</p>
+    <button onclick="document.getElementById('vipSuccessBox').style.display='none'" class="upload-btn">AWESOME!</button>
+  </div>
+
+
+  <div id="campaignContainer">
+
+    <section id="studioTutorial" class="studio-tutorial" aria-label="How feature requests work">
+      <h2 class="studio-tutorial-title"><span>✨</span> How to get featured</h2>
+      <p class="studio-tutorial-sub">Follow these 3 steps to request a feature spot on Asteroid.</p>
+      <div class="studio-tutorial-steps">
+        <div class="studio-tutorial-step" data-step="1" data-status="active">
+          <div class="step-bullet"><span class="step-bullet-num">1</span></div>
+          <div class="step-body">
+            <div class="step-title">Sign in</div>
+            <div class="step-desc">Sign in with Apple or email so we can link your referral code to your artist profile.</div>
+          </div>
+          <div class="step-badge">Start here</div>
+        </div>
+        <div class="studio-tutorial-step" data-step="2" data-status="pending">
+          <div class="step-bullet"><span class="step-bullet-num">2</span></div>
+          <div class="step-body">
+            <div class="step-title">Upload a song</div>
+            <div class="step-desc">Fill in song details and upload your track using the form below.</div>
+          </div>
+          <div class="step-badge">Pending</div>
+        </div>
+        <div class="studio-tutorial-step" data-step="3" data-status="pending">
+          <div class="step-bullet"><span class="step-bullet-num">3</span></div>
+          <div class="step-body">
+            <div class="step-title">Share your referral code</div>
+            <div class="step-desc">Copy your unique 18-character code and share it with 1 artist friend to request feature.</div>
+          </div>
+          <div class="step-badge">Pending</div>
+        </div>
+      </div>
+    </section>
+
+    <div id="pendingUploadBanner" style="display:none;margin:0 auto 16px;max-width:600px;padding:16px 18px;border-radius:14px;background:linear-gradient(135deg,#fff4e0,#ffe8c2);border:2px solid #f59e0b;text-align:left;font-family:Montserrat,sans-serif;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span style="font-size:22px;">🎉</span>
+        <strong style="color:#92400e;font-size:15px;">Someone used your referral code!</strong>
+      </div>
+      <p style="margin:0;color:#7c2d12;font-size:13px;line-height:1.45;">Upload a song below to claim your spot in <strong>Featured Songs</strong>. You won't appear until you upload.</p>
+    </div>
+
+    <div class="progress-box">
+      <h3 style="margin: 0; color: coral;">Reward Progress</h3>
+      <p id="countText" style="font-weight: bold;">0 / 1 Artist Joined</p>
+      <div class="bar-bg"><div id="progressBarStatus"></div></div>
+      <div id="unlockMsg">✅ UNLOCKED: 3-Month Feature Active!</div>
+      
+      <p style="font-size: 0.9em;">Your Referral Code:</p>
+      <input type="text" id="shareLinkInput" readonly placeholder="Loading your code...">
+      <button id="copyBtn" class="upload-btn" style="width: 80px; height: 35px; font-size: 12px;">COPY</button>
+
+      <div class="referral-code-panel">
+        <p class="referral-code-title">Share your code — one use only</p>
+        <input type="text" id="referralCodeDisplay" readonly placeholder="Loading your code...">
+        <button id="copyCodeBtn" class="upload-btn" style="width: 110px; height: 35px; font-size: 12px;">COPY CODE</button>
+        <input type="text" id="referralCodeEntry" placeholder="Enter another artist's referral code" autocomplete="off">
+        <button id="submitReferralCodeBtn" class="upload-btn" style="width: 180px; height: 35px; font-size: 12px;">SUBMIT CODE</button>
+        <div id="referralCodeStatus" class="referral-code-status"></div>
+      </div>
+
+      <div id="referralComplete">
+        <h3>Your song is featured!</h3>
+        <p>You have already been granted feature for this song.</p>
+        <div class="social-links-form">
+          <label>Add up to 3 links (social media, streaming, website)</label>
+          <input type="url" id="socialLink1" placeholder="https://instagram.com/..." autocomplete="off">
+          <input type="url" id="socialLink2" placeholder="https://open.spotify.com/..." autocomplete="off">
+          <input type="url" id="socialLink3" placeholder="https://soundcloud.com/..." autocomplete="off">
+          <button type="button" id="saveSocialLinksBtn">Save Links</button>
+          <div id="socialLinksSaved">Links saved! They will appear with your featured song.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Q&A Inbox ── -->
+  <div id="qaInboxSection" style="max-width:600px;margin:32px auto 0;padding:0 16px;display:none;">
+    <h2 style="font-size:16px;font-weight:700;margin-bottom:14px;color:#fff;display:flex;align-items:center;gap:8px;">
+      <span class="material-symbols-outlined" style="font-size:20px;color:#ff7a59">question_answer</span>
+      Fan Questions
+      <span id="qaUnreadBadge" style="display:none;background:#ff7a59;color:#fff;font-size:10px;font-weight:700;border-radius:99px;padding:2px 7px;"></span>
+    </h2>
+    <div id="qaInboxList" style="display:flex;flex-direction:column;gap:12px;">
+      <p style="color:rgba(255,255,255,0.35);font-size:13px;">Loading questions…</p>
+    </div>
+    <a id="qaShareLink" href="#" target="_blank" style="display:block;margin-top:18px;padding:13px;text-align:center;background:rgba(255,122,89,0.12);border:1px solid rgba(255,122,89,0.3);border-radius:12px;color:#ff7a59;font-weight:700;font-size:13px;text-decoration:none;">
+      Share your Q&amp;A page →
+    </a>
+  </div>
+
+  <div id="boostuploadContainer" class="boost-container">
+
+    <h2>Boost Your Upload</h2>
+  
+    <form id="boostForm">
+  
+      <input type="text" id="BoostTitle" placeholder="Song Title" required>
+      <input type="text" id="BoostArtist" placeholder="Artist Name" required>
+      <input type="text" id="BoostAlbum" placeholder="Album Name" required>
+  
+      <input type="text" id="linkToArtist" placeholder="Artist Social Link" required>
+      <input type="text" id="linkToSong" placeholder="Song Link" required>
+      <input type="text" id="linkToAlbum" placeholder="Album Link" required>
+  
+      <div class="upload-wrapper">
+  
+        <div class="upload-box" id="dropAreaBoost">
+          <p id="boostUploadText">🎵 Drag & Drop Your Audio Here</p>
+          <small>or click to upload (.mp3 / .wav)</small>
+        </div>
+  
+        <input type="file"
+               id="boostFileInp"
+               accept=".mp3,.wav"
+               hidden
+               required>
+  
+      </div>
+  
+      <button type="button" id="boostBtn" class="boost-btn">
+        BOOST NOW & PAY
+      </button>
+  
+    </form>
+    <div id="alertBox" class="alertBox"><h2>Uploading...</h2></div>
+  <div id="ooaa" class="alertBox" style="display:none !important;" aria-hidden="true"></div>
+  </div>
+<style>
+
+.boost-container {
+  display: none;
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 3px solid black;
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+}
+
+.boost-container input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.upload-wrapper {
+  margin-top: 15px;
+}
+
+.upload-box {
+  padding: 40px 20px;
+  border: 2px dashed coral;
+  border-radius: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s ease;
+  background: rgba(255,127,80,0.05);
+}
+
+.upload-box:hover {
+  background: rgba(255,127,80,0.15);
+}
+
+.upload-box.dragover {
+  border-color: #ff3c78;
+  background: rgba(255,60,120,0.2);
+}
+
+.boost-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  border: none;
+  border-radius: 30px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #ff7f50, #ff3c78);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.boost-btn:hover {
+  transform: scale(1.05);
+}
+
+</style>
+  
+<script>const boostInput = document.getElementById("boostFileInp");
+  const boostDropArea = document.getElementById("dropAreaBoost");
+  const uploadText = document.getElementById("uploadMain");
+  const boostUploadText = document.getElementById("boostUploadText");
+  
+  // Clicking box opens file picker
+  boostDropArea.addEventListener("click", () => {
+    boostInput.click();
+  });
+  
+  // Show file name when selected
+  boostInput.addEventListener("change", () => {
+    if (boostInput.files.length > 0) {
+      boostUploadText.textContent =
+        "File Selected ✅"
+    }
+  });
+  </script>  
+
+  <form id="uploadForm">
+    <h2>Upload Your Media</h2>
+  <div id="studioSignInRow" class="sign-in-row studio-account-wrap" style="margin-top: 6px; margin-bottom: 12px; display: none;">
+    <div class="studio-account-card">
+      <p class="studio-account-lead">Sign in with the same account as the home page. After Apple or email login, you can finish your profile here — same form as on Asteroid Music home.</p>
+      <div class="header-sign-in-group" aria-label="Sign in options">
+        <button type="button" class="header-sign-in-btn header-sign-in-apple" id="apple-sign-in" aria-label="Continue with Apple">
+          <i class="fa-brands fa-apple" aria-hidden="true"></i>
+          <span id="gcd">Continue with Apple</span>
+        </button>
+        <button type="button" class="header-email-login" id="studio-email-signin" style="background:none;border:none;cursor:pointer;color:coral;text-decoration:underline;font-size:inherit;padding:0;">Email sign-in</button>
+      </div>
+      <div id="studioEmailForm" style="display:none;margin-top:12px;">
+        <input type="email" id="studioEmailInput" placeholder="Email" autocomplete="username" style="width:100%;padding:10px;margin:4px 0;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;">
+        <input type="password" id="studioPasswordInput" placeholder="Password" autocomplete="current-password" style="width:100%;padding:10px;margin:4px 0;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;">
+        <button type="button" id="studioEmailSubmitBtn" style="width:100%;margin-top:8px;padding:10px;border:none;border-radius:30px;font-weight:bold;background:linear-gradient(135deg,#ff7f50,#ff3c78);color:#fff;cursor:pointer;font-size:14px;">Sign In</button>
+        <div id="studioEmailErr" style="color:#ff3c78;font-size:13px;margin-top:6px;text-align:center;"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function studioEmailSignIn() {
+      var toggle = document.getElementById('studio-email-signin');
+      var form = document.getElementById('studioEmailForm');
+      var submitBtn = document.getElementById('studioEmailSubmitBtn');
+      var errEl = document.getElementById('studioEmailErr');
+
+      function doEmailSignIn() {
+        var email = (document.getElementById('studioEmailInput').value || '').trim();
+        var password = document.getElementById('studioPasswordInput').value || '';
+        if (errEl) errEl.textContent = '';
+        if (!email || !password) {
+          if (errEl) errEl.textContent = 'Enter both email and password.';
+          return;
+        }
+        if (email === 'demo@asteroid8.net' && password === 'Password123') {
+          var key = email.replace(/[.#$[\]]/g, '_');
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userEmail', email);
+          localStorage.setItem('userName', 'User');
+          localStorage.setItem('localAuthOnly', '1');
+          localStorage.setItem('email', email);
+          localStorage.setItem('CurrentUser', email);
+          localStorage.setItem('fullName', 'User');
+          localStorage.setItem('asteroidSignedInBefore', 'true');
+          localStorage.setItem('emailKey', key);
+          setTimeout(function () { location.reload(); }, 150);
+        } else {
+          if (errEl) errEl.textContent = 'Invalid email or password.';
+        }
+      }
+
+      if (toggle && form) {
+        toggle.addEventListener('click', function () {
+          // Show legal overlay first if not yet accepted
+          var legalDone = typeof window.__asteroidLegalFirstVisitDone === 'function' && window.__asteroidLegalFirstVisitDone();
+          if (!legalDone) {
+            var ov = document.getElementById('ugcPolicyOverlay');
+            var chk = document.getElementById('ugcPolicyCheck');
+            var btn = document.getElementById('ugcPolicyContinue');
+            var titleEl = document.getElementById('ugcPolicyTitle');
+            if (ov && chk && btn) {
+              if (chk) chk.checked = false;
+              if (btn) btn.disabled = true;
+              if (titleEl) titleEl.textContent = 'Before you continue';
+              btn.textContent = 'Continue to sign in';
+              window.__appleUgcPendingRunner = function () {
+                form.style.display = 'block';
+              };
+              ov.classList.add('is-visible');
+              return;
+            }
+          }
+          form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        });
+      }
+      if (submitBtn) {
+        submitBtn.addEventListener('click', doEmailSignIn);
+      }
+    })();
+    (function studioAuthPaintSync() {
+      function uid() {
+        var id = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || localStorage.getItem("userEmail") || localStorage.getItem("artemail") || "").trim();
+        if (id === "null" || id === "undefined") return "";
+        return id;
+      }
+      function sessionQuick() {
+        if (typeof window.isSessionValid === "function") return window.isSessionValid();
+        if (localStorage.getItem("isLoggedIn") === "true") return true;
+        if (localStorage.getItem("localAuthOnly") === "1" && uid()) return true;
+        if (localStorage.getItem("asteroidSignedInBefore") === "true" && uid()) return true;
+        return false;
+      }
+      try {
+        var signedIn = sessionQuick();
+        var row = document.getElementById("studioSignInRow");
+        var bar = document.getElementById("studioTopBar");
+        var campaign = document.getElementById("campaignContainer");
+        if (signedIn) {
+          if (row) {
+            row.classList.add("studio-signin-row--hidden");
+            row.setAttribute("aria-hidden", "true");
+          }
+          if (bar) bar.classList.add("studio-topbar--visible");
+          if (campaign) campaign.style.display = "block";
+        } else {
+          if (row) {
+            row.style.display = "";
+            row.classList.remove("studio-signin-row--hidden");
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+    <input type="text" id="title" placeholder="Song Title" required><br>
+    <input type="text" id="artist" placeholder="Artist Name" required><br>
+    <input type="text" id="album" placeholder="Album Name" required><br>
+    <label for="studioMarkExplicit" class="studio-explicit-option">
+      <input type="checkbox" id="studioMarkExplicit" autocomplete="off">
+      <span class="studio-explicit-copy"><strong>Explicit content</strong> — check this if the track has strong language or adult themes. Listeners will see an <strong>E</strong> badge next to the title (and can hide explicit songs in settings).</span>
+    </label>
+    <style>
+      .upload-wrapper {
+        width: 320px;
+      }
+    
+      .upload-box {
+        width: 100%;
+        padding: 40px 20px;
+        border: 2px dashed coral;
+        border-radius: 15px;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        cursor: pointer;
+        transition: 0.3s ease;
+        background: rgba(255, 127, 80, 0.05);
+        box-sizing: border-box;
+      }
+    
+      .upload-box:hover {
+        background: rgba(255, 127, 80, 0.15);
+      }
+    
+      .upload-box.dragover {
+        background: rgba(255, 60, 120, 0.2);
+        border-color: #ff3c78;
+      }
+    
+      .upload-box.file-selected {
+        border-style: solid;
+        background: rgba(0, 200, 120, 0.15);
+        border-color: #00c878;
+      }
+    
+      .upload-text {
+        margin: 0;
+        font-weight: bold;
+        color: #333;
+      }
+    
+      .upload-sub {
+        font-weight: normal;
+        font-size: 13px;
+        margin-top: 8px;
+      }
+    
+      #fileInp {
+        display: none;
+      }
+    </style>
+    
+  <center>
+    <div class="upload-wrapper">
+      <div class="upload-box" id="dropArea">
+        <p class="upload-text" id="uploadMain">
+          🎵 Drag & Drop Your Audio Here
+        </p>
+        <p class="upload-sub" id="uploadSub">
+          or click to upload (.mp3 only)
+        </p>
+      </div>
+ 
+      <input type="file" id="fileInp" accept="audio/mpeg/wav" required>
+      
+    </div>
+  </center>
+    <script>
+      const dropArea = document.getElementById("dropArea");
+      const fileInput = document.getElementById("fileInp");
+      const uploadMain = document.getElementById("uploadMain");
+      const uploadSub = document.getElementById("uploadSub");
+    
+      function showFileName(file) {
+        uploadMain.textContent = "✅ " + file.name;
+        uploadSub.textContent = "Click to change file";
+        dropArea.classList.add("file-selected");
+      }
+    
+      // Click to open
+      dropArea.addEventListener("click", () => {
+        fileInput.click();
+      });
+    
+      // File selected from picker
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files.length > 0) {
+          showFileName(fileInput.files[0]);
+        }
+      });
+    
+      // Drag styling
+      dropArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropArea.classList.add("dragover");
+      });
+    
+      dropArea.addEventListener("dragleave", () => {
+        dropArea.classList.remove("dragover");
+      });
+    
+      dropArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropArea.classList.remove("dragover");
+    
+        if (e.dataTransfer.files.length > 0) {
+          fileInput.files = e.dataTransfer.files;
+          showFileName(e.dataTransfer.files[0]);
+        }
+      });
+
+      document.getElementById("title").addEventListener("input", function() {
+        const el = document.getElementById("agreementSongTitle");
+        el.textContent = this.value.trim() || "this song";
+      });
+    </script>
+    
+    <div style="margin: 15px; text-align: left; max-width: 400px; display: inline-block;">
+        <div id="agreementLabelRow" style="display: flex; align-items: flex-start; gap: 10px; line-height: 1.5;">
+        <input type="checkbox" id="agreement" style="width: auto; flex-shrink: 0; margin-top: 4px;" aria-describedby="agreementLabel">
+        <span id="agreementLabel">I confirm that I own <strong id="agreementSongTitle">this song</strong> and I accept the <a href="Asteroid%20Terms.html" target="_blank" rel="noopener noreferrer" style="color: coral;">Terms of Service</a> and <a href="policy.html" target="_blank" rel="noopener noreferrer" style="color: coral;">Privacy Policy</a> of Asteroid.</span>
+        </div>
+    </div>
+    <button type="button" id="btn" class="upload-btn" onclick="if(!window._uploadHandlerReady){console.log('[upload] module not loaded yet — form inputs:',{title:document.getElementById('title').value,artist:document.getElementById('artist').value,album:document.getElementById('album').value,file:document.getElementById('fileInp').files[0]?.name||null,agreement:document.getElementById('agreement').checked});alert('Upload is still loading. Please wait a moment and try again, or hard-refresh (Cmd+Shift+R).');}">UPLOAD NOW</button>
+    <label for="uploadStatusArea" style="display:block;margin:16px auto 6px;max-width:400px;text-align:left;font-size:12px;font-weight:700;color:#333;font-family:Montserrat,sans-serif;">Upload status</label>
+    <textarea id="uploadStatusArea" readonly rows="5" aria-live="polite" placeholder="Progress will show here when you upload." style="display:block;width:min(400px,92vw);max-width:400px;margin:0 auto 20px;padding:12px;font-size:13px;line-height:1.45;font-family:Montserrat,sans-serif;border-radius:12px;border:1px solid #bbb;box-sizing:border-box;background:#f8f8f8;color:#111;resize:vertical;"></textarea>
+    <style>
+      body {
+        margin: 0;
+        background: #ffffff;
+        transition: background 1.5s ease;
+      }
+    
+      /* Full rainbow spectrum gradient */
+      .liquid-bg {
+        background: linear-gradient(
+          -45deg,
+          hsl(0, 100%, 50%),
+          hsl(30, 100%, 50%),
+          hsl(60, 100%, 50%),
+          hsl(90, 100%, 50%),
+          hsl(120, 100%, 50%),
+          hsl(150, 100%, 50%),
+          hsl(180, 100%, 50%),
+          hsl(210, 100%, 50%),
+          hsl(240, 100%, 50%),
+          hsl(270, 100%, 50%),
+          hsl(300, 100%, 50%),
+          hsl(330, 100%, 50%),
+          hsl(360, 100%, 50%)
+        );
+        background-size: 800% 800%;
+        animation: liquidMove 15s ease infinite;
+      }
+    
+      @keyframes liquidMove {
+        0%   { background-position: 0% 50%; }
+        25%  { background-position: 50% 100%; }
+        50%  { background-position: 100% 50%; }
+        75%  { background-position: 50% 0%; }
+        100% { background-position: 0% 50%; }
+      }
+    
+      #boost {
+        background: linear-gradient(135deg, #ff7f50, #ff3c78);
+        color: white;
+        padding: 12px 28px;
+        border: none;
+        border-radius: 30px;
+        font-weight: bold;
+        font-size: 15px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(255, 60, 120, 0.4);
+        width: 170px;
+        height: 60px;
+        transition: 0.3s ease;
+        position: relative;
+        z-index: 20;
+        pointer-events: auto;
+        touch-action: manipulation;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+    
+      #boost:hover {
+        transform: scale(1.08);
+      }
+
+      #boost:disabled {
+        background: #9a9a9a;
+        box-shadow: none;
+        cursor: not-allowed;
+        opacity: 0.75;
+        transform: none;
+      }
+
+      #boost:disabled:hover {
+        transform: none;
+      }
+    </style>
+  <br>
+  <br>
+    <button id="boost" type="button" >Currently Disabled</button>
+    <br>
+    <br>
+    <font face="Montserrat">Click Activate to get your song featured on the top page</font>
+    <script>
+    
+    </script>
+    
+  </form>
+
+  <script>
+    function openBoostUpload(event) {
+      if (event) event.preventDefault();
+      const boostBtn = document.getElementById("boost");
+      if (boostBtn && boostBtn.disabled) return;
+      const boostContainer = document.getElementById("boostuploadContainer");
+      if (!boostContainer) return;
+
+      boostContainer.style.display = "block";
+      boostContainer.removeAttribute("hidden");
+      boostContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      const firstField = document.getElementById("BoostTitle");
+      if (firstField && typeof firstField.focus === "function") {
+        setTimeout(() => firstField.focus(), 250);
+      }
+    }
+
+    function initBoostTrigger() {
+      const boostBtn = document.getElementById("boost");
+      if (!boostBtn || boostBtn.dataset.boostBound === "1") return;
+      boostBtn.dataset.boostBound = "1";
+      boostBtn.type = "button";
+
+      const openFromEvent = (ev) => openBoostUpload(ev);
+      boostBtn.addEventListener("click", openFromEvent, { passive: false });
+      boostBtn.addEventListener("touchend", openFromEvent, { passive: false });
+      boostBtn.addEventListener("pointerup", openFromEvent);
+      boostBtn.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") openFromEvent(ev);
+      });
+    }
+
+    function initBoostGlobalFallback() {
+      if (window.__boostGlobalFallbackBound) return;
+      window.__boostGlobalFallbackBound = true;
+
+      const delegateOpen = (ev) => {
+        const target = ev.target && ev.target.closest ? ev.target.closest("#boost") : null;
+        if (!target || target.disabled) return;
+        openBoostUpload(ev);
+      };
+
+      document.addEventListener("click", delegateOpen, true);
+      document.addEventListener("touchend", delegateOpen, { capture: true, passive: false });
+    }
+
+    initBoostTrigger();
+    initBoostGlobalFallback();
+    document.addEventListener("DOMContentLoaded", () => {
+      initBoostTrigger();
+      initBoostGlobalFallback();
+    });
+  </script>
+  
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getDatabase, goOnline, ref as ref2, update, get, set, onValue, increment, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  import { initializeAuth, getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInAnonymously, OAuthProvider, onAuthStateChanged, browserLocalPersistence, browserPopupRedirectResolver } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getStorage, getDownloadURL, uploadBytes, ref } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+  import { processReferralURL, createOrUpdateUserOnSignup, getReferralFromURL, onSongUploaded } from "./js/referral-system.js";
+  import { songMetadataExplicit } from "./js/explicit-appendix.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+    authDomain: "asteroid-cdc13.firebaseapp.com",
+    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+    projectId: "asteroid-cdc13",
+    storageBucket: "asteroid-cdc13.appspot.com",
+    messagingSenderId: "793353824502",
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+    measurementId: "G-GV72TMNNGR"
+  };
+
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  // Expose firebase globals so miniplayer.js (regular script) can persist the queue.
+  window.firebaseDatabase = db;
+  window.firebaseRef = ref2;
+  window.firebaseSet = set;
+  window.firebaseRemove = remove;
+  window.firebaseGet = get;
+  let auth;
+  try {
+    console.log('[studio][init] Calling initializeAuth…');
+    auth = initializeAuth(app, {
+      persistence: browserLocalPersistence,
+      popupRedirectResolver: browserPopupRedirectResolver,
+    });
+    console.log('[studio][init] initializeAuth OK — auth.currentUser:', auth.currentUser);
+  } catch (e) {
+    const code = e && e.code ? String(e.code) : "";
+    const msg = e && e.message ? String(e.message) : "";
+    console.warn('[studio][init] initializeAuth threw:', code, msg);
+    if (code === "auth/already-initialized" || /already.*initialized/i.test(msg)) {
+      auth = getAuth(app);
+      console.log('[studio][init] Fell back to getAuth — auth.currentUser:', auth.currentUser);
+    } else {
+      throw e;
+    }
+  }
+  // Diagnostic: check if Firebase has stored auth tokens
+  try {
+    const fbKey = 'firebase:authUser:' + firebaseConfig.apiKey + ':[DEFAULT]';
+    const fbToken = localStorage.getItem(fbKey);
+    console.log('[studio][init] Firebase auth token in localStorage (' + fbKey + '):', fbToken ? 'EXISTS (' + fbToken.length + ' chars)' : 'MISSING');
+  } catch (e) {}
+  const storage = getStorage(app);
+  const appleProvider = new OAuthProvider("apple.com");
+  appleProvider.addScope("email");
+  appleProvider.addScope("name");
+  try {
+    if (typeof window.Capacitor !== "undefined" && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+      console.info(
+        "[studio][auth] WebView origin (must be in Firebase Authorized domains for redirect OAuth):",
+        typeof location !== "undefined" ? location.origin : "?"
+      );
+    }
+  } catch (eOrig) {}
+  const jsConfetti = new JSConfetti();
+
+  function isAppleAuthUser(user) {
+    if (!user || !user.providerData) return false;
+    return user.providerData.some((p) => p && p.providerId === "apple.com");
+  }
+  function getStableAccountId(user) {
+    if (!user) return "";
+    if (isAppleAuthUser(user)) return (user.uid || user.email || user.providerData[0]?.email || "").trim();
+    return (user.email || user.providerData[0]?.email || user.uid || "").trim();
+  }
+
+  let appleOnboardingUiOpen = false;
+  let appleOnboardingCheckLock = false;
+
+  function slugPublicUsernameFromLabel(label) {
+    let s = String(label || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+    if (s.length > 40) s = s.slice(0, 40);
+    return s;
+  }
+
+  function openAppleOnboardingModal() {
+    const m = document.getElementById("appleOnboardingModal");
+    if (!m || appleOnboardingUiOpen) return;
+    appleOnboardingUiOpen = true;
+    if (window.setCreateProfileMode) window.setCreateProfileMode(true);
+    const nick = document.getElementById("appleOnboardingNickname");
+    if (nick) {
+      const pre = typeof window.__appleOnboardingPrefillNick === "string" ? window.__appleOnboardingPrefillNick : "";
+      delete window.__appleOnboardingPrefillNick;
+      nick.value = (pre || (localStorage.getItem("fullName") || "")).trim();
+      setTimeout(() => nick.focus(), 100);
+    }
+    const hdl = document.getElementById("appleOnboardingHandle");
+    if (hdl) {
+      hdl.dataset.userEdited = "";
+      hdl.value = slugPublicUsernameFromLabel(nick ? nick.value : "");
+    }
+    ["appleOnboardingInstagram", "appleOnboardingTwitter", "appleOnboardingTiktok", "appleOnboardingYoutube", "appleOnboardingSpotify", "appleOnboardingSoundcloud", "appleOnboardingWebsite"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+    const storedType = (localStorage.getItem("profileType") || "").trim().toLowerCase();
+    const artistRadio = document.getElementById("appleProfileTypeArtist");
+    const listenerRadio = document.getElementById("appleProfileTypeListener");
+    if (artistRadio && listenerRadio) {
+      if (storedType === "artist") artistRadio.checked = true;
+      else listenerRadio.checked = true;
+    }
+    m.style.display = "flex";
+  }
+
+  function closeAppleOnboardingModal() {
+    const m = document.getElementById("appleOnboardingModal");
+    if (m) m.style.display = "none";
+    appleOnboardingUiOpen = false;
+    if (window.setCreateProfileMode) window.setCreateProfileMode(false);
+  }
+
+  async function maybeShowAppleOnboarding() {
+    if (appleOnboardingUiOpen || appleOnboardingCheckLock) return;
+    const accountId = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim();
+    if (!accountId) return;
+    if (localStorage.getItem("appleOnboardingSkipped") === "1") return;
+    appleOnboardingCheckLock = true;
+    try {
+      const key = accountId.replace(/[.#$[\]]/g, "_");
+      try {
+        const snap = await get(ref2(db, "PROFILES/" + key));
+        const val = snap.exists() ? snap.val() : null;
+        if (val && (val.nickname || val.profileNickname)) {
+          const pu = String(val.publicUsername || "")
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9_]/g, "");
+          if (pu.length >= 3 && /^[a-z0-9_]{3,40}$/.test(pu)) return;
+          window.__appleOnboardingPrefillNick = String(val.nickname || val.profileNickname || "").trim();
+        } else if (localStorage.getItem("appleOnboardingDone") === "1") {
+          return;
+        } else {
+          window.__appleOnboardingPrefillNick = "";
+        }
+      } catch (e) {
+        console.warn("[studio][apple onboarding] profile read:", e);
+        if (localStorage.getItem("appleOnboardingDone") === "1") return;
+        window.__appleOnboardingPrefillNick = "";
+      }
+      openAppleOnboardingModal();
+    } finally {
+      appleOnboardingCheckLock = false;
+    }
+  }
+
+  async function saveAppleOnboardingProfile() {
+    const nickEl = document.getElementById("appleOnboardingNickname");
+    const nickname = (nickEl && nickEl.value ? nickEl.value : "").trim();
+    if (!nickname) {
+      alert("Please enter a nickname.");
+      if (nickEl) nickEl.focus();
+      return;
+    }
+    const accountId = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim();
+    if (!accountId) {
+      alert("Session missing. Please sign in again.");
+      return;
+    }
+    const key = accountId.replace(/[.#$[\]]/g, "_");
+    const hdlEl = document.getElementById("appleOnboardingHandle");
+    let handleRaw = (hdlEl && hdlEl.value ? hdlEl.value : "").trim().toLowerCase().replace(/^@+/, "").replace(/[^a-z0-9_]/g, "");
+    if (!handleRaw) handleRaw = slugPublicUsernameFromLabel(nickname);
+    if (handleRaw.length < 3) {
+      alert("Public username must be at least 3 characters (letters, numbers, underscores only).");
+      if (hdlEl) hdlEl.focus();
+      return;
+    }
+    if (handleRaw.length > 40 || !/^[a-z0-9_]{3,40}$/.test(handleRaw)) {
+      alert("Public username must be 3–40 characters: lowercase letters, numbers, and underscores only.");
+      if (hdlEl) hdlEl.focus();
+      return;
+    }
+    const regRef = ref2(db, "USERNAME_REGISTRY/" + handleRaw);
+    let regSnap;
+    try {
+      regSnap = await get(regRef);
+    } catch (e1) {
+      console.warn("[studio][apple onboarding] registry read", e1);
+      alert("Could not verify username. Check your connection and try again.");
+      return;
+    }
+    const owner = regSnap.exists() ? String(regSnap.val() || "").trim() : "";
+    if (owner && owner !== key) {
+      alert("That username is already taken. Pick another.");
+      if (hdlEl) hdlEl.focus();
+      return;
+    }
+    if (!owner) {
+      try {
+        await set(regRef, key);
+      } catch (e2) {
+        console.warn("[studio][apple onboarding] registry claim", e2);
+        alert("That username was just taken or could not be saved. Try a different one.");
+        return;
+      }
+    }
+    const gv = (id) => {
+      const el = document.getElementById(id);
+      const v = el && (el.value || "").trim();
+      return v || null;
+    };
+    const selectedTypeEl = document.querySelector('input[name="appleOnboardingProfileType"]:checked');
+    const profileType = selectedTypeEl ? selectedTypeEl.value : "listener";
+    const isPublicArtist = profileType === "artist";
+    const payload = {
+      nickname,
+      profileNickname: nickname,
+      publicUsername: handleRaw,
+      email: accountId,
+      profileType,
+      profileVisibility: isPublicArtist ? "public" : "private",
+      publicProfile: isPublicArtist,
+      hideEmail: !isPublicArtist,
+      role: isPublicArtist ? "Artist" : "Listener",
+      profileRole: isPublicArtist ? "Artist" : "Listener",
+      instagram: gv("appleOnboardingInstagram"),
+      twitter: gv("appleOnboardingTwitter"),
+      tiktok: gv("appleOnboardingTiktok"),
+      youtube: gv("appleOnboardingYoutube"),
+      spotify: gv("appleOnboardingSpotify"),
+      soundcloud: gv("appleOnboardingSoundcloud"),
+      website: gv("appleOnboardingWebsite"),
+      onboardingComplete: true,
+      onboardingUpdatedAt: Date.now(),
+    };
+    Object.keys(payload).forEach((k) => {
+      if (payload[k] == null) delete payload[k];
+    });
+    try {
+      await update(ref2(db, "PROFILES/" + key), payload);
+    } catch (e) {
+      console.warn("[studio][apple onboarding] RTDB save failed:", e);
+      try {
+        localStorage.setItem("profileNickname", nickname);
+        localStorage.setItem("profileSocials", JSON.stringify({
+          instagram: payload.instagram,
+          twitter: payload.twitter,
+          tiktok: payload.tiktok,
+          youtube: payload.youtube,
+          spotify: payload.spotify,
+          soundcloud: payload.soundcloud,
+          website: payload.website,
+        }));
+      } catch (e2) {}
+    }
+    localStorage.setItem("fullName", nickname);
+    localStorage.setItem("profileType", profileType);
+    localStorage.setItem("appleOnboardingDone", "1");
+    localStorage.removeItem("appleOnboardingSkipped");
+    const gcd = document.getElementById("gcd");
+    if (gcd) gcd.textContent = nickname;
+    closeAppleOnboardingModal();
+    try {
+      loadUserProgress(nickname);
+      const _qaKey = studioReferralUserKey();
+      if (_qaKey) loadQAInbox(_qaKey);
+    } catch (e3) {}
+  }
+
+  function skipAppleOnboarding() {
+    localStorage.setItem("appleOnboardingSkipped", "1");
+    closeAppleOnboardingModal();
+  }
+
+  function wireAppleOnboardingButtons() {
+    const saveBtn = document.getElementById("appleOnboardingSaveBtn");
+    const skipBtn = document.getElementById("appleOnboardingSkipBtn");
+    if (saveBtn && !saveBtn.dataset.studioOnboardBound) {
+      saveBtn.dataset.studioOnboardBound = "1";
+      saveBtn.addEventListener("click", () => { void saveAppleOnboardingProfile(); });
+    }
+    if (skipBtn && !skipBtn.dataset.studioOnboardBound) {
+      skipBtn.dataset.studioOnboardBound = "1";
+      skipBtn.addEventListener("click", skipAppleOnboarding);
+    }
+    const nick = document.getElementById("appleOnboardingNickname");
+    const hdl = document.getElementById("appleOnboardingHandle");
+    if (nick && hdl && !nick.dataset.studioHandleSync) {
+      nick.dataset.studioHandleSync = "1";
+      nick.addEventListener("input", () => {
+        if (hdl.dataset.userEdited === "1") return;
+        hdl.value = slugPublicUsernameFromLabel(nick.value);
+      });
+      hdl.addEventListener("input", () => {
+        hdl.dataset.userEdited = "1";
+      });
+    }
+  }
+  function initStudioAppleOnboardingDom() {
+    wireAppleOnboardingButtons();
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initStudioAppleOnboardingDom);
+  } else {
+    initStudioAppleOnboardingDom();
+  }
+
+  function appendUploadStatus(line) {
+    const ta = document.getElementById("uploadStatusArea");
+    if (!ta) return;
+    const cur = ta.value.trim();
+    ta.value = cur ? cur + "\n" + line : line;
+    ta.style.display = "block";
+    try { ta.scrollTop = ta.scrollHeight; } catch (e) {}
+  }
+  function clearUploadStatus() {
+    const ta = document.getElementById("uploadStatusArea");
+    if (ta) {
+      ta.value = "";
+      ta.style.display = "block";
+    }
+  }
+
+  /** RTDB path segments cannot contain . # $ [ ] / — invalid keys often surface as PERMISSION_DENIED. */
+  function sanitizeRtdbPathSegment(seg) {
+    const s = String(seg ?? "").replace(/[.#$\[\]/]/g, "_").trim();
+    return s.length ? s : "_";
+  }
+
+  function withTimeout(promise, ms, label) {
+    return new Promise((resolve, reject) => {
+      const t = setTimeout(() => {
+        reject(new Error(label + " timed out after " + Math.round(ms / 1000) + "s — check network or try again."));
+      }, ms);
+      Promise.resolve(promise).then(
+        (v) => {
+          clearTimeout(t);
+          resolve(v);
+        },
+        (e) => {
+          clearTimeout(t);
+          reject(e);
+        }
+      );
+    });
+  }
+
+  function closeUploadSuccessModal() {
+    const overlay = document.getElementById("uploadSuccessOverlay");
+    if (!overlay) return;
+    overlay.setAttribute("hidden", "");
+    overlay.setAttribute("aria-hidden", "true");
+    try {
+      document.body.style.overflow = "";
+    } catch (e) {}
+  }
+  window.closeUploadSuccessModal = closeUploadSuccessModal;
+
+  function initUploadSuccessOverlayOnce() {
+    const uploadOkOverlay = document.getElementById("uploadSuccessOverlay");
+    if (!uploadOkOverlay || uploadOkOverlay.dataset.studioOverlayBound === "1") return;
+    uploadOkOverlay.dataset.studioOverlayBound = "1";
+    const close = () => closeUploadSuccessModal();
+    const bd = uploadOkOverlay.querySelector(".upload-success-backdrop");
+    const btn = document.getElementById("uploadSuccessCloseBtn");
+    const modal = uploadOkOverlay.querySelector(".upload-success-modal");
+    if (bd) bd.addEventListener("click", close);
+    if (btn) btn.addEventListener("click", close);
+    if (modal) {
+      modal.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+      });
+    }
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && uploadOkOverlay && !uploadOkOverlay.hasAttribute("hidden")) close();
+    });
+  }
+
+  function openUploadSuccessModal(opts) {
+    initUploadSuccessOverlayOnce();
+    const overlay = document.getElementById("uploadSuccessOverlay");
+    const trackEl = document.getElementById("uploadSuccessTrack");
+    const subEl = document.getElementById("uploadSuccessSub");
+    if (!overlay) return;
+    const track = (opts && opts.trackTitle) || "Your song";
+    const artist = (opts && opts.artist) || "";
+    if (trackEl) trackEl.textContent = track;
+    if (subEl) subEl.textContent = artist ? "by " + artist : "";
+    overlay.removeAttribute("hidden");
+    overlay.setAttribute("aria-hidden", "false");
+    try {
+      document.body.style.overflow = "hidden";
+    } catch (e) {}
+    try {
+      const closeBtn = document.getElementById("uploadSuccessCloseBtn");
+      if (closeBtn && typeof closeBtn.focus === "function") closeBtn.focus();
+    } catch (e2) {}
+    try {
+      localStorage.setItem("_studioTutorialUploadedOnce", "1");
+      if (typeof window.updateStudioTutorial === "function") window.updateStudioTutorial();
+    } catch (e3) {}
+  }
+
+  function studioUploadLocalIdentity() {
+    let id = (
+      localStorage.getItem("email") ||
+      localStorage.getItem("userEmail") ||
+      localStorage.getItem("CurrentUser") ||
+      localStorage.getItem("artemail") ||
+      ""
+    ).trim();
+    if (id === "null" || id === "undefined") id = "";
+    return id;
+  }
+
+  /** Local / demo “email” session: Storage still needs a Firebase user; we use anonymous for request.auth. */
+  function shouldAttemptAnonymousFirebaseForUpload() {
+    if (!studioUploadLocalIdentity()) return false;
+    if (localStorage.getItem("localAuthOnly") === "1") return true;
+    if (localStorage.getItem("isLoggedIn") === "true") return true;
+    if (typeof window.isSessionValid === "function" && window.isSessionValid()) return true;
+    return false;
+  }
+
+  async function ensureFirebaseAuthForUpload() {
+    // Wait for any pending redirect result first (blocks signInAnonymously if not consumed)
+    try {
+      if (window._redirectResultReady) {
+        await Promise.race([window._redirectResultReady, new Promise(r => setTimeout(r, 5000))]);
+      }
+    } catch (e) {}
+
+    if (typeof auth.authStateReady === "function") {
+      try {
+        await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 3000))]);
+      } catch (e) {
+        console.warn("[studio] auth.authStateReady", e);
+      }
+    }
+    syncAuthUserToLocalStorage(auth.currentUser);
+    if (auth.currentUser) return true;
+
+    // Email-only users: try anonymous sign-in for Storage
+    if (localStorage.getItem('localAuthOnly') === '1' && localStorage.getItem('emailKey')) {
+      try {
+        await Promise.race([
+          signInAnonymously(auth),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('anonymous auth timeout')), 8000))
+        ]);
+        return true;
+      } catch (e) {
+        console.warn("[studio] anonymous auth for email upload:", e.code || e.message || e);
+        // Proceed anyway — Storage rules may allow it
+        return true;
+      }
+    }
+
+    if (shouldAttemptAnonymousFirebaseForUpload()) {
+      try {
+        await signInAnonymously(auth);
+        appendUploadStatus("Signed in for upload (Firebase session for Storage).");
+        return true;
+      } catch (e) {
+        console.error("[studio] signInAnonymously", e);
+        const code = e && e.code ? String(e.code) : "";
+        let msg =
+          "Could not start a Firebase session for upload. Your app sign-in is fine; Storage requires Firebase Auth.";
+        if (code === "auth/operation-not-allowed") {
+          msg =
+            "Enable Anonymous sign-in in Firebase: Console → Authentication → Sign-in method → Anonymous → Enable. Then try upload again.";
+        } else if (code) {
+          msg += " Error: " + code + (e.message ? " — " + e.message : "");
+        }
+        appendUploadStatus(msg);
+        alert(msg);
+        return false;
+      }
+    }
+    appendUploadStatus("Please sign in first — Apple or email (button above).");
+    alert("Please sign in before uploading: use “Sign in with Apple” or “Sign in with email” at the top of this page.");
+    return false;
+  }
+
+  let _studioCapResumeCloserDone = false;
+  const isCapacitorNative = () => typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
+  const getBrowserPlugin = () => {
+    try {
+      const C = window.Capacitor;
+      const P = C && C.Plugins && C.Plugins.Browser;
+      if (P && typeof P.open === "function") return P;
+      if (C && typeof C.nativePromise === "function" && typeof C.getPlatform === "function" && C.getPlatform() === "ios") {
+        return {
+          open: (opts) => C.nativePromise("Browser", "open", opts || {}),
+          close: () => C.nativePromise("Browser", "close", {}),
+        };
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  };
+  const getAppPlugin = () => { try { return window.Capacitor?.Plugins?.App || null; } catch (e) { return null; } };
+
+  async function dismissInAppBrowser(reason) {
+    const Browser = getBrowserPlugin();
+    if (!Browser || typeof Browser.close !== "function") {
+      console.warn("[studio][Cap Browser] close skipped - plugin missing", reason);
+      return;
+    }
+    const delays = [0, 60, 180, 400, 800];
+    for (let i = 0; i < delays.length; i++) {
+      const ms = delays[i];
+      if (ms > 0) await new Promise((r) => setTimeout(r, ms));
+      try {
+        await Browser.close();
+        console.log("[studio][Cap Browser] closed OK", reason, "afterMs", ms);
+        try { sessionStorage.removeItem("capAuthBrowserOpened"); } catch (e2) {}
+        return;
+      } catch (e) {
+        console.warn("[studio][Cap Browser] close attempt failed", reason, "afterMs", ms, e && (e.message || e));
+      }
+    }
+  }
+
+  function shouldOpenOAuthInCapBrowser(url) {
+    const s = String(url || "");
+    if (!/^https?:\/\//i.test(s)) return false;
+    return (
+      s.includes("appleid.apple.com") ||
+      s.includes("idmsa.apple.com") ||
+      s.includes("firebaseapp.com/__/auth") ||
+      s.includes("accounts.google.com") ||
+      s.includes("googleapis.com") ||
+      s.includes("google.com/")
+    );
+  }
+
+  async function signInWithRedirectCapacitorBrowser(auth, provider) {
+    if (!isCapacitorNative()) {
+      await signInWithRedirect(auth, provider);
+      return;
+    }
+    const Browser = getBrowserPlugin();
+    if (!Browser || typeof Browser.open !== "function") {
+      await signInWithRedirect(auth, provider);
+      return;
+    }
+
+    const locProto = window.Location.prototype;
+    const origReplace = locProto.replace;
+    const origAssign = locProto.assign;
+    let patchesActive = false;
+    let oauthOpened = false;
+    let hrefDesc = null;
+
+    const openOAuthBrowser = (url) => {
+      if (oauthOpened) return false;
+      if (!shouldOpenOAuthInCapBrowser(url)) return false;
+      oauthOpened = true;
+      try {
+        sessionStorage.setItem("capAuthBrowserOpened", String(Date.now()));
+      } catch (e0) {}
+      console.log("[studio][auth] OAuth navigation → Capacitor Browser.open", String(url).slice(0, 200));
+      void Browser.open({ url: String(url), presentationStyle: "fullscreen" });
+      return true;
+    };
+
+    const restorePatches = () => {
+      if (!patchesActive) return;
+      patchesActive = false;
+      try {
+        locProto.replace = origReplace;
+        locProto.assign = origAssign;
+        if (hrefDesc) Object.defineProperty(locProto, "href", hrefDesc);
+      } catch (e1) {}
+    };
+
+    locProto.replace = function (url) {
+      if (openOAuthBrowser(url)) return;
+      return origReplace.call(this, url);
+    };
+    locProto.assign = function (url) {
+      if (openOAuthBrowser(url)) return;
+      return origAssign.call(this, url);
+    };
+    patchesActive = true;
+
+    try {
+      hrefDesc = Object.getOwnPropertyDescriptor(locProto, "href");
+      if (hrefDesc && typeof hrefDesc.set === "function") {
+        const origHrefSet = hrefDesc.set;
+        Object.defineProperty(locProto, "href", {
+          configurable: true,
+          enumerable: !!hrefDesc.enumerable,
+          get: hrefDesc.get,
+          set: function (v) {
+            if (openOAuthBrowser(v)) return;
+            return origHrefSet.call(this, v);
+          },
+        });
+      }
+    } catch (eHref) {
+      console.warn("[studio][auth] href interceptor not applied", eHref && (eHref.message || eHref));
+    }
+
+    try {
+      await Promise.race([
+        signInWithRedirect(auth, provider),
+        new Promise((_, rej) =>
+          setTimeout(() => rej(Object.assign(new Error("cap-redirect-timeout"), { code: "cap/redirect-timeout" })), 15000)
+        ),
+      ]);
+    } catch (e) {
+      const code = e && e.code ? String(e.code) : "";
+      if (code !== "cap/redirect-timeout") console.warn("[studio][auth] signInWithRedirect:", e);
+      if (code === "auth/unauthorized-domain" && isCapacitorNative()) {
+        try {
+          if (!sessionStorage.getItem("asteroidFirebaseDomainHintShown")) {
+            sessionStorage.setItem("asteroidFirebaseDomainHintShown", "1");
+            const o = typeof location !== "undefined" ? location.origin : "";
+            const host = typeof location !== "undefined" ? location.hostname : "";
+            alert(
+              "Firebase: auth/unauthorized-domain\n\n" +
+                "Add this WebView’s hostname in Firebase Console:\n" +
+                "Authentication → Settings → Authorized domains\n\n" +
+                "Hostname: " +
+                (host || "(unknown)") +
+                "\nOrigin: " +
+                (o || "(unknown)") +
+                "\n\nAlso add localhost, www.asteroid8.net, asteroid8.net, and any Xcode live-reload IP you use."
+            );
+          }
+        } catch (a0) {}
+      }
+    } finally {
+      setTimeout(restorePatches, oauthOpened ? 400 : 8000);
+    }
+  }
+
+  function getAppleNativeSignInPlugin() {
+    try {
+      const C = window.Capacitor;
+      if (!C) return null;
+      if (typeof C.registerPlugin === "function") {
+        if (!C.Plugins) C.Plugins = {};
+        if (!C.Plugins.SignInWithApple) {
+          C.registerPlugin("SignInWithApple", {
+            web: () => ({
+              authorize: async () => {
+                const E = C.Exception || Error;
+                const unimpl = C.ExceptionCode && C.ExceptionCode.Unimplemented;
+                if (unimpl) throw new E("Sign in with Apple requires the Asteroid iOS app.", unimpl);
+                throw new E("Sign in with Apple requires the iOS app.");
+              },
+            }),
+          });
+        }
+        const reg = C.Plugins.SignInWithApple;
+        if (reg && typeof reg.authorize === "function") return reg;
+      }
+      if (typeof C.nativePromise === "function" && typeof C.getPlatform === "function") {
+        const plat = String(C.getPlatform() || "").toLowerCase();
+        if (plat === "ios") {
+          return {
+            authorize: (options) => C.nativePromise("SignInWithApple", "authorize", options || {}),
+          };
+        }
+      }
+      return null;
+    } catch (e) {
+      console.warn("[studio][auth] getAppleNativeSignInPlugin:", e);
+      return null;
+    }
+  }
+
+  function buildAppleAuthRawNonce() {
+    try {
+      const arr = new Uint8Array(32);
+      crypto.getRandomValues(arr);
+      return Array.from(arr, (b) => ("0" + b.toString(16)).slice(-2)).join("");
+    } catch (e) {
+      return "n_" + Math.random().toString(36).slice(2) + "_" + Math.random().toString(36).slice(2);
+    }
+  }
+
+  async function sha256HexUtf8(plain) {
+    const enc = new TextEncoder();
+    const buf = await crypto.subtle.digest("SHA-256", enc.encode(String(plain)));
+    return Array.from(new Uint8Array(buf), (b) => ("0" + b.toString(16)).slice(-2)).join("");
+  }
+
+  async function tryNativeAppleStudioSignIn() {
+    try {
+      if (!isCapacitorNative()) return false;
+      const plat =
+        typeof window.Capacitor.getPlatform === "function"
+          ? String(window.Capacitor.getPlatform() || "").toLowerCase()
+          : "";
+      if (plat !== "ios") return false;
+      const P = getAppleNativeSignInPlugin();
+      if (!P || typeof P.authorize !== "function") {
+        console.log("[studio][auth] Native SignInWithApple plugin unavailable — using redirect/Browser flow");
+        return false;
+      }
+      const rawNonce = buildAppleAuthRawNonce();
+      const nonceForAppleRequest = await sha256HexUtf8(rawNonce);
+      console.log("[studio][auth] Invoking native Sign in with Apple (system sheet)…");
+      const res = await Promise.race([
+        P.authorize({
+          clientId: "com.asteroid.asteroidinc8",
+          redirectURI: "https://asteroid-cdc13.firebaseapp.com/__/auth/handler",
+          scopes: "email name",
+          nonce: nonceForAppleRequest,
+        }),
+        new Promise((_, rej) =>
+          setTimeout(
+            () => rej(Object.assign(new Error("Apple authorize timed out (no response from native)."), { code: "apple/timeout" })),
+            120000
+          )
+        ),
+      ]);
+      const resp = res && res.response ? res.response : res;
+      const idToken = resp && (resp.identityToken || resp.identity_token);
+      if (!idToken) {
+        console.warn("[studio][auth] Native Apple authorize returned no identityToken", res);
+        return false;
+      }
+      const appleCred = appleProvider.credential({ idToken: String(idToken), rawNonce: rawNonce });
+      try {
+        const result = await signInWithCredential(auth, appleCred);
+        await completeStudioSignIn(result);
+        console.log("[studio][auth] Native Sign in with Apple + Firebase signInWithCredential OK");
+        return true;
+      } catch (fe) {
+        const c = fe && fe.code ? String(fe.code) : "";
+        console.error("[studio][auth] Firebase signInWithCredential (Apple) failed:", c, fe && (fe.message || fe));
+        return false;
+      }
+    } catch (err) {
+      const msg = err && (err.message || err.localizedDescription || String(err));
+      console.warn("[studio][auth] Native Apple sign-in failed, falling back:", msg);
+      if (isCapacitorNative() && /1000|AuthorizationError/i.test(String(msg))) {
+        try {
+          if (!sessionStorage.getItem("asteroidApple1000HintShown")) {
+            sessionStorage.setItem("asteroidApple1000HintShown", "1");
+            alert(
+              "Sign in with Apple returned Apple error 1000.\n\n" +
+                "Enable Sign in with Apple in Xcode capabilities, sign into an Apple ID in the Simulator Settings app, or test on a real device."
+            );
+          }
+        } catch (x0) {}
+      }
+      return false;
+    }
+  }
+
+  let _lastStudioAppleUrl = null;
+  async function handleAppleAuthRedirect(url) {
+    if (!url || url === _lastStudioAppleUrl) return;
+    _lastStudioAppleUrl = url;
+    console.log("[studio] handleAppleAuthRedirect", url);
+    const params = new URLSearchParams(String(url).split("?")[1] || "");
+    const appleIdToken = params.get("appleIdToken") || "";
+    const appleAccessToken = params.get("appleAccessToken") || "";
+    if (appleIdToken) {
+      try {
+        const credential = appleProvider.credential({
+          idToken: appleIdToken,
+          accessToken: appleAccessToken || undefined,
+        });
+        await signInWithCredential(auth, credential);
+        console.log("[studio] Firebase Auth restored for Storage/RTDB");
+      } catch (e) {
+        console.error("[studio] signInWithCredential (Apple)", e);
+      }
+    }
+    const email = params.get("email") || "";
+    const fullName = params.get("name") || "";
+    const uid = params.get("uid") || "";
+    const photo = params.get("photo") || "";
+    const id = (email || uid || "").trim();
+    if (id) {
+      localStorage.setItem("email", id);
+      localStorage.setItem("CurrentUser", id);
+      localStorage.setItem("fullName", fullName);
+      localStorage.setItem("asteroidSignedInBefore", "true");
+      localStorage.setItem("pfp", photo);
+      localStorage.setItem("emailKey", id.replace(/[.#$[\]]/g, "_"));
+      const gcdEl = document.getElementById("gcd");
+      if (gcdEl) gcdEl.textContent = fullName || id;
+      console.log("[studio] Apple auth complete via redirect:", id);
+    }
+    try {
+      syncAuthUserToLocalStorage(auth.currentUser);
+    } catch (e) {}
+    applyStudioAuthUI();
+    void maybeShowAppleOnboarding();
+  }
+
+  if (isCapacitorNative()) {
+    const App = getAppPlugin();
+    if (App) {
+      try {
+        App.addListener("appUrlOpen", (event) => {
+          const u = event && event.url;
+          if (!u) return;
+          const s = String(u);
+          if (s.startsWith("asteroid://auth-apple")) {
+            void (async () => {
+              await dismissInAppBrowser("studio-apple-deeplink");
+              await handleAppleAuthRedirect(u);
+            })();
+            return;
+          }
+          if (s.includes("/__/auth/handler")) {
+            void dismissInAppBrowser("firebase-auth-handler");
+          }
+        });
+        App.getLaunchUrl().then((launch) => {
+          const u = launch && launch.url;
+          if (!u) return;
+          const s = String(u);
+          if (s.startsWith("asteroid://auth-apple")) {
+            void (async () => {
+              await dismissInAppBrowser("studio-apple-launch");
+              await handleAppleAuthRedirect(u);
+            })();
+            return;
+          }
+          if (s.includes("/__/auth/handler")) {
+            void dismissInAppBrowser("firebase-auth-handler");
+          }
+        }).catch(() => {});
+        if (!_studioCapResumeCloserDone) {
+          _studioCapResumeCloserDone = true;
+          App.addListener("resume", () => {
+            const t = parseInt(sessionStorage.getItem("capAuthBrowserOpened") || "0", 10);
+            if (t && Date.now() - t < 180000) void dismissInAppBrowser("studio-app-resume-fallback");
+          });
+        }
+      } catch (e) { console.warn("[studio] Capacitor App listener:", e); }
+    }
+  }
+
+  function syncAuthUserToLocalStorage(user) {
+    if (!user) return;
+    const accountId = getStableAccountId(user);
+    const rawEmail = (user.email || user.providerData[0]?.email || "").trim();
+    const storedEmail = (rawEmail || accountId).trim();
+    if (!storedEmail && !accountId) return;
+    localStorage.setItem("email", storedEmail || accountId);
+    localStorage.setItem("CurrentUser", accountId);
+    localStorage.setItem("emailKey", accountId.replace(/[.#$[\]]/g, "_"));
+    localStorage.setItem("asteroidSignedInBefore", "true");
+    if (user.displayName) localStorage.setItem("fullName", user.displayName);
+    if (user.photoURL) localStorage.setItem("pfp", user.photoURL);
+
+    const gcdEl = document.getElementById("gcd");
+    if (gcdEl && (!gcdEl.textContent || /continue with apple/i.test(gcdEl.textContent))) {
+      gcdEl.textContent = user.displayName || storedEmail || accountId;
+    }
+  }
+
+  function applyStudioAuthUI() {
+    const row = document.getElementById("studioSignInRow");
+    const topBar = document.getElementById("studioTopBar");
+    const sessionOk = typeof window.isSessionValid === "function" && window.isSessionValid();
+    const hasLocalIdentity = !!(
+      localStorage.getItem("emailKey") ||
+      localStorage.getItem("CurrentUser") ||
+      localStorage.getItem("email") ||
+      localStorage.getItem("userEmail") ||
+      localStorage.getItem("artemail")
+    );
+    const signedIn = !!auth.currentUser || sessionOk || hasLocalIdentity;
+    if (row) {
+      if (signedIn) {
+        row.classList.add("studio-signin-row--hidden");
+        row.style.display = "none";
+        row.setAttribute("aria-hidden", "true");
+      } else {
+        row.classList.remove("studio-signin-row--hidden");
+        row.style.display = "";
+        row.removeAttribute("aria-hidden");
+      }
+    }
+    if (topBar) {
+      if (signedIn) {
+        topBar.classList.add("studio-topbar--visible");
+        topBar.style.display = "block";
+      } else {
+        topBar.classList.remove("studio-topbar--visible");
+        topBar.style.display = "none";
+      }
+    }
+    // NOTE: referral UI is loaded separately via loadReferralCode(), not here.
+    // This function is sync-only — safe to call from anywhere without races.
+    updateCampaignVisibility();
+  }
+  window.applyStudioAuthUI = applyStudioAuthUI;
+
+  function studioSessionSignedIn() {
+    if (auth.currentUser) return true;
+    try {
+      if (typeof window.isSessionValid === 'function' && window.isSessionValid()) return true;
+    } catch (e) {}
+    const signedFlag =
+      localStorage.getItem('asteroidSignedInBefore') === 'true' ||
+      localStorage.getItem('isLoggedIn') === 'true' ||
+      localStorage.getItem('localAuthOnly') === '1';
+    if (!signedFlag) return false;
+    const id = (localStorage.getItem('emailKey') || localStorage.getItem('CurrentUser') || localStorage.getItem('email') || '').trim();
+    return !!id;
+  }
+
+  function updateCampaignVisibility() {
+    const box = document.getElementById('campaignContainer');
+    if (!box) return;
+    box.style.display = studioSessionSignedIn() ? 'block' : 'none';
+  }
+
+  let _authStateKnown = false;
+  let _referralLoadVersion = 0;   // version counter — newer calls invalidate older ones
+
+  console.log('[studio][init] Registering onAuthStateChanged listener — auth object:', typeof auth, '| auth.currentUser:', auth && auth.currentUser);
+  onAuthStateChanged(auth, (user) => {
+    console.log('[studio] onAuthStateChanged fired — user:', user ? (user.email || user.uid) : 'NULL (signed out)');
+    _authStateKnown = true;
+    syncAuthUserToLocalStorage(user);
+    if (user) {
+      // Clear any stale local fallback code so RTDB code takes priority
+      const userKey = studioReferralUserKey();
+      if (userKey) localStorage.removeItem('_localReferralCode_' + userKey);
+      void maybeShowAppleOnboarding();
+    }
+    applyStudioAuthUI();
+    // Primary trigger for referral code loading (also retried by pollAuthReady/authStateReady).
+    void loadReferralCode();
+  });
+  if (auth.currentUser) syncAuthUserToLocalStorage(auth.currentUser);
+  applyStudioAuthUI();
+
+  // Poll for auth restoration — hides sign-in row as soon as Firebase session is ready
+  (function pollAuthReady() {
+    let checks = 0;
+    const iv = setInterval(() => {
+      checks++;
+      if (auth.currentUser) {
+        syncAuthUserToLocalStorage(auth.currentUser);
+        applyStudioAuthUI();
+        void loadReferralCode();
+        clearInterval(iv);
+      } else if (checks > 30) {
+        clearInterval(iv);
+      }
+    }, 500);
+  })();
+  window.addEventListener("pageshow", () => {
+    try { applyStudioAuthUI(); } catch (e) {}
+    try { void loadReferralCode(); } catch (e) {}
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      try { applyStudioAuthUI(); } catch (e) {}
+      try { void loadReferralCode(); } catch (e) {}
+      try { updateStudioTutorial(); } catch (e) {}
+    }
+  });
+  try { updateStudioTutorial(); } catch (e) {}
+  if (typeof auth.authStateReady === "function") {
+    auth.authStateReady().then(() => {
+      try {
+        syncAuthUserToLocalStorage(auth.currentUser);
+        if (auth.currentUser) void maybeShowAppleOnboarding();
+        applyStudioAuthUI();
+        void loadReferralCode();
+      } catch (e) {}
+    });
+  }
+
+  // --- 0. REFERRAL (VIP featuring system) ---
+  processReferralURL();
+
+  // --- 1. DETECTION ---
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('by')) localStorage.setItem('pending_inviter', params.get('by'));
+
+  // --- 2. AUTH & PROGRESS ---
+  async function completeStudioSignIn(res) {
+    const user = res.user;
+    const accountId = getStableAccountId(user);
+    const rawEmail = (user.email || user.providerData[0]?.email || "").trim();
+    const emailForStorage = rawEmail || accountId;
+    const safeEmail = (rawEmail || user.uid).replace(/\./g, ',');
+
+    try {
+      await createOrUpdateUserOnSignup(user, getReferralFromURL());
+    } catch (e) { console.warn("Referral system:", e); }
+    const inviter = localStorage.getItem('pending_inviter');
+
+    localStorage.removeItem("localAuthOnly");
+    localStorage.setItem("email", emailForStorage);
+    localStorage.setItem("CurrentUser", accountId);
+    localStorage.setItem("fullName", user.displayName || "");
+    localStorage.setItem("asteroidSignedInBefore", "true");
+    localStorage.setItem("pfp", user.photoURL || "");
+    localStorage.setItem("emailKey", accountId.replace(/[.#$[\]]/g, "_"));
+
+    const displayLabel = user.displayName || rawEmail || accountId || "Signed in";
+    const gcdEl = document.getElementById("gcd");
+    if (gcdEl) {
+      gcdEl.innerHTML = displayLabel;
+      gcdEl.innerText = displayLabel;
+    }
+
+    console.log("[studio] Auth complete. accountId=" + accountId + ", name=" + (user.displayName || "(none)"));
+
+    const userRef = ref2(db, 'users/' + safeEmail);
+    const snap = await get(userRef);
+
+    if (!snap.exists() && inviter) {
+      await update(ref2(db, 'referralCounts/' + inviter), { count: increment(1) });
+      localStorage.removeItem('pending_inviter');
+    }
+
+    await update(userRef, {
+      email: emailForStorage,
+      name: user.displayName || "",
+      provider: user.providerData[0]?.providerId || "unknown",
+      lastLogin: Date.now()
+    });
+    try { loadUserProgress(user.displayName || rawEmail || accountId || "Artist"); } catch (e) { console.warn("[studio] loadUserProgress:", e); }
+    try { const _qaKey2 = studioReferralUserKey(); if (_qaKey2) loadQAInbox(_qaKey2); } catch (e) { console.warn("[studio] loadQAInbox:", e); }
+    applyStudioAuthUI();
+    void maybeShowAppleOnboarding();
+    try { sessionStorage.setItem("_studioJustSignedIn", "1"); } catch (e) {}
+    setTimeout(() => { try { location.reload(); } catch (e) {} }, 200);
+  }
+
+  const appleBtn = document.getElementById("apple-sign-in");
+  if (!appleBtn) {
+    console.error("[studio] Apple sign-in button missing from DOM");
+  }
+  if (appleBtn) {
+    appleBtn.addEventListener("click", async () => {
+      console.log("[studio] Apple sign-in clicked");
+      var ovU = document.getElementById("ugcPolicyOverlay");
+      var chkU = document.getElementById("ugcPolicyCheck");
+      var btnU = document.getElementById("ugcPolicyContinue");
+      var titleU = document.getElementById("ugcPolicyTitle");
+      var legalAlready =
+        typeof window.__asteroidLegalFirstVisitDone === "function" && window.__asteroidLegalFirstVisitDone();
+      if (legalAlready) {
+        console.log("[studio][auth] Terms/Privacy already accepted (skipping legal overlay). Clear localStorage asteroidTermsPrivacyAccepted / asteroidUgcPolicyAccepted to see it again.");
+      }
+      if (ovU && chkU && btnU && !legalAlready) {
+        if (!window.__ugcAppleGateDefaults && titleU && btnU) {
+          window.__ugcAppleGateDefaults = { title: titleU.textContent, btn: btnU.textContent };
+        }
+        chkU.checked = false;
+        btnU.disabled = true;
+        if (titleU) titleU.textContent = "Sign in with Apple";
+        btnU.textContent = "Continue with Apple";
+        window.__appleUgcPendingRunner = async function () {
+          if (isCapacitorNative()) {
+            if (await tryNativeAppleStudioSignIn()) return;
+            try {
+              await signInWithRedirectCapacitorBrowser(auth, appleProvider);
+            } catch (redirectErr) {
+              console.error("[studio] Apple redirect sign-in (native):", redirectErr);
+              alert(
+                "Could not start Apple sign-in.\n\n" +
+                  "If you see 403 on Apple’s page, open Apple Developer → your Services ID → " +
+                  "Sign in with Apple → Return URLs must include exactly:\n" +
+                  "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
+                  "Domains must list the site you use (e.g. asteroid8.net and www.asteroid8.net)."
+              );
+            }
+            return;
+          }
+          try {
+            console.log("[studio] Attempting signInWithPopup (Apple)");
+            const result = await signInWithPopup(auth, appleProvider);
+            await completeStudioSignIn(result);
+          } catch (popupErr) {
+            const code = popupErr && popupErr.code ? String(popupErr.code) : "";
+            console.warn("[studio] popup failed:", code, popupErr && (popupErr.message || popupErr));
+            if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+              try {
+                await signInWithRedirect(auth, appleProvider, browserPopupRedirectResolver);
+              } catch (e2) {
+                console.error("[studio] redirect fallback failed:", e2);
+                alert("Apple sign-in failed. Please allow popups for this site and try again.");
+              }
+            } else if (code !== "auth/user-cancelled") {
+              alert("Apple sign-in failed: " + (popupErr.message || code || popupErr));
+            }
+          }
+        };
+        ovU.classList.add("is-visible");
+        return;
+      }
+      if (isCapacitorNative()) {
+        if (await tryNativeAppleStudioSignIn()) return;
+        try {
+          await signInWithRedirectCapacitorBrowser(auth, appleProvider);
+        } catch (redirectErr) {
+          console.error("[studio] Apple redirect sign-in (native):", redirectErr);
+          alert(
+            "Could not start Apple sign-in.\n\n" +
+              "If you see 403 on Apple’s page, open Apple Developer → your Services ID → " +
+              "Sign in with Apple → Return URLs must include exactly:\n" +
+              "https://asteroid-cdc13.firebaseapp.com/__/auth/handler\n\n" +
+              "Domains must list the site you use (e.g. asteroid8.net and www.asteroid8.net)."
+          );
+        }
+        return;
+      }
+      try {
+        console.log("[studio] Attempting signInWithPopup (Apple)");
+        const result = await signInWithPopup(auth, appleProvider);
+        await completeStudioSignIn(result);
+      } catch (popupErr) {
+        const code = popupErr && popupErr.code ? String(popupErr.code) : "";
+        console.warn("[studio] popup failed:", code, popupErr && (popupErr.message || popupErr));
+        if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+          try {
+            await signInWithRedirect(auth, appleProvider, browserPopupRedirectResolver);
+          } catch (e2) {
+            console.error("[studio] redirect fallback failed:", e2);
+            alert("Apple sign-in failed. Please allow popups for this site and try again.");
+          }
+        } else if (code !== "auth/user-cancelled") {
+          alert("Apple sign-in failed: " + (popupErr.message || code || popupErr));
+        }
+      }
+    });
+  }
+
+  window._redirectResultReady = (async function consumeStudioFirebaseRedirectSignIn() {
+    try {
+      const result = await getRedirectResult(auth);
+      if (result && result.user) {
+        console.log("[studio] getRedirectResult: completed redirect sign-in");
+        await completeStudioSignIn(result);
+      }
+    } catch (e) {
+      const code = e && e.code ? String(e.code) : "";
+      if (code && code.indexOf("auth/") === 0) {
+        console.warn("[studio] getRedirectResult:", code, e.message || e);
+      }
+    }
+  })();
+
+  function loadUserProgress(name) {
+    const userKey = studioReferralUserKey() || name.replace(/[.#$[\]\s]/g, '_');
+    const emailRaw = localStorage.getItem("email") || "";
+    const safeEmail = emailRaw.replace(/\./g, ',');
+    const rewardKey = (typeof authScopedKey === "function") ? authScopedKey("rewardNotified") : "rewardNotified";
+
+    // Watch for pending_upload referrals so we can prompt this artist to upload.
+    onValue(ref2(db, 'FEATURE_REFERRAL_REQUESTS/' + userKey), (snap) => {
+      const banner = document.getElementById('pendingUploadBanner');
+      if (!banner) return;
+      let hasPending = false;
+      if (snap.exists()) {
+        const reqs = snap.val() || {};
+        for (const fk in reqs) {
+          if (reqs[fk] && reqs[fk].status === 'pending_upload') { hasPending = true; break; }
+        }
+      }
+      banner.style.display = hasPending ? 'block' : 'none';
+    });
+
+    onValue(ref2(db, 'referralCounts/' + userKey), async (snap) => {
+      const count = snap.val()?.count || 0;
+      const countEl = document.getElementById('countText');
+      const barEl = document.getElementById('progressBarStatus');
+      const barBg = document.querySelector('.bar-bg');
+      const unlockEl = document.getElementById('unlockMsg');
+      const vipBox = document.getElementById('vipSuccessBox');
+      if (countEl) countEl.innerText = `${count} / 1 Artist Joined`;
+      if (barEl) barEl.style.width = (count >= 1 ? 100 : 0) + "%";
+
+      if (count >= 1) {
+          if (barBg) barBg.classList.add('bar-success');
+          if (unlockEl) unlockEl.style.display = 'block';
+          localStorage.setItem('_studioReferralCodeUsed', '1');
+          updateStudioTutorial();
+          if (localStorage.getItem(rewardKey) !== 'true') {
+              if (vipBox) vipBox.style.display = 'block';
+              await update(ref2(db, 'users/' + safeEmail), { eligibility: "3_MONTH_FEATURE" });
+              jsConfetti.addConfetti({ emojis: ['🎉', '🚀', '🔥'] });
+              localStorage.setItem(rewardKey, 'true');
+          }
+      } else {
+          // Reset unlock UI when no one has used this user's code (e.g. data cleared)
+          if (barBg) barBg.classList.remove('bar-success');
+          if (unlockEl) unlockEl.style.display = 'none';
+          if (vipBox) vipBox.style.display = 'none';
+          localStorage.removeItem('_studioReferralCodeUsed');
+          localStorage.removeItem(rewardKey);
+      }
+    });
+  }
+
+  function loadQAInbox(artistKey) {
+    if (!artistKey) return;
+    const section = document.getElementById('qaInboxSection');
+    const listEl = document.getElementById('qaInboxList');
+    const badge = document.getElementById('qaUnreadBadge');
+    const shareLink = document.getElementById('qaShareLink');
+    if (!section || !listEl) return;
+
+    section.style.display = 'block';
+    if (shareLink) {
+      shareLink.href = 'qa.html?artist=' + encodeURIComponent(artistKey);
+    }
+
+    function timeAgo(ts) {
+      const d = Math.floor((Date.now() - ts) / 1000);
+      if (d < 60) return 'just now';
+      if (d < 3600) return Math.floor(d / 60) + 'm ago';
+      if (d < 86400) return Math.floor(d / 3600) + 'h ago';
+      return Math.floor(d / 86400) + 'd ago';
+    }
+    function escH(s) {
+      const d = document.createElement('div');
+      d.textContent = s == null ? '' : String(s);
+      return d.innerHTML;
+    }
+
+    onValue(ref2(db, 'ARTIST_QA/' + artistKey), (snap) => {
+      if (!snap.exists()) {
+        listEl.innerHTML = '<p style="color:rgba(255,255,255,0.35);font-size:13px;">No questions yet. Share your Q&A link to get started.</p>';
+        if (badge) badge.style.display = 'none';
+        return;
+      }
+      const items = [];
+      snap.forEach((child) => items.push({ id: child.key, ...child.val() }));
+      items.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+      const unanswered = items.filter(q => !q.answer).length;
+      if (badge) {
+        if (unanswered) { badge.textContent = unanswered + ' new'; badge.style.display = ''; }
+        else badge.style.display = 'none';
+      }
+
+      listEl.innerHTML = items.slice(0, 30).map(q => `
+        <div class="qa-inbox-card" id="qa-card-${escH(q.id)}">
+          <div class="qa-inbox-q">${escH(q.question)}</div>
+          <div class="qa-inbox-meta">${escH(q.askerName || 'Anonymous')} · ${timeAgo(q.ts || 0)}</div>
+          ${q.answer
+            ? `<div class="qa-inbox-answered">
+                <div class="qa-inbox-answered-label">✓ You answered</div>
+                <div class="qa-inbox-answered-text">${escH(q.answer)}</div>
+               </div>`
+            : `<div class="qa-answer-form">
+                <textarea class="qa-answer-input" id="qa-ans-${escH(q.id)}" placeholder="Type your answer…" rows="2" maxlength="1000"></textarea>
+                <button class="qa-answer-submit" data-qid="${escH(q.id)}" data-akey="${escH(artistKey)}">Reply</button>
+               </div>`
+          }
+        </div>`).join('');
+
+      listEl.querySelectorAll('.qa-answer-submit').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const qid = btn.dataset.qid;
+          const akey = btn.dataset.akey;
+          const ta = document.getElementById('qa-ans-' + qid);
+          if (!ta) return;
+          const ansText = ta.value.trim();
+          if (!ansText) return;
+          btn.disabled = true; btn.textContent = 'Sending…';
+          try {
+            await update(ref2(db, 'ARTIST_QA/' + akey + '/' + qid), {
+              answer: ansText,
+              answeredAt: Date.now(),
+            });
+          } catch (e) {
+            console.warn('[qa-inbox] answer write failed', e);
+            btn.disabled = false; btn.textContent = 'Reply';
+          }
+        });
+      });
+    });
+  }
+
+  function studioReferralUserKey() {
+    const candidates = [
+      localStorage.getItem('emailKey'),
+      localStorage.getItem('CurrentUser'),
+      localStorage.getItem('email'),
+      localStorage.getItem('userEmail'),
+      localStorage.getItem('artemail'),
+      (auth && auth.currentUser) ? (auth.currentUser.email || auth.currentUser.uid) : null,
+    ];
+    const raw = (candidates.find(v => v && String(v).trim() && String(v).trim() !== 'null' && String(v).trim() !== 'undefined') || '').trim();
+    if (!raw) {
+      // Fallback: if any sign-in flag exists, use or create a stable anonymous key
+      const signedFlag = localStorage.getItem('asteroidSignedInBefore') === 'true' ||
+        localStorage.getItem('isLoggedIn') === 'true' ||
+        localStorage.getItem('localAuthOnly') === '1';
+      if (signedFlag) {
+        let anonKey = localStorage.getItem('_referralAnonKey');
+        if (!anonKey) {
+          anonKey = 'anon_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+          localStorage.setItem('_referralAnonKey', anonKey);
+        }
+        return anonKey;
+      }
+      return '';
+    }
+    return raw.replace(/[.#$[\]]/g, '_');
+  }
+
+  function studioReferralDisplayName() {
+    const fromProfile = (localStorage.getItem('profileNickname') || localStorage.getItem('fullName') || '').trim();
+    if (fromProfile) return fromProfile;
+    const idRaw = (
+      localStorage.getItem('CurrentUser') ||
+      localStorage.getItem('email') ||
+      localStorage.getItem('userEmail') ||
+      localStorage.getItem('artemail') ||
+      (auth.currentUser && (auth.currentUser.displayName || auth.currentUser.email || auth.currentUser.uid)) ||
+      ''
+    ).trim();
+    if (!idRaw || idRaw === 'null' || idRaw === 'undefined') return 'artist';
+    return String(idRaw).split('@')[0] || 'artist';
+  }
+
+  function setReferralStatus(message, cls) {
+    const el = document.getElementById('referralCodeStatus');
+    if (!el) return;
+    el.textContent = message || '';
+    el.className = 'referral-code-status' + (cls ? ' ' + cls : '');
+  }
+
+  function generateUsernameReferralCode(displayName) {
+    const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const base = String(displayName || 'artist').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'ARTIST';
+    const shift = Math.floor(Math.random() * 25) + 1;
+    // Caesar-encrypt the base
+    let encrypted = '';
+    for (const ch of base) {
+      if (ch >= 'A' && ch <= 'Z') {
+        encrypted += String.fromCharCode(((ch.charCodeAt(0) - 65 + shift) % 26) + 65);
+      } else if (ch >= '0' && ch <= '9') {
+        encrypted += String((Number(ch) + shift) % 10);
+      }
+    }
+    // Intersperse encrypted chars with random alphanumerics to reach exactly 18 chars
+    const randChar = () => CHARS[Math.floor(Math.random() * CHARS.length)];
+    let result = '';
+    for (let i = 0; i < encrypted.length && result.length < 18; i++) {
+      result += encrypted[i];
+      if (result.length < 18) result += randChar();
+    }
+    while (result.length < 18) result += randChar();
+    return result.slice(0, 18);
+  }
+
+  async function ensureStudioReferralCode() {
+    const key = studioReferralUserKey();
+    const out = document.getElementById('referralCodeDisplay');
+    const shareInput = document.getElementById('shareLinkInput');
+    if (!out) return '';
+    if (!key) {
+      out.value = '';
+      if (shareInput) shareInput.value = '';
+      return '';
+    }
+    const userRef = ref2(db, 'REFERRAL_CODES_BY_USER/' + key);
+    const snap = await get(userRef);
+    const prev = snap.exists() && snap.val() ? snap.val() : null;
+    let code = prev && prev.code ? String(prev.code).trim().toUpperCase() : '';
+
+    // Helper: check if a code is still valid (not used by someone else)
+    async function codeIsValid(c) {
+      if (!c) return false;
+      const idxSnap = await get(ref2(db, 'REFERRAL_CODE_INDEX/' + c));
+      if (!idxSnap.exists()) return true; // unclaimed slot, ok
+      const v = idxSnap.val();
+      const owner = typeof v === 'string' ? v : (v?.ownerKey || '');
+      const used = typeof v === 'object' && v?.used === true;
+      return owner === key && !used;
+    }
+
+    const stillValid = await codeIsValid(code);
+    if (code && !stillValid) {
+      localStorage.setItem('_studioReferralCodeUsed', '1');
+    }
+    if (!code || !stillValid) {
+      const oldCode = code;
+      const name = studioReferralDisplayName();
+      code = '';
+      for (let i = 0; i < 8; i++) {
+        const candidate = generateUsernameReferralCode(name);
+        const idxSnap = await get(ref2(db, 'REFERRAL_CODE_INDEX/' + candidate));
+        if (!idxSnap.exists()) { code = candidate; break; }
+        const v = idxSnap.val();
+        const owner = typeof v === 'string' ? v : (v?.ownerKey || '');
+        if (owner === key) { code = candidate; break; }
+      }
+      if (!code) code = generateUsernameReferralCode(studioReferralDisplayName());
+      if (oldCode && oldCode !== code) {
+        try { await remove(ref2(db, 'REFERRAL_CODE_INDEX/' + oldCode)); } catch (eRm) {}
+      }
+      const ownerEmailRaw = (localStorage.getItem('email') || (auth && auth.currentUser && auth.currentUser.email) || '').trim();
+      await set(userRef, {
+        code,
+        ownerKey: key,
+        ownerEmail: ownerEmailRaw || '',
+        createdAt: Date.now(),
+        codeSource: 'username-encrypted'
+      });
+      await set(ref2(db, 'REFERRAL_CODE_INDEX/' + code), { ownerKey: key, ownerEmail: ownerEmailRaw || '', used: false });
+    }
+    out.value = code;
+    if (shareInput) shareInput.value = code;
+    return code;
+  }
+
+  /**
+   * loadReferralCode — the ONLY function that loads/displays the referral code.
+   * Called from onAuthStateChanged, authStateReady, pollAuthReady, pageshow,
+   * and visibilitychange.  Uses a version counter so that if a newer call starts
+   * while an older one is awaiting RTDB, the older one silently abandons its
+   * DOM writes.  No locks needed.
+   */
+  async function loadReferralCode() {
+    const myVersion = ++_referralLoadVersion;
+    const stale = () => myVersion !== _referralLoadVersion;
+
+    console.log('[referral-code] loadReferralCode() called — version', myVersion,
+      '| auth.currentUser:', !!auth.currentUser,
+      '| _authStateKnown:', _authStateKnown,
+      '| localStorage keys:', {
+        emailKey: localStorage.getItem('emailKey'),
+        CurrentUser: localStorage.getItem('CurrentUser'),
+        email: localStorage.getItem('email'),
+        localAuthOnly: localStorage.getItem('localAuthOnly'),
+        asteroidSignedInBefore: localStorage.getItem('asteroidSignedInBefore'),
+      });
+
+    const display = document.getElementById('referralCodeDisplay');
+    const entry = document.getElementById('referralCodeEntry');
+    const submit = document.getElementById('submitReferralCodeBtn');
+    const copyCode = document.getElementById('copyCodeBtn');
+    const copyMain = document.getElementById('copyBtn');
+    const shareInput = document.getElementById('shareLinkInput');
+
+    function setAllDisabled(off) {
+      if (display) display.disabled = off;
+      if (entry) entry.disabled = off;
+      if (submit) submit.disabled = off;
+      if (copyCode) copyCode.disabled = off;
+      if (copyMain) copyMain.disabled = off;
+    }
+
+    // Determine auth key from localStorage OR live auth
+    let key = studioReferralUserKey();
+    if (!key && auth.currentUser) {
+      syncAuthUserToLocalStorage(auth.currentUser);
+      key = studioReferralUserKey();
+    }
+
+    if (!key) {
+      if (!_authStateKnown) {
+        console.log('[referral-code] No key and auth not yet known — waiting');
+        return;
+      }
+      console.log('[referral-code] No key found — user is NOT signed in');
+      setAllDisabled(true);
+      if (display) { display.value = ''; display.placeholder = 'Sign in to generate your code'; }
+      if (shareInput) { shareInput.value = ''; shareInput.placeholder = 'Sign in to generate code...'; }
+      setReferralStatus('Sign in to generate your referral code.', '');
+      return;
+    }
+
+    console.log('[referral-code] User key resolved:', key);
+
+    // User is signed in — update placeholders & enable controls immediately
+    if (display) display.placeholder = 'Loading your code...';
+    if (shareInput) shareInput.placeholder = 'Loading your code...';
+    setAllDisabled(false);
+
+    // Email-only users: use static code (no RTDB write needed)
+    if (!auth.currentUser && localStorage.getItem('localAuthOnly') === '1') {
+      console.log('[referral-code] localAuthOnly path — using static code');
+      const staticCode = 'B3Z9LKY2Q7PANFR1XM';
+      if (display) display.value = staticCode;
+      if (shareInput) shareInput.value = staticCode;
+      try {
+        const idxSnap = await get(ref2(db, 'REFERRAL_CODE_INDEX/' + staticCode));
+        if (stale()) return;
+        if (idxSnap.exists()) {
+          const v = idxSnap.val();
+          if (typeof v === 'object' && v.used === true) {
+            localStorage.setItem('_studioReferralCodeUsed', '1');
+          }
+        }
+      } catch (e) {}
+      if (stale()) return;
+      setReferralStatus('Share your code with another artist — one use only.', '');
+      updateStudioTutorial();
+      return;
+    }
+
+    // Load/generate code — try RTDB with a 5s timeout, fall back to local code
+    console.log('[referral-code] Loading code from RTDB — auth.currentUser:', !!auth.currentUser, '| key:', key);
+    try {
+      const rtdbTimeout = new Promise((_, rej) => setTimeout(() => rej(new Error('RTDB timeout (5s)')), 5000));
+      const code = await Promise.race([ensureStudioReferralCode(), rtdbTimeout]);
+      if (stale()) { console.log('[referral-code] Version', myVersion, 'is stale after ensureStudioReferralCode — aborting'); return; }
+      setAllDisabled(false);
+      if (!code) {
+        console.warn('[referral-code] ensureStudioReferralCode returned empty — no code generated');
+        if (display) display.disabled = true;
+        if (copyCode) copyCode.disabled = true;
+        if (copyMain) copyMain.disabled = true;
+      } else {
+        console.log('[referral-code] Code loaded successfully:', code);
+      }
+      setReferralStatus(code ? 'Share your code with another artist — one use only.' : 'Could not prepare code yet.', code ? '' : 'error');
+    } catch (e) {
+      if (stale()) return;
+      console.error('[referral-code] RTDB failed or timed out:', e.message || e);
+      setReferralStatus('Could not load referral code right now.', 'error');
+    }
+    updateStudioTutorial();
+  }
+
+  function updateStudioTutorial() {
+    const steps = document.querySelectorAll('.studio-tutorial-step');
+    if (!steps.length) return;
+    const signedIn = !!studioReferralUserKey();
+    const uploaded = localStorage.getItem('_studioTutorialUploadedOnce') === '1';
+    const codeUsedByAnother = localStorage.getItem('_studioReferralCodeUsed') === '1';
+    const doneFlags = [signedIn, uploaded, codeUsedByAnother];
+    let firstPending = -1;
+    for (let i = 0; i < doneFlags.length; i++) {
+      if (!doneFlags[i]) { firstPending = i; break; }
+    }
+    steps.forEach((el, idx) => {
+      const badge = el.querySelector('.step-badge');
+      if (doneFlags[idx]) {
+        el.setAttribute('data-status', 'done');
+        if (badge) badge.textContent = 'Done';
+      } else if (idx === firstPending) {
+        el.setAttribute('data-status', 'active');
+        if (badge) badge.textContent = idx === 0 ? 'Start here' : 'Next step';
+      } else {
+        el.setAttribute('data-status', 'pending');
+        if (badge) badge.textContent = 'Pending';
+      }
+    });
+    // Always check completion state after tutorial update
+    try { checkReferralCompletion(); } catch (e) {}
+    // Start watching for code usage if signed in
+    try { watchReferralCodeUsage(); } catch (e) {}
+  }
+  window.updateStudioTutorial = updateStudioTutorial;
+
+  // Check if all steps are done and show/hide the completion panel
+  function checkReferralCompletion() {
+    const signedIn = !!studioReferralUserKey();
+    const uploaded = localStorage.getItem('_studioTutorialUploadedOnce') === '1';
+    const codeUsed = localStorage.getItem('_studioReferralCodeUsed') === '1';
+    const allDone = signedIn && uploaded && codeUsed;
+    const panel = document.getElementById('referralComplete');
+    const codePanel = document.querySelector('.referral-code-panel');
+    const shareLinkRow = document.getElementById('shareLinkInput');
+    const copyBtn = document.getElementById('copyBtn');
+    const shareLabel = shareLinkRow && shareLinkRow.previousElementSibling; // the <p> "Your Referral Code:"
+    if (allDone) {
+      if (panel) panel.style.display = 'block';
+      if (codePanel) codePanel.style.display = 'none';
+      if (shareLinkRow) shareLinkRow.style.display = 'none';
+      if (copyBtn) copyBtn.style.display = 'none';
+      if (shareLabel) shareLabel.style.display = 'none';
+      // Load saved social links
+      loadSocialLinks();
+    } else {
+      if (panel) panel.style.display = 'none';
+      if (codePanel) codePanel.style.display = '';
+      if (shareLinkRow) shareLinkRow.style.display = '';
+      if (copyBtn) copyBtn.style.display = '';
+      if (shareLabel) shareLabel.style.display = '';
+    }
+  }
+
+  // Load saved social links from RTDB
+  async function loadSocialLinks() {
+    const key = studioReferralUserKey();
+    if (!key) return;
+    try {
+      const snap = await rtdbGet(ref2(db, 'FEATURED_SOCIAL_LINKS/' + key));
+      if (snap.exists()) {
+        const data = snap.val();
+        const links = data.links || [];
+        if (links[0]) document.getElementById('socialLink1').value = links[0];
+        if (links[1]) document.getElementById('socialLink2').value = links[1];
+        if (links[2]) document.getElementById('socialLink3').value = links[2];
+      }
+    } catch (e) {
+      console.warn('[social-links] Could not load:', e.message || e);
+    }
+  }
+
+  // Save social links to RTDB
+  document.getElementById('saveSocialLinksBtn')?.addEventListener('click', async () => {
+    const key = studioReferralUserKey();
+    if (!key) return;
+    const links = [
+      (document.getElementById('socialLink1').value || '').trim(),
+      (document.getElementById('socialLink2').value || '').trim(),
+      (document.getElementById('socialLink3').value || '').trim(),
+    ].filter(Boolean);
+    const savedMsg = document.getElementById('socialLinksSaved');
+    try {
+      await rtdbSet(ref2(db, 'FEATURED_SOCIAL_LINKS/' + key), {
+        links: links,
+        updatedAt: Date.now(),
+      });
+      if (savedMsg) { savedMsg.style.display = 'block'; setTimeout(() => { savedMsg.style.display = 'none'; }, 3000); }
+      console.log('[social-links] Saved:', links);
+    } catch (e) {
+      console.error('[social-links] Save failed:', e);
+      if (savedMsg) { savedMsg.textContent = 'Could not save links right now.'; savedMsg.style.display = 'block'; savedMsg.style.color = '#b91c1c'; }
+    }
+  });
+
+  // Real-time listener: watch the user's referral code for when it gets used
+  let _codeWatcherUnsub = null;
+  function watchReferralCodeUsage() {
+    const key = studioReferralUserKey();
+    if (!key) return;
+    // Watch REFERRAL_CODES_BY_USER/<key> for the code, then watch its used status
+    if (_codeWatcherUnsub) return; // already watching
+    _codeWatcherUnsub = onValue(ref2(db, 'REFERRAL_CODES_BY_USER/' + key), (snap) => {
+      if (!snap.exists()) return;
+      const data = snap.val();
+      const code = data && data.code;
+      if (!code) return;
+      // Now watch the code's used status in REFERRAL_CODE_INDEX
+      onValue(ref2(db, 'REFERRAL_CODE_INDEX/' + code), (idxSnap) => {
+        if (!idxSnap.exists()) return;
+        const idx = idxSnap.val();
+        if (typeof idx === 'object' && idx.used === true) {
+          console.log('[referral-watch] Code', code, 'has been used!');
+          localStorage.setItem('_studioReferralCodeUsed', '1');
+          updateStudioTutorial();
+          checkReferralCompletion();
+        }
+      });
+    });
+  }
+
+  // Helper: RTDB get with a timeout so it never hangs
+  function rtdbGet(dbRef, ms) {
+    ms = ms || 6000;
+    return Promise.race([
+      get(dbRef),
+      new Promise(function (_, rej) { setTimeout(function () { rej(new Error('RTDB get timeout (' + ms + 'ms)')); }, ms); }),
+    ]);
+  }
+  // Helper: RTDB set with a timeout
+  function rtdbSet(dbRef, val, ms) {
+    ms = ms || 6000;
+    return Promise.race([
+      set(dbRef, val),
+      new Promise(function (_, rej) { setTimeout(function () { rej(new Error('RTDB set timeout (' + ms + 'ms)')); }, ms); }),
+    ]);
+  }
+
+  async function submitStudioReferralCode() {
+    console.log('[referral-submit] submitStudioReferralCode() called');
+    try {
+      if (typeof auth.authStateReady === 'function') {
+        await Promise.race([auth.authStateReady(), new Promise(r => setTimeout(r, 4000))]);
+      }
+    } catch (e) {}
+    let key = studioReferralUserKey();
+    // Fallback: if auth.currentUser exists but localStorage wasn't synced yet
+    if (!key && auth.currentUser) {
+      syncAuthUserToLocalStorage(auth.currentUser);
+      key = studioReferralUserKey();
+    }
+    if (!key) {
+      console.log('[referral-submit] No user key — not signed in');
+      setReferralStatus('Sign in to submit a referral code.', 'error');
+      return;
+    }
+    const input = document.getElementById('referralCodeEntry');
+    const rawCode = String((input && input.value) || '').trim().toUpperCase();
+    if (!rawCode) {
+      setReferralStatus('Enter a referral code first.', 'error');
+      return;
+    }
+    console.log('[referral-submit] Submitting code:', rawCode, '| user key:', key);
+    setReferralStatus('Submitting…', '');
+    try {
+      const ownerSnap = await rtdbGet(ref2(db, 'REFERRAL_CODE_INDEX/' + rawCode));
+      const idxVal = ownerSnap.exists() ? ownerSnap.val() : null;
+      const ownerKey = typeof idxVal === 'string' ? idxVal : (idxVal?.ownerKey || '');
+      const isUsed = typeof idxVal === 'object' && idxVal?.used === true;
+      console.log('[referral-submit] Lookup result — ownerKey:', ownerKey, '| used:', isUsed);
+      if (!ownerKey) {
+        setReferralStatus('Code not found. Ask the artist to share a valid code.', 'error');
+        return;
+      }
+      if (ownerKey === key) {
+        setReferralStatus('You cannot enter your own code.', 'error');
+        return;
+      }
+      if (isUsed) {
+        setReferralStatus('This code has already been used. Ask the artist for a new one.', 'error');
+        return;
+      }
+      const reqPath = 'FEATURE_REFERRAL_REQUESTS/' + ownerKey + '/' + key;
+      const existing = await rtdbGet(ref2(db, reqPath));
+      if (existing.exists()) {
+        setReferralStatus('You already submitted this artist\'s code.', 'ok');
+        return;
+      }
+      // Mark code as used (one-time only)
+      await rtdbSet(ref2(db, 'REFERRAL_CODE_INDEX/' + rawCode), { ownerKey, used: true });
+      // Clear owner's stored code so they get a fresh one next visit
+      await Promise.race([remove(ref2(db, 'REFERRAL_CODES_BY_USER/' + ownerKey)), new Promise(r => setTimeout(r, 6000))]);
+      // Increment the code owner's referral count so their progress bar updates in real-time
+      await Promise.race([update(ref2(db, 'referralCounts/' + ownerKey), { count: increment(1) }), new Promise(r => setTimeout(r, 6000))]);
+      await rtdbSet(ref2(db, reqPath), {
+        fromKey: key,
+        ownerKey: ownerKey,
+        referralCode: rawCode,
+        status: 'pending_upload',
+        requestedAt: Date.now()
+      });
+      await rtdbSet(ref2(db, 'FEATURE_REFERRAL_OUTBOX/' + key + '/' + ownerKey), {
+        ownerKey: ownerKey,
+        referralCode: rawCode,
+        requestedAt: Date.now()
+      });
+      if (input) input.value = '';
+      console.log('[referral-submit] Code submitted successfully');
+      setReferralStatus('Code accepted! The artist will be featured once they upload a song.', 'ok');
+      localStorage.setItem('_studioTutorialSubmittedAt', String(Date.now()));
+      updateStudioTutorial();
+      // NOTE: do NOT touch countText / progressBarStatus / unlockMsg here.
+      // Those belong to the OWNER's progress (people who used THEIR code).
+      // Submitting someone else's code does not advance the submitter's own bar.
+      try {
+        var overlay = document.getElementById('referralSuccessOverlay');
+        if (overlay) {
+          overlay.classList.add('visible');
+          var closeBtn = document.getElementById('referralSuccessCloseBtn');
+          var closeFn = function () { overlay.classList.remove('visible'); };
+          if (closeBtn) closeBtn.onclick = closeFn;
+          overlay.addEventListener('click', function (ev) { if (ev.target === overlay) closeFn(); });
+        }
+      } catch (e2) {}
+    } catch (e) {
+      console.error('[referral-submit] ERROR:', e);
+      setReferralStatus('Could not submit code right now. Check connection and try again.', 'error');
+    }
+  }
+
+  // --- 3. UPLOAD ---
+  window._uploadHandlerReady = true;
+  document.getElementById("btn").onclick = async () => {
+    clearUploadStatus();
+
+    const _title = document.getElementById("title").value.trim();
+    const _artist = document.getElementById("artist").value.trim();
+    const _album = document.getElementById("album").value.trim();
+    const _file = document.getElementById("fileInp").files[0];
+    const _agree = document.getElementById("agreement").checked;
+    console.log("[upload] form inputs:", { title: _title, artist: _artist, album: _album, file: _file ? _file.name : null, agreement: _agree });
+    if (!_title || !_artist || !_album || !_file || !_agree) {
+      var missing = [];
+      if (!_title) missing.push("Song Title");
+      if (!_artist) missing.push("Artist Name");
+      if (!_album) missing.push("Album Name");
+      if (!_file) missing.push("Audio file");
+      if (!_agree) missing.push("Agreement checkbox");
+      appendUploadStatus("Please fill in: " + missing.join(", "));
+      return;
+    }
+
+    appendUploadStatus("Preparing upload…");
+
+    const okAuth = await ensureFirebaseAuthForUpload();
+    if (!okAuth) {
+      document.getElementById("alertBox").style.visibility = "hidden";
+      closeUploadSuccessModal();
+      return;
+    }
+
+    syncAuthUserToLocalStorage(auth.currentUser);
+    const email = (localStorage.getItem("email") || "").trim() || (auth.currentUser && (auth.currentUser.email || auth.currentUser.uid)) || "";
+    const file = document.getElementById("fileInp").files[0];
+    if (!email || !file) {
+      appendUploadStatus("Error: Sign in and choose an audio file.");
+      alert("Please sign in and select a file!");
+      return;
+    }
+    if (!document.getElementById("agreement").checked) {
+      appendUploadStatus("Error: Accept the agreement to upload.");
+      alert("Please accept the agreement!");
+      return;
+    }
+
+    closeUploadSuccessModal();
+    document.getElementById("alertBox").style.visibility = "hidden";
+
+    try {
+      console.log("File size: " + (file.size / 1024 / 1024).toFixed(2) + " MB");
+      appendUploadStatus("Uploading file (" + (file.size / 1024 / 1024).toFixed(2) + " MB)…");
+
+      const title = document.getElementById("title").value.trim();
+      const artist = document.getElementById("artist").value.trim();
+      const album = document.getElementById("album").value.trim();
+
+      if (!title || !artist || !album) {
+        throw new Error("Please fill in all fields (Title, Artist, Album)");
+      }
+
+      const safeTitle = sanitizeRtdbPathSegment(title);
+      const safeAlbum = sanitizeRtdbPathSegment(album);
+      const safeArtist = sanitizeRtdbPathSegment(artist);
+      const path = `${safeAlbum}/${safeTitle}/${safeArtist}/${file.name}`;
+      appendUploadStatus("Sending file to storage…");
+      const snap = await withTimeout(uploadBytes(ref(storage, path), file), 60000, "Uploading file to storage");
+      const url = await withTimeout(getDownloadURL(snap.ref), 15000, "Getting download URL");
+      console.log("File uploaded to:", url);
+
+      appendUploadStatus("Saving song info to the database…");
+      try {
+        goOnline(db);
+      } catch (e) {
+        console.warn("[studio] goOnline", e);
+      }
+      const fullName = localStorage.getItem("fullName") || "";
+      const markExplicitEl = document.getElementById("studioMarkExplicit");
+      const markExplicitChecked = !!(markExplicitEl && markExplicitEl.checked);
+      const uploaderOwnerKey = (localStorage.getItem('emailKey') || '').trim() ||
+        (localStorage.getItem('CurrentUser') || '').trim().replace(/[.#$[\]]/g, '_') ||
+        (email || '').replace(/[.#$[\]]/g, '_');
+      const songData = {
+        album: album,
+        artist: artist,
+        title: title,
+        fileInp: url,
+        uploader: email,
+        uploaderName: fullName,
+        uploaderOwnerKey: uploaderOwnerKey || '',
+        campaign: "ARTISTSOFFEB26",
+        createdAt: Date.now(),
+        isExplicit: markExplicitChecked || songMetadataExplicit({ title, artist, album }),
+      };
+      const dbPath = `SONGS/${safeTitle}/${safeAlbum}/${safeArtist}`;
+      const rtdbTimeoutMs = 45000;
+      await withTimeout(update(ref2(db, dbPath), songData), rtdbTimeoutMs, "Saving song metadata");
+      console.log("✅ Song data saved to database at:", dbPath);
+
+      // Pin this upload as the artist's featured song so the home page Featured Songs
+      // card surfaces THIS track (the one they just uploaded) the moment a fan redeems
+      // their referral code, instead of having to bridge by email/name later.
+      if (uploaderOwnerKey) {
+        try {
+          await Promise.race([
+            set(ref2(db, "FEATURED_ARTIST_SONG/" + uploaderOwnerKey), {
+              title: title,
+              album: album,
+              artist: artist,
+              fileInp: url,
+              uploader: email,
+              uploaderName: fullName,
+              songPath: dbPath,
+              uploadedAt: Date.now(),
+            }),
+            new Promise((r) => setTimeout(r, 5000)),
+          ]);
+        } catch (e) { console.warn("[studio] FEATURED_ARTIST_SONG write", e); }
+        // Promote any pending_upload referrals for this artist to 'featured'
+        // now that they have actually uploaded a song.
+        try {
+          const pendingSnap = await Promise.race([
+            get(ref2(db, "FEATURE_REFERRAL_REQUESTS/" + uploaderOwnerKey)),
+            new Promise((r) => setTimeout(() => r(null), 5000)),
+          ]);
+          if (pendingSnap && pendingSnap.exists && pendingSnap.exists()) {
+            const reqs = pendingSnap.val() || {};
+            const updates = {};
+            for (const fk in reqs) {
+              if (reqs[fk] && reqs[fk].status === 'pending_upload') {
+                updates[fk + '/status'] = 'featured';
+                updates[fk + '/featuredAt'] = Date.now();
+              }
+            }
+            if (Object.keys(updates).length) {
+              await Promise.race([
+                update(ref2(db, "FEATURE_REFERRAL_REQUESTS/" + uploaderOwnerKey), updates),
+                new Promise((r) => setTimeout(r, 5000)),
+              ]);
+              console.log("[studio] promoted", Object.keys(updates).length / 2, "pending_upload referrals to featured");
+            }
+          }
+        } catch (e) { console.warn("[studio] referral promotion failed (non-fatal):", e); }
+      }
+
+      appendUploadStatus("Saving agreement record…");
+      const agreementKey = email.replace(/[.#$[\]]/g, "_") + "_" + Date.now();
+      await withTimeout(
+        update(ref2(db, "AGREEMENTS/" + agreementKey), {
+          email: email,
+          name: fullName,
+          songTitle: title,
+          artistName: artist,
+          albumName: album,
+          type: album.toLowerCase() === title.toLowerCase() ? "single" : "album",
+          acceptedAt: Date.now(),
+          acceptedTerms: true,
+          acceptedPrivacy: true
+        }),
+        rtdbTimeoutMs,
+        "Saving agreement"
+      );
+
+      // Firestore referral system – increment songCount & check eligibility (don’t block success UI)
+      try {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          void withTimeout(onSongUploaded(currentUser.uid, title), 20000, "Referral sync").catch((e) =>
+            console.warn("Referral system:", e)
+          );
+        }
+      } catch (e) {
+        console.warn("Referral system:", e);
+      }
+      console.log("📦 Song data:", songData);
+
+      appendUploadStatus("Done! Your song was uploaded and should appear on the home page shortly.");
+      openUploadSuccessModal({ trackTitle: title, artist: artist });
+      jsConfetti.addConfetti();
+
+      // Reset form
+      document.getElementById("uploadForm").reset();
+      document.getElementById("fileInp").value = "";
+      document.getElementById("uploadMain").textContent = "🎵 Drag & Drop Your Audio Here";
+      document.getElementById("uploadSub").textContent = "or click to upload (.mp3 only)";
+      document.getElementById("dropArea").classList.remove("file-selected");
+      document.getElementById("agreement").checked = false;
+      var songTitleLabel = document.getElementById("agreementSongTitle");
+      if (songTitleLabel) songTitleLabel.textContent = "this song";
+
+    } catch (err) {
+      console.error("Upload error:", err);
+      document.getElementById("alertBox").style.visibility = "hidden";
+      const msg = err.message || "Unknown error. Please try again.";
+      appendUploadStatus("Failed: " + msg);
+      if (/permission|Permission/i.test(String(msg))) {
+        appendUploadStatus(
+          "Realtime Database rules blocked the save. Open Firebase Console → Realtime Database → Rules and deploy the rules from this repo (database.rules.json), or ensure SONGS and AGREEMENTS allow write for signed-in users (auth != null). Email login uses anonymous Firebase auth for uploads."
+        );
+      }
+      alert("Upload failed: " + msg);
+    }
+  };
+
+  document.getElementById("copyBtn").onclick = () => {
+    const val = (document.getElementById("shareLinkInput")?.value || '').trim();
+    if (!val) return;
+    navigator.clipboard.writeText(val);
+    alert("Copied! Share it with 1 artist friend.");
+  };
+
+  document.getElementById("copyCodeBtn")?.addEventListener("click", async () => {
+    const codeInput = document.getElementById("referralCodeDisplay");
+    const code = (codeInput && codeInput.value ? codeInput.value : "").trim();
+    if (!code) {
+      setReferralStatus("Code is loading, try again in a moment.", "error");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(code);
+      setReferralStatus("Referral code copied.", "ok");
+    } catch (e) {
+      setReferralStatus("Could not copy code automatically. Copy it manually.", "error");
+    }
+  });
+
+  document.getElementById("submitReferralCodeBtn")?.addEventListener("click", async () => {
+    try {
+      await submitStudioReferralCode();
+    } catch (e) {
+      console.error('[referral-submit]', e);
+      setReferralStatus('Could not submit code right now. Check connection and try again.', 'error');
+    }
+  });
+
+  if(localStorage.getItem("fullName") || localStorage.getItem("email")) {
+      const savedName = localStorage.getItem("fullName") || localStorage.getItem("email") || "";
+      const gcmEl = document.getElementById("gcm");
+      if (gcmEl) gcmEl.innerHTML = savedName;
+      const gcdEl = document.getElementById("gcd");
+      if (gcdEl) gcdEl.textContent = savedName;
+      if (savedName) try { loadUserProgress(savedName); } catch (e) { console.warn("[studio] loadUserProgress:", e); }
+      try { const _qaKey3 = studioReferralUserKey(); if (_qaKey3) loadQAInbox(_qaKey3); } catch (e) { console.warn("[studio] loadQAInbox:", e); }
+  }
+  applyStudioAuthUI();
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+    initUploadSuccessOverlayOnce();
+
+const boostBtn = document.getElementById("boostBtn");
+
+async function cleanupExpiredBoosts() {
+  const snapshot = await get(ref2(db, "boostSongs"));
+  if (!snapshot.exists()) return;
+
+  const boosts = snapshot.val();
+  const now = Date.now();
+  const oneHour = 60 * 60 * 1000;
+
+  for (const id in boosts) {
+    const boost = boosts[id];
+
+    if (
+      boost.status === "pending_payment" &&
+      boost.paid !== true &&
+      now - boost.createdAt > oneHour
+    ) {
+      await remove(ref2(db, "boostSongs/" + id));
+      console.log("Deleted expired boost:", id);
+    }
+  }
+}
+
+boostBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  if (!(await ensureFirebaseAuthForUpload())) {
+    document.getElementById("alertBox").style.visibility = "hidden";
+    return;
+  }
+
+  syncAuthUserToLocalStorage(auth.currentUser);
+  const email = (localStorage.getItem("email") || "").trim() || (auth.currentUser && (auth.currentUser.email || auth.currentUser.uid)) || "";
+  const file = document.getElementById("boostFileInp").files[0];
+
+  if (!email || !file) {             
+    alert("Sign in and select a file!");
+    return;
+  }
+
+  document.getElementById("alertBox").style.visibility = "visible";
+
+  try {
+
+    await cleanupExpiredBoosts();
+
+    const boostId = "boost_" + Date.now();
+
+    const title = document.getElementById("BoostTitle").value.trim();
+    const artist = document.getElementById("BoostArtist").value.trim();
+    const album = document.getElementById("BoostAlbum").value.trim();
+    const linkToArtist = document.getElementById("linkToArtist").value.trim();
+    const linkToSong = document.getElementById("linkToSong").value.trim();
+    const linkToAlbum = document.getElementById("linkToAlbum").value.trim();
+
+    const path = `boostUploads/${email}/${boostId}_${file.name}`;
+
+    const snap = await uploadBytes(ref(storage, path), file);
+    const url = await getDownloadURL(snap.ref);
+
+    await update(ref2(db, "boostSongs/" + boostId), {
+      BoostFileInp: url,
+      uploader: email,
+      campaign: "ARTISTSOFFEB26",
+      linkToArtist,
+      linkToSong,
+      linkToAlbum,
+      BoostTitle: title,
+      BoostArtist: artist,
+      BoostAlbum: album,
+      status: "pending_payment",
+      paid: false,
+      createdAt: Date.now()
+    });
+
+    const pendingBoostKey = (typeof authScopedKey === "function") ? authScopedKey("pendingBoostId") : "pendingBoostId";
+    localStorage.setItem(pendingBoostKey, boostId);
+
+    const stripeUrl = "https://buy.stripe.com/bJe14nbpWfuV81idk7gQE04";
+    const capBrowser = (() => {
+      try {
+        const C = window.Capacitor;
+        const P = C && C.Plugins && C.Plugins.Browser;
+        if (P && typeof P.open === "function") return P;
+        if (C && typeof C.nativePromise === "function") return { open: (o) => C.nativePromise("Browser", "open", o) };
+      } catch (e) {}
+      return null;
+    })();
+    if (capBrowser) {
+      await capBrowser.open({ url: stripeUrl, presentationStyle: "fullscreen" });
+    } else {
+      window.location.href = stripeUrl;
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Upload failed.");
+    document.getElementById("alertBox").style.visibility = "hidden";
+  }
+});
+  });
+
+
+</script>
+
+<!-- Same “Finish your profile” flow as index.html (PROFILES / nickname + socials) -->
+<div id="appleOnboardingModal" class="apple-onboarding-modal" aria-modal="true" role="dialog" aria-labelledby="appleOnboardingTitle">
+  <div class="apple-onboarding-box">
+    <h2 id="appleOnboardingTitle">Finish your profile</h2>
+    <p class="apple-onboarding-sub">Choose a display name and a unique username (letters, numbers, underscores). Usernames cannot repeat. Social links are optional.</p>
+    <label for="appleOnboardingNickname">Nickname</label>
+    <input type="text" id="appleOnboardingNickname" maxlength="80" placeholder="Your artist or display name" autocomplete="nickname">
+    <label for="appleOnboardingHandle">Public username</label>
+    <input type="text" id="appleOnboardingHandle" maxlength="40" placeholder="e.g. indie_alex" autocomplete="username" spellcheck="false" autocapitalize="off">
+    <p class="apple-onboarding-hint" style="margin:-6px 0 10px;font-size:12px;color:rgba(255,255,255,0.5);">3–40 characters: a–z, 0–9, underscore only. Your unique @handle for search and follows.</p>
+    <label>Profile type</label>
+    <div class="apple-onboarding-choice-group" role="radiogroup" aria-label="Profile type">
+      <label class="apple-onboarding-choice" for="appleProfileTypeArtist">
+        <input type="radio" id="appleProfileTypeArtist" name="appleOnboardingProfileType" value="artist">
+        <div>
+          <strong>Public / Artist</strong>
+          <span>Your profile shows in the app so others can find you, follow you, and hear your music.</span>
+        </div>
+      </label>
+      <label class="apple-onboarding-choice" for="appleProfileTypeListener">
+        <input type="radio" id="appleProfileTypeListener" name="appleOnboardingProfileType" value="listener" checked>
+        <div>
+          <strong>Private / Listener</strong>
+          <span>Your profile stays private—you are not shown to others in the app.</span>
+        </div>
+      </label>
+    </div>
+    <p class="apple-onboarding-hint" style="margin:8px 0 0;font-size:12px;color:rgba(255,255,255,0.55);line-height:1.45;">Public shows you in the app; private keeps you private.</p>
+    <p class="apple-onboarding-optional">Socials (optional)</p>
+    <label for="appleOnboardingInstagram">Instagram URL</label>
+    <input type="url" id="appleOnboardingInstagram" placeholder="https://instagram.com/…">
+    <label for="appleOnboardingTwitter">X (Twitter) URL</label>
+    <input type="url" id="appleOnboardingTwitter" placeholder="https://x.com/…">
+    <label for="appleOnboardingTiktok">TikTok URL</label>
+    <input type="url" id="appleOnboardingTiktok" placeholder="https://tiktok.com/@…">
+    <label for="appleOnboardingYoutube">YouTube URL</label>
+    <input type="url" id="appleOnboardingYoutube" placeholder="https://youtube.com/…">
+    <label for="appleOnboardingSpotify">Spotify URL</label>
+    <input type="url" id="appleOnboardingSpotify" placeholder="https://open.spotify.com/…">
+    <label for="appleOnboardingSoundcloud">SoundCloud URL</label>
+    <input type="url" id="appleOnboardingSoundcloud" placeholder="https://soundcloud.com/…">
+    <label for="appleOnboardingWebsite">Website</label>
+    <input type="url" id="appleOnboardingWebsite" placeholder="https://…">
+    <div class="apple-onboarding-actions">
+      <button type="button" class="apple-onboarding-skip" id="appleOnboardingSkipBtn">Skip for now</button>
+      <button type="button" class="apple-onboarding-save" id="appleOnboardingSaveBtn">Save &amp; continue</button>
+    </div>
+  </div>
+</div>
+
+<div id="uploadSuccessOverlay" class="upload-success-overlay" hidden aria-hidden="true">
+  <div class="upload-success-backdrop" role="presentation" aria-hidden="true"></div>
+  <div class="upload-success-modal" role="dialog" aria-modal="true" aria-labelledby="uploadSuccessHeading">
+    <div class="upload-success-icon" aria-hidden="true">🎵</div>
+    <h2 id="uploadSuccessHeading" class="upload-success-title">You’re all set</h2>
+    <p class="upload-success-track" id="uploadSuccessTrack"></p>
+    <p class="upload-success-sub" id="uploadSuccessSub"></p>
+    <p class="upload-success-body">Your song has been uploaded successfully. It should appear on the home page shortly.</p>
+    <button type="button" class="upload-success-btn" id="uploadSuccessCloseBtn" onclick="if (window.closeUploadSuccessModal) window.closeUploadSuccessModal();">Great!</button>
+  </div>
+</div>
+<!-- Dynamic Featured Songs (artist profile + social links + player) -->
+<style>
+  #studioFeaturedSection { max-width: 900px; margin: 24px auto 40px; padding: 0 16px; text-align: left; color: #fff; }
+  #studioFeaturedSection h2 {
+    font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; color: #ff7f50;
+    margin: 0 0 4px; display: flex; align-items: center; gap: 8px;
+  }
+  #studioFeaturedSection .studio-featured-sub { margin: 0 0 14px; font-size: 12px; color: rgba(0,0,0,0.55); font-weight: 500; }
+  #studioFeaturedContainer { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .studioFeaturedCard {
+    background: #0a0a0a; color: #fff;
+    border: 1px solid rgba(255,127,80,0.35);
+    border-radius: 14px; padding: 14px;
+    display: flex; flex-direction: column; gap: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  }
+  .studioFeaturedCard h3 { margin: 0; font-size: 15px; font-weight: 700; color: #fff; }
+  .studioFeaturedCard p { margin: 0; font-size: 12px; color: rgba(255,255,255,0.6); }
+  .studioFeaturedCard .studio-artist-block {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px; border-radius: 10px;
+    background: rgba(255,127,80,0.08); border: 1px solid rgba(255,127,80,0.2);
+  }
+  .studioFeaturedCard .studio-artist-avatar {
+    width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
+    background: linear-gradient(135deg, #ff7f50, #e66a3a);
+    display: flex; align-items: center; justify-content: center;
+    color: #000; font-weight: 800; font-size: 16px; flex-shrink: 0;
+  }
+  .studioFeaturedCard .studio-artist-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .studioFeaturedCard .studio-artist-meta { display: flex; flex-direction: column; min-width: 0; }
+  .studioFeaturedCard .studio-artist-name { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .studioFeaturedCard .studio-artist-tag { font-size: 10px; color: #ff7f50; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+  .studioFeaturedCard .studio-social-links { display: flex; flex-wrap: wrap; gap: 6px; }
+  .studioFeaturedCard .studio-social-links a {
+    font-size: 11px; padding: 5px 10px; border-radius: 999px;
+    color: #ff7f50; text-decoration: none;
+    border: 1px solid rgba(255,127,80,0.4); background: rgba(255,127,80,0.08);
+  }
+  .studioFeaturedCard .studio-social-links a:hover { background: #ff7f50; color: #000; }
+  .studioFeaturedCard .studio-card-actions { display: flex; gap: 8px; margin-top: 2px; }
+  .studioFeaturedCard .studio-card-actions button {
+    flex: 1; padding: 8px 10px; border-radius: 8px;
+    font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700;
+    cursor: pointer; border: 1px solid rgba(255,127,80,0.45);
+  }
+  .studioFeaturedCard .studio-card-actions .studio-play-btn { background: linear-gradient(135deg, #ff7f50, #e66a3a); color: #000; border-color: transparent; }
+  .studioFeaturedCard .studio-card-actions .studio-queue-btn { background: transparent; color: #ff7f50; }
+  .studioFeaturedCard .studio-card-actions .studio-queue-btn:hover { background: rgba(255,127,80,0.14); }
+  #studioFeaturedEmpty { text-align: center; padding: 24px; color: rgba(0,0,0,0.55); font-size: 13px; }
+</style>
+<section id="studioFeaturedSection">
+  <h2><span class="material-symbols-outlined">star</span>Featured Songs</h2>
+  <p class="studio-featured-sub">Artists featured via the referral program — with links straight to their music and socials.</p>
+  <div id="studioFeaturedContainer"></div>
+  <div id="studioFeaturedEmpty">Loading featured artists…</div>
+</section>
+
+<!-- Mobile bottom nav -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<nav class="mobile-nav">
+  <a href="index.html" class="mobile-nav-item"><span class="material-symbols-outlined">home</span><span>Home</span></a>
+  <a href="lively.html" class="mobile-nav-item"><span class="material-symbols-outlined">mic</span><span>Concerts</span></a>
+  <a href="studio.html" class="mobile-nav-item mobile-nav-active"><span class="material-symbols-outlined">upload</span><span>Upload</span></a>
+  <a href="pat.html" class="mobile-nav-item"><span class="material-symbols-outlined">queue_music</span><span>Playlist</span></a>
+</nav>
+<style>
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;width:100%;z-index:10000;background:#0a0a0a;border-top:1px solid rgba(255,127,80,0.25);padding:6px 0 max(6px,env(safe-area-inset-bottom));justify-content:space-around;align-items:center}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:rgba(255,255,255,0.5);font-family:'Poppins',sans-serif;font-size:11px;font-weight:500;padding:4px 12px;border-radius:10px;transition:color .2s,background .2s}
+.mobile-nav-item .material-symbols-outlined{font-size:24px}
+.mobile-nav-item:hover,.mobile-nav-item.mobile-nav-active{color:#ff7f50}
+.mobile-nav-item.mobile-nav-active{background:rgba(255,127,80,0.1)}
+@media screen and (max-width:3840px){body{padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}.mobile-nav{display:flex !important}}
+</style>
+
+<script src="js/miniplayer.js" defer></script>
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getDatabase, ref as ref2, get, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+  const studioFeaturedConfig = {
+    apiKey: "AIzaSyA-6qtVYHfipL_c6g5JzXKXCxMN5WDKU7A",
+    authDomain: "asteroid-cdc13.firebaseapp.com",
+    databaseURL: "https://asteroid-cdc13-default-rtdb.firebaseio.com",
+    projectId: "asteroid-cdc13",
+    storageBucket: "asteroid-cdc13.appspot.com",
+    messagingSenderId: "793353824502",
+    appId: "1:793353824502:web:3ac24821911d14773ba4d7",
+    measurementId: "G-GV72TMNNGR"
+  };
+  const _app = getApps().length ? getApp() : initializeApp(studioFeaturedConfig);
+  const _db = getDatabase(_app);
+
+  function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+  function prettifyUrl(url) {
+    try {
+      const h = new URL(url).hostname.replace('www.', '').replace('open.', '');
+      if (/instagram/i.test(h)) return 'Instagram';
+      if (/spotify/i.test(h)) return 'Spotify';
+      if (/soundcloud/i.test(h)) return 'SoundCloud';
+      if (/youtube|youtu\.be/i.test(h)) return 'YouTube';
+      if (/tiktok/i.test(h)) return 'TikTok';
+      if (/twitter|x\.com/i.test(h)) return 'X / Twitter';
+      if (/apple/i.test(h)) return 'Apple Music';
+      return h.split('.')[0].charAt(0).toUpperCase() + h.split('.')[0].slice(1);
+    } catch (e) { return 'Link'; }
+  }
+
+  const container = document.getElementById('studioFeaturedContainer');
+  const emptyEl = document.getElementById('studioFeaturedEmpty');
+  if (container && emptyEl) {
+    onValue(ref2(_db, 'FEATURE_REFERRAL_REQUESTS'), (snap) => {
+      container.innerHTML = '';
+      if (!snap.exists()) {
+        emptyEl.style.display = '';
+        emptyEl.textContent = 'No featured artists yet. Be the first!';
+        return;
+      }
+      const requests = snap.val();
+      const ownerKeys = new Set();
+      for (const ownerKey in requests) {
+        for (const fromKey in requests[ownerKey]) {
+          const req = requests[ownerKey][fromKey];
+          if (req && req.status === 'featured') ownerKeys.add(ownerKey);
+        }
+      }
+      if (!ownerKeys.size) {
+        emptyEl.style.display = '';
+        emptyEl.textContent = 'No featured artists yet. Be the first!';
+        return;
+      }
+      emptyEl.style.display = 'none';
+      ownerKeys.forEach((ownerKey) => {
+        Promise.all([
+          get(ref2(_db, 'FEATURED_SOCIAL_LINKS/' + ownerKey)).catch(() => null),
+          get(ref2(_db, 'PROFILES/' + ownerKey)).catch(() => null),
+          get(ref2(_db, 'SONGS')).catch(() => null)
+        ]).then(([linkSnap, profileSnap, songsSnap]) => {
+          if (!songsSnap || !songsSnap.exists()) return;
+          const socialData = (linkSnap && linkSnap.exists()) ? linkSnap.val() : {};
+          const savedLinks = (socialData.links || []).filter(Boolean);
+          const profile = (profileSnap && profileSnap.exists()) ? profileSnap.val() : {};
+          const allSongs = songsSnap.val();
+          let song = null;
+          for (const titleKey in allSongs) {
+            for (const albumKey in allSongs[titleKey]) {
+              for (const artistKey in allSongs[titleKey][albumKey]) {
+                const s = allSongs[titleKey][albumKey][artistKey];
+                if (s && s.uploader) {
+                  const uploaderKey = s.uploader.replace(/[.#$[\]]/g, '_');
+                  if (uploaderKey === ownerKey || s.uploader === ownerKey) { song = s; break; }
+                }
+              }
+              if (song) break;
+            }
+            if (song) break;
+          }
+          if (!song || !song.fileInp) return;
+          const profileSocialLinks = [
+            profile.instagram, profile.youtube, profile.soundcloud,
+            profile.spotify, profile.applemusic, profile.website, profile.tiktok
+          ].filter(u => u && /^https?:\/\//.test(u));
+          const allSocialLinks = Array.from(new Set([...savedLinks, ...profileSocialLinks]));
+          const artistName = profile.nickname || song.artist || song.uploaderName || 'Artist';
+          const avatarImg = profile.profileImage || profile.photoURL || '';
+          const initial = String(artistName).trim().charAt(0).toUpperCase() || 'A';
+          const avatarHtml = avatarImg
+            ? '<div class="studio-artist-avatar"><img src="' + esc(avatarImg) + '" alt="' + esc(artistName) + '"></div>'
+            : '<div class="studio-artist-avatar">' + esc(initial) + '</div>';
+          const profileBlockHtml =
+            '<div class="studio-artist-block">' +
+              avatarHtml +
+              '<div class="studio-artist-meta">' +
+                '<span class="studio-artist-name">' + esc(artistName) + '</span>' +
+                '<span class="studio-artist-tag">Featured artist</span>' +
+              '</div>' +
+            '</div>';
+          const linksHtml = allSocialLinks.length
+            ? '<div class="studio-social-links">' +
+                allSocialLinks.map(u => '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(prettifyUrl(u)) + '</a>').join('') +
+              '</div>'
+            : '';
+          const card = document.createElement('div');
+          card.className = 'studioFeaturedCard';
+          card.innerHTML =
+            profileBlockHtml +
+            '<h3>' + esc(song.title || 'Untitled') + '</h3>' +
+            '<p>Album: ' + esc(song.album || '') + '</p>' +
+            linksHtml +
+            '<div class="studio-card-actions">' +
+              '<button class="studio-play-btn">Play</button>' +
+              '<button class="studio-queue-btn">Queue</button>' +
+            '</div>';
+          const meta = { url: song.fileInp, title: song.title || 'Untitled', artist: artistName, imageUrl: avatarImg || '' };
+          card.querySelector('.studio-play-btn').addEventListener('click', () => {
+            if (window.AsteroidPlayer) window.AsteroidPlayer.play(meta);
+          });
+          card.querySelector('.studio-queue-btn').addEventListener('click', () => {
+            if (window.AsteroidPlayer) window.AsteroidPlayer.enqueue(meta);
+          });
+          container.appendChild(card);
+        }).catch(() => {});
+      });
+    }, () => {
+      emptyEl.style.display = '';
+      emptyEl.textContent = 'Could not load featured artists.';
+    });
+  }
+</script>
+</body>
+</html>          

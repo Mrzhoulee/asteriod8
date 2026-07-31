@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sI \"https://asteroid8.net\")",
+      "Bash(curl -s \"https://www.asteroid8.net/index.html\")",
+      "Read(//Users/ottotan/Downloads/asteriod8-main/**)",
+      "Bash(curl -sI \"https://www.asteroid8.net\")",
+      "Bash(git commit -m ' *)",
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://www.asteroid8.net/users.html\" -o /tmp/users_live.html)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /tmp/profiles_size.json -w \"HTTP %{http_code}, size=%{size_download} bytes, time=%{time_total}s\\\\n\" \"https://asteroid-cdc13-default-rtdb.firebaseio.com/PROFILES.json?shallow=true\")",
+      "Read(//private/tmp/**)",
+      "Bash(curl -s -o /tmp/profiles_full.json -w \"HTTP %{http_code}, size=%{size_download} bytes, time=%{time_total}s\\\\n\" \"https://asteroid-cdc13-default-rtdb.firebaseio.com/PROFILES.json\")",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\('deps:'\\); [print\\(' ',k,v\\) for k,v in p.get\\('dependencies',{}\\).items\\(\\) if 'capacitor' in k.lower\\(\\) or 'push' in k.lower\\(\\) or 'notif' in k.lower\\(\\) or 'firebase' in k.lower\\(\\)]\")",
+      "Bash(curl -s -o /dev/null -w \"users.html: %{http_code}\\\\n\" \"https://www.asteroid8.net/users.html\")",
+      "Bash(curl -s -o /dev/null -w \"miniplayer.js: %{http_code}\\\\n\" \"https://www.asteroid8.net/js/miniplayer.js\")",
+      "Bash(curl -s -o /dev/null -w \"firebase-app: %{http_code}\\\\n\" \"https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js\")",
+      "Bash(npm install *)",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\(p.get\\('dependencies',{}\\).get\\('@capacitor/push-notifications','NOT FOUND'\\)\\)\")",
+      "Bash(npx cap *)"
+    ]
+  }
+}

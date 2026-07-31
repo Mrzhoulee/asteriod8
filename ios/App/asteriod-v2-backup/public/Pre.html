@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7BM505N9L0"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-7BM505N9L0');
+</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+
+    <style>
+        body {
+        background-color: black;
+        align-items: center;
+        text-alight: center;
+        }
+
+        .loginForm {
+        align-items: center;
+        text-alight: center;
+        }
+ input[type="text"] {
+width: 100%;
+ height: 50px;
+ }
+
+        input[type="submit"] {
+        width: 120px;
+         height: 50px;
+        }
+  h1{
+  color: coral;
+  }
+    </style>
+</head>
+<body>
+    <div class="forum">
+        <center>
+  <font face="Montserrat" font color="coral"><h1>SCOPE SIGN IN</h1></font>
+    <form id="loginForm" method="post">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username"><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password"><br><br>
+        <input type="submit" value="Login">
+    </form>
+    </center>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent form submission
+            
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            
+            if (username === "Preuser" && password === "User102049") {
+                alert("Login successful!");
+                window.location.href = "presigma.html"; // Redirect to Game.html
+            } else {
+                alert("Cannot log in. Incorrect username or password.");
+            }
+        });
+    </script>
+</body>
+</html>

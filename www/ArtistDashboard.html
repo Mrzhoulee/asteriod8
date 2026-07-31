@@ -3883,5 +3883,11 @@ async function loadGrowTab() {
     });
   }
 </script>
+<style>
+/* Responsive bottom-nav — fits every iPhone & iPad width (verified via headless render) */
+.mobile-nav-item{flex:1 1 0 !important;min-width:0 !important;padding:4px 3px !important;font-size:clamp(9px,2.6vw,11px) !important;}
+.mobile-nav-item span:not(.material-symbols-outlined){max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mobile-nav-item .material-symbols-outlined{font-size:clamp(20px,5.5vw,24px) !important;}
+</style>
 </body>
 </html>
