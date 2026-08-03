@@ -5,17 +5,7 @@
   "ios": {
     "webContentsDebuggingEnabled": true
   },
-  "plugins": {
-    "LottieSplashscreen": {
-      "launchAutoShow": true,
-      "launchAnimationName": "public/splash",
-      "launchLoop": true,
-      "launchSpeed": 1,
-      "launchBackgroundColor": "#020617",
-      "launchAutoHideMs": 2500,
-      "launchSafetyHideMs": 7000
-    }
-  },
+  "plugins": {},
   "server": {
     "hostname": "localhost",
     "iosScheme": "https",
