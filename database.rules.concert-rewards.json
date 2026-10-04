@@ -1,0 +1,69 @@
+{
+  "rules": {
+    "CONCERT_SCHEDULE": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      "$showId": {
+        ".validate": "newData.hasChildren(['room','artist','startsAt','endsAt']) && newData.child('room').isString() && newData.child('room').val().matches(/^Room[1-5]$/) && newData.child('artist').isString() && newData.child('artist').val().length <= 80 && newData.child('startsAt').isNumber() && newData.child('endsAt').isNumber() && newData.child('endsAt').val() > newData.child('startsAt').val()"
+      }
+    },
+    "CONCERT_CONFIG": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email == 'console.admin@asteroid8.net'"
+    },
+    "CONCERT_PRESENCE": {
+      ".read": true,
+      "$room": {
+        "$viewer": {
+          ".write": true,
+          ".validate": "$room.matches(/^Room[1-5]$/) && $viewer.length <= 200 && newData.isNumber()"
+        }
+      }
+    },
+    "FAN_SURVEY": {
+      ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      "$key": {
+        ".write": "($key.beginsWith('a_') && $key.length <= 40) || (auth != null && auth.token.email != null && $key == auth.token.email.toLowerCase().replace('.', '_'))",
+        ".validate": "newData.hasChildren(['role','ts']) && (newData.child('role').val() == 'fan' || newData.child('role').val() == 'artist') && newData.child('ts').isNumber() && (!newData.hasChild('other') || (newData.child('other').isString() && newData.child('other').val().length <= 120))"
+      }
+    },
+    "REWARDS": {
+      ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      ".write": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      "attendance": {
+        "$uk": {
+          ".read": "auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+          "$showId": {
+            ".write": "!data.exists() && auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+            ".validate": "newData.hasChildren(['ts']) && newData.child('ts').val() == now && root.child('CONCERT_SCHEDULE').child($showId).child('startsAt').val() <= now + 1800000 && root.child('CONCERT_SCHEDULE').child($showId).child('endsAt').val() >= now"
+          }
+        }
+      },
+      "tips": {
+        "$uk": {
+          ".read": "auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+          "$tipId": {
+            ".validate": "newData.hasChildren(['amountCents','artist','ts']) && newData.child('amountCents').isNumber() && newData.child('amountCents').val() > 0 && newData.child('artist').isString() && newData.child('ts').isNumber()"
+          }
+        }
+      },
+      "adjust": {
+        "$uk": {
+          ".read": "auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+          "$adjId": {
+            ".validate": "newData.hasChildren(['points','ts']) && newData.child('points').isNumber() && newData.child('ts').isNumber()"
+          }
+        }
+      },
+      "redemptions": {
+        "$uk": {
+          ".read": "auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+          "$reqId": {
+            ".write": "!data.exists() && newData.child('status').val() == 'pending' && auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+            ".validate": "newData.hasChildren(['type','points','ts','status']) && newData.child('type').isString() && newData.child('type').val().matches(/^(giftcard|tip|shoutout|badge|early)$/) && newData.child('points').isNumber() && newData.child('points').val() > 0 && newData.child('points').val() <= 1000000 && newData.child('ts').isNumber() && newData.child('status').isString() && newData.child('status').val().matches(/^(pending|sent|rejected)$/) && (!newData.hasChild('email') || (newData.child('email').isString() && newData.child('email').val().length <= 200)) && (!newData.hasChild('detail') || (newData.child('detail').isString() && newData.child('detail').val().length <= 300)) && (!newData.hasChild('card') || (newData.child('card').isString() && newData.child('card').val().length <= 40))"
+          }
+        }
+      }
+    }
+  }
+}

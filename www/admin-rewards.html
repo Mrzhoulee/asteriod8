@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Concert Rewards Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#0e0f12; --card:#15161a; --line:rgba(255,255,255,.08); --text:#ececec; --muted:rgba(255,255,255,.55); --accent:#ff7f50; --good:#4ade80; --warn:#fbbf24; --bad:#f87171; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:14px/1.45 Montserrat, system-ui, sans-serif; }
+    .wrap { max-width:1100px; margin:0 auto; padding:20px 16px 60px; }
+    h1 { font-size:22px; margin:0; color:#fff; }
+    h2 { font-size:16px; margin:0 0 12px; color:#fff; }
+    .muted { color:var(--muted); }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin:0 0 16px; }
+    .login { max-width:360px; margin:12vh auto 0; text-align:center; }
+    .login h1 { margin-bottom:4px; }
+    input, select, textarea { width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.14); background:#0b0b0e; color:#fff; font:inherit; }
+    input:focus, select:focus { outline:none; border-color:var(--accent); }
+    label { display:block; font-size:12px; font-weight:600; color:var(--muted); margin:0 0 4px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:10px 16px; border:none; border-radius:10px; background:var(--accent); color:#fff; font:700 13px Montserrat, system-ui, sans-serif; cursor:pointer; text-decoration:none; white-space:nowrap; }
+    .btn.ghost { background:transparent; border:1px solid rgba(255,255,255,.18); color:var(--text); }
+    .btn.small { padding:6px 10px; font-size:12px; }
+    .btn.good { background:rgba(74,222,128,.15); color:var(--good); border:1px solid rgba(74,222,128,.4); }
+    .btn.bad { background:rgba(248,113,113,.12); color:var(--bad); border:1px solid rgba(248,113,113,.35); }
+    .btn:disabled { opacity:.4; cursor:not-allowed; }
+    .login .btn { width:100%; margin-top:10px; }
+    .err { color:var(--bad); min-height:20px; margin:10px 0 0; }
+    .top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .tabs { display:flex; gap:6px; overflow-x:auto; margin:0 0 16px; padding-bottom:2px; }
+    .tabs button { flex-shrink:0; padding:9px 14px; border-radius:999px; border:1px solid var(--line); background:none; color:var(--muted); font:600 13px Montserrat, system-ui, sans-serif; cursor:pointer; }
+    .tabs button.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .count { display:inline-block; min-width:18px; padding:0 5px; margin-left:4px; border-radius:9px; background:#ff3b3b; color:#fff; font-size:11px; }
+    .grid { display:grid; gap:10px; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); align-items:end; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th, td { text-align:left; padding:9px 8px; border-top:1px solid var(--line); vertical-align:top; }
+    th { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.06em; border-top:none; }
+    td.num, th.num { text-align:right; white-space:nowrap; }
+    .pill { display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:2px 8px; border-radius:999px; }
+    .pill.pending { color:var(--warn); background:rgba(251,191,36,.12); }
+    .pill.sent { color:var(--good); background:rgba(74,222,128,.12); }
+    .pill.rejected { color:var(--bad); background:rgba(248,113,113,.12); }
+    .pill.live { color:#fff; background:#ff3b3b; }
+    .over { color:var(--bad); font-weight:700; }
+    .stats { display:grid; gap:10px; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); margin-bottom:16px; }
+    .stat { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; }
+    .stat b { display:block; font-size:20px; color:#fff; }
+    .stat span { font-size:12px; color:var(--muted); }
+    .row-actions { display:flex; gap:6px; flex-wrap:wrap; }
+    .note { font-size:12px; color:var(--muted); margin:8px 0 0; }
+    .split { font-size:12.5px; color:var(--muted); margin-top:8px; }
+    .seg { display:flex; gap:6px; margin-bottom:12px; }
+    [hidden] { display:none !important; }
+  </style>
+</head>
+<body>
+  <div id="loginView" class="wrap">
+    <div class="card login">
+      <h1>Asteroid admin</h1>
+      <p class="muted">Concerts, tips and fan rewards</p>
+      <input id="pw" type="password" placeholder="Admin password" autocomplete="current-password">
+      <button id="loginBtn" class="btn" type="button">Sign in</button>
+      <p id="loginErr" class="err"></p>
+    </div>
+  </div>
+
+  <div id="appView" class="wrap" hidden>
+    <header class="top">
+      <h1>Concerts and rewards</h1>
+      <button id="signOutBtn" class="btn ghost small" type="button">Sign out</button>
+    </header>
+    <nav class="tabs" id="tabs"></nav>
+    <main id="main"></main>
+  </div>
+
+  <script type="module">
+    import { ref, onValue, set, push, update, remove } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+    import { initializeAuth, getAuth, browserLocalPersistence, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import {
+      firebaseApp, firebaseDb, readConfig, rewardsKey, computeRewards, listShows, splitCents, tipPoints,
+      centsToUsd, ptsToUsd, fmtPts, esc, ADMIN_EMAIL, POINTS_PER_USD, REDEEM_LABELS, ROOMS, GIFT_CARDS,
+    } from "./js/concert-rewards-core.js";
+
+    const app = firebaseApp();
+    const db = firebaseDb();
+    let auth;
+    try { auth = initializeAuth(app, { persistence: browserLocalPersistence }); } catch (e) { auth = getAuth(app); }
+
+    const TZS = [
+      ["America/New_York", "US Eastern"], ["America/Chicago", "US Central"], ["America/Denver", "US Mountain"],
+      ["America/Los_Angeles", "US Pacific"], ["Asia/Bangkok", "Bangkok"],
+    ];
+    const S = {
+      cfgRaw: null, cfg: readConfig(null), schedule: null, rewards: {}, survey: {},
+      tab: "requests", reqFilter: "pending",
+      tz: localStorage.getItem("astAdminTz") || "America/New_York",
+      started: false,
+    };
+    const $ = (sel, root = document) => root.querySelector(sel);
+
+    // ---------- Auth ----------
+    async function login() {
+      const pw = $("#pw").value;
+      const btn = $("#loginBtn");
+      $("#loginErr").textContent = "";
+      if (!pw) return;
+      btn.disabled = true; btn.textContent = "Signing in…";
+      try {
+        await signInWithEmailAndPassword(auth, ADMIN_EMAIL, pw);
+      } catch (e) {
+        $("#loginErr").textContent = "Wrong password.";
+      }
+      btn.disabled = false; btn.textContent = "Sign in";
+    }
+    $("#loginBtn").addEventListener("click", login);
+    $("#pw").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+    $("#signOutBtn").addEventListener("click", () => signOut(auth).then(() => location.reload()));
+
+    onAuthStateChanged(auth, (u) => {
+      const ok = !!(u && u.email && u.email.toLowerCase() === ADMIN_EMAIL);
+      $("#loginView").hidden = ok;
+      $("#appView").hidden = !ok;
+      if (ok) start();
+    });
+
+    function start() {
+      if (S.started) return;
+      S.started = true;
+      const fail = (what) => (e) => console.warn("[admin] " + what, e && e.code);
+      onValue(ref(db, "CONCERT_CONFIG"), (s) => { S.cfgRaw = s.val() || {}; S.cfg = readConfig(S.cfgRaw); render(); }, fail("config"));
+      onValue(ref(db, "CONCERT_SCHEDULE"), (s) => { S.schedule = s.val(); render(); }, fail("schedule"));
+      onValue(ref(db, "REWARDS"), (s) => { S.rewards = s.val() || {}; render(); }, fail("rewards"));
+      onValue(ref(db, "FAN_SURVEY"), (s) => { S.survey = s.val() || {}; render(); }, fail("survey"));
+      render();
+    }
+
+    // ---------- Helpers ----------
+    function tzParts(ms, tz) {
+      const parts = new Intl.DateTimeFormat("en-US", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).formatToParts(new Date(ms));
+      const o = {};
+      for (const p of parts) o[p.type] = Number(p.value);
+      return { y: o.year, m: o.month, d: o.day, h: o.hour % 24, min: o.minute };
+    }
+    function zonedToUtc(dateStr, timeStr, tz) {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      const [hh, mm] = timeStr.split(":").map(Number);
+      const target = Date.UTC(y, m - 1, d, hh, mm);
+      let guess = target;
+      for (let i = 0; i < 3; i++) {
+        const p = tzParts(guess, tz);
+        guess += target - Date.UTC(p.y, p.m - 1, p.d, p.h, p.min);
+      }
+      return guess;
+    }
+    function fmtTz(ms, tz = S.tz) {
+      return new Date(ms).toLocaleString("en-US", { timeZone: tz, weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    }
+    function fmtDate(ms) {
+      return ms ? new Date(ms).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "";
+    }
+    function tzLabel(tz) { const t = TZS.find(([k]) => k === tz); return t ? t[1] : tz; }
+    function slug(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 60) || "artist"; }
+    function artistNames() {
+      const set = new Set();
+      for (const a of Object.values(S.cfg.artists || {})) if (a && a.name) set.add(a.name);
+      for (const s of listShows(S.schedule)) if (s.artist) set.add(s.artist);
+      return [...set].sort((a, b) => a.localeCompare(b));
+    }
+    function datalist(id) {
+      return '<datalist id="' + id + '">' + artistNames().map((n) => '<option value="' + esc(n) + '">').join("") + "</datalist>";
+    }
+
+    /** One entry per fan key with computed balance. */
+    function fans() {
+      const R = S.rewards || {};
+      const parts = ["attendance", "tips", "adjust", "redemptions"];
+      const keys = new Set();
+      for (const p of parts) for (const k of Object.keys(R[p] || {})) keys.add(k);
+      const out = new Map();
+      for (const k of keys) {
+        const data = { schedule: S.schedule };
+        for (const p of parts) data[p] = (R[p] || {})[k] || null;
+        let email = "";
+        for (const p of ["redemptions", "tips", "adjust"]) {
+          for (const v of Object.values(data[p] || {})) if (!email && v && v.email) email = v.email;
+        }
+        out.set(k, { key: k, email: email || k, data, r: computeRewards(data, S.cfg) });
+      }
+      return out;
+    }
+    function allRedemptions() {
+      const list = [];
+      for (const [uk, reqs] of Object.entries((S.rewards || {}).redemptions || {})) {
+        for (const [id, v] of Object.entries(reqs || {})) if (v) list.push({ uk, id, ...v });
+      }
+      return list.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    }
+    function allTips() {
+      const list = [];
+      for (const [uk, tips] of Object.entries((S.rewards || {}).tips || {})) {
+        for (const [id, v] of Object.entries(tips || {})) if (v) list.push({ uk, id, ...v });
+      }
+      return list.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    }
+
+    // ---------- Render ----------
+    const TABS = [["requests", "Requests"], ["shows", "Shows"], ["tips", "Tips"], ["money", "Money"], ["fans", "Fans"], ["settings", "Settings"]];
+    function render() {
+      if (!S.started) return;
+      const pending = allRedemptions().filter((r) => r.status === "pending").length;
+      $("#tabs").innerHTML = TABS.map(([k, label]) =>
+        '<button type="button" data-tab="' + k + '"' + (S.tab === k ? ' class="on"' : "") + ">" + label +
+        (k === "requests" && pending ? '<span class="count">' + pending + "</span>" : "") + "</button>").join("");
+      $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { S.tab = b.dataset.tab; render(); }));
+      const focused = document.activeElement && document.activeElement.id;
+      if (focused && /^f_/.test(focused)) return; // don't wipe a form while typing
+      ({ requests: renderRequests, shows: renderShows, tips: renderTips, money: renderMoney, fans: renderFans, settings: renderSettings })[S.tab]();
+    }
+
+    function renderRequests() {
+      const F = fans();
+      const rows = allRedemptions().filter((r) => S.reqFilter === "all" || r.status === "pending");
+      $("#main").innerHTML =
+        '<div class="card"><div class="seg">' +
+        '<button type="button" class="btn small ' + (S.reqFilter === "pending" ? "" : "ghost") + '" data-filter="pending">Pending</button>' +
+        '<button type="button" class="btn small ' + (S.reqFilter === "all" ? "" : "ghost") + '" data-filter="all">All</button></div>' +
+        (rows.length ? '<div class="table-wrap"><table><thead><tr><th>When</th><th>Fan</th><th>Request</th><th class="num">Points</th><th class="num">Fan balance</th><th>Status</th><th></th></tr></thead><tbody>' +
+          rows.map((q) => {
+            const f = F.get(q.uk);
+            const bal = f ? f.r.balance : 0;
+            const what = esc(REDEEM_LABELS[q.type] || q.type) +
+              (q.type === "giftcard" ? ": <b>" + esc(q.card || "") + " " + esc(q.detail || "") + "</b>" : "") +
+              (q.type === "tip" ? ": <b>" + esc(q.detail || "") + "</b> gets " + ptsToUsd(q.points) : "") +
+              (q.type === "shoutout" ? ': "' + esc(q.detail || "") + '"' : "");
+            const act = q.status === "pending"
+              ? '<div class="row-actions">' +
+                (q.type === "giftcard" ? '<a class="btn small ghost" href="https://www.bitrefill.com/us/en/gift-cards/" target="_blank" rel="noopener">Bitrefill</a>' : "") +
+                '<button type="button" class="btn small good" data-done="' + esc(q.uk) + "|" + esc(q.id) + '">Mark done</button>' +
+                '<button type="button" class="btn small bad" data-reject="' + esc(q.uk) + "|" + esc(q.id) + '">Reject</button></div>'
+              : "";
+            return "<tr><td>" + esc(fmtDate(q.ts)) + "</td><td>" + esc(q.email || q.uk) + "</td><td>" + what + '</td><td class="num">' + fmtPts(q.points) +
+              '</td><td class="num' + (bal < 0 ? " over" : "") + '">' + (bal < 0 ? "Over by " + fmtPts(-bal) : fmtPts(bal)) +
+              '</td><td><span class="pill ' + esc(q.status) + '">' + esc(q.status) + "</span></td><td>" + act + "</td></tr>";
+          }).join("") + "</tbody></table></div>"
+          : '<p class="muted">No ' + (S.reqFilter === "pending" ? "pending " : "") + "requests.</p>") +
+        '<p class="note">Gift cards: buy the card on Bitrefill, email the code to the fan, then Mark done. Tips with points: pay the artist from the rewards pool. "Over" means the fan spent more than they earned, so reject or check first. Rejecting returns the points.</p></div>';
+      $("#main").querySelectorAll("[data-filter]").forEach((b) => b.addEventListener("click", () => { S.reqFilter = b.dataset.filter; render(); }));
+      $("#main").querySelectorAll("[data-done],[data-reject]").forEach((b) => b.addEventListener("click", async () => {
+        const [uk, id] = (b.dataset.done || b.dataset.reject).split("|");
+        const status = b.dataset.done ? "sent" : "rejected";
+        if (status === "rejected" && !confirm("Reject this request and return the points?")) return;
+        b.disabled = true;
+        try { await update(ref(db, "REWARDS/redemptions/" + uk + "/" + id), { status, doneAt: Date.now() }); }
+        catch (e) { alert("Update failed: " + (e && e.code)); b.disabled = false; }
+      }));
+    }
+
+    function renderShows() {
+      const now = Date.now();
+      const shows = listShows(S.schedule);
+      const att = (S.rewards || {}).attendance || {};
+      const attendees = (id) => Object.values(att).filter((m) => m && m[id]).length;
+      const upcoming = shows.filter((s) => s.endsAt >= now);
+      const past = shows.filter((s) => s.endsAt < now).reverse().slice(0, 30);
+      const row = (s) => {
+        const live = s.startsAt <= now && now <= s.endsAt;
+        return "<tr><td>" + esc(fmtTz(s.startsAt)) + "<br><span class=\"muted\">to " + esc(fmtTz(s.endsAt)) + "</span></td><td>" + esc(s.room.replace("Room", "Room ")) +
+          "</td><td>" + esc(s.artist) + "</td><td>" + (live ? '<span class="pill live">Live</span>' : s.startsAt > now ? "Upcoming" : "Ended") +
+          '</td><td class="num">' + attendees(s.id) + "</td><td>" +
+          (s.startsAt > now ? '<button type="button" class="btn small bad" data-del-show="' + esc(s.id) + '">Remove</button>' : "") + "</td></tr>";
+      };
+      const table = (list) => '<div class="table-wrap"><table><thead><tr><th>When (' + esc(tzLabel(S.tz)) + ')</th><th>Room</th><th>Artist</th><th>Status</th><th class="num">Fans counted</th><th></th></tr></thead><tbody>' + list.map(row).join("") + "</tbody></table></div>";
+      const artists = Object.entries(S.cfg.artists || {});
+      $("#main").innerHTML =
+        '<div class="card"><h2>Add a show</h2><p class="note" style="margin:0 0 12px">The room shows LIVE during this window, and fans earn points for watching it. Add every show here.</p><div class="grid">' +
+        '<div><label for="f_room">Room</label><select id="f_room">' + ROOMS.map((r) => "<option value=\"" + r + "\">" + r.replace("Room", "Room ") + "</option>").join("") + "</select></div>" +
+        '<div><label for="f_artist">Artist</label><input id="f_artist" list="dl_artists" maxlength="80" placeholder="Artist name">' + datalist("dl_artists") + "</div>" +
+        '<div><label for="f_date">Date</label><input id="f_date" type="date"></div>' +
+        '<div><label for="f_time">Start time</label><input id="f_time" type="time" value="20:00"></div>' +
+        '<div><label for="f_hours">Length (hours)</label><input id="f_hours" type="number" min="0.5" max="10" step="0.5" value="3"></div>' +
+        '<div><label for="f_tz">Time zone</label><select id="f_tz">' + TZS.map(([k, l]) => '<option value="' + k + '"' + (k === S.tz ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
+        '<div><button type="button" class="btn" id="addShow">Add show</button></div></div></div>' +
+        '<div class="card"><h2>Upcoming</h2>' + (upcoming.length ? table(upcoming) : '<p class="muted">No upcoming shows.</p>') + "</div>" +
+        '<div class="card"><h2>Past</h2>' + (past.length ? table(past) : '<p class="muted">No past shows yet.</p>') + "</div>" +
+        '<div class="card"><h2>Artists in the survey</h2><p class="note" style="margin:0 0 12px">Fans pick from these when asked who they\'re a fan of. Add the artist\'s Asteroid account key (their email with dots as underscores) to show a Follow button.</p>' +
+        (artists.length ? '<div class="table-wrap"><table><thead><tr><th>Name</th><th>Asteroid key</th><th></th></tr></thead><tbody>' +
+          artists.map(([id, a]) => "<tr><td>" + esc(a && a.name) + "</td><td>" + esc((a && a.emailKey) || "") + '</td><td><button type="button" class="btn small bad" data-del-artist="' + esc(id) + '">Remove</button></td></tr>').join("") +
+          "</tbody></table></div>" : '<p class="muted">No artists yet. Artists from scheduled shows are listed automatically.</p>') +
+        '<div class="grid" style="margin-top:12px"><div><label for="f_aname">Name</label><input id="f_aname" maxlength="80"></div>' +
+        '<div><label for="f_akey">Asteroid key (optional)</label><input id="f_akey" maxlength="200" placeholder="luna@gmail_com"></div>' +
+        '<div><button type="button" class="btn" id="addArtist">Add artist</button></div></div></div>';
+
+      $("#f_tz").addEventListener("change", (e) => { S.tz = e.target.value; localStorage.setItem("astAdminTz", S.tz); $("#f_tz").blur(); render(); });
+      $("#addShow").addEventListener("click", async () => {
+        const room = $("#f_room").value, artist = $("#f_artist").value.trim(), date = $("#f_date").value, time = $("#f_time").value;
+        const hours = Number($("#f_hours").value) || 3;
+        if (!artist || !date || !time) { alert("Fill in artist, date and start time."); return; }
+        const startsAt = zonedToUtc(date, time, S.tz);
+        const endsAt = startsAt + Math.round(hours * 3600000);
+        try {
+          await set(push(ref(db, "CONCERT_SCHEDULE")), { room, artist: artist.slice(0, 80), startsAt, endsAt, createdAt: Date.now() });
+          document.activeElement && document.activeElement.blur();
+          render();
+        } catch (e) { alert("Couldn't save: " + (e && e.code)); }
+      });
+      $("#main").querySelectorAll("[data-del-show]").forEach((b) => b.addEventListener("click", async () => {
+        if (!confirm("Remove this show?")) return;
+        await remove(ref(db, "CONCERT_SCHEDULE/" + b.dataset.delShow)).catch((e) => alert(e && e.code));
+      }));
+      $("#addArtist").addEventListener("click", async () => {
+        const name = $("#f_aname").value.trim();
+        const emailKey = $("#f_akey").value.trim().toLowerCase().replace(/[.#$[\]\/]/g, "_");
+        if (!name) return;
+        await set(ref(db, "CONCERT_CONFIG/artists/" + slug(name)), { name: name.slice(0, 80), emailKey }).catch((e) => alert(e && e.code));
+        document.activeElement && document.activeElement.blur();
+        render();
+      });
+      $("#main").querySelectorAll("[data-del-artist]").forEach((b) => b.addEventListener("click", () => {
+        remove(ref(db, "CONCERT_CONFIG/artists/" + b.dataset.delArtist)).catch((e) => alert(e && e.code));
+      }));
+    }
+
+    function renderTips() {
+      const cfg = S.cfg;
+      const tips = allTips().slice(0, 50);
+      $("#main").innerHTML =
+        '<div class="card"><h2>Credit a tip</h2><p class="note" style="margin:0 0 12px">When a fan tips (Donorbox, Stripe), enter it here with the email on their Asteroid account. They get ' + cfg.pointsPerDollar + " points per $1.</p>" +
+        '<div class="grid"><div><label for="f_temail">Fan email</label><input id="f_temail" type="email"></div>' +
+        '<div><label for="f_tartist">Artist</label><input id="f_tartist" list="dl_tip_artists" maxlength="80">' + datalist("dl_tip_artists") + "</div>" +
+        '<div><label for="f_tamt">Amount (USD)</label><input id="f_tamt" type="number" min="1" step="0.01"></div>' +
+        '<div><label for="f_tnote">Note</label><input id="f_tnote" maxlength="120" placeholder="Optional"></div>' +
+        '<div><button type="button" class="btn" id="addTip">Credit tip</button></div></div><p class="split" id="tipSplit"></p></div>' +
+        '<div class="card"><h2>Adjust points</h2><div class="grid">' +
+        '<div><label for="f_aemail">Fan email</label><input id="f_aemail" type="email"></div>' +
+        '<div><label for="f_apts">Points (+ or minus)</label><input id="f_apts" type="number" step="1"></div>' +
+        '<div><label for="f_areason">Reason</label><input id="f_areason" maxlength="120"></div>' +
+        '<div><button type="button" class="btn" id="addAdj">Save</button></div></div></div>' +
+        '<div class="card"><h2>Recent tips</h2>' + (tips.length ? '<div class="table-wrap"><table><thead><tr><th>When</th><th>Fan</th><th>Artist</th><th class="num">Amount</th><th class="num">Artist ' + cfg.artistSharePct + '%</th><th class="num">Fan pts</th><th></th></tr></thead><tbody>' +
+          tips.map((t) => "<tr><td>" + esc(fmtDate(t.ts)) + "</td><td>" + esc(t.email || t.uk) + "</td><td>" + esc(t.artist) + '</td><td class="num">' + centsToUsd(t.amountCents) +
+            '</td><td class="num">' + centsToUsd(splitCents(t.amountCents, cfg).artist) + '</td><td class="num">' + fmtPts(tipPoints(t.amountCents, cfg)) +
+            '</td><td><button type="button" class="btn small bad" data-del-tip="' + esc(t.uk) + "|" + esc(t.id) + '">Delete</button></td></tr>').join("") +
+          "</tbody></table></div>" : '<p class="muted">No tips credited yet.</p>') + "</div>";
+
+      const showSplit = () => {
+        const cents = Math.round((Number($("#f_tamt").value) || 0) * 100);
+        const sp = splitCents(cents, cfg);
+        $("#tipSplit").textContent = cents > 0
+          ? "Artist " + centsToUsd(sp.artist) + " · Fan rewards " + centsToUsd(sp.rewards) + " · Asteroid " + centsToUsd(sp.asteroid) + " · Fan earns " + fmtPts(tipPoints(cents, cfg)) + " pts"
+          : "";
+      };
+      $("#f_tamt").addEventListener("input", showSplit);
+      $("#addTip").addEventListener("click", async () => {
+        const email = $("#f_temail").value.trim().toLowerCase();
+        const artist = $("#f_tartist").value.trim();
+        const cents = Math.round((Number($("#f_tamt").value) || 0) * 100);
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !artist || cents <= 0) { alert("Fill in fan email, artist and amount."); return; }
+        try {
+          await push(ref(db, "REWARDS/tips/" + rewardsKey(email)), { amountCents: cents, artist: artist.slice(0, 80), email, note: $("#f_tnote").value.trim().slice(0, 120), ts: Date.now() });
+          document.activeElement && document.activeElement.blur();
+          render();
+        } catch (e) { alert("Couldn't save: " + (e && e.code)); }
+      });
+      $("#addAdj").addEventListener("click", async () => {
+        const email = $("#f_aemail").value.trim().toLowerCase();
+        const points = Math.round(Number($("#f_apts").value) || 0);
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !points) { alert("Fill in fan email and points."); return; }
+        try {
+          await push(ref(db, "REWARDS/adjust/" + rewardsKey(email)), { points, reason: $("#f_areason").value.trim().slice(0, 120), email, ts: Date.now() });
+          document.activeElement && document.activeElement.blur();
+          render();
+        } catch (e) { alert("Couldn't save: " + (e && e.code)); }
+      });
+      $("#main").querySelectorAll("[data-del-tip]").forEach((b) => b.addEventListener("click", async () => {
+        if (!confirm("Delete this tip? The fan loses its points.")) return;
+        const [uk, id] = b.dataset.delTip.split("|");
+        await remove(ref(db, "REWARDS/tips/" + uk + "/" + id)).catch((e) => alert(e && e.code));
+      }));
+    }
+
+    function renderMoney() {
+      const cfg = S.cfg;
+      const by = new Map();
+      const get = (name) => {
+        const k = String(name || "Unknown").trim() || "Unknown";
+        if (!by.has(k)) by.set(k, { name: k, gross: 0, share: 0, ptsSent: 0, ptsPending: 0 });
+        return by.get(k);
+      };
+      let gross = 0, poolIn = 0, asteroid = 0;
+      for (const t of allTips()) {
+        const sp = splitCents(t.amountCents, cfg);
+        const a = get(t.artist);
+        a.gross += Number(t.amountCents) || 0;
+        a.share += sp.artist;
+        gross += Number(t.amountCents) || 0;
+        poolIn += sp.rewards;
+        asteroid += sp.asteroid;
+      }
+      let poolOut = 0, cardsSent = 0;
+      for (const q of allRedemptions()) {
+        const cents = Math.round(((Number(q.points) || 0) / POINTS_PER_USD) * 100);
+        if (q.type === "tip") {
+          const a = get(q.detail);
+          if (q.status === "sent") { a.ptsSent += cents; poolOut += cents; }
+          if (q.status === "pending") a.ptsPending += cents;
+        }
+        if (q.type === "giftcard" && q.status === "sent") { poolOut += cents; cardsSent += cents; }
+      }
+      let liability = 0;
+      for (const f of fans().values()) liability += Math.max(0, f.r.balance);
+      const rows = [...by.values()].sort((a, b) => (b.share + b.ptsSent) - (a.share + a.ptsSent));
+      $("#main").innerHTML =
+        '<div class="stats">' +
+        '<div class="stat"><b>' + centsToUsd(gross) + "</b><span>Cash tips credited</span></div>" +
+        '<div class="stat"><b>' + centsToUsd(gross - poolIn - asteroid) + "</b><span>Artists' " + cfg.artistSharePct + "%</span></div>" +
+        '<div class="stat"><b>' + centsToUsd(asteroid) + "</b><span>Asteroid " + cfg.asteroidSharePct + "%</span></div>" +
+        '<div class="stat"><b>' + centsToUsd(poolIn) + "</b><span>Rewards pool in (" + cfg.rewardsSharePct + "%)</span></div>" +
+        '<div class="stat"><b>' + centsToUsd(poolOut) + "</b><span>Rewards paid out</span></div>" +
+        '<div class="stat"><b class="' + (poolIn - poolOut < 0 ? "over" : "") + '">' + centsToUsd(poolIn - poolOut) + "</b><span>Pool left</span></div>" +
+        '<div class="stat"><b>' + ptsToUsd(liability) + "</b><span>Unspent fan points</span></div></div>" +
+        '<div class="card"><h2>Artist earnings</h2>' + (rows.length ? '<div class="table-wrap"><table><thead><tr><th>Artist</th><th class="num">Tips</th><th class="num">Their ' + cfg.artistSharePct + '%</th><th class="num">Point tips paid</th><th class="num">Point tips pending</th><th class="num">Total</th></tr></thead><tbody>' +
+          rows.map((a) => "<tr><td>" + esc(a.name) + '</td><td class="num">' + centsToUsd(a.gross) + '</td><td class="num">' + centsToUsd(a.share) + '</td><td class="num">' + centsToUsd(a.ptsSent) +
+            '</td><td class="num">' + centsToUsd(a.ptsPending) + '</td><td class="num"><b>' + centsToUsd(a.share + a.ptsSent) + "</b></td></tr>").join("") +
+          "</tbody></table></div>" : '<p class="muted">No tips yet.</p>') +
+        '<p class="note">Gift cards sent: ' + centsToUsd(cardsSent) + '. If "Pool left" goes negative, watch and streak points are costing more than the ' + cfg.rewardsSharePct + "% rewards share. Lower them in Settings or top up the pool.</p></div>";
+    }
+
+    function renderFans() {
+      const rows = Object.entries(S.survey || {}).map(([k, v]) => ({ k, ...(v || {}) })).sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      const fansN = rows.filter((r) => r.role === "fan").length;
+      const artistsN = rows.filter((r) => r.role === "artist").length;
+      const counts = new Map();
+      for (const r of rows) for (const n of (Array.isArray(r.fanOf) ? r.fanOf : Object.values(r.fanOf || {}))) counts.set(n, (counts.get(n) || 0) + 1);
+      const top = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
+      const who = (r) => r.email || r.emailKey || "Guest";
+      $("#main").innerHTML =
+        '<div class="stats"><div class="stat"><b>' + rows.length + '</b><span>Answers</span></div><div class="stat"><b>' + fansN + '</b><span>Fans</span></div><div class="stat"><b>' + artistsN + "</b><span>Artists</span></div></div>" +
+        '<div class="card"><h2>Fans of</h2>' + (top.length ? top.map(([n, c]) => "<div>" + esc(n) + ' <span class="muted">' + c + "</span></div>").join("") : '<p class="muted">No answers yet.</p>') + "</div>" +
+        '<div class="card"><div class="top" style="margin-bottom:8px"><h2 style="margin:0">Survey answers</h2><button type="button" class="btn small ghost" id="csv">Download CSV</button></div>' +
+        (rows.length ? '<div class="table-wrap"><table><thead><tr><th>When</th><th>Role</th><th>Fan of</th><th>Other</th><th>Who</th><th>Room</th></tr></thead><tbody>' +
+          rows.slice(0, 300).map((r) => "<tr><td>" + esc(fmtDate(r.ts)) + "</td><td>" + esc(r.role) + "</td><td>" + esc((Array.isArray(r.fanOf) ? r.fanOf : Object.values(r.fanOf || {})).join(", ")) +
+            "</td><td>" + esc(r.other || "") + "</td><td>" + esc(who(r)) + "</td><td>" + esc(r.room || "") + "</td></tr>").join("") +
+          "</tbody></table></div>" : "") + "</div>";
+      $("#csv").addEventListener("click", () => {
+        const q = (s) => '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"';
+        const lines = [["date", "role", "fan_of", "other", "email", "room"].join(",")].concat(rows.map((r) =>
+          [new Date(r.ts || 0).toISOString(), r.role, (Array.isArray(r.fanOf) ? r.fanOf : Object.values(r.fanOf || {})).join("; "), r.other, who(r), r.room].map(q).join(",")));
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" }));
+        a.download = "asteroid-concert-survey.csv";
+        a.click();
+      });
+    }
+
+    function renderSettings() {
+      const c = S.cfg;
+      const field = (id, label, val, step = "1") => '<div><label for="f_' + id + '">' + label + '</label><input id="f_' + id + '" type="number" min="0" step="' + step + '" value="' + val + '"></div>';
+      $("#main").innerHTML =
+        '<div class="card"><h2>Points</h2><div class="grid">' +
+        field("pointsPerDollar", "Points per $1 tipped", c.pointsPerDollar) +
+        field("pointsPerShow", "Points per show watched", c.pointsPerShow) +
+        field("attendMinutes", "Minutes to count a show", c.attendMinutes) +
+        field("streakDays", "Show days for a streak", c.streakDays) +
+        field("streakBonusPoints", "Streak bonus points", c.streakBonusPoints) +
+        field("minGiftCardUsd", "Smallest gift card ($)", c.minGiftCardUsd) +
+        "</div><p class=\"note\">" + POINTS_PER_USD + " points = $1. At " + c.pointsPerDollar + " points per $1 tipped, tip points cost exactly " + c.pointsPerDollar + "% of tips.</p></div>" +
+        '<div class="card"><h2>Costs</h2><div class="grid">' +
+        field("cost_shoutout", "Shoutout", c.costs.shoutout) + field("cost_badge", "Supporter badge", c.costs.badge) +
+        field("cost_early", "Early access", c.costs.early) + field("cost_minTip", "Smallest points tip", c.costs.minTip) + "</div></div>" +
+        '<div class="card"><h2>Split and display</h2><div class="grid">' +
+        field("artistSharePct", "Artist %", c.artistSharePct) + field("rewardsSharePct", "Fan rewards %", c.rewardsSharePct) +
+        field("asteroidSharePct", "Asteroid %", c.asteroidSharePct) + field("viewerCountThreshold", "Show viewer count from", c.viewerCountThreshold) +
+        '<div><label for="f_instagram">Asteroid Instagram</label><input id="f_instagram" value="' + esc(c.instagram) + '"></div></div>' +
+        '<p class="note">These numbers appear in the fan slides and the points panel, so fans always see the real split.</p></div>' +
+        '<button type="button" class="btn" id="saveCfg">Save settings</button> <span class="muted" id="cfgMsg"></span>';
+      $("#saveCfg").addEventListener("click", async () => {
+        const num = (id) => Math.max(0, Number($("#f_" + id).value) || 0);
+        const a = num("artistSharePct"), r = num("rewardsSharePct"), s = num("asteroidSharePct");
+        if (a + r + s !== 100) { alert("Artist + rewards + Asteroid must add up to 100."); return; }
+        const patch = {
+          pointsPerDollar: num("pointsPerDollar"), pointsPerShow: num("pointsPerShow"), attendMinutes: num("attendMinutes"),
+          streakDays: Math.max(1, num("streakDays")), streakBonusPoints: num("streakBonusPoints"), minGiftCardUsd: Math.max(1, num("minGiftCardUsd")),
+          artistSharePct: a, rewardsSharePct: r, asteroidSharePct: s, viewerCountThreshold: num("viewerCountThreshold"),
+          costs: { shoutout: num("cost_shoutout"), badge: num("cost_badge"), early: num("cost_early"), minTip: Math.max(1, num("cost_minTip")) },
+          instagram: $("#f_instagram").value.trim(),
+        };
+        try { await update(ref(db, "CONCERT_CONFIG"), patch); $("#cfgMsg").textContent = "Saved."; document.activeElement && document.activeElement.blur(); }
+        catch (e) { alert("Couldn't save: " + (e && e.code)); }
+      });
+    }
+  </script>
+</body>
+</html>
