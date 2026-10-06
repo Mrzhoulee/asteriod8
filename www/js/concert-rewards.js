@@ -60,6 +60,10 @@ const CSS = `
 .crx-slide-icon{font-size:52px !important;color:#ff7f50;margin-bottom:10px}
 .crx-slide p{font-size:15px;line-height:1.55;color:rgba(255,255,255,.75);margin:0 0 8px}
 .crx-slide p.small{font-size:12.5px;color:rgba(255,255,255,.5)}
+.crx-logo{width:64px;height:64px;border-radius:16px;object-fit:cover;display:block;margin:0 auto 12px;box-shadow:0 8px 24px rgba(255,127,80,.25)}
+.crx-checks{list-style:none;padding:0;margin:12px auto 4px;display:inline-flex;flex-direction:column;gap:8px;text-align:left}
+.crx-checks li{display:flex;align-items:center;gap:8px;font-size:14px;color:#fff;font-weight:600}
+.crx-checks .material-symbols-outlined{font-size:20px;color:#ff7f50}
 .crx-dots{display:flex;justify-content:center;gap:6px;margin:14px 0 4px}
 .crx-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2)}
 .crx-dots i.on{background:#ff7f50;width:20px;border-radius:4px}
@@ -382,12 +386,16 @@ export function mountConcertRewards(roomNum) {
     const fee = c.rewardsSharePct + c.asteroidSharePct;
     if (role === "artist") {
       return [
+        { logo: true, t: "Welcome to Asteroid", p: ["Upload music, go live, get heard. A music platform built for artists and the fans who back them."],
+          list: ["No pay to play", "No algorithm deciding who hears you", "Fans support you directly"] },
         { i: "mic", t: "Go live, get paid", p: ["Fans tip you during your show. You keep " + c.artistSharePct + "% of every tip after card fees."] },
         { i: "redeem", t: "Your fans get rewarded", p: ["Every tip and every show earns your fans points, so they keep coming back to watch you."] },
-        { i: "group_add", t: "No algorithm, no ads", p: ["Nobody decides who sees you. Ask fans to follow you here so they hear about your next show."] },
+        { i: "group_add", t: "Bring them back", p: ["Ask fans to follow you here so they hear about your next show."] },
       ];
     }
     return [
+      { logo: true, t: "Welcome to Asteroid", p: ["Music built around fans and artists, not ads. Find new artists, watch them live and talk to them."],
+        list: ["No ads interrupting the music", "No algorithm deciding what you hear", "Your support goes to the artist"] },
       { i: "volunteer_activism", t: "Your tips go to the artist", p: [
         "Artists keep " + c.artistSharePct + "% of every tip after card fees.",
         "Asteroid's " + fee + "% fee splits in two: " + c.rewardsSharePct + "% pays for fan rewards, " + c.asteroidSharePct + "% keeps Asteroid running."] },
@@ -417,8 +425,10 @@ export function mountConcertRewards(roomNum) {
           '<a class="crx-btn ghost" href="' + esc(state.cfg.instagram) + '" target="_blank" rel="noopener">' + icon("photo_camera") + "Follow Asteroid on Instagram</a></div>";
       }
       body.innerHTML =
-        '<div class="crx-slide">' + icon(s.i).replace("material-symbols-outlined", "material-symbols-outlined crx-slide-icon") +
+        '<div class="crx-slide">' +
+        (s.logo ? '<img class="crx-logo" src="astei.jpg" alt="Asteroid">' : icon(s.i).replace("material-symbols-outlined", "material-symbols-outlined crx-slide-icon")) +
         "<h2>" + esc(s.t) + "</h2>" + s.p.map((x) => "<p>" + esc(x) + "</p>").join("") +
+        (s.list ? '<ul class="crx-checks">' + s.list.map((x) => "<li>" + icon("check_circle") + esc(x) + "</li>").join("") + "</ul>" : "") +
         (s.small ? '<p class="small">' + esc(s.small) + "</p>" : "") + "</div>" + follow +
         '<div class="crx-dots">' + slides.map((_, k) => "<i" + (k === i ? ' class="on"' : "") + "></i>").join("") + "</div>" +
         '<div class="crx-row">' + (last ? "" : '<button type="button" class="crx-link" data-skip>Skip</button>') +

@@ -56,7 +56,7 @@ export const DEFAULT_CONFIG = {
   rewardsSharePct: 10,
   asteroidSharePct: 10,
   costs: { shoutout: 100, badge: 300, early: 200, minTip: 100 },
-  instagram: "https://instagram.com/asteroid8net",
+  instagram: "https://instagram.com/asteroidincofficial",
   artists: {},              // id -> {name, emailKey}
 };
 
