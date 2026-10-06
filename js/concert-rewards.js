@@ -384,17 +384,21 @@ export function mountConcertRewards(roomNum) {
   function slidesFor(role) {
     const c = state.cfg;
     const fee = c.rewardsSharePct + c.asteroidSharePct;
+    const ig = "@" + String(c.instagram || "").replace(/[?#].*$/, "").replace(/\/+$/, "").split("/").pop();
     if (role === "artist") {
       return [
         { logo: true, t: "Welcome to Asteroid", p: ["Upload music, go live, get heard. A music platform built for artists and the fans who back them."],
           list: ["No pay to play", "No algorithm deciding who hears you", "Fans support you directly"] },
+        { i: "campaign", t: "Get spotlighted", p: ["Play a show here and Asteroid promotes you."],
+          list: ["Spotlight on " + ig, "Your song in Featured Songs on Asteroid", "Promo posts before your show"] },
         { i: "mic", t: "Go live, get paid", p: ["Fans tip you during your show. You keep " + c.artistSharePct + "% of every tip after card fees."] },
-        { i: "redeem", t: "Your fans get rewarded", p: ["Every tip and every show earns your fans points, so they keep coming back to watch you."] },
-        { i: "group_add", t: "Bring them back", p: ["Ask fans to follow you here so they hear about your next show."] },
+        { i: "group_add", t: "Fans come back for you", p: [
+          "Every tip and every show earns your fans points, so they keep coming back.",
+          "Ask them to follow you here so they hear about your next show."] },
       ];
     }
     return [
-      { logo: true, t: "Welcome to Asteroid", p: ["Music built around fans and artists, not ads. Find new artists, watch them live and talk to them."],
+      { logo: true, t: "Welcome to Asteroid", p: ["Music built around fans and artists, not ads. We spotlight new artists, feature their songs and bring them here live."],
         list: ["No ads interrupting the music", "No algorithm deciding what you hear", "Your support goes to the artist"] },
       { i: "volunteer_activism", t: "Your tips go to the artist", p: [
         "Artists keep " + c.artistSharePct + "% of every tip after card fees.",
