@@ -57,6 +57,7 @@ export const DEFAULT_CONFIG = {
   asteroidSharePct: 10,
   costs: { shoutout: 100, badge: 300, early: 200, minTip: 100 },
   instagram: "https://instagram.com/asteroidincofficial",
+  tipLink: "",              // Stripe Payment Link ("customers choose what to pay")
   artists: {},              // id -> {name, emailKey}
 };
 
@@ -81,6 +82,7 @@ export function readConfig(raw) {
   cfg.costs = costs;
   cfg.instagram = typeof src.instagram === "string" && /^https:\/\//.test(src.instagram) ? src.instagram : DEFAULT_CONFIG.instagram;
   cfg.artists = src.artists && typeof src.artists === "object" ? src.artists : {};
+  cfg.tipLink = typeof src.tipLink === "string" && /^https:\/\/[^\s"'<>]+$/.test(src.tipLink.trim()) ? src.tipLink.trim() : "";
   return cfg;
 }
 
@@ -132,6 +134,11 @@ export function fmtPts(n) {
 
 export function ptsToUsd(pts) {
   return "$" + ((Number(pts) || 0) / POINTS_PER_USD).toFixed(2);
+}
+
+/** Lowercase letters, digits and underscores (safe for Stripe client_reference_id). */
+export function refSlug(s) {
+  return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 60);
 }
 
 /** "$5" for whole dollars, "$5.50" otherwise. */

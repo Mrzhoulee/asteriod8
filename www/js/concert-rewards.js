@@ -13,7 +13,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import {
   firebaseApp, firebaseDb, readConfig, rewardsKey, anonId, appEmailKey, esc, fmtPts, ptsToUsd,
-  listShows, roomStatus, computeRewards, fmtWhen, GIFT_CARDS, REDEEM_LABELS, POINTS_PER_USD, ptsToUsdShort,
+  listShows, roomStatus, computeRewards, fmtWhen, GIFT_CARDS, REDEEM_LABELS, POINTS_PER_USD, ptsToUsdShort, refSlug,
 } from "./concert-rewards-core.js";
 
 const SURVEY_KEY = "astConcertSurvey_v1";
@@ -36,6 +36,8 @@ const CSS = `
 .crx-flames i.on{background:#ff7f50}
 .crx-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;padding:12px 16px;border:none;border-radius:12px;background:#ff7f50;color:#fff;font:700 14px Montserrat,system-ui,sans-serif;cursor:pointer;text-decoration:none;margin-top:8px}
 .crx-btn:disabled{opacity:.45;cursor:not-allowed}
+.crx-btn.tip{background:linear-gradient(90deg,#ff3b3b,#ff7a3b)}
+body.crx-has-tip #donationBox{display:none !important}
 .crx-btn.ghost{background:transparent;border:1px solid rgba(255,127,80,.5);color:#ff9a73}
 .crx-btn.done{background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.5);color:#86efac}
 .crx-link{background:none;border:none;color:#ff9a73;font:600 12px Montserrat,system-ui,sans-serif;cursor:pointer;padding:4px 0}
@@ -169,6 +171,7 @@ export function mountConcertRewards(roomNum) {
     const t = e.target.closest("[data-act]");
     if (!t) return;
     if (t.dataset.act === "spend") openSpend();
+    if (t.dataset.act === "tip") openTip();
     if (t.dataset.act === "how") {
       const s = readSurvey();
       openSlides((s && s.role) || "fan", (s && s.fanOf) || []);
@@ -217,10 +220,16 @@ export function mountConcertRewards(roomNum) {
     const fine = '<p class="crx-fine">Tip with the email on your Asteroid account to earn ' + cfg.pointsPerDollar +
       " pts per $1. Artists keep " + cfg.artistSharePct + "% of tips after card fees. Asteroid's " + fee + "%: " +
       cfg.rewardsSharePct + "% funds fan rewards, " + cfg.asteroidSharePct + "% runs Asteroid.</p>";
+    document.body.classList.toggle("crx-has-tip", !!cfg.tipLink);
+    const st = status();
+    const tipArtist = st.current && st.current.artist ? st.current.artist : "the artist";
+    const tipBtn = cfg.tipLink && st.live
+      ? '<button class="crx-btn tip" data-act="tip">' + icon("favorite") + "Tip " + esc(tipArtist) + "</button>"
+      : "";
     if (!state.user) {
       panel.innerHTML = '<h3><span>Earn points</span><button class="crx-link" data-act="how">How it works</button></h3>' +
         '<p class="cr-hint">Log in to earn points for watching and tipping. Spend them on gift cards, shoutouts and more.</p>' +
-        '<a class="crx-btn" href="login.html">Log in</a>' + fine;
+        tipBtn + '<a class="crx-btn' + (tipBtn ? " ghost" : "") + '" href="login.html">Log in</a>' + fine;
       return;
     }
     const r = rewards();
@@ -233,7 +242,40 @@ export function mountConcertRewards(roomNum) {
       '<div class="crx-line">' + icon("local_fire_department") + '<span class="crx-flames">' + flames + "</span><span>Streak " +
       r.streakProgress + " of " + cfg.streakDays + " show days for +" + fmtPts(cfg.streakBonusPoints) + " pts</span></div>" +
       (att ? '<div class="crx-line">' + att + "</div>" : "") +
-      '<button class="crx-btn" data-act="spend">' + icon("redeem") + "Spend points</button>" + fine;
+      tipBtn + '<button class="crx-btn' + (tipBtn ? " ghost" : "") + '" data-act="spend">' + icon("redeem") + "Spend points</button>" + fine;
+  }
+
+  // ---- Tips: Stripe Payment Link ("customers choose what to pay") ----------------
+  function browserPlugin() {
+    try {
+      const C = window.Capacitor;
+      const P = C && C.Plugins && C.Plugins.Browser;
+      if (P && typeof P.open === "function") return P;
+      if (C && typeof C.nativePromise === "function" && typeof C.getPlatform === "function" && C.getPlatform() === "ios") {
+        return { open: (opts) => C.nativePromise("Browser", "open", opts || {}) };
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function tipUrl() {
+    const st = status();
+    const show = st.current;
+    const parts = [refSlug(show && show.artist ? show.artist : room), show ? show.id : refSlug(room), state.key ? "fan" : "guest"];
+    let url;
+    try { url = new URL(state.cfg.tipLink); } catch (e) { return ""; }
+    url.searchParams.set("client_reference_id", parts.map((x) => String(x).replace(/[^A-Za-z0-9_-]/g, "")).join("__").slice(0, 200));
+    if (state.user && state.user.email) url.searchParams.set("prefilled_email", state.user.email);
+    return url.toString();
+  }
+
+  function openTip() {
+    const url = tipUrl();
+    if (!url) return;
+    const B = browserPlugin();
+    if (B) { B.open({ url, presentationStyle: "fullscreen" }); return; }
+    const w = window.open(url, "_blank");
+    if (w) { try { w.opener = null; } catch (e) {} } else { location.href = url; }
   }
 
   // ---- Attendance: watch a scheduled show for N minutes ---------------------------

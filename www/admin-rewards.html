@@ -329,7 +329,7 @@
       const cfg = S.cfg;
       const tips = allTips().slice(0, 50);
       $("#main").innerHTML =
-        '<div class="card"><h2>Credit a tip</h2><p class="note" style="margin:0 0 12px">When a fan tips (Donorbox, Stripe), enter it here with the email on their Asteroid account. They get ' + cfg.pointsPerDollar + " points per $1.</p>" +
+        '<div class="card"><h2>Credit a tip</h2><p class="note" style="margin:0 0 12px">When a tip comes in on Stripe (Payments), enter it here with the fan\'s email. The client reference shows the artist and show. They get ' + cfg.pointsPerDollar + " points per $1.</p>" +
         '<div class="grid"><div><label for="f_temail">Fan email</label><input id="f_temail" type="email"></div>' +
         '<div><label for="f_tartist">Artist</label><input id="f_tartist" list="dl_tip_artists" maxlength="80">' + datalist("dl_tip_artists") + "</div>" +
         '<div><label for="f_tamt">Amount (USD)</label><input id="f_tamt" type="number" min="1" step="0.01"></div>' +
@@ -476,6 +476,10 @@
         field("asteroidSharePct", "Asteroid %", c.asteroidSharePct) + field("viewerCountThreshold", "Show viewer count from", c.viewerCountThreshold) +
         '<div><label for="f_instagram">Asteroid Instagram</label><input id="f_instagram" value="' + esc(c.instagram) + '"></div></div>' +
         '<p class="note">These numbers appear in the fan slides and the points panel, so fans always see the real split.</p></div>' +
+        '<div class="card"><h2>Tips</h2><div class="grid" style="grid-template-columns:1fr"><div><label for="f_tipLink">Stripe tip link</label>' +
+        '<input id="f_tipLink" placeholder="https://buy.stripe.com/..." value="' + esc(c.tipLink) + '"></div></div>' +
+        '<p class="note">Stripe Dashboard: Payment Links, New, "Customers choose what to pay", product name "Tip for the artist". Paste the link here. ' +
+        'Rooms then show a Tip button during live shows, with the fan\'s email filled in. Each payment\'s client reference shows the artist and show.</p></div>' +
         '<button type="button" class="btn" id="saveCfg">Save settings</button> <span class="muted" id="cfgMsg"></span>';
       $("#saveCfg").addEventListener("click", async () => {
         const num = (id) => Math.max(0, Number($("#f_" + id).value) || 0);
@@ -487,7 +491,9 @@
           artistSharePct: a, rewardsSharePct: r, asteroidSharePct: s, viewerCountThreshold: num("viewerCountThreshold"),
           costs: { shoutout: num("cost_shoutout"), badge: num("cost_badge"), early: num("cost_early"), minTip: Math.max(1, num("cost_minTip")) },
           instagram: $("#f_instagram").value.trim(),
+          tipLink: $("#f_tipLink").value.trim(),
         };
+        if (patch.tipLink && !/^https:\/\/\S+$/.test(patch.tipLink)) { alert("Tip link must start with https://"); return; }
         try { await update(ref(db, "CONCERT_CONFIG"), patch); $("#cfgMsg").textContent = "Saved."; document.activeElement && document.activeElement.blur(); }
         catch (e) { alert("Couldn't save: " + (e && e.code)); }
       });
