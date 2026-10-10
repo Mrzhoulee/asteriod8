@@ -224,7 +224,7 @@ export function mountConcertRewards(roomNum) {
     shoutPanel.hidden = !list.length;
     if (!list.length) return;
     shoutPanel.innerHTML = "<h3>Shoutouts and requests</h3>" + list.map((x) =>
-      '<div class="crx-sh"><b>' + esc(x.name || "A fan") + "</b><span>" + esc((x.perk || "") + forArtist(x)) + "</span>" +
+      '<div class="crx-sh"><b>' + esc(censor(String(x.name || "A fan"))) + "</b><span>" + esc((x.perk || "") + forArtist(x)) + "</span>" +
       (x.message ? "<p>" + esc(censor(String(x.message))) + "</p>" : "") + "</div>").join("");
   }
 
@@ -233,7 +233,7 @@ export function mountConcertRewards(roomNum) {
     if (!x) { bannerBusy = false; return; }
     bannerBusy = true;
     const b = el("div", "crx-shout",
-      "<b>" + icon("celebration") + esc(x.name || "A fan") + " · " + esc((x.perk || "Support") + forArtist(x)) + "</b>" +
+      "<b>" + icon("celebration") + esc(censor(String(x.name || "A fan"))) + " · " + esc((x.perk || "Support") + forArtist(x)) + "</b>" +
       "<p>" + (x.message ? esc(censor(String(x.message))) : "Thank you for supporting " + esc(x.artist || "the artist") + "!") + "</p>");
     b.setAttribute("role", "status");
     document.body.appendChild(b);
@@ -417,9 +417,13 @@ export function mountConcertRewards(roomNum) {
       cfg.rewardsSharePct + "% funds fan rewards, " + cfg.asteroidSharePct + "% runs Asteroid. Direct tips go 100% to the artist.</p>";
     const tipBtn = supportHtml();
     if (!state.user) {
-      setHtml(panel, '<h3><span>Earn points</span><button class="crx-link" data-act="how">How it works</button></h3>' +
-        '<p class="cr-hint">Log in to earn points for watching and tipping. Spend them on gift cards, shoutouts and more.</p>' +
-        '<a class="crx-btn" href="login.html">Log in</a>' + tipBtn + fine);
+      // The app can remember you while the points login has ended (for example after signing out elsewhere)
+      const remembered = !!appEmailKey();
+      setHtml(panel, '<h3><span>' + (remembered ? "Your points" : "Earn points") + '</span><button class="crx-link" data-act="how">How it works</button></h3>' +
+        '<p class="cr-hint">' + (remembered
+          ? "Your points are safe. Sign in again to see them and keep earning."
+          : "Log in to earn points for watching and tipping. Spend them on gift cards, shoutouts and more.") + "</p>" +
+        '<a class="crx-btn" href="login.html">' + (remembered ? "Sign in again" : "Log in") + "</a>" + tipBtn + fine);
       return;
     }
     const r = rewards();
@@ -775,7 +779,7 @@ export function mountConcertRewards(roomNum) {
         (spendForm.artist ? "Send " + fmtPts(spendForm.tipPts) + " pts (" + ptsToUsd(spendForm.tipPts) + ") to " + esc(spendForm.artist) : "Choose an artist first") + "</button>" +
         '<p class="crx-fine">Asteroid pays the artist the full dollar value from the fan rewards pool.</p>';
     } else if (spendTab === "shoutout") {
-      form = '<p class="crx-sub">Send a message for the artist to read out during a show.</p>' + artistSelectHtml() +
+      form = '<p class="crx-sub">Your message pops up on screen during the show once it\'s approved, for the artist to read out.</p>' + artistSelectHtml() +
         '<label class="crx-label" for="crxMsg">Message</label><input class="crx-input" id="crxMsg" maxlength="140" placeholder="Your shoutout" value="' + esc(spendForm.message) + '">' +
         '<button type="button" class="crx-btn" data-submit' + (spendForm.artist ? "" : " disabled") + ">" +
         (spendForm.artist ? "Request shoutout · " + fmtPts(cfg.costs.shoutout) + " pts" : "Choose an artist first") + "</button>";
@@ -814,10 +818,18 @@ export function mountConcertRewards(roomNum) {
     if (submit) submit.addEventListener("click", () => submitSpend(submit));
   }
 
+  /** First name shown with a points shoutout on screen. */
+  function fanFirstName() {
+    let n = (state.user && state.user.displayName) || "";
+    try { n = n || localStorage.getItem("fullName") || localStorage.getItem("profileNickname") || ""; } catch (e) {}
+    n = String(n).trim().split(/\s+/)[0] || "";
+    return n.includes("@") ? "" : n.slice(0, 30);
+  }
+
   async function submitSpend(btn) {
     const cfg = state.cfg;
     const bal = rewards().balance;
-    const req = { type: spendTab, ts: Date.now(), status: "pending", email: state.user.email };
+    const req = { type: spendTab, ts: Date.now(), status: "pending", email: state.user.email, room };
     let done = "Request sent.";
     if (spendTab === "giftcard") {
       const email = (spendBody.querySelector("#crxEmail") || {}).value || state.user.email;
@@ -842,6 +854,8 @@ export function mountConcertRewards(roomNum) {
       req.points = cfg.costs.shoutout;
       req.detail = m;
       req.artist = artist;
+      req.name = fanFirstName() || "A fan";
+      done = "Sent. It pops up on screen once it's approved.";
     } else if (spendTab === "badge") {
       req.points = cfg.costs.badge;
     } else {

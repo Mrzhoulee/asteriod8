@@ -86,16 +86,20 @@
   </div>
 
   <script type="module">
-    import { ref, onValue, set, push, update, remove } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, push, update, remove } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
     import { initializeAuth, getAuth, browserLocalPersistence, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
     import {
-      firebaseApp, firebaseDb, readConfig, rewardsKey, computeRewards, listShows, splitCents, tipPoints,
+      FIREBASE_CONFIG, readConfig, rewardsKey, computeRewards, listShows, splitCents, tipPoints,
       centsToUsd, ptsToUsd, fmtPts, esc, ADMIN_EMAIL, POINTS_PER_USD, REDEEM_LABELS, ROOMS, GIFT_CARDS,
       cleanArtistList, artistsLabel, safeTipLink, MAX_SHOW_ARTISTS,
     } from "./js/concert-rewards-core.js";
 
-    const app = firebaseApp();
-    const db = firebaseDb();
+    // The admin signs in on its own Firebase app instance, so signing in or out
+    // here never switches or signs out the fan account the site and app use.
+    const ADMIN_APP = "asteroid-admin";
+    const app = getApps().find((a) => a.name === ADMIN_APP) || initializeApp(FIREBASE_CONFIG, ADMIN_APP);
+    const db = getDatabase(app);
     let auth;
     try { auth = initializeAuth(app, { persistence: browserLocalPersistence }); } catch (e) { auth = getAuth(app); }
 
@@ -229,6 +233,17 @@
       }
       return list.sort((a, b) => (b.ts || 0) - (a.ts || 0));
     }
+    /** Where an approved points shoutout goes on screen: {room, showId} or null. */
+    function shoutoutTarget(q) {
+      const now = Date.now();
+      const live = listShows(S.schedule).filter((s) => s.startsAt <= now && now <= s.endsAt);
+      const asked = /^Room[1-5]$/.test(String(q.room || "")) ? q.room : "";
+      const art = String(q.artist || "").trim().toLowerCase();
+      let show = asked ? live.find((s) => s.room === asked) || null : null;
+      if (!show && art) show = live.find((s) => s.artists.some((n) => n.toLowerCase() === art)) || null;
+      const room = show ? show.room : asked;
+      return room ? { room, showId: show ? show.id : "" } : null;
+    }
     function allTips() {
       const list = [];
       for (const [uk, tips] of Object.entries((S.rewards || {}).tips || {})) {
@@ -262,14 +277,16 @@
           rows.map((q) => {
             const f = F.get(q.uk);
             const bal = f ? f.r.balance : 0;
+            const target = q.type === "shoutout" && q.status === "pending" ? shoutoutTarget(q) : null;
             const what = esc(REDEEM_LABELS[q.type] || q.type) +
               (q.type === "giftcard" ? ": <b>" + esc(q.card || "") + " " + esc(q.detail || "") + "</b>" : "") +
               (q.type === "tip" ? ": <b>" + esc(q.detail || "") + "</b> gets " + ptsToUsd(q.points) : "") +
-              (q.type === "shoutout" ? (q.artist ? " for <b>" + esc(q.artist) + "</b>" : "") + ': "' + esc(q.detail || "") + '"' : "");
+              (q.type === "shoutout" ? (q.artist ? " for <b>" + esc(q.artist) + "</b>" : "") + ': "' + esc(q.detail || "") + '"' +
+                (q.status === "pending" ? '<br><span class="muted">' + (target ? "Shows on screen in " + esc(target.room.replace("Room", "Room ")) : "No live room right now, so it won't show on screen") + "</span>" : "") : "");
             const act = q.status === "pending"
               ? '<div class="row-actions">' +
                 (q.type === "giftcard" ? '<a class="btn small ghost" href="https://www.bitrefill.com/us/en/gift-cards/" target="_blank" rel="noopener">Bitrefill</a>' : "") +
-                '<button type="button" class="btn small good" data-done="' + esc(q.uk) + "|" + esc(q.id) + '">Mark done</button>' +
+                '<button type="button" class="btn small good" data-done="' + esc(q.uk) + "|" + esc(q.id) + '">' + (target ? "Approve and show" : "Mark done") + "</button>" +
                 '<button type="button" class="btn small bad" data-reject="' + esc(q.uk) + "|" + esc(q.id) + '">Reject</button></div>'
               : "";
             return "<tr><td>" + esc(fmtDate(q.ts)) + "</td><td>" + esc(q.email || q.uk) + "</td><td>" + what + '</td><td class="num">' + fmtPts(q.points) +
@@ -277,14 +294,27 @@
               '</td><td><span class="pill ' + esc(q.status) + '">' + esc(q.status) + "</span></td><td>" + act + "</td></tr>";
           }).join("") + "</tbody></table></div>"
           : '<p class="muted">No ' + (S.reqFilter === "pending" ? "pending " : "") + "requests.</p>") +
-        '<p class="note">Gift cards: buy the card on Bitrefill, email the code to the fan, then Mark done. Tips with points: pay the artist from the rewards pool. "Over" means the fan spent more than they earned, so reject or check first. Rejecting returns the points.</p></div>';
+        '<p class="note">Gift cards: buy the card on Bitrefill, email the code to the fan, then Mark done. Shoutouts: Approve and show puts the message on screen in the live room. Tips with points: pay the artist from the rewards pool. "Over" means the fan spent more than they earned, so reject or check first. Rejecting returns the points.</p></div>';
       $("#main").querySelectorAll("[data-filter]").forEach((b) => b.addEventListener("click", () => { S.reqFilter = b.dataset.filter; render(); }));
       $("#main").querySelectorAll("[data-done],[data-reject]").forEach((b) => b.addEventListener("click", async () => {
         const [uk, id] = (b.dataset.done || b.dataset.reject).split("|");
         const status = b.dataset.done ? "sent" : "rejected";
         if (status === "rejected" && !confirm("Reject this request and return the points?")) return;
         b.disabled = true;
-        try { await update(ref(db, "REWARDS/redemptions/" + uk + "/" + id), { status, doneAt: Date.now() }); }
+        const now = Date.now();
+        const base = "REWARDS/redemptions/" + uk + "/" + id;
+        const updates = { [base + "/status"]: status, [base + "/doneAt"]: now };
+        const q = allRedemptions().find((r) => r.uk === uk && r.id === id);
+        const target = status === "sent" && q && q.type === "shoutout" ? shoutoutTarget(q) : null;
+        if (target) {
+          // Pops up in the room like a paid shoutout (see js/concert-rewards.js)
+          updates["CONCERT_SHOUTOUTS/" + target.room + "/pts_" + id] = {
+            ts: now, name: String(q.name || "A fan").slice(0, 40), perk: "Shoutout",
+            message: String(q.detail || "").slice(0, 140), artist: String(q.artist || "").slice(0, 80),
+            showId: target.showId, source: "points",
+          };
+        }
+        try { await update(ref(db), updates); }
         catch (e) { alert("Update failed: " + (e && e.code)); b.disabled = false; }
       }));
     }
