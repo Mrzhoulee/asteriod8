@@ -58,6 +58,7 @@ export const DEFAULT_CONFIG = {
   costs: { shoutout: 100, badge: 300, early: 200, minTip: 100 },
   instagram: "https://instagram.com/asteroidincofficial",
   tipLink: "",              // Stripe Payment Link ("customers choose what to pay")
+  perks: [],                // fixed price Stripe Payment Links: [{name, price, url}]
   artists: {},              // id -> {name, emailKey}
 };
 
@@ -82,8 +83,39 @@ export function readConfig(raw) {
   cfg.costs = costs;
   cfg.instagram = typeof src.instagram === "string" && /^https:\/\//.test(src.instagram) ? src.instagram : DEFAULT_CONFIG.instagram;
   cfg.artists = src.artists && typeof src.artists === "object" ? src.artists : {};
+  cfg.perks = readPerks(src.perks);
   cfg.tipLink = typeof src.tipLink === "string" && /^https:\/\/[^\s"'<>]+$/.test(src.tipLink.trim()) ? src.tipLink.trim() : "";
   return cfg;
+}
+
+function readPerks(raw) {
+  const list = Array.isArray(raw) ? raw : raw && typeof raw === "object" ? Object.values(raw) : [];
+  const out = [];
+  for (const p of list) {
+    if (!p || typeof p !== "object") continue;
+    const name = String(p.name || "").trim().slice(0, 40);
+    const price = Number(p.price);
+    const url = String(p.url || "").trim();
+    if (!name || !(price > 0) || !/^https:\/\/[^\s"'<>]+$/.test(url)) continue;
+    out.push({ name, price: Math.round(price * 100) / 100, url });
+    if (out.length === 4) break;
+  }
+  return out;
+}
+
+// Artists can add their own tip link when going live. Only well known tip sites
+// are shown as a button, so a bad link can't pose as an Asteroid tip.
+const ARTIST_TIP_HOSTS = ["paypal.me", "paypal.com", "ko-fi.com", "cash.app", "venmo.com", "buymeacoffee.com", "patreon.com"];
+export function artistTipLink(roomData) {
+  const raw = roomData && typeof roomData.donationEmbed === "string" ? roomData.donationEmbed.trim() : "";
+  if (!/^https:\/\/\S+$/.test(raw)) return "";
+  try {
+    const u = new URL(raw);
+    const host = u.hostname.toLowerCase().replace(/^www\./, "");
+    return ARTIST_TIP_HOSTS.some((h) => host === h || host.endsWith("." + h)) ? u.toString() : "";
+  } catch (e) {
+    return "";
+  }
 }
 
 export function firebaseApp() {

@@ -476,10 +476,19 @@
         field("asteroidSharePct", "Asteroid %", c.asteroidSharePct) + field("viewerCountThreshold", "Show viewer count from", c.viewerCountThreshold) +
         '<div><label for="f_instagram">Asteroid Instagram</label><input id="f_instagram" value="' + esc(c.instagram) + '"></div></div>' +
         '<p class="note">These numbers appear in the fan slides and the points panel, so fans always see the real split.</p></div>' +
-        '<div class="card"><h2>Tips</h2><div class="grid" style="grid-template-columns:1fr"><div><label for="f_tipLink">Stripe tip link</label>' +
+        '<div class="card"><h2>Fan perks</h2><p class="note" style="margin:0 0 12px">Each perk is a fixed price Stripe Payment Link. Stripe: Payment Links, New, Products or subscriptions, add the product at its price, Create link. Rooms show these as buttons during live shows. Leave a row empty to hide it.</p>' +
+        [0, 1, 2, 3].map((i) => {
+          const pk = (c.perks || [])[i] || {};
+          const def = [["Shoutout", 5], ["Song request", 10], ["Supporter", 3], ["", ""]][i];
+          return '<div class="grid" style="grid-template-columns:1fr 100px 2fr;margin-bottom:8px">' +
+            '<div><label for="f_perkName' + i + '">Name</label><input id="f_perkName' + i + '" maxlength="40" placeholder="' + esc(def[0]) + '" value="' + esc(pk.name || "") + '"></div>' +
+            '<div><label for="f_perkPrice' + i + '">Price $</label><input id="f_perkPrice' + i + '" type="number" min="1" step="1" placeholder="' + esc(def[1]) + '" value="' + esc(pk.price || "") + '"></div>' +
+            '<div><label for="f_perkUrl' + i + '">Stripe link</label><input id="f_perkUrl' + i + '" placeholder="https://buy.stripe.com/..." value="' + esc(pk.url || "") + '"></div></div>';
+        }).join("") +
+        '<p class="note">Each payment\'s client reference shows the artist, show and perk. Credit perks in the Tips tab so fans get points, and pay the artist ' + c.artistSharePct + '%.</p></div>' +
+        '<div class="card"><h2>Variable tip link</h2><div class="grid" style="grid-template-columns:1fr"><div><label for="f_tipLink">Stripe tip link (only if your Stripe account allows tips)</label>' +
         '<input id="f_tipLink" placeholder="https://buy.stripe.com/..." value="' + esc(c.tipLink) + '"></div></div>' +
-        '<p class="note">Stripe Dashboard: Payment Links, New, "Customers choose what to pay", product name "Tip for the artist". Paste the link here. ' +
-        'Rooms then show a Tip button during live shows, with the fan\'s email filled in. Each payment\'s client reference shows the artist and show.</p></div>' +
+        '<p class="note">Thai Stripe accounts can\'t take pay what you want tips, so leave this empty and use Fan perks. Artists can add their own PayPal, Ko-fi, Cash App or Venmo link when they go live; rooms show it as "Tip directly".</p></div>' +
         '<button type="button" class="btn" id="saveCfg">Save settings</button> <span class="muted" id="cfgMsg"></span>';
       $("#saveCfg").addEventListener("click", async () => {
         const num = (id) => Math.max(0, Number($("#f_" + id).value) || 0);
@@ -492,7 +501,15 @@
           costs: { shoutout: num("cost_shoutout"), badge: num("cost_badge"), early: num("cost_early"), minTip: Math.max(1, num("cost_minTip")) },
           instagram: $("#f_instagram").value.trim(),
           tipLink: $("#f_tipLink").value.trim(),
+          perks: [0, 1, 2, 3].map((i) => ({
+            name: $("#f_perkName" + i).value.trim().slice(0, 40),
+            price: Math.round((Number($("#f_perkPrice" + i).value) || 0) * 100) / 100,
+            url: $("#f_perkUrl" + i).value.trim(),
+          })).filter((pk) => pk.name || pk.url),
         };
+        for (const pk of patch.perks) {
+          if (!pk.name || !(pk.price > 0) || !/^https:\/\/\S+$/.test(pk.url)) { alert("Each perk needs a name, a price and a link starting with https://"); return; }
+        }
         if (patch.tipLink && !/^https:\/\/\S+$/.test(patch.tipLink)) { alert("Tip link must start with https://"); return; }
         try { await update(ref(db, "CONCERT_CONFIG"), patch); $("#cfgMsg").textContent = "Saved."; document.activeElement && document.activeElement.blur(); }
         catch (e) { alert("Couldn't save: " + (e && e.code)); }
