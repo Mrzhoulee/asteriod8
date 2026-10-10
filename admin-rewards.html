@@ -247,7 +247,7 @@
             const what = esc(REDEEM_LABELS[q.type] || q.type) +
               (q.type === "giftcard" ? ": <b>" + esc(q.card || "") + " " + esc(q.detail || "") + "</b>" : "") +
               (q.type === "tip" ? ": <b>" + esc(q.detail || "") + "</b> gets " + ptsToUsd(q.points) : "") +
-              (q.type === "shoutout" ? ': "' + esc(q.detail || "") + '"' : "");
+              (q.type === "shoutout" ? (q.artist ? " for <b>" + esc(q.artist) + "</b>" : "") + ': "' + esc(q.detail || "") + '"' : "");
             const act = q.status === "pending"
               ? '<div class="row-actions">' +
                 (q.type === "giftcard" ? '<a class="btn small ghost" href="https://www.bitrefill.com/us/en/gift-cards/" target="_blank" rel="noopener">Bitrefill</a>' : "") +
@@ -325,7 +325,7 @@
       }));
       $("#addArtist").addEventListener("click", async () => {
         const name = $("#f_aname").value.trim();
-        const emailKey = $("#f_akey").value.trim().toLowerCase().replace(/[.#$[\]\/]/g, "_");
+        const emailKey = $("#f_akey").value.trim().replace(/[.#$[\]\/]/g, "_");
         if (!name) return;
         await set(ref(db, "CONCERT_CONFIG/artists/" + slug(name)), { name: name.slice(0, 80), emailKey }).catch((e) => alert(e && e.code));
         document.activeElement && document.activeElement.blur();
@@ -529,7 +529,7 @@
             '<div><label for="f_perkPrice' + i + '">Price $</label><input id="f_perkPrice' + i + '" type="number" min="1" step="1" placeholder="' + esc(def[1]) + '" value="' + esc(pk.price || "") + '"></div>' +
             '<div><label for="f_perkUrl' + i + '">Stripe link</label><input id="f_perkUrl' + i + '" placeholder="https://buy.stripe.com/..." value="' + esc(pk.url || "") + '"></div></div>';
         }).join("") +
-        '<p class="note">Each payment\'s client reference shows the artist, show and perk. Credit perks in the Tips tab so fans get points, and pay the artist ' + c.artistSharePct + '%.</p></div>' +
+        '<p class="note">Each payment\'s client reference shows the artist, show and perk. Fans get points automatically through the Stripe webhook. Pay the artist ' + c.artistSharePct + '%.</p></div>' +
         '<div class="card"><h2>Variable tip link</h2><div class="grid" style="grid-template-columns:1fr"><div><label for="f_tipLink">Stripe tip link (only if your Stripe account allows tips)</label>' +
         '<input id="f_tipLink" placeholder="https://buy.stripe.com/..." value="' + esc(c.tipLink) + '"></div></div>' +
         '<p class="note">Thai Stripe accounts can\'t take pay what you want tips, so leave this empty and use Fan perks. Artists can add their own PayPal, Ko-fi, Cash App or Venmo link when they go live; rooms show it as "Tip directly".</p></div>' +

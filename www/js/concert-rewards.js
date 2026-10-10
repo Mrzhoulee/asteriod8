@@ -285,7 +285,22 @@ export function mountConcertRewards(roomNum) {
     for (const a of Object.values(state.cfg.artists || {})) if (a) add(a.name, a.emailKey);
     const now = Date.now();
     for (const s of shows()) if (s.endsAt > now) add(s.artist);
+    for (const s of shows().slice().reverse()) add(s.artist);
     return [...seen.values()];
+  }
+
+  /** Required artist dropdown for points tips and shoutouts. */
+  function artistSelectHtml() {
+    const opts = artistOptions();
+    const st = status();
+    const live = st.current && st.current.artist ? st.current.artist : "";
+    if (spendForm.artist && !opts.some((a) => a.name === spendForm.artist)) spendForm.artist = "";
+    return '<label class="crx-label" for="crxArtist">Artist</label>' +
+      '<select class="crx-input" id="crxArtist"' + (opts.length ? "" : " disabled") + ">" +
+      '<option value="">' + (opts.length ? "Choose an artist" : "No artists yet") + "</option>" +
+      opts.map((a) => '<option value="' + esc(a.name) + '"' + (a.name === spendForm.artist ? " selected" : "") + ">" +
+        esc(a.name) + (live && a.name === live ? " (live now)" : "") + "</option>").join("") +
+      "</select>";
   }
 
   function attendanceLine() {
@@ -648,20 +663,17 @@ export function mountConcertRewards(roomNum) {
           '<p class="crx-fine">We email your code within 48 hours.</p>';
       }
     } else if (spendTab === "tip") {
-      const opts = artistOptions();
-      if (!spendForm.artist && opts[0]) spendForm.artist = opts[0].name;
       if (!spendForm.tipPts) spendForm.tipPts = cfg.costs.minTip;
-      form = '<label class="crx-label" for="crxArtist">Artist</label>' +
-        (opts.length
-          ? '<select class="crx-input" id="crxArtist">' + opts.map((a) => '<option' + (a.name === spendForm.artist ? " selected" : "") + ">" + esc(a.name) + "</option>").join("") + "</select>"
-          : '<input class="crx-input" id="crxArtist" maxlength="80" placeholder="Artist name" value="' + esc(spendForm.artist) + '">') +
+      form = artistSelectHtml() +
         '<label class="crx-label" for="crxTipPts">Points</label><input class="crx-input" id="crxTipPts" type="number" inputmode="numeric" min="' + cfg.costs.minTip + '" step="50" value="' + spendForm.tipPts + '">' +
-        '<button type="button" class="crx-btn" data-submit>Send ' + fmtPts(spendForm.tipPts) + " pts (" + ptsToUsd(spendForm.tipPts) + ") to the artist</button>" +
+        '<button type="button" class="crx-btn" data-submit' + (spendForm.artist ? "" : " disabled") + ">" +
+        (spendForm.artist ? "Send " + fmtPts(spendForm.tipPts) + " pts (" + ptsToUsd(spendForm.tipPts) + ") to " + esc(spendForm.artist) : "Choose an artist first") + "</button>" +
         '<p class="crx-fine">Asteroid pays the artist the full dollar value from the fan rewards pool.</p>';
     } else if (spendTab === "shoutout") {
-      form = '<p class="crx-sub">Send a message for the artist to read out during a show.</p>' +
-        '<input class="crx-input" id="crxMsg" maxlength="140" placeholder="Your shoutout" value="' + esc(spendForm.message) + '">' +
-        '<button type="button" class="crx-btn" data-submit>Request shoutout · ' + fmtPts(cfg.costs.shoutout) + " pts</button>";
+      form = '<p class="crx-sub">Send a message for the artist to read out during a show.</p>' + artistSelectHtml() +
+        '<label class="crx-label" for="crxMsg">Message</label><input class="crx-input" id="crxMsg" maxlength="140" placeholder="Your shoutout" value="' + esc(spendForm.message) + '">' +
+        '<button type="button" class="crx-btn" data-submit' + (spendForm.artist ? "" : " disabled") + ">" +
+        (spendForm.artist ? "Request shoutout · " + fmtPts(cfg.costs.shoutout) + " pts" : "Choose an artist first") + "</button>";
     } else if (spendTab === "badge") {
       form = '<p class="crx-sub">A supporter badge on your Asteroid profile.</p>' +
         '<button type="button" class="crx-btn" data-submit>Get the badge · ' + fmtPts(cfg.costs.badge) + " pts</button>";
@@ -688,7 +700,7 @@ export function mountConcertRewards(roomNum) {
     const amt = spendBody.querySelector("#crxAmt");
     if (amt) amt.addEventListener("change", () => { spendForm.amount = Number(amt.value); renderSpend(); });
     const art = spendBody.querySelector("#crxArtist");
-    if (art) art.addEventListener("change", () => { spendForm.artist = art.value.trim(); });
+    if (art) art.addEventListener("change", () => { spendForm.artist = art.value.trim(); renderSpend(); });
     const tp = spendBody.querySelector("#crxTipPts");
     if (tp) tp.addEventListener("change", () => { spendForm.tipPts = Math.max(cfg.costs.minTip, Math.floor(Number(tp.value) || 0)); renderSpend(); });
     const msg = spendBody.querySelector("#crxMsg");
@@ -711,17 +723,20 @@ export function mountConcertRewards(roomNum) {
       req.detail = "$" + spendForm.amount;
       done = "Request sent. Your " + spendForm.card + " code arrives by email within 48 hours.";
     } else if (spendTab === "tip") {
-      const artInput = spendBody.querySelector("#crxArtist");
-      const artist = ((artInput && artInput.value) || spendForm.artist || "").trim().slice(0, 80);
-      if (!artist) { toast("Pick an artist"); return; }
+      const artist = (spendForm.artist || "").trim().slice(0, 80);
+      if (!artist) { toast("Choose an artist"); return; }
       req.points = Math.max(cfg.costs.minTip, Math.floor(spendForm.tipPts));
       req.detail = artist;
+      req.artist = artist;
       done = "Sent. " + artist + " gets " + ptsToUsd(req.points) + " from your points.";
     } else if (spendTab === "shoutout") {
+      const artist = (spendForm.artist || "").trim().slice(0, 80);
       const m = (spendForm.message || "").trim().slice(0, 140);
+      if (!artist) { toast("Choose an artist"); return; }
       if (!m) { toast("Write your shoutout first"); return; }
       req.points = cfg.costs.shoutout;
       req.detail = m;
+      req.artist = artist;
     } else if (spendTab === "badge") {
       req.points = cfg.costs.badge;
     } else {
