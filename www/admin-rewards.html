@@ -60,6 +60,7 @@
     .achip { display:inline-flex; align-items:center; gap:4px; padding:5px 4px 5px 12px; border-radius:999px; background:rgba(255,127,80,.15); border:1px solid rgba(255,127,80,.5); color:#fff; font-size:13px; font-weight:600; }
     .achip button { background:none; border:none; color:var(--muted); cursor:pointer; font-size:18px; line-height:1; padding:0 6px; border-radius:999px; }
     .achip button:hover, .achip button:focus-visible { color:#fff; }
+    .payto { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:6px; font-size:12.5px; }
     .addrow { display:flex; gap:8px; }
     .addrow input { flex:1; min-width:0; }
     [hidden] { display:none !important; }
@@ -253,7 +254,68 @@
     }
 
     // ---------- Render ----------
-    const TABS = [["requests", "Requests"], ["shows", "Shows"], ["tips", "Tips"], ["money", "Money"], ["fans", "Fans"], ["settings", "Settings"]];
+    // ---------- Artist payout contacts (private: REWARDS/contacts, admin only) ----------
+    const PAY_METHODS = ["PayPal", "Wise", "Venmo", "Cash App", "Zelle", "Bank transfer", "PromptPay", "Other"];
+    function contactList() {
+      return Object.entries((S.rewards || {}).contacts || {}).map(([id, c]) => ({ id, ...(c || {}) }))
+        .filter((c) => c.name).sort((a, b) => String(a.name).localeCompare(String(b.name)));
+    }
+    function contactFor(name) {
+      const n = String(name || "").trim().toLowerCase();
+      return n ? contactList().find((c) => String(c.name).trim().toLowerCase() === n) || null : null;
+    }
+    /** PayPal.me or Cash App link with the amount filled in, from the contact or the artist's tip link. */
+    function payLink(name, cents) {
+      const c = contactFor(name);
+      const cfgArtist = Object.values(S.cfg.artists || {}).find((a) => a && String(a.name || "").toLowerCase() === String(name || "").toLowerCase());
+      const amt = cents > 0 ? (cents / 100).toFixed(2) : "";
+      for (const raw of [c && c.handle, cfgArtist && cfgArtist.tipLink]) {
+        const s = String(raw || "").trim();
+        if (!s) continue;
+        let u;
+        try { u = new URL(/^https:\/\//i.test(s) ? s : "https://" + s.replace(/^\/+/, "")); } catch (e) { continue; }
+        const host = u.hostname.toLowerCase().replace(/^www\./, "");
+        const first = u.pathname.split("/").filter(Boolean)[0] || "";
+        if (host === "paypal.me" && /^[A-Za-z0-9._-]{1,60}$/.test(first)) return "https://paypal.me/" + first + (amt ? "/" + amt + "USD" : "");
+        if (host === "cash.app" && /^\$[A-Za-z0-9_-]{1,40}$/.test(first)) return "https://cash.app/" + first + (amt ? "/" + amt : "");
+      }
+      return "";
+    }
+    /** One line under a payout: who to pay and how, with Copy and Pay buttons. */
+    function payToHtml(name, cents) {
+      const n = String(name || "").trim();
+      if (!n) return "";
+      const c = contactFor(n);
+      const link = payLink(n, cents);
+      const pay = link ? '<a class="btn small ghost" href="' + esc(link) + '" target="_blank" rel="noopener">Pay' + (cents > 0 ? " " + centsToUsd(cents) : "") + "</a>" : "";
+      if (!c) return '<span class="muted">No payout contact for ' + esc(n) + "</span> " + pay +
+        '<button type="button" class="btn small ghost" data-add-contact="' + esc(n) + '">Add contact</button>';
+      const shown = c.email || c.handle || "";
+      return '<span class="muted">' + esc(c.method || "") + "</span> " + esc(shown) + " " +
+        (c.email ? '<button type="button" class="btn small ghost" data-copy="' + esc(c.email) + '">Copy email</button>' : "") +
+        (!c.email && c.handle ? '<button type="button" class="btn small ghost" data-copy="' + esc(c.handle) + '">Copy</button>' : "") + pay;
+    }
+    async function copyText(text, btn) {
+      try {
+        await navigator.clipboard.writeText(text);
+        if (btn) { const t = btn.textContent; btn.textContent = "Copied"; setTimeout(() => { btn.textContent = t; }, 1500); }
+      } catch (e) { prompt("Copy this:", text); }
+    }
+    // Copy and Add contact buttons work on every tab
+    document.addEventListener("click", (e) => {
+      const cp = e.target.closest("[data-copy]");
+      if (cp) { copyText(cp.dataset.copy, cp); return; }
+      const add = e.target.closest("[data-add-contact]");
+      if (add) {
+        S.tab = "payouts";
+        S.contactDraft = { id: "", name: add.dataset.addContact, email: "", method: "PayPal", handle: "", note: "" };
+        render();
+        const f = document.getElementById("f_cemail");
+        if (f) f.focus();
+      }
+    });
+
+    const TABS = [["requests", "Requests"], ["shows", "Shows"], ["tips", "Tips"], ["money", "Money"], ["payouts", "Payouts"], ["fans", "Fans"], ["settings", "Settings"]];
     function render() {
       if (!S.started) return;
       const pending = allRedemptions().filter((r) => r.status === "pending").length;
@@ -263,7 +325,7 @@
       $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { S.tab = b.dataset.tab; render(); }));
       const focused = document.activeElement && document.activeElement.id;
       if (focused && /^f_/.test(focused)) return; // don't wipe a form while typing
-      ({ requests: renderRequests, shows: renderShows, tips: renderTips, money: renderMoney, fans: renderFans, settings: renderSettings })[S.tab]();
+      ({ requests: renderRequests, shows: renderShows, tips: renderTips, money: renderMoney, payouts: renderPayouts, fans: renderFans, settings: renderSettings })[S.tab]();
     }
 
     function renderRequests() {
@@ -280,7 +342,8 @@
             const target = q.type === "shoutout" && q.status === "pending" ? shoutoutTarget(q) : null;
             const what = esc(REDEEM_LABELS[q.type] || q.type) +
               (q.type === "giftcard" ? ": <b>" + esc(q.card || "") + " " + esc(q.detail || "") + "</b>" : "") +
-              (q.type === "tip" ? ": <b>" + esc(q.detail || "") + "</b> gets " + ptsToUsd(q.points) : "") +
+              (q.type === "tip" ? ": <b>" + esc(q.detail || "") + "</b> gets " + ptsToUsd(q.points) +
+                (q.status === "pending" ? '<div class="payto">' + payToHtml(q.detail || q.artist, Math.round(((Number(q.points) || 0) / POINTS_PER_USD) * 100)) + "</div>" : "") : "") +
               (q.type === "shoutout" ? (q.artist ? " for <b>" + esc(q.artist) + "</b>" : "") + ': "' + esc(q.detail || "") + '"' +
                 (q.status === "pending" ? '<br><span class="muted">' + (target ? "Shows on screen in " + esc(target.room.replace("Room", "Room ")) : "No live room right now, so it won't show on screen") + "</span>" : "") : "");
             const act = q.status === "pending"
@@ -615,9 +678,9 @@
             '</td><td class="num">' + centsToUsd(q.cents) + '</td><td><button type="button" class="btn small bad" data-undo="' + esc(q.uk) + "|" + esc(q.id) + '">Undo</button></td></tr>').join("") +
           "</tbody></table></div>" : '<p class="muted">Nothing paid from the pool yet.</p>') +
         '<p class="note">Biggest first. Undo a test or a mistake and the fan gets the points back.</p></div>' +
-        '<div class="card"><h2>Artist earnings</h2>' + (rows.length ? '<div class="table-wrap"><table><thead><tr><th>Artist</th><th class="num">Tips</th><th class="num">Their ' + cfg.artistSharePct + '%</th><th class="num">Point tips paid</th><th class="num">Point tips pending</th><th class="num">Total</th></tr></thead><tbody>' +
+        '<div class="card"><h2>Artist earnings</h2>' + (rows.length ? '<div class="table-wrap"><table><thead><tr><th>Artist</th><th class="num">Tips</th><th class="num">Their ' + cfg.artistSharePct + '%</th><th class="num">Point tips paid</th><th class="num">Point tips pending</th><th class="num">Total</th><th>Pay to</th></tr></thead><tbody>' +
           rows.map((a) => "<tr><td>" + esc(a.name) + '</td><td class="num">' + centsToUsd(a.gross) + '</td><td class="num">' + centsToUsd(a.share) + '</td><td class="num">' + centsToUsd(a.ptsSent) +
-            '</td><td class="num">' + centsToUsd(a.ptsPending) + '</td><td class="num"><b>' + centsToUsd(a.share + a.ptsSent) + "</b></td></tr>").join("") +
+            '</td><td class="num">' + centsToUsd(a.ptsPending) + '</td><td class="num"><b>' + centsToUsd(a.share + a.ptsSent) + '</b></td><td><div class="payto">' + payToHtml(a.name === "Unknown" ? "" : a.name, 0) + "</div></td></tr>").join("") +
           "</tbody></table></div>" : '<p class="muted">No tips yet.</p>') +
         '<p class="note">Gift cards sent: ' + centsToUsd(cardsSent) + '. If "Pool left" goes negative, gift cards and points tips are costing more than the ' + cfg.rewardsSharePct + "% rewards share. Lower watch and streak points in Settings, or top up the pool.</p></div>";
 
@@ -648,6 +711,90 @@
         try { await update(ref(db, "REWARDS/redemptions/" + uk + "/" + id), { status: "rejected", undoneAt: Date.now() }); }
         catch (e) { alert("Update failed: " + (e && e.code)); b.disabled = false; }
       }));
+    }
+
+    /** Every artist name we know: shows, the artist list, tips, point tips, perk orders. */
+    function payoutArtistNames() {
+      const seen = new Map();
+      const add = (n) => { const k = String(n || "").trim(); if (k && k !== "Unknown" && !seen.has(k.toLowerCase())) seen.set(k.toLowerCase(), k); };
+      artistNames().forEach(add);
+      for (const t of allTips()) add(t.artist);
+      for (const q of allRedemptions()) if (q.type === "tip") add(q.detail || q.artist);
+      for (const o of Object.values(S.orders || {})) if (o) add(o.artist);
+      return [...seen.values()].sort((a, b) => a.localeCompare(b));
+    }
+
+    function renderPayouts() {
+      const list = contactList();
+      const have = new Set(list.map((c) => String(c.name).toLowerCase()));
+      const names = payoutArtistNames();
+      const missing = names.filter((n) => !have.has(n.toLowerCase()));
+      const d = S.contactDraft || (S.contactDraft = { id: "", name: "", email: "", method: "PayPal", handle: "", note: "" });
+      const emails = list.map((c) => c.email).filter(Boolean);
+      $("#main").innerHTML =
+        '<div class="card"><div class="top" style="margin-bottom:8px"><h2 style="margin:0">Artist payout contacts</h2><div class="row-actions">' +
+        (emails.length ? '<button type="button" class="btn small ghost" data-copy="' + esc(emails.join(", ")) + '">Copy all emails</button>' : "") +
+        '<button type="button" class="btn small ghost" id="csvContacts"' + (list.length ? "" : " disabled") + ">Download CSV</button></div></div>" +
+        '<p class="note" style="margin:0 0 12px">Private, only you can see this. Use it to pay artists after point tips and perk payments. Each artist\'s contact also shows next to their point tips in Requests and in Money.</p>' +
+        (list.length ? '<div class="table-wrap"><table id="contactsTable"><thead><tr><th>Artist</th><th>Email</th><th>Pay with</th><th>Handle or link</th><th>Note</th><th></th></tr></thead><tbody>' +
+          list.map((c) => {
+            const link = payLink(c.name, 0);
+            return "<tr><td><b>" + esc(c.name) + "</b></td><td>" + esc(c.email || "") + "</td><td>" + esc(c.method || "") + "</td><td>" + esc(c.handle || "") + "</td><td>" + esc(c.note || "") +
+              '</td><td><div class="row-actions">' +
+              (c.email ? '<button type="button" class="btn small ghost" data-copy="' + esc(c.email) + '">Copy email</button>' : "") +
+              (link ? '<a class="btn small ghost" href="' + esc(link) + '" target="_blank" rel="noopener">Pay</a>' : "") +
+              '<button type="button" class="btn small ghost" data-edit-contact="' + esc(c.id) + '">Edit</button>' +
+              '<button type="button" class="btn small bad" data-del-contact="' + esc(c.id) + '">Delete</button></div></td></tr>';
+          }).join("") + "</tbody></table></div>" : '<p class="muted">No contacts yet.</p>') +
+        (missing.length ? '<p class="note">No contact yet: ' + missing.map((n) => '<button type="button" class="btn small ghost" data-add-contact="' + esc(n) + '">+ ' + esc(n) + "</button>").join(" ") + "</p>" : "") +
+        "</div>" +
+        '<div class="card" id="contactForm"><h2>' + (d.id ? "Edit contact" : "Add a contact") + '</h2><div class="grid">' +
+        '<div><label for="f_cname">Artist</label><input id="f_cname" list="dl_contact_artists" maxlength="80" value="' + esc(d.name) + '">' +
+        '<datalist id="dl_contact_artists">' + names.map((n) => '<option value="' + esc(n) + '">').join("") + "</datalist></div>" +
+        '<div><label for="f_cemail">Email</label><input id="f_cemail" type="email" maxlength="200" placeholder="luna@gmail.com" value="' + esc(d.email) + '"></div>' +
+        '<div><label for="f_cmethod">Pay with</label><select id="f_cmethod">' + PAY_METHODS.map((m) => '<option' + (m === d.method ? " selected" : "") + ">" + m + "</option>").join("") + "</select></div>" +
+        '<div><label for="f_chandle">Handle or link (optional)</label><input id="f_chandle" maxlength="200" placeholder="paypal.me/luna or $luna" value="' + esc(d.handle) + '"></div>' +
+        '<div><label for="f_cnote">Note (optional)</label><input id="f_cnote" maxlength="200" value="' + esc(d.note) + '"></div>' +
+        '<div class="row-actions"><button type="button" class="btn" id="saveContact">Save contact</button>' +
+        (d.id ? '<button type="button" class="btn ghost" id="cancelContact">Cancel</button>' : "") + "</div></div>" +
+        '<p class="note">With a PayPal.me or Cash App link, the Pay button opens it with the amount filled in.</p></div>';
+
+      for (const [id, key] of [["f_cname", "name"], ["f_cemail", "email"], ["f_chandle", "handle"], ["f_cnote", "note"]]) {
+        $("#" + id).addEventListener("input", (e) => { d[key] = e.target.value; });
+      }
+      $("#f_cmethod").addEventListener("change", (e) => { d.method = e.target.value; });
+      $("#saveContact").addEventListener("click", async () => {
+        const name = $("#f_cname").value.trim().slice(0, 80);
+        const email = $("#f_cemail").value.trim().toLowerCase().slice(0, 200);
+        const method = $("#f_cmethod").value;
+        const handle = $("#f_chandle").value.trim().slice(0, 200);
+        const note = $("#f_cnote").value.trim().slice(0, 200);
+        if (!name) { alert("Fill in the artist."); return; }
+        if (!email && !handle) { alert("Add an email or a handle."); return; }
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert("That email doesn't look right."); return; }
+        const existing = contactFor(name);
+        const id = d.id || (existing && existing.id) || slug(name);
+        try {
+          await set(ref(db, "REWARDS/contacts/" + id), { name, email, method, handle, note, ts: Date.now() });
+          S.contactDraft = null;
+          document.activeElement && document.activeElement.blur();
+          render();
+        } catch (e) { alert("Couldn't save: " + (e && e.code)); }
+      });
+      if (d.id) $("#cancelContact").addEventListener("click", () => { S.contactDraft = null; render(); });
+      $("#main").querySelectorAll("[data-edit-contact]").forEach((b) => b.addEventListener("click", () => {
+        const c = contactList().find((x) => x.id === b.dataset.editContact);
+        if (!c) return;
+        S.contactDraft = { id: c.id, name: c.name || "", email: c.email || "", method: c.method || "PayPal", handle: c.handle || "", note: c.note || "" };
+        render();
+        $("#contactForm").scrollIntoView({ behavior: "smooth", block: "start" });
+      }));
+      $("#main").querySelectorAll("[data-del-contact]").forEach((b) => b.addEventListener("click", async () => {
+        if (!confirm("Delete this contact?")) return;
+        await remove(ref(db, "REWARDS/contacts/" + b.dataset.delContact)).catch((e) => alert(e && e.code));
+      }));
+      $("#csvContacts").addEventListener("click", () => downloadCsv("asteroid-artist-contacts.csv",
+        ["artist", "email", "pay_with", "handle", "note"], list.map((c) => [c.name, c.email, c.method, c.handle, c.note])));
     }
 
     function renderFans() {
