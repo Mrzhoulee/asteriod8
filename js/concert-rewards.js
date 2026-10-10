@@ -38,6 +38,17 @@ const CSS = `
 .crx-btn:disabled{opacity:.45;cursor:not-allowed}
 .crx-btn.tip{background:linear-gradient(90deg,#ff3b3b,#ff7a3b)}
 #donationBox{display:none !important}
+.crx-shout{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translate(-50%,-160%);z-index:100002;width:min(92vw,460px);box-sizing:border-box;padding:14px 18px;border-radius:16px;background:linear-gradient(135deg,#ff3b3b,#ff7a3b);color:#fff;box-shadow:0 18px 50px rgba(255,90,60,.45);transition:transform .45s cubic-bezier(.2,.9,.3,1.2);font-family:Montserrat,system-ui,sans-serif}
+.crx-shout.show{transform:translate(-50%,0)}
+.crx-shout b{display:flex;align-items:center;gap:6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.95}
+.crx-shout b .material-symbols-outlined{font-size:18px}
+.crx-shout p{margin:6px 0 0;font-size:18px;font-weight:700;line-height:1.35;word-break:break-word}
+.crx-shoutlist[hidden]{display:none}
+.crx-sh{padding:10px 0;border-top:1px solid rgba(255,255,255,.07)}
+.crx-sh:first-of-type{border-top:none}
+.crx-sh b{color:#fff;font-size:13px}
+.crx-sh span{color:#ff9a73;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-left:8px}
+.crx-sh p{margin:4px 0 0;font-size:13px;color:rgba(255,255,255,.85);line-height:1.45;word-break:break-word}
 .crx-support{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
 .crx-support-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:2px}
 .crx-perks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -171,6 +182,74 @@ export function mountConcertRewards(roomNum) {
   const aside = document.querySelector(".cr-aside");
   const panel = el("div", "cr-panel crx-panel");
   if (aside) aside.insertBefore(panel, aside.firstChild);
+
+  // ---- Shoutouts: paid perks arrive from the Stripe webhook (CONCERT_SHOUTOUTS) ----
+  const shoutPanel = el("div", "cr-panel crx-shoutlist");
+  shoutPanel.hidden = true;
+  if (aside) aside.insertBefore(shoutPanel, panel.nextSibling);
+  let censor = (t) => t;
+  import("./text-censor.js")
+    .then((m) => { if (m && typeof m.censorProfanity === "function") { censor = m.censorProfanity; renderShouts(); } })
+    .catch(() => {});
+  const loadedAt = Date.now();
+  let shouts = [];
+  let shoutsSeen = null;
+  const bannerQueue = [];
+  let bannerBusy = false;
+
+  function shoutsSince() {
+    const st = status();
+    if (st.current) return st.current.startsAt - 30 * 60 * 1000;
+    const startedAt = Number(state.roomData && state.roomData.startedAt) || 0;
+    return startedAt ? startedAt - 30 * 60 * 1000 : Date.now() - 6 * 60 * 60 * 1000;
+  }
+
+  function renderShouts() {
+    const since = shoutsSince();
+    const list = shouts.filter((x) => x.ts >= since).slice(0, 15);
+    shoutPanel.hidden = !list.length;
+    if (!list.length) return;
+    shoutPanel.innerHTML = "<h3>Shoutouts and requests</h3>" + list.map((x) =>
+      '<div class="crx-sh"><b>' + esc(x.name || "A fan") + "</b><span>" + esc(x.perk || "") + "</span>" +
+      (x.message ? "<p>" + esc(censor(String(x.message))) + "</p>" : "") + "</div>").join("");
+  }
+
+  function nextBanner() {
+    const x = bannerQueue.shift();
+    if (!x) { bannerBusy = false; return; }
+    bannerBusy = true;
+    const b = el("div", "crx-shout",
+      "<b>" + icon("celebration") + esc(x.name || "A fan") + " · " + esc(x.perk || "Support") + "</b>" +
+      "<p>" + (x.message ? esc(censor(String(x.message))) : "Thank you for supporting " + esc(x.artist || "the artist") + "!") + "</p>");
+    b.setAttribute("role", "status");
+    document.body.appendChild(b);
+    requestAnimationFrame(() => requestAnimationFrame(() => b.classList.add("show")));
+    setTimeout(() => {
+      b.classList.remove("show");
+      setTimeout(() => { b.remove(); nextBanner(); }, 500);
+    }, 9000);
+  }
+
+  onValue(ref(db, "CONCERT_SHOUTOUTS/" + room), (snap) => {
+    const v = snap.val() || {};
+    shouts = Object.entries(v)
+      .map(([id, x]) => ({ id, ...(x || {}) }))
+      .filter((x) => typeof x.ts === "number")
+      .sort((a, b) => b.ts - a.ts);
+    if (shoutsSeen === null) {
+      shoutsSeen = new Set(shouts.map((x) => x.id));
+    } else {
+      for (const x of shouts.slice().reverse()) {
+        if (shoutsSeen.has(x.id)) continue;
+        shoutsSeen.add(x.id);
+        if (x.ts > loadedAt - 2 * 60 * 1000) {
+          bannerQueue.push(x);
+          if (!bannerBusy) nextBanner();
+        }
+      }
+    }
+    renderShouts();
+  }, () => {});
 
   panel.addEventListener("click", (e) => {
     const t = e.target.closest("[data-act]");
@@ -331,8 +410,8 @@ export function mountConcertRewards(roomNum) {
 
   // ---- Data -------------------------------------------------------------------------
   onValue(ref(db, "CONCERT_CONFIG"), (s) => { state.cfg = readConfig(s.val()); renderPill(); renderPanel(); }, () => {});
-  onValue(ref(db, "CONCERT_SCHEDULE"), (s) => { state.schedule = s.val(); renderPill(); renderPanel(); }, () => {});
-  onValue(ref(db, "LiveRooms/" + room), (s) => { state.roomData = s.val(); renderPill(); renderPanel(); }, () => {});
+  onValue(ref(db, "CONCERT_SCHEDULE"), (s) => { state.schedule = s.val(); renderPill(); renderPanel(); renderShouts(); }, () => {});
+  onValue(ref(db, "LiveRooms/" + room), (s) => { state.roomData = s.val(); renderPill(); renderPanel(); renderShouts(); }, () => {});
 
   let unsubs = [];
   onAuthStateChanged(auth, (user) => {

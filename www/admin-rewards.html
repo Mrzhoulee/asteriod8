@@ -96,7 +96,7 @@
       ["America/Los_Angeles", "US Pacific"], ["Asia/Bangkok", "Bangkok"],
     ];
     const S = {
-      cfgRaw: null, cfg: readConfig(null), schedule: null, rewards: {}, survey: {},
+      cfgRaw: null, cfg: readConfig(null), schedule: null, rewards: {}, survey: {}, orders: {}, optins: {}, shouts: {},
       tab: "requests", reqFilter: "pending",
       tz: localStorage.getItem("astAdminTz") || "America/New_York",
       started: false,
@@ -136,6 +136,9 @@
       onValue(ref(db, "CONCERT_SCHEDULE"), (s) => { S.schedule = s.val(); render(); }, fail("schedule"));
       onValue(ref(db, "REWARDS"), (s) => { S.rewards = s.val() || {}; render(); }, fail("rewards"));
       onValue(ref(db, "FAN_SURVEY"), (s) => { S.survey = s.val() || {}; render(); }, fail("survey"));
+      onValue(ref(db, "STRIPE_ORDERS"), (s) => { S.orders = s.val() || {}; render(); }, fail("orders"));
+      onValue(ref(db, "FAN_OPTIN"), (s) => { S.optins = s.val() || {}; render(); }, fail("optins"));
+      onValue(ref(db, "CONCERT_SHOUTOUTS"), (s) => { S.shouts = s.val() || {}; render(); }, fail("shoutouts"));
       render();
     }
 
@@ -162,6 +165,14 @@
     }
     function fmtDate(ms) {
       return ms ? new Date(ms).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "";
+    }
+    function downloadCsv(filename, header, rows) {
+      const q = (v) => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+      const lines = [header.map(q).join(",")].concat(rows.map((r) => r.map(q).join(",")));
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" }));
+      a.download = filename;
+      a.click();
     }
     function tzLabel(tz) { const t = TZS.find(([k]) => k === tz); return t ? t[1] : tz; }
     function slug(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 60) || "artist"; }
@@ -329,7 +340,7 @@
       const cfg = S.cfg;
       const tips = allTips().slice(0, 50);
       $("#main").innerHTML =
-        '<div class="card"><h2>Credit a tip</h2><p class="note" style="margin:0 0 12px">When a tip comes in on Stripe (Payments), enter it here with the fan\'s email. The client reference shows the artist and show. They get ' + cfg.pointsPerDollar + " points per $1.</p>" +
+        '<div class="card"><h2>Credit a tip</h2><p class="note" style="margin:0 0 12px">Stripe perk payments are credited automatically by the webhook. Use this for anything else, with the fan\'s Asteroid email. They get ' + cfg.pointsPerDollar + " points per $1.</p>" +
         '<div class="grid"><div><label for="f_temail">Fan email</label><input id="f_temail" type="email"></div>' +
         '<div><label for="f_tartist">Artist</label><input id="f_tartist" list="dl_tip_artists" maxlength="80">' + datalist("dl_tip_artists") + "</div>" +
         '<div><label for="f_tamt">Amount (USD)</label><input id="f_tamt" type="number" min="1" step="0.01"></div>' +
@@ -437,7 +448,30 @@
       for (const r of rows) for (const n of (Array.isArray(r.fanOf) ? r.fanOf : Object.values(r.fanOf || {}))) counts.set(n, (counts.get(n) || 0) + 1);
       const top = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
       const who = (r) => r.email || r.emailKey || "Guest";
-      $("#main").innerHTML =
+      const orders = Object.entries(S.orders || {}).map(([id, o]) => ({ id, ...(o || {}) })).sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      const answers = (o) => (Array.isArray(o.fields) ? o.fields : Object.values(o.fields || {})).map((f) => (f && f.label ? f.label + ": " : "") + (f ? f.value : "")).join(" | ");
+      const optins = [];
+      for (const [uk, byArtist] of Object.entries(S.optins || {})) for (const [ak, v] of Object.entries(byArtist || {})) if (v) optins.push({ uk, ak, ...v });
+      optins.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      const shouts = [];
+      for (const [room, byId] of Object.entries(S.shouts || {})) for (const [id, v] of Object.entries(byId || {})) if (v) shouts.push({ room, id, ...v });
+      shouts.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      const ordersHtml =
+        '<div class="card"><div class="top" style="margin-bottom:8px"><h2 style="margin:0">Perk orders</h2><button type="button" class="btn small ghost" id="csvOrders">Download CSV</button></div>' +
+        (orders.length ? '<div class="table-wrap"><table><thead><tr><th>When</th><th>Fan</th><th>Perk</th><th>Artist</th><th class="num">Paid</th><th>Answers</th></tr></thead><tbody>' +
+          orders.slice(0, 100).map((o) => "<tr><td>" + esc(fmtDate(o.ts)) + "</td><td>" + esc(o.name || "") + "<br><span class=\"muted\">" + esc(o.email || "") + "</span></td><td>" + esc(o.perk) +
+            "</td><td>" + esc(o.artist) + '</td><td class="num">' + (o.amountCents ? centsToUsd(o.amountCents) : esc(String(o.amountTotal || "") + " " + (o.currency || ""))) + "</td><td>" + esc(answers(o)) + "</td></tr>").join("") +
+          "</tbody></table></div>" : '<p class="muted">No perk orders yet. They appear here automatically once the Stripe webhook is set up.</p>') + "</div>";
+      const optinHtml =
+        '<div class="card"><div class="top" style="margin-bottom:8px"><h2 style="margin:0">Next show list <span class="muted">(' + optins.length + ")</span></h2>" +
+        '<button type="button" class="btn small ghost" id="csvOptins">Download CSV</button></div>' +
+        '<p class="note" style="margin:0">Fans who asked for a heads up about an artist\'s next show. Email them when you schedule it.</p></div>';
+      const shoutHtml =
+        '<div class="card"><h2>Shoutouts on screen</h2>' +
+        (shouts.length ? shouts.slice(0, 30).map((x) => '<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line)"><div><b>' + esc(x.name || "A fan") +
+          '</b> <span class="muted">' + esc(x.perk || "") + " · " + esc(x.room.replace("Room", "Room ")) + " · " + esc(fmtDate(x.ts)) + "</span><div>" + esc(x.message || "") + "</div></div>" +
+          '<button type="button" class="btn small bad" data-del-shout="' + esc(x.room) + "|" + esc(x.id) + '">Remove</button></div>').join("") : '<p class="muted">None yet.</p>') + "</div>";
+      $("#main").innerHTML = ordersHtml + optinHtml + shoutHtml +
         '<div class="stats"><div class="stat"><b>' + rows.length + '</b><span>Answers</span></div><div class="stat"><b>' + fansN + '</b><span>Fans</span></div><div class="stat"><b>' + artistsN + "</b><span>Artists</span></div></div>" +
         '<div class="card"><h2>Fans of</h2>' + (top.length ? top.map(([n, c]) => "<div>" + esc(n) + ' <span class="muted">' + c + "</span></div>").join("") : '<p class="muted">No answers yet.</p>') + "</div>" +
         '<div class="card"><div class="top" style="margin-bottom:8px"><h2 style="margin:0">Survey answers</h2><button type="button" class="btn small ghost" id="csv">Download CSV</button></div>' +
@@ -445,6 +479,16 @@
           rows.slice(0, 300).map((r) => "<tr><td>" + esc(fmtDate(r.ts)) + "</td><td>" + esc(r.role) + "</td><td>" + esc((Array.isArray(r.fanOf) ? r.fanOf : Object.values(r.fanOf || {})).join(", ")) +
             "</td><td>" + esc(r.other || "") + "</td><td>" + esc(who(r)) + "</td><td>" + esc(r.room || "") + "</td></tr>").join("") +
           "</tbody></table></div>" : "") + "</div>";
+      $("#csvOrders").addEventListener("click", () => downloadCsv("asteroid-perk-orders.csv",
+        ["date", "name", "email", "perk", "artist", "paid_usd", "answers"],
+        orders.map((o) => [new Date(o.ts || 0).toISOString(), o.name, o.email, o.perk, o.artist, ((o.amountCents || 0) / 100).toFixed(2), answers(o)])));
+      $("#csvOptins").addEventListener("click", () => downloadCsv("asteroid-next-show-list.csv",
+        ["date", "name", "email", "artist"], optins.map((o) => [new Date(o.ts || 0).toISOString(), o.name, o.email, o.artist])));
+      $("#main").querySelectorAll("[data-del-shout]").forEach((b) => b.addEventListener("click", async () => {
+        if (!confirm("Remove this shoutout from the room?")) return;
+        const [room, id] = b.dataset.delShout.split("|");
+        await remove(ref(db, "CONCERT_SHOUTOUTS/" + room + "/" + id)).catch((e) => alert(e && e.code));
+      }));
       $("#csv").addEventListener("click", () => {
         const q = (s) => '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"';
         const lines = [["date", "role", "fan_of", "other", "email", "room"].join(",")].concat(rows.map((r) =>

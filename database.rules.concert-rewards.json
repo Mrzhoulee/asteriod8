@@ -64,6 +64,18 @@
           }
         }
       }
+    },
+    "CONCERT_SHOUTOUTS": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email == 'console.admin@asteroid8.net'"
+    },
+    "FAN_OPTIN": {
+      ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      ".write": "auth != null && auth.token.email == 'console.admin@asteroid8.net'"
+    },
+    "STRIPE_ORDERS": {
+      ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      ".write": "auth != null && auth.token.email == 'console.admin@asteroid8.net'"
     }
   }
 }

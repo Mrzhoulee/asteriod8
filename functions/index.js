@@ -114,3 +114,7 @@ exports.previewAudio = preview.previewAudio;
 // Public client config (PostHog key, etc.)
 const config = require('./config');
 exports.publicConfig = config.publicConfig;
+
+// Concert fan perks: Stripe webhook shows shoutouts in the room and credits points
+const stripeWebhook = require('./stripe-webhook');
+exports.stripeWebhook = stripeWebhook.stripeWebhook;
