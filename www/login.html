@@ -221,7 +221,10 @@
     function postLoginRedirect() {
       const q = new URLSearchParams(window.location.search);
       const ret = (q.get("return") || "").trim();
-      const allow = { "index.html": 1, "studio.html": 1, "pat.html": 1 };
+      const allow = {
+        "index.html": 1, "studio.html": 1, "pat.html": 1, "lively.html": 1,
+        "liveroom1.html": 1, "liveroom2.html": 1, "liveroom3.html": 1, "liveroom4.html": 1, "liveroom5.html": 1,
+      };
       window.location.replace(allow[ret] ? ret : "index.html");
     }
 

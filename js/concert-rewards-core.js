@@ -14,6 +14,12 @@
 //   REWARDS/adjust/{uk}/{id}          {points, reason, ts}               admin only
 //   REWARDS/redemptions/{uk}/{id}     {type, points, status, ts, ...}    fan requests, admin fulfils
 //
+// Concert invites (fans invite friends; both earn points once the friend watches a show)
+//   CONCERT_REF_CODES/{code}          {uk, ts}   owner creates once, admin reads
+//   CONCERT_REF_BY_USER/{uk}          code       owner reads, creates once
+//   REWARDS/referrals/{code}/{friend} {ts, showId}  friend writes once, after watching a show
+//   REWARDS/referred/{friend}         {code, ts}    written with it: one inviter per friend, ever
+//
 // uk = rewardsKey(email). database.rules.json derives the same key from the
 // signed in Firebase user, so nobody can write points for another account.
 
@@ -55,6 +61,8 @@ export const DEFAULT_CONFIG = {
   streakBonusPoints: 500,   // 500 pts = a free $5 gift card
   minGiftCardUsd: 5,
   viewerCountThreshold: 30, // viewer count stays hidden below this
+  referralPoints: 50,       // for the fan who invited, per friend who watches a show
+  referralFriendPoints: 50, // for the invited friend
   artistSharePct: 80,
   rewardsSharePct: 10,
   asteroidSharePct: 10,
@@ -68,7 +76,58 @@ export const DEFAULT_CONFIG = {
 const NUMERIC_KEYS = [
   "pointsPerDollar", "pointsPerShow", "attendMinutes", "streakDays", "streakBonusPoints",
   "minGiftCardUsd", "viewerCountThreshold", "artistSharePct", "rewardsSharePct", "asteroidSharePct",
+  "referralPoints", "referralFriendPoints",
 ];
+
+// ---- Concert invites ---------------------------------------------------------------
+export const PUBLIC_SITE = "https://asteroid8.net/";
+const INVITE_KEY = "astConcertInvite";
+const INVITE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
+export function isInviteCode(s) {
+  return typeof s === "string" && /^[a-z0-9]{6,12}$/.test(s);
+}
+
+export function newInviteCode() {
+  const abc = "abcdefghijkmnpqrstuvwxyz23456789";
+  const bytes = new Uint8Array(8);
+  try { crypto.getRandomValues(bytes); } catch (e) { for (let i = 0; i < 8; i++) bytes[i] = Math.floor(Math.random() * 256); }
+  return Array.from(bytes, (b) => abc[b % abc.length]).join("");
+}
+
+/** Invite link for a room, always on the public site (the app runs on localhost). */
+export function inviteUrl(roomNum, code) {
+  return PUBLIC_SITE + "liveroom" + roomNum + ".html?invite=" + code;
+}
+
+/** Saved invite from a friend's link: {code, ts}, or null (expires after 30 days). */
+export function readInvite() {
+  try {
+    const v = JSON.parse(localStorage.getItem(INVITE_KEY) || "null");
+    if (v && isInviteCode(v.code) && Date.now() - Number(v.ts || 0) < INVITE_TTL_MS) return { code: v.code, ts: Number(v.ts) };
+  } catch (e) {}
+  return null;
+}
+
+export function clearInvite() {
+  try { localStorage.removeItem(INVITE_KEY); } catch (e) {}
+}
+
+/** Keeps ?invite=CODE from the address bar and takes it out of the URL so it isn't shared on. */
+export function captureInvite() {
+  try {
+    const u = new URL(location.href);
+    if (!u.searchParams.has("invite")) return readInvite();
+    const code = (u.searchParams.get("invite") || "").trim().toLowerCase();
+    u.searchParams.delete("invite");
+    history.replaceState(history.state, "", u.pathname + (u.search || "") + u.hash);
+    const had = readInvite();
+    if (isInviteCode(code) && !(had && had.code === code)) {
+      localStorage.setItem(INVITE_KEY, JSON.stringify({ code, ts: Date.now() }));
+    }
+  } catch (e) {}
+  return readInvite();
+}
 
 export function readConfig(raw) {
   const src = raw && typeof raw === "object" ? raw : {};
@@ -303,7 +362,8 @@ export function roomStatus(room, roomData, shows, now = Date.now()) {
 
 /**
  * Points balance and streak for one fan.
- * input = {schedule, attendance, tips, adjust, redemptions} (raw RTDB values)
+ * input = {schedule, attendance, tips, adjust, redemptions, referrals, referred} (raw RTDB values)
+ *   referrals = REWARDS/referrals/{this fan's invite code}, referred = REWARDS/referred/{uk}
  */
 export function computeRewards(input, cfg, now = Date.now()) {
   const shows = listShows(input && input.schedule);
@@ -352,11 +412,16 @@ export function computeRewards(input, cfg, now = Date.now()) {
   }
   const showPts = attendedIds.length * cfg.pointsPerShow;
   const streakPts = bonuses * cfg.streakBonusPoints;
-  const earned = showPts + tipPts + streakPts + adjustPts;
+  // Invites: friends who watched a show through this fan's link, and the bonus for being invited
+  const referralCount = Object.values((input && input.referrals) || {}).filter((r) => r && typeof r === "object").length;
+  const referralPts = referralCount * cfg.referralPoints;
+  const referred = input && input.referred;
+  const referredPts = referred && typeof referred === "object" && isInviteCode(referred.code) ? cfg.referralFriendPoints : 0;
+  const earned = showPts + tipPts + streakPts + adjustPts + referralPts + referredPts;
   return {
     balance: earned - spent,
     earned, spent, pending,
-    showPts, tipPts, streakPts, adjustPts, tipCents,
+    showPts, tipPts, streakPts, adjustPts, tipCents, referralPts, referredPts, referralCount,
     attendedShows: attendedIds.length,
     streak,
     streakProgress: streak % cfg.streakDays,

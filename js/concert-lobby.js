@@ -3,7 +3,7 @@
 // show set in admin-rewards.html (CONCERT_SCHEDULE) is inside its time window.
 
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
-import { firebaseDb, listShows, roomStatus, fmtWhen, esc, ROOMS } from "./concert-rewards-core.js";
+import { firebaseDb, listShows, roomStatus, fmtWhen, esc, ROOMS, captureInvite } from "./concert-rewards-core.js";
 
 const CSS = `
 .lvx-pill{margin-left:auto;flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:.08em;padding:5px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);color:rgba(244,244,248,.75);white-space:nowrap}
@@ -22,6 +22,7 @@ const CSS = `
 `;
 
 function init() {
+  captureInvite(); // keep a friend's ?invite= code for when they open a room
   const style = document.createElement("style");
   style.textContent = CSS;
   document.head.appendChild(style);

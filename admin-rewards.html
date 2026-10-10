@@ -109,7 +109,7 @@
       ["America/Los_Angeles", "US Pacific"], ["Asia/Bangkok", "Bangkok"],
     ];
     const S = {
-      cfgRaw: null, cfg: readConfig(null), schedule: null, rewards: {}, survey: {}, orders: {}, optins: {}, shouts: {},
+      cfgRaw: null, cfg: readConfig(null), schedule: null, rewards: {}, survey: {}, orders: {}, optins: {}, shouts: {}, refCodes: {},
       tab: "requests", reqFilter: "pending",
       tz: localStorage.getItem("astAdminTz") || "America/New_York",
       started: false,
@@ -154,6 +154,7 @@
       onValue(ref(db, "STRIPE_ORDERS"), (s) => { S.orders = s.val() || {}; render(); }, fail("orders"));
       onValue(ref(db, "FAN_OPTIN"), (s) => { S.optins = s.val() || {}; render(); }, fail("optins"));
       onValue(ref(db, "CONCERT_SHOUTOUTS"), (s) => { S.shouts = s.val() || {}; render(); }, fail("shoutouts"));
+      onValue(ref(db, "CONCERT_REF_CODES"), (s) => { S.refCodes = s.val() || {}; render(); }, fail("invite codes"));
       render();
     }
 
@@ -210,15 +211,26 @@
     }
 
     /** One entry per fan key with computed balance. */
+    /** uk -> invite code, from CONCERT_REF_CODES. */
+    function inviteCodesByUser() {
+      const m = {};
+      for (const [code, v] of Object.entries(S.refCodes || {})) if (v && v.uk) m[v.uk] = code;
+      return m;
+    }
     function fans() {
       const R = S.rewards || {};
       const parts = ["attendance", "tips", "adjust", "redemptions"];
+      const codes = inviteCodesByUser();
       const keys = new Set();
       for (const p of parts) for (const k of Object.keys(R[p] || {})) keys.add(k);
+      for (const k of Object.keys(R.referred || {})) keys.add(k);
+      for (const code of Object.keys(R.referrals || {})) { const o = (S.refCodes[code] || {}).uk; if (o) keys.add(o); }
       const out = new Map();
       for (const k of keys) {
         const data = { schedule: S.schedule };
         for (const p of parts) data[p] = (R[p] || {})[k] || null;
+        data.referrals = codes[k] ? (R.referrals || {})[codes[k]] || null : null;
+        data.referred = (R.referred || {})[k] || null;
         let email = "";
         for (const p of ["redemptions", "tips", "adjust"]) {
           for (const v of Object.values(data[p] || {})) if (!email && v && v.email) email = v.email;
@@ -828,7 +840,29 @@
         (shouts.length ? shouts.slice(0, 30).map((x) => '<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line)"><div><b>' + esc(x.name || "A fan") +
           '</b> <span class="muted">' + esc(x.perk || "") + " · " + esc(x.room.replace("Room", "Room ")) + " · " + esc(fmtDate(x.ts)) + "</span><div>" + esc(x.message || "") + "</div></div>" +
           '<button type="button" class="btn small bad" data-del-shout="' + esc(x.room) + "|" + esc(x.id) + '">Remove</button></div>').join("") : '<p class="muted">None yet.</p>') + "</div>";
-      $("#main").innerHTML = ordersHtml + optinHtml + shoutHtml +
+      // Invites: friends who watched a show through a fan's invite link
+      const F = fans();
+      const who2 = (uk) => { const f = F.get(uk); return f && f.email !== uk ? f.email : uk; };
+      const invites = [];
+      for (const [code, friends] of Object.entries((S.rewards || {}).referrals || {})) {
+        const owner = (S.refCodes[code] || {}).uk || "";
+        for (const [friend, v] of Object.entries(friends || {})) if (v) invites.push({ code, owner, friend, ...v });
+      }
+      invites.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      const perInviter = new Map();
+      for (const i of invites) perInviter.set(i.owner, (perInviter.get(i.owner) || 0) + 1);
+      const topInviters = [...perInviter.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+      const showName = (id) => { const sh = listShows(S.schedule).find((x) => x.id === id); return sh ? sh.artist + ", " + fmtDate(sh.startsAt) : id; };
+      const inviteHtml =
+        '<div class="card"><h2>Invites <span class="muted">(' + invites.length + (invites.length === 1 ? " friend" : " friends") + " joined)</span></h2>" +
+        '<p class="note" style="margin:0 0 10px">Fans share an invite link from the room. When a friend watches a show through it, the fan gets ' + S.cfg.referralPoints +
+        " pts and the friend gets " + S.cfg.referralFriendPoints + " pts. Change this in Settings.</p>" +
+        (topInviters.length ? '<p class="note" style="margin:0 0 10px">Top inviters: ' + topInviters.map(([uk, n]) => esc(who2(uk)) + " (" + n + ")").join(", ") + "</p>" : "") +
+        (invites.length ? '<div class="table-wrap"><table id="invitesTable"><thead><tr><th>When</th><th>Invited by</th><th>Friend</th><th>Show</th><th></th></tr></thead><tbody>' +
+          invites.slice(0, 100).map((i) => "<tr><td>" + esc(fmtDate(i.ts)) + "</td><td>" + esc(who2(i.owner) || i.code) + "</td><td>" + esc(who2(i.friend)) + "</td><td>" + esc(showName(i.showId)) +
+            '</td><td><button type="button" class="btn small bad" data-del-invite="' + esc(i.code) + "|" + esc(i.friend) + '">Delete</button></td></tr>').join("") +
+          "</tbody></table></div>" : '<p class="muted">No invites used yet.</p>') + "</div>";
+      $("#main").innerHTML = ordersHtml + optinHtml + shoutHtml + inviteHtml +
         '<div class="stats"><div class="stat"><b>' + rows.length + '</b><span>Answers</span></div><div class="stat"><b>' + fansN + '</b><span>Fans</span></div><div class="stat"><b>' + artistsN + "</b><span>Artists</span></div></div>" +
         '<div class="card"><h2>Fans of</h2>' + (top.length ? top.map(([n, c]) => "<div>" + esc(n) + ' <span class="muted">' + c + "</span></div>").join("") : '<p class="muted">No answers yet.</p>') + "</div>" +
         '<div class="card"><div class="top" style="margin-bottom:8px"><h2 style="margin:0">Survey answers</h2><button type="button" class="btn small ghost" id="csv">Download CSV</button></div>' +
@@ -841,6 +875,11 @@
         orders.map((o) => [new Date(o.ts || 0).toISOString(), o.name, o.email, o.perk, o.artist, ((o.amountCents || 0) / 100).toFixed(2), answers(o)])));
       $("#csvOptins").addEventListener("click", () => downloadCsv("asteroid-next-show-list.csv",
         ["date", "name", "email", "artist"], optins.map((o) => [new Date(o.ts || 0).toISOString(), o.name, o.email, o.artist])));
+      $("#main").querySelectorAll("[data-del-invite]").forEach((b) => b.addEventListener("click", async () => {
+        if (!confirm("Delete this invite? Both fans lose the invite points.")) return;
+        const [code, friend] = b.dataset.delInvite.split("|");
+        await update(ref(db), { ["REWARDS/referrals/" + code + "/" + friend]: null, ["REWARDS/referred/" + friend]: null }).catch((e) => alert(e && e.code));
+      }));
       $("#main").querySelectorAll("[data-del-shout]").forEach((b) => b.addEventListener("click", async () => {
         if (!confirm("Remove this shoutout from the room?")) return;
         const [room, id] = b.dataset.delShout.split("|");
@@ -868,6 +907,8 @@
         field("streakDays", "Show days for a streak", c.streakDays) +
         field("streakBonusPoints", "Streak bonus points", c.streakBonusPoints) +
         field("minGiftCardUsd", "Smallest gift card ($)", c.minGiftCardUsd) +
+        field("referralPoints", "Invite points: inviter", c.referralPoints) +
+        field("referralFriendPoints", "Invite points: friend", c.referralFriendPoints) +
         "</div><p class=\"note\">" + POINTS_PER_USD + " points = $1. At " + c.pointsPerDollar + " points per $1 tipped, tip points cost exactly " + c.pointsPerDollar + "% of tips.</p></div>" +
         '<div class="card"><h2>Costs</h2><div class="grid">' +
         field("cost_shoutout", "Shoutout", c.costs.shoutout) + field("cost_badge", "Supporter badge", c.costs.badge) +
@@ -898,6 +939,7 @@
         const patch = {
           pointsPerDollar: num("pointsPerDollar"), pointsPerShow: num("pointsPerShow"), attendMinutes: num("attendMinutes"),
           streakDays: Math.max(1, num("streakDays")), streakBonusPoints: num("streakBonusPoints"), minGiftCardUsd: Math.max(1, num("minGiftCardUsd")),
+          referralPoints: num("referralPoints"), referralFriendPoints: num("referralFriendPoints"),
           artistSharePct: a, rewardsSharePct: r, asteroidSharePct: s, viewerCountThreshold: num("viewerCountThreshold"),
           costs: { shoutout: num("cost_shoutout"), badge: num("cost_badge"), early: num("cost_early"), minTip: Math.max(1, num("cost_minTip")) },
           instagram: $("#f_instagram").value.trim(),

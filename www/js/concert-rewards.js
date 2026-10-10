@@ -9,7 +9,7 @@
 //   shoutouts, badges, early access) that Otto fulfils from admin-rewards.html.
 
 import {
-  ref, onValue, set, push, update, remove, onDisconnect, serverTimestamp,
+  ref, onValue, set, get, push, update, remove, onDisconnect, serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 import {
   initializeAuth, getAuth, onAuthStateChanged, browserLocalPersistence, indexedDBLocalPersistence,
@@ -17,6 +17,7 @@ import {
 import {
   firebaseApp, firebaseDb, readConfig, rewardsKey, anonId, appEmailKey, esc, fmtPts, ptsToUsd,
   listShows, roomStatus, computeRewards, fmtWhen, GIFT_CARDS, REDEEM_LABELS, POINTS_PER_USD, ptsToUsdShort, refSlug, directTipLink,
+  captureInvite, clearInvite, isInviteCode, newInviteCode, inviteUrl,
 } from "./concert-rewards-core.js";
 
 const SURVEY_KEY = "astConcertSurvey_v1";
@@ -53,6 +54,7 @@ const CSS = `
 .crx-sh span{color:#ff9a73;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-left:8px}
 .crx-sh p{margin:4px 0 0;font-size:13px;color:rgba(255,255,255,.85);line-height:1.45;word-break:break-word}
 .crx-support{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
+.crx-invite{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
 .crx-support-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:2px}
 .crx-perks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .crx-perks .crx-btn{margin-top:8px;padding:11px 10px;font-size:13px;flex-direction:column;gap:2px}
@@ -146,11 +148,15 @@ export function mountConcertRewards(roomNum) {
     viewers: 0,
     user: null,
     key: "",
-    mine: { attendance: null, tips: null, adjust: null, redemptions: null },
+    mine: { attendance: null, tips: null, adjust: null, redemptions: null, referrals: null, referred: null },
     attendanceLoaded: false,
     writingAttendance: false,
     attendanceRetryAt: 0,
     support: { showId: "", name: "" }, // artist the fan picked in a show with several artists
+    invite: captureInvite(),           // {code, ts} from a friend's invite link, or null
+    myInvite: "",                      // this fan's own invite code
+    referredLoaded: false,
+    creditingInvite: false,
   };
   const shows = () => listShows(state.schedule);
   const status = () => roomStatus(room, state.roomData, shows(), Date.now());
@@ -277,6 +283,7 @@ export function mountConcertRewards(roomNum) {
         renderPanel();
       }
     }
+    if (t.dataset.act === "invite") shareInvite(t);
     if (t.dataset.act === "tip") openStripe(state.cfg.tipLink, "tip");
     if (t.dataset.act === "perk") {
       const perk = state.cfg.perks[Number(t.dataset.i)];
@@ -416,14 +423,18 @@ export function mountConcertRewards(roomNum) {
       " pts per $1. Artists keep " + cfg.artistSharePct + "% after card fees. Asteroid's " + fee + "%: " +
       cfg.rewardsSharePct + "% funds fan rewards, " + cfg.asteroidSharePct + "% runs Asteroid. Direct tips go 100% to the artist.</p>";
     const tipBtn = supportHtml();
+    const invited = pendingInvite(true);
+    const login = "login.html?return=liveroom" + roomNum + ".html";
     if (!state.user) {
       // The app can remember you while the points login has ended (for example after signing out elsewhere)
       const remembered = !!appEmailKey();
       setHtml(panel, '<h3><span>' + (remembered ? "Your points" : "Earn points") + '</span><button class="crx-link" data-act="how">How it works</button></h3>' +
-        '<p class="cr-hint">' + (remembered
-          ? "Your points are safe. Sign in again to see them and keep earning."
-          : "Log in to earn points for watching and tipping. Spend them on gift cards, shoutouts and more.") + "</p>" +
-        '<a class="crx-btn" href="login.html">' + (remembered ? "Sign in again" : "Log in") + "</a>" + tipBtn + fine);
+        '<p class="cr-hint">' + (invited && cfg.referralFriendPoints > 0
+          ? "A friend invited you. " + (remembered ? "Sign in" : "Log in") + " and watch " + cfg.attendMinutes + " minutes of a show to get +" + fmtPts(cfg.referralFriendPoints) + " pts."
+          : remembered
+            ? "Your points are safe. Sign in again to see them and keep earning."
+            : "Log in to earn points for watching and tipping. Spend them on gift cards, shoutouts and more.") + "</p>" +
+        '<a class="crx-btn" href="' + login + '">' + (remembered ? "Sign in again" : "Log in") + "</a>" + tipBtn + fine);
       return;
     }
     const r = rewards();
@@ -436,7 +447,98 @@ export function mountConcertRewards(roomNum) {
       '<div class="crx-line">' + icon("local_fire_department") + '<span class="crx-flames">' + flames + "</span><span>Streak " +
       r.streakProgress + " of " + cfg.streakDays + " show days for +" + fmtPts(cfg.streakBonusPoints) + " pts</span></div>" +
       (att ? '<div class="crx-line">' + att + "</div>" : "") +
-      '<button class="crx-btn" data-act="spend">' + icon("redeem") + "Spend points</button>" + tipBtn + fine);
+      (invited && cfg.referralFriendPoints > 0 ? '<div class="crx-line">' + icon("person_add") + "<span>A friend invited you. Watch " + cfg.attendMinutes +
+        " minutes of a show and get +" + fmtPts(cfg.referralFriendPoints) + " pts.</span></div>" : "") +
+      '<button class="crx-btn" data-act="spend">' + icon("redeem") + "Spend points</button>" + tipBtn + inviteHtml(r) + fine);
+  }
+
+  // ---- Invite friends -------------------------------------------------------------------
+  function inviteHtml(r) {
+    const c = state.cfg;
+    const a = c.referralPoints, b = c.referralFriendPoints;
+    const how = a > 0 && a === b
+      ? "You both get +" + fmtPts(a) + " pts when a friend watches " + c.attendMinutes + " minutes of a show."
+      : a > 0 || b > 0
+        ? "You get +" + fmtPts(a) + " pts and your friend gets +" + fmtPts(b) + " pts when they watch " + c.attendMinutes + " minutes of a show."
+        : "Share this concert with friends.";
+    return '<div class="crx-invite"><div class="crx-support-title">Invite friends</div>' +
+      '<p class="crx-fine" style="margin:4px 0 0">' + how + "</p>" +
+      '<button type="button" class="crx-btn ghost" data-act="invite">' + icon("ios_share") + "Share invite link</button>" +
+      (r.referralCount ? '<div class="crx-line">' + icon("group") + "<span>" + r.referralCount + (r.referralCount === 1 ? " friend" : " friends") +
+        " joined · +" + fmtPts(r.referralPts) + " pts</span></div>" : "") +
+      "</div>";
+  }
+
+  /** This fan's invite code, made the first time they share. */
+  async function ensureInviteCode() {
+    if (state.myInvite) return state.myInvite;
+    if (!state.key) return "";
+    try {
+      const s = await get(ref(db, "CONCERT_REF_BY_USER/" + state.key));
+      if (isInviteCode(s.val())) { state.myInvite = s.val(); return state.myInvite; }
+    } catch (e) {}
+    for (let i = 0; i < 3; i++) {
+      const code = newInviteCode();
+      try {
+        await update(ref(db), {
+          ["CONCERT_REF_CODES/" + code]: { uk: state.key, ts: serverTimestamp() },
+          ["CONCERT_REF_BY_USER/" + state.key]: code,
+        });
+        state.myInvite = code;
+        return code;
+      } catch (e) { console.warn("[rewards] invite code", e && e.code); }
+    }
+    return "";
+  }
+
+  async function shareInvite(btn) {
+    btn.disabled = true;
+    const code = await ensureInviteCode();
+    btn.disabled = false;
+    if (!code) { toast("Couldn't make your invite link. Try again."); return; }
+    const url = inviteUrl(roomNum, code);
+    try {
+      if (navigator.share) { await navigator.share({ title: "Asteroid live concert", text: "Watch this live concert with me on Asteroid", url }); return; }
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    try { await navigator.clipboard.writeText(url); toast("Invite link copied. Send it to your friends."); }
+    catch (e) { prompt("Copy your invite link:", url); }
+  }
+
+  /** The friend's invite code still waiting to be credited, or "". */
+  function pendingInvite(forDisplay) {
+    const inv = state.invite;
+    if (!inv) return "";
+    if (state.key && state.referredLoaded && (state.mine.referred || inv.code === state.myInvite)) {
+      clearInvite();
+      state.invite = null;
+      return "";
+    }
+    return forDisplay || (state.key && state.referredLoaded) ? inv.code : "";
+  }
+
+  /** Once the invited friend has watched a show (after opening the link), both get points. */
+  function creditInvite() {
+    const code = pendingInvite(false);
+    if (!code || state.creditingInvite || !state.attendanceLoaded) return;
+    const since = (state.invite.ts || 0) - 60 * 60 * 1000;
+    const att = state.mine.attendance || {};
+    const showId = Object.keys(att)
+      .filter((id) => Number(att[id] && att[id].ts) >= since)
+      .sort((x, y) => Number(att[y].ts) - Number(att[x].ts))[0];
+    if (!showId) return;
+    state.creditingInvite = true;
+    update(ref(db), {
+      ["REWARDS/referrals/" + code + "/" + state.key]: { ts: serverTimestamp(), showId },
+      ["REWARDS/referred/" + state.key]: { code, ts: serverTimestamp() },
+    }).then(() => {
+      clearInvite();
+      state.invite = null;
+      if (state.cfg.referralFriendPoints > 0) toast("+" + fmtPts(state.cfg.referralFriendPoints) + " pts for joining through a friend");
+    }).catch((e) => {
+      // Not allowed (own link, already invited, unknown code): drop it. Anything else: try again later.
+      if (/PERMISSION_DENIED/i.test(String((e && (e.code || e.message)) || ""))) { clearInvite(); state.invite = null; }
+      else console.warn("[rewards] invite", e && e.code);
+    }).finally(() => { state.creditingInvite = false; renderPanel(); });
   }
 
   // ---- Support: Stripe Payment Links and the artist's own tip link ---------------
@@ -524,6 +626,7 @@ export function mountConcertRewards(roomNum) {
   }
   function refresh() {
     checkAttendance();
+    creditInvite();
     renderPill();
     renderPanel();
   }
@@ -536,22 +639,40 @@ export function mountConcertRewards(roomNum) {
   onValue(ref(db, "LiveRooms/" + room), (s) => { state.roomData = s.val(); refresh(); renderShouts(); }, () => {});
 
   let unsubs = [];
+  let unsubReferrals = null;
   onAuthStateChanged(auth, (user) => {
     unsubs.forEach((u) => u());
     unsubs = [];
-    state.mine = { attendance: null, tips: null, adjust: null, redemptions: null };
+    if (unsubReferrals) { unsubReferrals(); unsubReferrals = null; }
+    state.mine = { attendance: null, tips: null, adjust: null, redemptions: null, referrals: null, referred: null };
     state.attendanceLoaded = false;
+    state.referredLoaded = false;
+    state.myInvite = "";
     state.user = user && user.email ? user : null;
     state.key = state.user ? rewardsKey(state.user.email) : "";
     if (state.key) {
-      for (const part of ["attendance", "tips", "adjust", "redemptions"]) {
+      for (const part of ["attendance", "tips", "adjust", "redemptions", "referred"]) {
         unsubs.push(onValue(ref(db, "REWARDS/" + part + "/" + state.key), (s) => {
           state.mine[part] = s.val();
           if (part === "attendance") state.attendanceLoaded = true;
+          if (part === "referred") state.referredLoaded = true;
           refresh();
           if (spendOpen) renderSpend();
         }, (e) => console.warn("[rewards] read " + part, e && e.code)));
       }
+      // Friends who joined through this fan's invite link
+      unsubs.push(onValue(ref(db, "CONCERT_REF_BY_USER/" + state.key), (s) => {
+        const code = isInviteCode(s.val()) ? s.val() : "";
+        if (code === state.myInvite && unsubReferrals) return;
+        state.myInvite = code;
+        if (unsubReferrals) { unsubReferrals(); unsubReferrals = null; }
+        state.mine.referrals = null;
+        if (code) {
+          unsubReferrals = onValue(ref(db, "REWARDS/referrals/" + code), (r) => { state.mine.referrals = r.val(); refresh(); },
+            (e) => console.warn("[rewards] read referrals", e && e.code));
+        }
+        refresh();
+      }, (e) => console.warn("[rewards] read invite code", e && e.code)));
     }
     renderPanel();
   });

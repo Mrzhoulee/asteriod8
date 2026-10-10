@@ -63,6 +63,22 @@
             ".validate": "newData.hasChildren(['type','points','ts','status']) && newData.child('type').isString() && newData.child('type').val().matches(/^(giftcard|tip|shoutout|badge|early)$/) && newData.child('points').isNumber() && newData.child('points').val() > 0 && newData.child('points').val() <= 1000000 && newData.child('ts').isNumber() && newData.child('status').isString() && newData.child('status').val().matches(/^(pending|sent|rejected)$/) && (!newData.hasChild('email') || (newData.child('email').isString() && newData.child('email').val().length <= 200)) && (!newData.hasChild('detail') || (newData.child('detail').isString() && newData.child('detail').val().length <= 300)) && (!newData.hasChild('card') || (newData.child('card').isString() && newData.child('card').val().length <= 40))"
           }
         }
+      },
+      "referrals": {
+        "$code": {
+          ".read": "auth != null && auth.token.email != null && root.child('CONCERT_REF_CODES').child($code).child('uk').val() == auth.token.email.toLowerCase().replace('.', '_')",
+          "$friend": {
+            ".write": "!data.exists() && auth != null && auth.token.email != null && $friend == auth.token.email.toLowerCase().replace('.', '_')",
+            ".validate": "newData.hasChildren(['ts','showId']) && newData.child('ts').val() == now && newData.child('showId').isString() && root.child('CONCERT_REF_CODES').child($code).exists() && root.child('CONCERT_REF_CODES').child($code).child('uk').val() != $friend && root.child('REWARDS').child('attendance').child($friend).child(newData.child('showId').val()).exists() && newData.parent().parent().parent().child('referred').child($friend).child('code').val() == $code"
+          }
+        }
+      },
+      "referred": {
+        "$uk": {
+          ".read": "auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+          ".write": "!data.exists() && auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+          ".validate": "newData.hasChildren(['code','ts']) && newData.child('ts').val() == now && newData.child('code').isString() && newData.parent().parent().child('referrals').child(newData.child('code').val()).child($uk).exists()"
+        }
       }
     },
     "CONCERT_SHOUTOUTS": {
@@ -76,6 +92,21 @@
     "STRIPE_ORDERS": {
       ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
       ".write": "auth != null && auth.token.email == 'console.admin@asteroid8.net'"
+    },
+    "CONCERT_REF_CODES": {
+      ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      "$code": {
+        ".write": "!data.exists() && auth != null && auth.token.email != null && newData.child('uk').val() == auth.token.email.toLowerCase().replace('.', '_')",
+        ".validate": "$code.matches(/^[a-z0-9]{6,12}$/) && newData.hasChildren(['uk','ts']) && newData.child('ts').isNumber() && newData.parent().parent().child('CONCERT_REF_BY_USER').child(newData.child('uk').val()).val() == $code"
+      }
+    },
+    "CONCERT_REF_BY_USER": {
+      ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      "$uk": {
+        ".read": "auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+        ".write": "!data.exists() && auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+        ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{6,12}$/) && newData.parent().parent().child('CONCERT_REF_CODES').child(newData.val()).child('uk').val() == $uk"
+      }
     }
   }
 }
