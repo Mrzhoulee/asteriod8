@@ -288,7 +288,7 @@
                 (q.type === "giftcard" ? '<a class="btn small ghost" href="https://www.bitrefill.com/us/en/gift-cards/" target="_blank" rel="noopener">Bitrefill</a>' : "") +
                 '<button type="button" class="btn small good" data-done="' + esc(q.uk) + "|" + esc(q.id) + '">' + (target ? "Approve and show" : "Mark done") + "</button>" +
                 '<button type="button" class="btn small bad" data-reject="' + esc(q.uk) + "|" + esc(q.id) + '">Reject</button></div>'
-              : "";
+              : q.status === "sent" ? '<button type="button" class="btn small ghost" data-undo="' + esc(q.uk) + "|" + esc(q.id) + '">Undo</button>' : "";
             return "<tr><td>" + esc(fmtDate(q.ts)) + "</td><td>" + esc(q.email || q.uk) + "</td><td>" + what + '</td><td class="num">' + fmtPts(q.points) +
               '</td><td class="num' + (bal < 0 ? " over" : "") + '">' + (bal < 0 ? "Over by " + fmtPts(-bal) : fmtPts(bal)) +
               '</td><td><span class="pill ' + esc(q.status) + '">' + esc(q.status) + "</span></td><td>" + act + "</td></tr>";
@@ -317,6 +317,7 @@
         try { await update(ref(db), updates); }
         catch (e) { alert("Update failed: " + (e && e.code)); b.disabled = false; }
       }));
+      bindUndo();
     }
 
     function newDraft() {
@@ -480,6 +481,11 @@
     function renderTips() {
       const cfg = S.cfg;
       const tips = allTips().slice(0, 50);
+      const adjusts = [];
+      for (const [uk, list] of Object.entries((S.rewards || {}).adjust || {})) {
+        for (const [id, v] of Object.entries(list || {})) if (v) adjusts.push({ uk, id, ...v });
+      }
+      adjusts.sort((a, b) => (b.ts || 0) - (a.ts || 0));
       $("#main").innerHTML =
         '<div class="card"><h2>Credit a tip</h2><p class="note" style="margin:0 0 12px">Stripe perk payments are credited automatically by the webhook. Use this for anything else, with the fan\'s Asteroid email. They get ' + cfg.pointsPerDollar + " points per $1.</p>" +
         '<div class="grid"><div><label for="f_temail">Fan email</label><input id="f_temail" type="email"></div>' +
@@ -491,7 +497,12 @@
         '<div><label for="f_aemail">Fan email</label><input id="f_aemail" type="email"></div>' +
         '<div><label for="f_apts">Points (+ or minus)</label><input id="f_apts" type="number" step="1"></div>' +
         '<div><label for="f_areason">Reason</label><input id="f_areason" maxlength="120"></div>' +
-        '<div><button type="button" class="btn" id="addAdj">Save</button></div></div></div>' +
+        '<div><button type="button" class="btn" id="addAdj">Save</button></div></div>' +
+        (adjusts.length ? '<div class="table-wrap" style="margin-top:12px"><table><thead><tr><th>When</th><th>Fan</th><th class="num">Points</th><th>Reason</th><th></th></tr></thead><tbody>' +
+          adjusts.slice(0, 50).map((a) => "<tr><td>" + esc(fmtDate(a.ts)) + "</td><td>" + esc(a.email || a.uk) + '</td><td class="num' + (Math.abs(Number(a.points) || 0) > 10000 ? " over" : "") + '">' +
+            ((Number(a.points) || 0) > 0 ? "+" : "") + fmtPts(a.points) + "</td><td>" + esc(a.reason || "") +
+            '</td><td><button type="button" class="btn small bad" data-del-adj="' + esc(a.uk) + "|" + esc(a.id) + '">Delete</button></td></tr>').join("") +
+          "</tbody></table></div>" : "") + "</div>" +
         '<div class="card"><h2>Recent tips</h2>' + (tips.length ? '<div class="table-wrap"><table><thead><tr><th>When</th><th>Fan</th><th>Artist</th><th class="num">Amount</th><th class="num">Artist ' + cfg.artistSharePct + '%</th><th class="num">Fan pts</th><th></th></tr></thead><tbody>' +
           tips.map((t) => "<tr><td>" + esc(fmtDate(t.ts)) + "</td><td>" + esc(t.email || t.uk) + "</td><td>" + esc(t.artist) + '</td><td class="num">' + centsToUsd(t.amountCents) +
             '</td><td class="num">' + centsToUsd(splitCents(t.amountCents, cfg).artist) + '</td><td class="num">' + fmtPts(tipPoints(t.amountCents, cfg)) +
@@ -511,6 +522,8 @@
         const artist = $("#f_tartist").value.trim();
         const cents = Math.round((Number($("#f_tamt").value) || 0) * 100);
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !artist || cents <= 0) { alert("Fill in fan email, artist and amount."); return; }
+        if (cents > 1000000) { alert("That's over $10,000. Check the amount."); return; }
+        if (cents > 50000 && !confirm("Credit a " + centsToUsd(cents) + " tip?")) return;
         try {
           await push(ref(db, "REWARDS/tips/" + rewardsKey(email)), { amountCents: cents, artist: artist.slice(0, 80), email, note: $("#f_tnote").value.trim().slice(0, 120), ts: Date.now() });
           document.activeElement && document.activeElement.blur();
@@ -521,6 +534,8 @@
         const email = $("#f_aemail").value.trim().toLowerCase();
         const points = Math.round(Number($("#f_apts").value) || 0);
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !points) { alert("Fill in fan email and points."); return; }
+        if (Math.abs(points) > 1000000) { alert("That's more than 1,000,000 points. Check the number."); return; }
+        if (Math.abs(points) > 10000 && !confirm((points > 0 ? "Add " : "Remove ") + fmtPts(Math.abs(points)) + " points (" + ptsToUsd(Math.abs(points)) + ")?")) return;
         try {
           await push(ref(db, "REWARDS/adjust/" + rewardsKey(email)), { points, reason: $("#f_areason").value.trim().slice(0, 120), email, ts: Date.now() });
           document.activeElement && document.activeElement.blur();
@@ -531,6 +546,11 @@
         if (!confirm("Delete this tip? The fan loses its points.")) return;
         const [uk, id] = b.dataset.delTip.split("|");
         await remove(ref(db, "REWARDS/tips/" + uk + "/" + id)).catch((e) => alert(e && e.code));
+      }));
+      $("#main").querySelectorAll("[data-del-adj]").forEach((b) => b.addEventListener("click", async () => {
+        if (!confirm("Delete this points adjustment?")) return;
+        const [uk, id] = b.dataset.delAdj.split("|");
+        await remove(ref(db, "REWARDS/adjust/" + uk + "/" + id)).catch((e) => alert(e && e.code));
       }));
     }
 
@@ -553,32 +573,81 @@
         asteroid += sp.asteroid;
       }
       let poolOut = 0, cardsSent = 0;
+      const payouts = [];
       for (const q of allRedemptions()) {
         const cents = Math.round(((Number(q.points) || 0) / POINTS_PER_USD) * 100);
         if (q.type === "tip") {
           const a = get(q.detail);
-          if (q.status === "sent") { a.ptsSent += cents; poolOut += cents; }
+          if (q.status === "sent") { a.ptsSent += cents; poolOut += cents; payouts.push({ ...q, cents }); }
           if (q.status === "pending") a.ptsPending += cents;
         }
-        if (q.type === "giftcard" && q.status === "sent") { poolOut += cents; cardsSent += cents; }
+        if (q.type === "giftcard" && q.status === "sent") { poolOut += cents; cardsSent += cents; payouts.push({ ...q, cents }); }
       }
+      const topups = Object.entries((S.rewards || {}).pool || {}).map(([id, v]) => ({ id, ...(v || {}) }))
+        .filter((t) => Number(t.cents) > 0).sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      const topupCents = topups.reduce((n, t) => n + Math.round(Number(t.cents) || 0), 0);
+      const poolLeft = poolIn + topupCents - poolOut;
       let liability = 0;
       for (const f of fans().values()) liability += Math.max(0, f.r.balance);
       const rows = [...by.values()].sort((a, b) => (b.share + b.ptsSent) - (a.share + a.ptsSent));
+      const what = (q) => q.type === "giftcard" ? esc((q.card || "Gift card") + " " + (q.detail || "")) : "Points tip to " + esc(q.detail || q.artist || "");
       $("#main").innerHTML =
         '<div class="stats">' +
         '<div class="stat"><b>' + centsToUsd(gross) + "</b><span>Cash tips credited</span></div>" +
         '<div class="stat"><b>' + centsToUsd(gross - poolIn - asteroid) + "</b><span>Artists' " + cfg.artistSharePct + "%</span></div>" +
         '<div class="stat"><b>' + centsToUsd(asteroid) + "</b><span>Asteroid " + cfg.asteroidSharePct + "%</span></div>" +
-        '<div class="stat"><b>' + centsToUsd(poolIn) + "</b><span>Rewards pool in (" + cfg.rewardsSharePct + "%)</span></div>" +
+        '<div class="stat"><b>' + centsToUsd(poolIn + topupCents) + "</b><span>Rewards pool in (" + cfg.rewardsSharePct + "%" + (topupCents ? " + top ups" : "") + ")</span></div>" +
         '<div class="stat"><b>' + centsToUsd(poolOut) + "</b><span>Rewards paid out</span></div>" +
-        '<div class="stat"><b class="' + (poolIn - poolOut < 0 ? "over" : "") + '">' + centsToUsd(poolIn - poolOut) + "</b><span>Pool left</span></div>" +
+        '<div class="stat"><b class="' + (poolLeft < 0 ? "over" : "") + '">' + centsToUsd(poolLeft) + "</b><span>Pool left</span></div>" +
         '<div class="stat"><b>' + ptsToUsd(liability) + "</b><span>Unspent fan points</span></div></div>" +
+        '<div class="card"><h2>Rewards pool</h2>' +
+        '<p class="note" style="margin:0 0 12px">The pool pays for gift cards and points tips. It fills with ' + cfg.rewardsSharePct + "% of every tip. " +
+        "Top up adds money you put in yourself, for example from Asteroid's " + cfg.asteroidSharePct + "%. It's a record for your books; you move the money yourself.</p>" +
+        '<div class="grid"><div><label for="f_pamt">Top up (USD)</label><input id="f_pamt" type="number" min="1" step="0.01"></div>' +
+        '<div><label for="f_pnote">Note</label><input id="f_pnote" maxlength="120" placeholder="Optional"></div>' +
+        '<div><button type="button" class="btn" id="addTopup">Add to pool</button></div></div>' +
+        (topups.length ? '<div class="table-wrap" style="margin-top:12px"><table id="poolTopups"><thead><tr><th>When</th><th>Top up</th><th>Note</th><th></th></tr></thead><tbody>' +
+          topups.map((t) => "<tr><td>" + esc(fmtDate(t.ts)) + '</td><td class="num">' + centsToUsd(t.cents) + "</td><td>" + esc(t.note || "") +
+            '</td><td><button type="button" class="btn small bad" data-del-topup="' + esc(t.id) + '">Delete</button></td></tr>').join("") + "</tbody></table></div>" : "") +
+        '<h2 style="margin:18px 0 8px">Paid from the pool</h2>' +
+        (payouts.length ? '<div class="table-wrap"><table id="poolPayouts"><thead><tr><th>When</th><th>Fan</th><th>What</th><th class="num">Amount</th><th></th></tr></thead><tbody>' +
+          payouts.sort((a, b) => b.cents - a.cents).slice(0, 50).map((q) => "<tr><td>" + esc(fmtDate(q.doneAt || q.ts)) + "</td><td>" + esc(q.email || q.uk) + "</td><td>" + what(q) +
+            '</td><td class="num">' + centsToUsd(q.cents) + '</td><td><button type="button" class="btn small bad" data-undo="' + esc(q.uk) + "|" + esc(q.id) + '">Undo</button></td></tr>').join("") +
+          "</tbody></table></div>" : '<p class="muted">Nothing paid from the pool yet.</p>') +
+        '<p class="note">Biggest first. Undo a test or a mistake and the fan gets the points back.</p></div>' +
         '<div class="card"><h2>Artist earnings</h2>' + (rows.length ? '<div class="table-wrap"><table><thead><tr><th>Artist</th><th class="num">Tips</th><th class="num">Their ' + cfg.artistSharePct + '%</th><th class="num">Point tips paid</th><th class="num">Point tips pending</th><th class="num">Total</th></tr></thead><tbody>' +
           rows.map((a) => "<tr><td>" + esc(a.name) + '</td><td class="num">' + centsToUsd(a.gross) + '</td><td class="num">' + centsToUsd(a.share) + '</td><td class="num">' + centsToUsd(a.ptsSent) +
             '</td><td class="num">' + centsToUsd(a.ptsPending) + '</td><td class="num"><b>' + centsToUsd(a.share + a.ptsSent) + "</b></td></tr>").join("") +
           "</tbody></table></div>" : '<p class="muted">No tips yet.</p>') +
-        '<p class="note">Gift cards sent: ' + centsToUsd(cardsSent) + '. If "Pool left" goes negative, watch and streak points are costing more than the ' + cfg.rewardsSharePct + "% rewards share. Lower them in Settings or top up the pool.</p></div>";
+        '<p class="note">Gift cards sent: ' + centsToUsd(cardsSent) + '. If "Pool left" goes negative, gift cards and points tips are costing more than the ' + cfg.rewardsSharePct + "% rewards share. Lower watch and streak points in Settings, or top up the pool.</p></div>";
+
+      $("#addTopup").addEventListener("click", async () => {
+        const cents = Math.round((Number($("#f_pamt").value) || 0) * 100);
+        if (!(cents > 0)) { alert("Enter an amount."); return; }
+        if (cents > 1000000) { alert("Top ups are $10,000 at most each."); return; }
+        if (cents > 50000 && !confirm("Add " + centsToUsd(cents) + " to the rewards pool?")) return;
+        try {
+          await push(ref(db, "REWARDS/pool"), { cents, note: $("#f_pnote").value.trim().slice(0, 120), ts: Date.now() });
+          document.activeElement && document.activeElement.blur();
+          render();
+        } catch (e) { alert("Couldn't save: " + (e && e.code)); }
+      });
+      $("#main").querySelectorAll("[data-del-topup]").forEach((b) => b.addEventListener("click", async () => {
+        if (!confirm("Delete this top up?")) return;
+        await remove(ref(db, "REWARDS/pool/" + b.dataset.delTopup)).catch((e) => alert(e && e.code));
+      }));
+      bindUndo();
+    }
+
+    /** Undo a fulfilled request: it counts as returned, the fan gets the points back. */
+    function bindUndo() {
+      $("#main").querySelectorAll("[data-undo]").forEach((b) => b.addEventListener("click", async () => {
+        if (!confirm("Undo this? It's marked returned and the fan gets the points back.")) return;
+        const [uk, id] = b.dataset.undo.split("|");
+        b.disabled = true;
+        try { await update(ref(db, "REWARDS/redemptions/" + uk + "/" + id), { status: "rejected", undoneAt: Date.now() }); }
+        catch (e) { alert("Update failed: " + (e && e.code)); b.disabled = false; }
+      }));
     }
 
     function renderFans() {

@@ -224,8 +224,14 @@ export function fmtPts(n) {
   return Math.round(Number(n) || 0).toLocaleString("en-US");
 }
 
+/** "$1,234.50", "-$3.00" */
+function usd(dollars) {
+  const n = Number(dollars) || 0;
+  return (n < 0 ? "-" : "") + "$" + Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 export function ptsToUsd(pts) {
-  return "$" + ((Number(pts) || 0) / POINTS_PER_USD).toFixed(2);
+  return usd((Number(pts) || 0) / POINTS_PER_USD);
 }
 
 /** Lowercase letters, digits and underscores (safe for Stripe client_reference_id). */
@@ -240,7 +246,7 @@ export function ptsToUsdShort(pts) {
 }
 
 export function centsToUsd(cents) {
-  return "$" + ((Number(cents) || 0) / 100).toFixed(2);
+  return usd((Number(cents) || 0) / 100);
 }
 
 export function splitCents(cents, cfg) {
