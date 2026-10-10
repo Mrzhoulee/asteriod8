@@ -2,8 +2,11 @@
 // Used by the concert rooms, the concerts lobby and admin-rewards.html.
 //
 // RTDB layout
-//   CONCERT_SCHEDULE/{showId}   {room:"Room1", artist, startsAt, endsAt}      admin only
+//   CONCERT_SCHEDULE/{showId}   {room:"Room1", artist, artists, startsAt, endsAt}   admin only
+//                               artists = every artist in the show ["Nova","Luna"]
+//                               artist  = "Nova & Luna" (label, kept for older app versions)
 //   CONCERT_CONFIG              rewards numbers + artists list                  admin only
+//                               artists/{id} = {name, emailKey, tipLink}
 //   CONCERT_PRESENCE/{room}/{viewer}  server timestamp, removed on disconnect
 //   FAN_SURVEY/{key}            {role, fanOf[], other, ts, email?}              admin read
 //   REWARDS/attendance/{uk}/{showId}  {ts, room}   fan writes once per show while it is live
@@ -103,19 +106,76 @@ function readPerks(raw) {
   return out;
 }
 
-// Artists can add their own tip link when going live. Only well known tip sites
-// are shown as a button, so a bad link can't pose as an Asteroid tip.
-const ARTIST_TIP_HOSTS = ["paypal.me", "paypal.com", "ko-fi.com", "cash.app", "venmo.com", "buymeacoffee.com", "patreon.com"];
-export function artistTipLink(roomData) {
-  const raw = roomData && typeof roomData.donationEmbed === "string" ? roomData.donationEmbed.trim() : "";
-  if (!/^https:\/\/\S+$/.test(raw)) return "";
+// Artists can add their own tip link when going live (or Otto adds it per artist in
+// admin-rewards.html). Only well known tip sites are shown as a button, so a bad
+// link can't pose as an Asteroid tip.
+export const ARTIST_TIP_HOSTS = ["paypal.me", "paypal.com", "ko-fi.com", "cash.app", "venmo.com", "buymeacoffee.com", "patreon.com"];
+export function safeTipLink(raw) {
+  const s = typeof raw === "string" ? raw.trim() : "";
+  if (!/^https:\/\/\S+$/.test(s)) return "";
   try {
-    const u = new URL(raw);
+    const u = new URL(s);
     const host = u.hostname.toLowerCase().replace(/^www\./, "");
     return ARTIST_TIP_HOSTS.some((h) => host === h || host.endsWith("." + h)) ? u.toString() : "";
   } catch (e) {
     return "";
   }
+}
+export function artistTipLink(roomData) {
+  return safeTipLink(roomData && roomData.donationEmbed);
+}
+
+/** Config entry for an artist name (case insensitive): {id, name, emailKey, tipLink} or null. */
+export function findArtist(cfg, name) {
+  const n = String(name || "").trim().toLowerCase();
+  if (!n) return null;
+  for (const [id, a] of Object.entries((cfg && cfg.artists) || {})) {
+    if (a && String(a.name || "").trim().toLowerCase() === n) {
+      return { id, name: String(a.name).trim(), emailKey: String(a.emailKey || ""), tipLink: String(a.tipLink || "") };
+    }
+  }
+  return null;
+}
+
+/**
+ * The artist's own tip link (PayPal, Ko-fi...) for the "Tip directly" button.
+ * 1. the link saved for that artist in admin
+ * 2. the link the host typed when going live, when the show has one artist
+ *    or the host's account is that artist's
+ */
+export function directTipLink(name, show, roomData, cfg) {
+  const a = findArtist(cfg, name);
+  const own = a ? safeTipLink(a.tipLink) : "";
+  if (own) return own;
+  const roomLink = artistTipLink(roomData);
+  if (!roomLink) return "";
+  if (!show || !show.artists || show.artists.length <= 1) return roomLink;
+  const host = roomData && typeof roomData.hostEmailKey === "string" ? roomData.hostEmailKey.trim() : "";
+  return a && a.emailKey && host && a.emailKey === host ? roomLink : "";
+}
+
+export const MAX_SHOW_ARTISTS = 8;
+
+/** Clean list of artist names: trimmed, no duplicates (any case), at most MAX_SHOW_ARTISTS. */
+export function cleanArtistList(raw) {
+  const list = Array.isArray(raw) ? raw : raw && typeof raw === "object" ? Object.values(raw) : typeof raw === "string" ? [raw] : [];
+  const seen = new Set();
+  const out = [];
+  for (const x of list) {
+    const n = typeof x === "string" ? x.replace(/\s+/g, " ").trim().slice(0, 80) : "";
+    if (!n || seen.has(n.toLowerCase())) continue;
+    seen.add(n.toLowerCase());
+    out.push(n);
+    if (out.length === MAX_SHOW_ARTISTS) break;
+  }
+  return out;
+}
+
+/** "Nova", "Nova & Luna", "Nova, Luna & Kai". */
+export function artistsLabel(list) {
+  const a = (list || []).filter(Boolean);
+  if (a.length <= 1) return a[0] || "";
+  return a.slice(0, -1).join(", ") + " & " + a[a.length - 1];
 }
 
 export function firebaseApp() {
@@ -211,7 +271,9 @@ export function listShows(schedule) {
     const endsAt = Number(s.endsAt);
     if (!Number.isFinite(startsAt) || !Number.isFinite(endsAt) || endsAt <= startsAt) continue;
     if (!ROOMS.includes(s.room)) continue;
-    out.push({ id, room: s.room, artist: String(s.artist || ""), startsAt, endsAt });
+    let artists = cleanArtistList(s.artists);
+    if (!artists.length) artists = cleanArtistList([String(s.artist || "")]);
+    out.push({ id, room: s.room, artist: artistsLabel(artists), artists, startsAt, endsAt });
   }
   return out.sort((a, b) => a.startsAt - b.startsAt);
 }

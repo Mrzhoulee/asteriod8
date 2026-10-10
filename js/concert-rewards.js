@@ -1,6 +1,9 @@
 // Concert room add on (liveroom1-5.html):
 //   LIVE pill with a real viewer count (hidden until CONCERT_CONFIG.viewerCountThreshold)
-//   first visit survey (fan or artist, fan of who) + 3 intro slides per role
+//   first visit survey (fan or artist, fan of who) + 4 intro slides per role
+//   support buttons (Stripe fan perks, artist's own tip link). Shows can have
+//   several artists: fans pick who they're supporting and the payment is
+//   credited to that artist.
 //   points panel: points for watching scheduled shows, tips credited by admin,
 //   show day streak bonus, and requests to spend points (gift cards, tips,
 //   shoutouts, badges, early access) that Otto fulfils from admin-rewards.html.
@@ -13,7 +16,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import {
   firebaseApp, firebaseDb, readConfig, rewardsKey, anonId, appEmailKey, esc, fmtPts, ptsToUsd,
-  listShows, roomStatus, computeRewards, fmtWhen, GIFT_CARDS, REDEEM_LABELS, POINTS_PER_USD, ptsToUsdShort, refSlug, artistTipLink,
+  listShows, roomStatus, computeRewards, fmtWhen, GIFT_CARDS, REDEEM_LABELS, POINTS_PER_USD, ptsToUsdShort, refSlug, directTipLink,
 } from "./concert-rewards-core.js";
 
 const SURVEY_KEY = "astConcertSurvey_v1";
@@ -54,6 +57,10 @@ const CSS = `
 .crx-perks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .crx-perks .crx-btn{margin-top:8px;padding:11px 10px;font-size:13px;flex-direction:column;gap:2px}
 .crx-perks .crx-btn small{font-weight:600;opacity:.85}
+.crx-pick-label{font-size:13px;font-weight:600;color:#fff;margin:6px 0 8px}
+.crx-pick .crx-chips{margin:0}
+.crx-pick-hint{font-size:12px;color:#ff9a73;margin:8px 0 0}
+.crx-chip:focus-visible,.crx-btn:focus-visible,.crx-link:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .crx-btn.ghost{background:transparent;border:1px solid rgba(255,127,80,.5);color:#ff9a73}
 .crx-btn.done{background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.5);color:#86efac}
 .crx-link{background:none;border:none;color:#ff9a73;font:600 12px Montserrat,system-ui,sans-serif;cursor:pointer;padding:4px 0}
@@ -140,8 +147,10 @@ export function mountConcertRewards(roomNum) {
     user: null,
     key: "",
     mine: { attendance: null, tips: null, adjust: null, redemptions: null },
+    attendanceLoaded: false,
     writingAttendance: false,
     attendanceRetryAt: 0,
+    support: { showId: "", name: "" }, // artist the fan picked in a show with several artists
   };
   const shows = () => listShows(state.schedule);
   const status = () => roomStatus(room, state.roomData, shows(), Date.now());
@@ -204,13 +213,18 @@ export function mountConcertRewards(roomNum) {
     return startedAt ? startedAt - 30 * 60 * 1000 : Date.now() - 6 * 60 * 60 * 1000;
   }
 
+  /** " for Nova" when the show has several artists, so each one knows it's theirs. */
+  function forArtist(x) {
+    return liveArtists().length > 1 && x.artist ? " for " + String(x.artist) : "";
+  }
+
   function renderShouts() {
     const since = shoutsSince();
     const list = shouts.filter((x) => x.ts >= since).slice(0, 15);
     shoutPanel.hidden = !list.length;
     if (!list.length) return;
     shoutPanel.innerHTML = "<h3>Shoutouts and requests</h3>" + list.map((x) =>
-      '<div class="crx-sh"><b>' + esc(x.name || "A fan") + "</b><span>" + esc(x.perk || "") + "</span>" +
+      '<div class="crx-sh"><b>' + esc(x.name || "A fan") + "</b><span>" + esc((x.perk || "") + forArtist(x)) + "</span>" +
       (x.message ? "<p>" + esc(censor(String(x.message))) + "</p>" : "") + "</div>").join("");
   }
 
@@ -219,7 +233,7 @@ export function mountConcertRewards(roomNum) {
     if (!x) { bannerBusy = false; return; }
     bannerBusy = true;
     const b = el("div", "crx-shout",
-      "<b>" + icon("celebration") + esc(x.name || "A fan") + " · " + esc(x.perk || "Support") + "</b>" +
+      "<b>" + icon("celebration") + esc(x.name || "A fan") + " · " + esc((x.perk || "Support") + forArtist(x)) + "</b>" +
       "<p>" + (x.message ? esc(censor(String(x.message))) : "Thank you for supporting " + esc(x.artist || "the artist") + "!") + "</p>");
     b.setAttribute("role", "status");
     document.body.appendChild(b);
@@ -255,13 +269,21 @@ export function mountConcertRewards(roomNum) {
     const t = e.target.closest("[data-act]");
     if (!t) return;
     if (t.dataset.act === "spend") openSpend();
+    if (t.dataset.act === "pick") {
+      const st = status();
+      const name = liveArtists()[Number(t.dataset.i)];
+      if (st.current && name) {
+        state.support = { showId: st.current.id, name };
+        renderPanel();
+      }
+    }
     if (t.dataset.act === "tip") openStripe(state.cfg.tipLink, "tip");
     if (t.dataset.act === "perk") {
       const perk = state.cfg.perks[Number(t.dataset.i)];
       if (perk) openStripe(perk.url, perk.name);
     }
     if (t.dataset.act === "artist-tip") {
-      const link = artistTipLink(state.roomData);
+      const link = directTipLink(supportArtist(), status().current, state.roomData, state.cfg);
       if (link) openExternal(link);
     }
     if (t.dataset.act === "how") {
@@ -269,6 +291,24 @@ export function mountConcertRewards(roomNum) {
       openSlides((s && s.role) || "fan", (s && s.fanOf) || []);
     }
   });
+
+  /** Everyone playing the show that's on now. */
+  function liveArtists() {
+    const st = status();
+    return st.current ? st.current.artists : [];
+  }
+
+  /**
+   * Who the fan's support goes to: the only artist of the show, or the one they
+   * picked when the show has several. "" means nobody picked yet (or no show).
+   */
+  function supportArtist() {
+    const st = status();
+    const list = liveArtists();
+    if (list.length === 1) return list[0];
+    if (!st.current || state.support.showId !== st.current.id) return "";
+    return list.includes(state.support.name) ? state.support.name : "";
+  }
 
   function artistOptions() {
     const seen = new Map();
@@ -280,27 +320,42 @@ export function mountConcertRewards(roomNum) {
       else if (emailKey && !seen.get(k).emailKey) seen.get(k).emailKey = emailKey;
     };
     const st = status();
-    if (st.current) add(st.current.artist);
-    if (st.next) add(st.next.artist);
+    if (st.current) st.current.artists.forEach((n) => add(n));
+    if (st.next) st.next.artists.forEach((n) => add(n));
     for (const a of Object.values(state.cfg.artists || {})) if (a) add(a.name, a.emailKey);
     const now = Date.now();
-    for (const s of shows()) if (s.endsAt > now) add(s.artist);
-    for (const s of shows().slice().reverse()) add(s.artist);
+    for (const s of shows()) if (s.endsAt > now) s.artists.forEach((n) => add(n));
+    for (const s of shows().slice().reverse()) s.artists.forEach((n) => add(n));
     return [...seen.values()];
   }
 
   /** Required artist dropdown for points tips and shoutouts. */
   function artistSelectHtml() {
     const opts = artistOptions();
-    const st = status();
-    const live = st.current && st.current.artist ? st.current.artist : "";
+    const live = new Set(liveArtists().map((n) => n.toLowerCase()));
     if (spendForm.artist && !opts.some((a) => a.name === spendForm.artist)) spendForm.artist = "";
     return '<label class="crx-label" for="crxArtist">Artist</label>' +
       '<select class="crx-input" id="crxArtist"' + (opts.length ? "" : " disabled") + ">" +
       '<option value="">' + (opts.length ? "Choose an artist" : "No artists yet") + "</option>" +
       opts.map((a) => '<option value="' + esc(a.name) + '"' + (a.name === spendForm.artist ? " selected" : "") + ">" +
-        esc(a.name) + (live && a.name === live ? " (live now)" : "") + "</option>").join("") +
+        esc(a.name) + (live.has(a.name.toLowerCase()) ? " (live now)" : "") + "</option>").join("") +
       "</select>";
+  }
+
+  /** Replace a panel's HTML only when it changed, and keep keyboard focus on the same button. */
+  function setHtml(node, html) {
+    if (node.__crxHtml === html) return;
+    const a = document.activeElement;
+    let again = "";
+    if (a && node.contains(a) && a.dataset && a.dataset.act) {
+      again = '[data-act="' + a.dataset.act + '"]' + (a.dataset.i != null ? '[data-i="' + a.dataset.i + '"]' : "");
+    }
+    node.innerHTML = html;
+    node.__crxHtml = html;
+    if (again) {
+      const b = node.querySelector(again);
+      if (b && !b.disabled) b.focus();
+    }
   }
 
   function attendanceLine() {
@@ -321,41 +376,63 @@ export function mountConcertRewards(roomNum) {
       " min for +" + cfg.pointsPerShow + " pts</span>";
   }
 
+  /** Support buttons during a live show. With several artists the fan picks one first. */
+  function supportHtml() {
+    const cfg = state.cfg;
+    const st = status();
+    if (!st.live) return "";
+    const show = st.current;
+    const list = liveArtists();
+    const multi = list.length > 1;
+    const pick = supportArtist();
+    const directFor = (name) => directTipLink(name, show, state.roomData, cfg);
+    const anyDirect = multi ? list.some((n) => directFor(n)) : !!directFor(pick);
+    if (!cfg.tipLink && !cfg.perks.length && !anyDirect) return "";
+    const name = pick || (multi ? "" : "the artist");
+    const locked = multi && !pick;
+    const off = locked ? ' disabled aria-describedby="crxPickHint"' : "";
+    const forWho = name ? " for " + name : "";
+    const direct = pick || !multi ? directFor(pick) : "";
+    return '<div class="crx-support"><div class="crx-support-title">' + (multi ? "Support the artists" : "Support " + esc(name)) + "</div>" +
+      (multi
+        ? '<div class="crx-pick"><p class="crx-pick-label" id="crxPickLabel">Who are you supporting?</p>' +
+          '<div class="crx-chips" role="group" aria-labelledby="crxPickLabel">' + list.map((n, i) =>
+            '<button type="button" class="crx-chip' + (n === pick ? " on" : "") + '" data-act="pick" data-i="' + i + '" aria-pressed="' + (n === pick) + '">' +
+            esc(n) + "</button>").join("") + "</div>" +
+          (locked ? '<p class="crx-pick-hint" id="crxPickHint">Pick an artist first. Your support goes to them.</p>' : "") + "</div>"
+        : "") +
+      (cfg.tipLink ? '<button type="button" class="crx-btn tip" data-act="tip"' + off + ">" + icon("favorite") + (locked ? "Tip" : "Tip " + esc(name)) + "</button>" : "") +
+      (cfg.perks.length ? '<div class="crx-perks">' + cfg.perks.map((pk, i) =>
+        '<button type="button" class="crx-btn tip" data-act="perk" data-i="' + i + '"' + off +
+        ' aria-label="' + esc(pk.name + ", $" + pk.price + forWho) + '">' + esc(pk.name) + "<small>$" + pk.price + "</small></button>").join("") + "</div>" : "") +
+      (direct ? '<button type="button" class="crx-btn ghost" data-act="artist-tip">' + icon("favorite") + "Tip " + esc(name) + " directly</button>" : "") +
+      "</div>";
+  }
+
   function renderPanel() {
     const cfg = state.cfg;
     const fee = cfg.rewardsSharePct + cfg.asteroidSharePct;
     const fine = '<p class="crx-fine">Pay with the email on your Asteroid account to earn ' + cfg.pointsPerDollar +
       " pts per $1. Artists keep " + cfg.artistSharePct + "% after card fees. Asteroid's " + fee + "%: " +
       cfg.rewardsSharePct + "% funds fan rewards, " + cfg.asteroidSharePct + "% runs Asteroid. Direct tips go 100% to the artist.</p>";
-    const st = status();
-    const tipArtist = st.current && st.current.artist ? st.current.artist : "the artist";
-    const artistLink = artistTipLink(state.roomData);
-    let tipBtn = "";
-    if (st.live && (cfg.tipLink || cfg.perks.length || artistLink)) {
-      tipBtn = '<div class="crx-support"><div class="crx-support-title">Support ' + esc(tipArtist) + "</div>" +
-        (cfg.tipLink ? '<button class="crx-btn tip" data-act="tip">' + icon("favorite") + "Tip " + esc(tipArtist) + "</button>" : "") +
-        (cfg.perks.length ? '<div class="crx-perks">' + cfg.perks.map((pk, i) =>
-          '<button class="crx-btn tip" data-act="perk" data-i="' + i + '">' + esc(pk.name) + "<small>$" + pk.price + "</small></button>").join("") + "</div>" : "") +
-        (artistLink ? '<button class="crx-btn ghost" data-act="artist-tip">' + icon("favorite") + "Tip " + esc(tipArtist) + " directly</button>" : "") +
-        "</div>";
-    }
+    const tipBtn = supportHtml();
     if (!state.user) {
-      panel.innerHTML = '<h3><span>Earn points</span><button class="crx-link" data-act="how">How it works</button></h3>' +
+      setHtml(panel, '<h3><span>Earn points</span><button class="crx-link" data-act="how">How it works</button></h3>' +
         '<p class="cr-hint">Log in to earn points for watching and tipping. Spend them on gift cards, shoutouts and more.</p>' +
-        '<a class="crx-btn" href="login.html">Log in</a>' + tipBtn + fine;
+        '<a class="crx-btn" href="login.html">Log in</a>' + tipBtn + fine);
       return;
     }
     const r = rewards();
     const flames = Array.from({ length: cfg.streakDays }, (_, i) => "<i" + (i < r.streakProgress ? ' class="on"' : "") + "></i>").join("");
     const att = attendanceLine();
-    panel.innerHTML =
+    setHtml(panel,
       '<h3><span>Your points</span><button class="crx-link" data-act="how">How it works</button></h3>' +
       '<div class="crx-balance"><b>' + fmtPts(r.balance) + "</b><span>pts</span><em>" + ptsToUsd(Math.max(0, r.balance)) + "</em></div>" +
       (r.pending > 0 ? '<div class="crx-line">' + icon("hourglass_top") + "<span>" + fmtPts(r.pending) + " pts in pending requests</span></div>" : "") +
       '<div class="crx-line">' + icon("local_fire_department") + '<span class="crx-flames">' + flames + "</span><span>Streak " +
       r.streakProgress + " of " + cfg.streakDays + " show days for +" + fmtPts(cfg.streakBonusPoints) + " pts</span></div>" +
       (att ? '<div class="crx-line">' + att + "</div>" : "") +
-      '<button class="crx-btn" data-act="spend">' + icon("redeem") + "Spend points</button>" + tipBtn + fine;
+      '<button class="crx-btn" data-act="spend">' + icon("redeem") + "Spend points</button>" + tipBtn + fine);
   }
 
   // ---- Support: Stripe Payment Links and the artist's own tip link ---------------
@@ -371,10 +448,14 @@ export function mountConcertRewards(roomNum) {
     return null;
   }
 
+  // client_reference_id = <artist>__<showId>__<perk>__<fan|guest>, read by the Stripe
+  // webhook (functions/stripe-perks.js) to credit the right artist and fan.
   function stripeUrl(base, tag) {
     const st = status();
     const show = st.current;
-    const parts = [refSlug(show && show.artist ? show.artist : room), show ? show.id : refSlug(room), refSlug(tag), state.key ? "fan" : "guest"];
+    const who = supportArtist();
+    if (liveArtists().length > 1 && !who) return "";
+    const parts = [refSlug(who || room), show ? show.id : refSlug(room), refSlug(tag), state.key ? "fan" : "guest"];
     let url;
     try { url = new URL(base); } catch (e) { return ""; }
     url.searchParams.set("client_reference_id", parts.map((x) => String(x).replace(/[^A-Za-z0-9_-]/g, "")).join("__").slice(0, 200));
@@ -391,55 +472,79 @@ export function mountConcertRewards(roomNum) {
   }
 
   function openStripe(base, tag) {
-    openExternal(stripeUrl(base, tag));
+    const url = stripeUrl(base, tag);
+    if (!url) { toast("Pick the artist you're supporting first"); return; }
+    openExternal(url);
   }
 
-  // ---- Attendance: watch a scheduled show for N minutes ---------------------------
-  function watchKey(showId) { return "astWatch_" + state.key + "_" + showId; }
-  function watchedSecs(showId) {
-    try { return Number(localStorage.getItem(watchKey(showId))) || 0; } catch (e) { return 0; }
+  // ---- Attendance: N minutes after you join a live scheduled show -----------------
+  // Counts from the first moment you're in the room while the show is live, so it
+  // keeps going in a background tab, during full screen video, or if the phone
+  // locks for a bit. Points are written the next time the room is open after that.
+  const joinedMem = {};
+  function joinKey(showId) { return "astJoined_" + state.key + "_" + showId; }
+  function joinedAt(showId) {
+    let t = 0;
+    try { t = Number(localStorage.getItem(joinKey(showId))) || 0; } catch (e) {}
+    return t || joinedMem[state.key + "_" + showId] || 0;
   }
-  let lastTick = Date.now();
-  function tick() {
+  function markJoined(showId, now) {
+    if (joinedAt(showId)) return;
+    let t = now;
+    try {
+      // progress counted by the older version of this page (seconds on screen)
+      const old = Number(localStorage.getItem("astWatch_" + state.key + "_" + showId)) || 0;
+      if (old > 0) t = now - old * 1000;
+    } catch (e) {}
+    joinedMem[state.key + "_" + showId] = t;
+    try { localStorage.setItem(joinKey(showId), String(t)); } catch (e) {}
+  }
+  function watchedSecs(showId) {
+    const t = joinedAt(showId);
+    return t ? Math.max(0, (Date.now() - t) / 1000) : 0;
+  }
+  function checkAttendance() {
     const now = Date.now();
-    const delta = Math.min(now - lastTick, 20000);
-    lastTick = now;
     const st = status();
     const show = st.current;
-    if (state.key && show && st.streamLive && !document.hidden &&
-        !(state.mine.attendance && state.mine.attendance[show.id])) {
-      const secs = watchedSecs(show.id) + delta / 1000;
-      try { localStorage.setItem(watchKey(show.id), String(Math.round(secs))); } catch (e) {}
-      if (secs >= state.cfg.attendMinutes * 60 && !state.writingAttendance && now >= state.attendanceRetryAt) {
-        state.writingAttendance = true;
-        set(ref(db, "REWARDS/attendance/" + state.key + "/" + show.id), { ts: serverTimestamp(), room })
-          .then(() => toast("+" + state.cfg.pointsPerShow + " points for watching"))
-          .catch((e) => { console.warn("[rewards] attendance", e && e.code); state.attendanceRetryAt = Date.now() + 60000; })
-          .finally(() => { state.writingAttendance = false; });
-      }
+    if (!state.key || !show || !st.streamLive || !state.attendanceLoaded) return;
+    if (state.mine.attendance && state.mine.attendance[show.id]) return;
+    markJoined(show.id, now);
+    if (watchedSecs(show.id) >= state.cfg.attendMinutes * 60 && !state.writingAttendance && now >= state.attendanceRetryAt) {
+      state.writingAttendance = true;
+      set(ref(db, "REWARDS/attendance/" + state.key + "/" + show.id), { ts: serverTimestamp(), room })
+        .then(() => toast("+" + state.cfg.pointsPerShow + " points for watching"))
+        .catch((e) => { console.warn("[rewards] attendance", e && e.code); state.attendanceRetryAt = Date.now() + 60000; })
+        .finally(() => { state.writingAttendance = false; });
     }
+  }
+  function refresh() {
+    checkAttendance();
     renderPill();
     renderPanel();
   }
-  setInterval(tick, 15000);
+  setInterval(refresh, 15000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 
   // ---- Data -------------------------------------------------------------------------
-  onValue(ref(db, "CONCERT_CONFIG"), (s) => { state.cfg = readConfig(s.val()); renderPill(); renderPanel(); }, () => {});
-  onValue(ref(db, "CONCERT_SCHEDULE"), (s) => { state.schedule = s.val(); renderPill(); renderPanel(); renderShouts(); }, () => {});
-  onValue(ref(db, "LiveRooms/" + room), (s) => { state.roomData = s.val(); renderPill(); renderPanel(); renderShouts(); }, () => {});
+  onValue(ref(db, "CONCERT_CONFIG"), (s) => { state.cfg = readConfig(s.val()); refresh(); }, () => {});
+  onValue(ref(db, "CONCERT_SCHEDULE"), (s) => { state.schedule = s.val(); refresh(); renderShouts(); }, () => {});
+  onValue(ref(db, "LiveRooms/" + room), (s) => { state.roomData = s.val(); refresh(); renderShouts(); }, () => {});
 
   let unsubs = [];
   onAuthStateChanged(auth, (user) => {
     unsubs.forEach((u) => u());
     unsubs = [];
     state.mine = { attendance: null, tips: null, adjust: null, redemptions: null };
+    state.attendanceLoaded = false;
     state.user = user && user.email ? user : null;
     state.key = state.user ? rewardsKey(state.user.email) : "";
     if (state.key) {
       for (const part of ["attendance", "tips", "adjust", "redemptions"]) {
         unsubs.push(onValue(ref(db, "REWARDS/" + part + "/" + state.key), (s) => {
           state.mine[part] = s.val();
-          renderPanel();
+          if (part === "attendance") state.attendanceLoaded = true;
+          refresh();
           if (spendOpen) renderSpend();
         }, (e) => console.warn("[rewards] read " + part, e && e.code)));
       }

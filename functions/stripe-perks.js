@@ -5,7 +5,8 @@
 // A fan buys a fan perk (Shoutout, Song request, Supporter...) through a Stripe
 // Payment Link opened from a concert room. The room adds
 //   client_reference_id = <artist>__<showId>__<perk>__<fan|guest>
-// (see js/concert-rewards.js stripeUrl). On checkout.session.completed we:
+// (see js/concert-rewards.js stripeUrl). <artist> is the artist the fan picked,
+// which matters when a show has several artists. On checkout.session.completed we:
 //   1. show the fan's message on screen in that room   CONCERT_SHOUTOUTS/{room}/{sessionId}
 //   2. credit the fan's points                         REWARDS/tips/{fanKey}/{sessionId}
 //   3. save who wants a heads up for the next show      FAN_OPTIN/{fanKey}/{artist}
@@ -90,6 +91,36 @@ function readCustomFields(session) {
   return out;
 }
 
+/** Every artist in a scheduled show: show.artists, or the single show.artist. */
+function showArtists(show) {
+  if (!show) return [];
+  const raw = show.artists;
+  const list = Array.isArray(raw) ? raw : raw && typeof raw === 'object' ? Object.values(raw) : [];
+  const out = [];
+  for (const x of list) {
+    const n = cleanText(typeof x === 'string' ? x : '', 80);
+    if (n && !out.some((o) => o.toLowerCase() === n.toLowerCase())) out.push(n);
+  }
+  if (!out.length) {
+    const one = cleanText(show.artist, 80);
+    if (one) out.push(one);
+  }
+  return out;
+}
+
+/**
+ * The artist this payment is for. A show with one artist: that artist. A show
+ * with several: the one whose name matches the slug the room sent. Older app
+ * versions send the show's combined label ("Nova & Luna"), which is kept as is.
+ */
+function pickArtist(show, artistSlug) {
+  const names = showArtists(show);
+  if (names.length === 1) return names[0];
+  const label = cleanText(show && show.artist, 80);
+  const hit = names.concat(label ? [label] : []).find((n) => slug(n) === artistSlug);
+  return hit || titleCase(artistSlug);
+}
+
 /** Amount in US cents, also when Stripe showed the fan a local currency. */
 function usdCents(session) {
   const conv = session && session.currency_conversion;
@@ -123,7 +154,7 @@ async function processCheckoutSession(session, db, now = Date.now()) {
   let room = show && /^Room[1-5]$/.test(show.room) ? show.room : '';
   const roomMatch = /^room([1-5])$/.exec(ref.showId);
   if (!room && roomMatch) room = 'Room' + roomMatch[1];
-  const artist = cleanText(show && show.artist ? show.artist : titleCase(ref.artistSlug), 80);
+  const artist = cleanText(pickArtist(show, ref.artistSlug), 80);
   const perksRaw = perksSnap.val();
   const perks = Array.isArray(perksRaw) ? perksRaw : Object.values(perksRaw || {});
   const perkName = cleanText(((perks.find((p) => p && slug(p.name) === ref.perk) || {}).name) || titleCase(ref.perk), 40);
@@ -164,5 +195,7 @@ module.exports = {
   readCustomFields,
   usdCents,
   rewardsKey,
+  showArtists,
+  pickArtist,
   processCheckoutSession,
 };

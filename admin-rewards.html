@@ -55,6 +55,13 @@
     .note { font-size:12px; color:var(--muted); margin:8px 0 0; }
     .split { font-size:12.5px; color:var(--muted); margin-top:8px; }
     .seg { display:flex; gap:6px; margin-bottom:12px; }
+    .achips { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 8px; }
+    .achips:empty { display:none; }
+    .achip { display:inline-flex; align-items:center; gap:4px; padding:5px 4px 5px 12px; border-radius:999px; background:rgba(255,127,80,.15); border:1px solid rgba(255,127,80,.5); color:#fff; font-size:13px; font-weight:600; }
+    .achip button { background:none; border:none; color:var(--muted); cursor:pointer; font-size:18px; line-height:1; padding:0 6px; border-radius:999px; }
+    .achip button:hover, .achip button:focus-visible { color:#fff; }
+    .addrow { display:flex; gap:8px; }
+    .addrow input { flex:1; min-width:0; }
     [hidden] { display:none !important; }
   </style>
 </head>
@@ -84,6 +91,7 @@
     import {
       firebaseApp, firebaseDb, readConfig, rewardsKey, computeRewards, listShows, splitCents, tipPoints,
       centsToUsd, ptsToUsd, fmtPts, esc, ADMIN_EMAIL, POINTS_PER_USD, REDEEM_LABELS, ROOMS, GIFT_CARDS,
+      cleanArtistList, artistsLabel, safeTipLink, MAX_SHOW_ARTISTS,
     } from "./js/concert-rewards-core.js";
 
     const app = firebaseApp();
@@ -100,6 +108,8 @@
       tab: "requests", reqFilter: "pending",
       tz: localStorage.getItem("astAdminTz") || "America/New_York",
       started: false,
+      draft: null, editShowId: "",                 // add / edit show form
+      artistDraft: null, editArtistId: "",         // add / edit artist form
     };
     const $ = (sel, root = document) => root.querySelector(sel);
 
@@ -177,10 +187,18 @@
     function tzLabel(tz) { const t = TZS.find(([k]) => k === tz); return t ? t[1] : tz; }
     function slug(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 60) || "artist"; }
     function artistNames() {
-      const set = new Set();
-      for (const a of Object.values(S.cfg.artists || {})) if (a && a.name) set.add(a.name);
-      for (const s of listShows(S.schedule)) if (s.artist) set.add(s.artist);
-      return [...set].sort((a, b) => a.localeCompare(b));
+      const seen = new Map();
+      const add = (n) => { const k = String(n || "").trim(); if (k && !seen.has(k.toLowerCase())) seen.set(k.toLowerCase(), k); };
+      for (const a of Object.values(S.cfg.artists || {})) if (a) add(a.name);
+      for (const s of listShows(S.schedule)) s.artists.forEach(add);
+      return [...seen.values()].sort((a, b) => a.localeCompare(b));
+    }
+    /** Label saved in the show's "artist" field (older app versions show it). Max 80 characters. */
+    function showLabel(artists) {
+      const full = artistsLabel(artists);
+      if (full.length <= 80) return full;
+      const short = artists[0] + " & " + (artists.length - 1) + " more";
+      return short.length <= 80 ? short : full.slice(0, 80);
     }
     function datalist(id) {
       return '<datalist id="' + id + '">' + artistNames().map((n) => '<option value="' + esc(n) + '">').join("") + "</datalist>";
@@ -271,6 +289,19 @@
       }));
     }
 
+    function newDraft() {
+      return { artists: [], room: "Room1", date: "", time: "20:00", hours: 3 };
+    }
+    function draftFromShow(s) {
+      const p = tzParts(s.startsAt, S.tz);
+      const pad = (n) => String(n).padStart(2, "0");
+      return {
+        artists: s.artists.slice(), room: s.room,
+        date: p.y + "-" + pad(p.m) + "-" + pad(p.d), time: pad(p.h) + ":" + pad(p.min),
+        hours: Math.round(((s.endsAt - s.startsAt) / 3600000) * 100) / 100,
+      };
+    }
+
     function renderShows() {
       const now = Date.now();
       const shows = listShows(S.schedule);
@@ -278,60 +309,140 @@
       const attendees = (id) => Object.values(att).filter((m) => m && m[id]).length;
       const upcoming = shows.filter((s) => s.endsAt >= now);
       const past = shows.filter((s) => s.endsAt < now).reverse().slice(0, 30);
+      const editing = S.editShowId ? shows.find((s) => s.id === S.editShowId) || null : null;
+      if (S.editShowId && !editing) { S.editShowId = ""; S.draft = null; }
+      const d = S.draft || (S.draft = newDraft());
       const row = (s) => {
         const live = s.startsAt <= now && now <= s.endsAt;
         return "<tr><td>" + esc(fmtTz(s.startsAt)) + "<br><span class=\"muted\">to " + esc(fmtTz(s.endsAt)) + "</span></td><td>" + esc(s.room.replace("Room", "Room ")) +
-          "</td><td>" + esc(s.artist) + "</td><td>" + (live ? '<span class="pill live">Live</span>' : s.startsAt > now ? "Upcoming" : "Ended") +
-          '</td><td class="num">' + attendees(s.id) + "</td><td>" +
-          (s.startsAt > now ? '<button type="button" class="btn small bad" data-del-show="' + esc(s.id) + '">Remove</button>' : "") + "</td></tr>";
+          "</td><td>" + s.artists.map(esc).join("<br>") + "</td><td>" + (live ? '<span class="pill live">Live</span>' : s.startsAt > now ? "Upcoming" : "Ended") +
+          '</td><td class="num">' + attendees(s.id) + '</td><td><div class="row-actions">' +
+          (s.endsAt >= now ? '<button type="button" class="btn small ghost" data-edit-show="' + esc(s.id) + '">Edit</button>' : "") +
+          (s.startsAt > now ? '<button type="button" class="btn small bad" data-del-show="' + esc(s.id) + '">Remove</button>' : "") + "</div></td></tr>";
       };
-      const table = (list) => '<div class="table-wrap"><table><thead><tr><th>When (' + esc(tzLabel(S.tz)) + ')</th><th>Room</th><th>Artist</th><th>Status</th><th class="num">Fans counted</th><th></th></tr></thead><tbody>' + list.map(row).join("") + "</tbody></table></div>";
+      const table = (list) => '<div class="table-wrap"><table><thead><tr><th>When (' + esc(tzLabel(S.tz)) + ')</th><th>Room</th><th>Artists</th><th>Status</th><th class="num">Fans counted</th><th></th></tr></thead><tbody>' + list.map(row).join("") + "</tbody></table></div>";
       const artists = Object.entries(S.cfg.artists || {});
+      const ad = S.artistDraft || (S.artistDraft = { name: "", key: "", tip: "" });
       $("#main").innerHTML =
-        '<div class="card"><h2>Add a show</h2><p class="note" style="margin:0 0 12px">The room shows LIVE during this window, and fans earn points for watching it. Add every show here.</p><div class="grid">' +
-        '<div><label for="f_room">Room</label><select id="f_room">' + ROOMS.map((r) => "<option value=\"" + r + "\">" + r.replace("Room", "Room ") + "</option>").join("") + "</select></div>" +
-        '<div><label for="f_artist">Artist</label><input id="f_artist" list="dl_artists" maxlength="80" placeholder="Artist name">' + datalist("dl_artists") + "</div>" +
-        '<div><label for="f_date">Date</label><input id="f_date" type="date"></div>' +
-        '<div><label for="f_time">Start time</label><input id="f_time" type="time" value="20:00"></div>' +
-        '<div><label for="f_hours">Length (hours)</label><input id="f_hours" type="number" min="0.5" max="10" step="0.5" value="3"></div>' +
+        '<div class="card" id="showForm"><h2>' + (editing ? "Edit show" : "Add a show") + '</h2><p class="note" style="margin:0 0 12px">' +
+        (editing ? "Changes show in the room right away, even during a live show." : "The room shows LIVE during this window, and fans earn points for watching. Add everyone playing.") +
+        " With more than one artist, fans pick who they're supporting.</p>" +
+        '<label for="f_artist">Artists</label><div class="achips" id="artistChips"></div>' +
+        '<div class="addrow"><input id="f_artist" list="dl_artists" maxlength="80" autocomplete="off"><button type="button" class="btn ghost" id="f_addArtistBtn">Add</button></div>' + datalist("dl_artists") +
+        '<div class="grid" style="margin-top:12px">' +
+        '<div><label for="f_room">Room</label><select id="f_room">' + ROOMS.map((r) => '<option value="' + r + '"' + (r === d.room ? " selected" : "") + ">" + r.replace("Room", "Room ") + "</option>").join("") + "</select></div>" +
+        '<div><label for="f_date">Date</label><input id="f_date" type="date" value="' + esc(d.date) + '"></div>' +
+        '<div><label for="f_time">Start time</label><input id="f_time" type="time" value="' + esc(d.time) + '"></div>' +
+        '<div><label for="f_hours">Length (hours)</label><input id="f_hours" type="number" min="0.5" max="10" step="0.5" value="' + esc(d.hours) + '"></div>' +
         '<div><label for="f_tz">Time zone</label><select id="f_tz">' + TZS.map(([k, l]) => '<option value="' + k + '"' + (k === S.tz ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
-        '<div><button type="button" class="btn" id="addShow">Add show</button></div></div></div>' +
+        '<div class="row-actions"><button type="button" class="btn" id="addShow">' + (editing ? "Save changes" : "Add show") + "</button>" +
+        (editing ? '<button type="button" class="btn ghost" id="cancelEdit">Cancel</button>' : "") + "</div></div></div>" +
         '<div class="card"><h2>Upcoming</h2>' + (upcoming.length ? table(upcoming) : '<p class="muted">No upcoming shows.</p>') + "</div>" +
         '<div class="card"><h2>Past</h2>' + (past.length ? table(past) : '<p class="muted">No past shows yet.</p>') + "</div>" +
-        '<div class="card"><h2>Artists in the survey</h2><p class="note" style="margin:0 0 12px">Fans pick from these when asked who they\'re a fan of. Add the artist\'s Asteroid account key (their email with dots as underscores) to show a Follow button.</p>' +
-        (artists.length ? '<div class="table-wrap"><table><thead><tr><th>Name</th><th>Asteroid key</th><th></th></tr></thead><tbody>' +
-          artists.map(([id, a]) => "<tr><td>" + esc(a && a.name) + "</td><td>" + esc((a && a.emailKey) || "") + '</td><td><button type="button" class="btn small bad" data-del-artist="' + esc(id) + '">Remove</button></td></tr>').join("") +
+        '<div class="card" id="artistForm"><h2>Artists</h2><p class="note" style="margin:0 0 12px">Fans pick from these in the survey and the artist dropdowns. ' +
+        "Asteroid key: the artist's account email with dots as underscores, adds a Follow button. " +
+        "Tip link: their own PayPal.me, Ko-fi, Cash App or Venmo link, shown as \"Tip directly\" when they play. Give each artist their own so every artist in a show can get tips.</p>" +
+        (artists.length ? '<div class="table-wrap"><table><thead><tr><th>Name</th><th>Asteroid key</th><th>Tip link</th><th></th></tr></thead><tbody>' +
+          artists.map(([id, a]) => "<tr><td>" + esc(a && a.name) + "</td><td>" + esc((a && a.emailKey) || "") + "</td><td>" + esc((a && a.tipLink) || "") +
+            '</td><td><div class="row-actions"><button type="button" class="btn small ghost" data-edit-artist="' + esc(id) + '">Edit</button>' +
+            '<button type="button" class="btn small bad" data-del-artist="' + esc(id) + '">Remove</button></div></td></tr>').join("") +
           "</tbody></table></div>" : '<p class="muted">No artists yet. Artists from scheduled shows are listed automatically.</p>') +
-        '<div class="grid" style="margin-top:12px"><div><label for="f_aname">Name</label><input id="f_aname" maxlength="80"></div>' +
-        '<div><label for="f_akey">Asteroid key (optional)</label><input id="f_akey" maxlength="200" placeholder="luna@gmail_com"></div>' +
-        '<div><button type="button" class="btn" id="addArtist">Add artist</button></div></div></div>';
+        '<div class="grid" style="margin-top:12px"><div><label for="f_aname">Name</label><input id="f_aname" maxlength="80" value="' + esc(ad.name) + '"></div>' +
+        '<div><label for="f_akey">Asteroid key (optional)</label><input id="f_akey" maxlength="200" placeholder="luna@gmail_com" value="' + esc(ad.key) + '"></div>' +
+        '<div><label for="f_atip">Tip link (optional)</label><input id="f_atip" maxlength="300" placeholder="https://paypal.me/luna" value="' + esc(ad.tip) + '"></div>' +
+        '<div class="row-actions"><button type="button" class="btn" id="addArtist">' + (S.editArtistId ? "Save artist" : "Add artist") + "</button>" +
+        (S.editArtistId ? '<button type="button" class="btn ghost" id="cancelArtist">Cancel</button>' : "") + "</div></div></div>";
 
+      // Artists of the show being added or edited
+      const drawChips = () => {
+        $("#artistChips").innerHTML = d.artists.map((n, i) =>
+          '<span class="achip">' + esc(n) + '<button type="button" data-rm-artist="' + i + '" aria-label="Remove ' + esc(n) + '">×</button></span>').join("");
+        $("#f_artist").placeholder = d.artists.length ? "Add another artist" : "Artist name";
+        $("#artistChips").querySelectorAll("[data-rm-artist]").forEach((b) => b.addEventListener("click", () => {
+          d.artists.splice(Number(b.dataset.rmArtist), 1);
+          drawChips();
+          $("#f_artist").focus();
+        }));
+      };
+      const addTyped = () => {
+        const inp = $("#f_artist");
+        const v = inp.value.trim();
+        if (!v) return;
+        if (d.artists.length >= MAX_SHOW_ARTISTS) { alert("Up to " + MAX_SHOW_ARTISTS + " artists per show."); return; }
+        d.artists = cleanArtistList(d.artists.concat([v]));
+        inp.value = "";
+        drawChips();
+      };
+      drawChips();
+      $("#f_artist").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addTyped(); } });
+      $("#f_addArtistBtn").addEventListener("click", () => { addTyped(); $("#f_artist").focus(); });
+      $("#f_room").addEventListener("change", (e) => { d.room = e.target.value; });
+      $("#f_date").addEventListener("input", (e) => { d.date = e.target.value; });
+      $("#f_time").addEventListener("input", (e) => { d.time = e.target.value; });
+      $("#f_hours").addEventListener("input", (e) => { d.hours = e.target.value; });
       $("#f_tz").addEventListener("change", (e) => { S.tz = e.target.value; localStorage.setItem("astAdminTz", S.tz); $("#f_tz").blur(); render(); });
       $("#addShow").addEventListener("click", async () => {
-        const room = $("#f_room").value, artist = $("#f_artist").value.trim(), date = $("#f_date").value, time = $("#f_time").value;
+        const list = cleanArtistList(d.artists.concat([$("#f_artist").value.trim()]));
+        const room = $("#f_room").value, date = $("#f_date").value, time = $("#f_time").value;
         const hours = Number($("#f_hours").value) || 3;
-        if (!artist || !date || !time) { alert("Fill in artist, date and start time."); return; }
+        if (!list.length || !date || !time) { alert("Fill in at least one artist, the date and the start time."); return; }
         const startsAt = zonedToUtc(date, time, S.tz);
         const endsAt = startsAt + Math.round(hours * 3600000);
+        const show = { room, artist: showLabel(list), artists: list, startsAt, endsAt };
         try {
-          await set(push(ref(db, "CONCERT_SCHEDULE")), { room, artist: artist.slice(0, 80), startsAt, endsAt, createdAt: Date.now() });
+          if (editing) await update(ref(db, "CONCERT_SCHEDULE/" + editing.id), { ...show, updatedAt: Date.now() });
+          else await set(push(ref(db, "CONCERT_SCHEDULE")), { ...show, createdAt: Date.now() });
+          S.draft = null;
+          S.editShowId = "";
           document.activeElement && document.activeElement.blur();
           render();
         } catch (e) { alert("Couldn't save: " + (e && e.code)); }
       });
+      if (editing) $("#cancelEdit").addEventListener("click", () => { S.draft = null; S.editShowId = ""; render(); });
+      $("#main").querySelectorAll("[data-edit-show]").forEach((b) => b.addEventListener("click", () => {
+        const s = shows.find((x) => x.id === b.dataset.editShow);
+        if (!s) return;
+        S.editShowId = s.id;
+        S.draft = draftFromShow(s);
+        render();
+        $("#showForm").scrollIntoView({ behavior: "smooth", block: "start" });
+      }));
       $("#main").querySelectorAll("[data-del-show]").forEach((b) => b.addEventListener("click", async () => {
         if (!confirm("Remove this show?")) return;
+        if (S.editShowId === b.dataset.delShow) { S.editShowId = ""; S.draft = null; }
         await remove(ref(db, "CONCERT_SCHEDULE/" + b.dataset.delShow)).catch((e) => alert(e && e.code));
       }));
+
+      // Artists list
+      $("#f_aname").addEventListener("input", (e) => { ad.name = e.target.value; });
+      $("#f_akey").addEventListener("input", (e) => { ad.key = e.target.value; });
+      $("#f_atip").addEventListener("input", (e) => { ad.tip = e.target.value; });
       $("#addArtist").addEventListener("click", async () => {
         const name = $("#f_aname").value.trim();
         const emailKey = $("#f_akey").value.trim().replace(/[.#$[\]\/]/g, "_");
-        if (!name) return;
-        await set(ref(db, "CONCERT_CONFIG/artists/" + slug(name)), { name: name.slice(0, 80), emailKey }).catch((e) => alert(e && e.code));
-        document.activeElement && document.activeElement.blur();
-        render();
+        const tipRaw = $("#f_atip").value.trim();
+        if (!name) { alert("Fill in the artist's name."); return; }
+        const tipLink = tipRaw ? safeTipLink(tipRaw) : "";
+        if (tipRaw && !tipLink) { alert("The tip link must be a PayPal, Ko-fi, Cash App, Venmo, Buy Me a Coffee or Patreon link starting with https://"); return; }
+        try {
+          await set(ref(db, "CONCERT_CONFIG/artists/" + (S.editArtistId || slug(name))), { name: name.slice(0, 80), emailKey, tipLink });
+          S.artistDraft = null;
+          S.editArtistId = "";
+          document.activeElement && document.activeElement.blur();
+          render();
+        } catch (e) { alert("Couldn't save: " + (e && e.code)); }
       });
+      if (S.editArtistId) $("#cancelArtist").addEventListener("click", () => { S.artistDraft = null; S.editArtistId = ""; render(); });
+      $("#main").querySelectorAll("[data-edit-artist]").forEach((b) => b.addEventListener("click", () => {
+        const a = (S.cfg.artists || {})[b.dataset.editArtist] || {};
+        S.editArtistId = b.dataset.editArtist;
+        S.artistDraft = { name: a.name || "", key: a.emailKey || "", tip: a.tipLink || "" };
+        render();
+        $("#artistForm").scrollIntoView({ behavior: "smooth", block: "end" });
+      }));
       $("#main").querySelectorAll("[data-del-artist]").forEach((b) => b.addEventListener("click", () => {
+        if (!confirm("Remove this artist from the list?")) return;
+        if (S.editArtistId === b.dataset.delArtist) { S.editArtistId = ""; S.artistDraft = null; }
         remove(ref(db, "CONCERT_CONFIG/artists/" + b.dataset.delArtist)).catch((e) => alert(e && e.code));
       }));
     }
@@ -532,7 +643,7 @@
         '<p class="note">Each payment\'s client reference shows the artist, show and perk. Fans get points automatically through the Stripe webhook. Pay the artist ' + c.artistSharePct + '%.</p></div>' +
         '<div class="card"><h2>Variable tip link</h2><div class="grid" style="grid-template-columns:1fr"><div><label for="f_tipLink">Stripe tip link (only if your Stripe account allows tips)</label>' +
         '<input id="f_tipLink" placeholder="https://buy.stripe.com/..." value="' + esc(c.tipLink) + '"></div></div>' +
-        '<p class="note">Thai Stripe accounts can\'t take pay what you want tips, so leave this empty and use Fan perks. Artists can add their own PayPal, Ko-fi, Cash App or Venmo link when they go live; rooms show it as "Tip directly".</p></div>' +
+        '<p class="note">Thai Stripe accounts can\'t take pay what you want tips, so leave this empty and use Fan perks. For tips that go straight to an artist, add their PayPal, Ko-fi, Cash App or Venmo link under Shows, Artists (or they add it when they go live). Rooms show it as "Tip directly".</p></div>' +
         '<button type="button" class="btn" id="saveCfg">Save settings</button> <span class="muted" id="cfgMsg"></span>';
       $("#saveCfg").addEventListener("click", async () => {
         const num = (id) => Math.max(0, Number($("#f_" + id).value) || 0);

@@ -2,7 +2,7 @@
 
 const crypto = require('crypto');
 const {
-  verifyStripeSignature, parseReference, usdCents, processCheckoutSession,
+  verifyStripeSignature, parseReference, usdCents, processCheckoutSession, showArtists, pickArtist,
 } = require('../stripe-perks');
 
 function fakeDb(initial = {}) {
@@ -128,5 +128,37 @@ describe('processCheckoutSession', () => {
     const r = await processCheckoutSession(session({ client_reference_id: 'room2__room2__song_request__fan' }), db, 7);
     expect(r.room).toBe('Room2');
     expect(db.data.CONCERT_SHOUTOUTS.Room2.cs_live_123.perk).toBe('Song Request');
+  });
+});
+
+describe('shows with several artists', () => {
+  const multiDb = () => fakeDb({
+    CONCERT_SCHEDULE: { '-Nduo': { room: 'Room3', artist: 'Nova, DJ Luna & Kai', artists: ['Nova', 'DJ Luna', 'Kai'], startsAt: 1, endsAt: 2 } },
+    CONCERT_CONFIG: { perks: [{ name: 'Shoutout', price: 5, url: 'https://buy.stripe.com/x' }] },
+  });
+
+  test('reads the artist list, or the single artist of older shows', () => {
+    expect(showArtists({ artists: ['Nova', ' nova ', 'Luna', ''] })).toEqual(['Nova', 'Luna']);
+    expect(showArtists({ artists: { 0: 'Nova', 1: 'Luna' } })).toEqual(['Nova', 'Luna']);
+    expect(showArtists({ artist: 'Nova' })).toEqual(['Nova']);
+    expect(showArtists(null)).toEqual([]);
+  });
+
+  test('credits the artist the fan picked', async () => {
+    const db = multiDb();
+    const r = await processCheckoutSession(session({ client_reference_id: 'dj_luna__-Nduo__shoutout__fan' }), db, 9);
+    expect(r).toMatchObject({ ok: true, room: 'Room3', artist: 'DJ Luna' });
+    expect(db.data.CONCERT_SHOUTOUTS.Room3.cs_live_123.artist).toBe('DJ Luna');
+    expect(db.data.REWARDS.tips['fan_one@test_com'].cs_live_123).toMatchObject({ amountCents: 500, artist: 'DJ Luna' });
+    expect(db.data.FAN_OPTIN['fan_one@test_com'].dj_luna).toMatchObject({ artist: 'DJ Luna' });
+    expect(db.data.STRIPE_ORDERS.cs_live_123.artist).toBe('DJ Luna');
+  });
+
+  test('older app versions that send the whole line up keep the combined name', () => {
+    const show = { artist: 'Nova, DJ Luna & Kai', artists: ['Nova', 'DJ Luna', 'Kai'] };
+    expect(pickArtist(show, 'nova_dj_luna_kai')).toBe('Nova, DJ Luna & Kai');
+    expect(pickArtist(show, 'kai')).toBe('Kai');
+    expect(pickArtist(show, 'someone_else')).toBe('Someone Else');
+    expect(pickArtist({ artist: 'Nova' }, 'anything')).toBe('Nova');
   });
 });
