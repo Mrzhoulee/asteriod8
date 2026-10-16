@@ -190,7 +190,7 @@ function confirmationEmail(c) {
   const joinUrl = SITE + 'pass#perform';
   const bsText = bs ? '\n\nWant to perform on Asteroid? DM your code ' + bs.code + ' to @' + IG_HANDLE +
     ' on Instagram. Only artists who send their code get booked right away: ' + IG_DM_URL
-    : c.joinArtist ? '\n\nMake music? Join the Asteroid partnership and perform at a future show, no application: ' + joinUrl : '';
+    : c.joinArtist ? '\n\nMake music? Join the lineup of future concerts, no application: ' + joinUrl : '';
   const text = hi + "\n\nYou're in! Here's your free pass:\n\n" + c.shows.map(nightText).join('\n\n') +
     "\n\nWe'll email you an hour before " + (n === 1 ? 'it starts' : 'each night') + '. Fans earn points for every show they watch, and you can spend them on gift cards and shoutouts.' +
     bsText + "\n\nCan't make it? Remove a night from your pass: " + SITE + 'pass\n\nSee you there,\nAsteroid';
@@ -209,8 +209,8 @@ function confirmationEmail(c) {
       ' on Instagram. Only artists who send their code get booked right away.</p>' + button(IG_DM_URL, 'DM us on Instagram') + '</div>'
       : c.joinArtist ? '<div style="border:1px dashed #ff7f50;border-radius:12px;padding:14px;margin:16px 0 0">' +
         '<div style="font-size:11px;font-weight:800;letter-spacing:.14em;color:#ff7f50">MAKE MUSIC?</div>' +
-        '<p style="font-size:14px;line-height:1.5;color:#d8d8e0;margin:8px 0 10px">Join the Asteroid partnership and perform at a future show. No application.</p>' +
-        button(joinUrl, 'Join as an artist') + '</div>' : ''));
+        '<p style="font-size:14px;line-height:1.5;color:#d8d8e0;margin:8px 0 10px">Join the lineup of future concerts. No application.</p>' +
+        button(joinUrl, 'Join the lineup') + '</div>' : ''));
   return { subject, text, html };
 }
 

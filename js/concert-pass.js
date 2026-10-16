@@ -3,7 +3,7 @@
 //   (via = the artist whose link brought them, so admin can see who brings fans).
 //   Passes come with calendar buttons, and the concertPassEmails function emails a
 //   confirmation and a reminder an hour before each night.
-//   Artists join the Asteroid partnership with one tap (no application, no screening) and get a
+//   Artists join the lineup of future concerts with one tap (no application, no screening) and get a
 //   code (BACKSTAGE/{uk}). They DM it to @asteroidincofficial to get booked: only artists who send
 //   their code get booked right away. Old applications (ARTIST_APPLICATIONS) still count as joined.
 //   The same page ships in the iOS app: room links stay relative, copying uses the native
@@ -94,7 +94,7 @@ const state = {
   bsLoaded: false,
   bsCreating: false,
   authKnown: false,
-  joinRequested: false, // tapped "Join as an artist" this visit
+  joinRequested: false, // tapped "Join the lineup" this visit
   showCode: false,      // scroll to the code card once it shows
 };
 
@@ -202,7 +202,7 @@ function renderMine() {
     '<button type="button" class="btn ghost" data-act="invite">' + icon("ios_share") + "Share your pass link</button></div>";
 }
 
-// ---- Join as an artist: no application, no screening. Joining gives the perform code. -----
+// ---- Join the lineup: no application, no screening. Joining gives the perform code. ------
 function hasCode() {
   return !!state.user && !!state.backstage && isBackstageCode(state.backstage.code);
 }
@@ -281,7 +281,7 @@ function renderBackstage() {
   scrollToPerform();
 }
 
-// pass.html#perform (the concert rooms' "Join the Asteroid partnership"): go to the code, or to Join
+// pass.html#perform (the concert rooms' "Join the lineup of future concerts"): go to the code, or to Join
 let performScroll = /^#(perform|backstageCard|artistCard)$/.test(location.hash || "");
 function scrollToPerform(force) {
   if (!performScroll) return;
@@ -415,7 +415,7 @@ async function shareInvite(btn) {
   else prompt("Copy your pass link:", url);
 }
 
-// ---- Join as an artist -----------------------------------------------------------------
+// ---- Join the lineup ------------------------------------------------------------------
 /** Makes their perform code (or shows the one they have) and takes them to it. */
 async function join() {
   state.joinRequested = true;

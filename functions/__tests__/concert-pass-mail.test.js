@@ -167,11 +167,11 @@ describe('runPassEmails', () => {
     expect(fan.html).toContain('Only artists who send their code get booked right away.');
     const verified = sent.find((e) => e.to[0] === 'b@test.com');
     expect(verified.text).not.toContain('Want to perform');
-    expect(verified.text).not.toContain('Join the Asteroid partnership');
+    expect(verified.text).not.toContain('Join the lineup');
     const noCode = sent.find((e) => e.to[0] === 'c@test.com');
     expect(noCode.text).not.toContain('Want to perform');
-    expect(noCode.text).toContain('Make music? Join the Asteroid partnership and perform at a future show, no application: https://www.asteroid8.net/pass#perform');
-    expect(noCode.html).toContain('Join as an artist');
+    expect(noCode.text).toContain('Make music? Join the lineup of future concerts, no application: https://www.asteroid8.net/pass#perform');
+    expect(noCode.html).toContain('Join the lineup');
   });
 
   test('a failed send keeps the flags off so the next run tries again', async () => {
