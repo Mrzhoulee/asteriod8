@@ -337,6 +337,44 @@
         ".write": "!data.exists() && auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
         ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{6,12}$/) && newData.parent().parent().child('CONCERT_REF_CODES').child(newData.val()).child('uk').val() == $uk"
       }
+    },
+    "CONCERT_PASSES": {
+      ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      "$showId": {
+        "$uk": {
+          ".read": "auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+          ".write": "auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_') && (!data.exists() || !newData.exists())",
+          ".validate": "newData.hasChildren(['ts','email']) && root.child('CONCERT_SCHEDULE').child($showId).child('endsAt').val() > now",
+          "ts": { ".validate": "newData.val() == now" },
+          "email": { ".validate": "newData.isString() && newData.val() == auth.token.email" },
+          "via": { ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{1,40}$/)" },
+          "name": { ".validate": "newData.isString() && newData.val().length <= 60" },
+          "tz": { ".validate": "newData.isString() && newData.val().length <= 64" },
+          "$other": { ".validate": false }
+        }
+      }
+    },
+    "CONCERT_PASS_MAIL": {
+      ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      ".write": "auth != null && auth.token.email == 'console.admin@asteroid8.net'"
+    },
+    "ARTIST_APPLICATIONS": {
+      ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      "$uk": {
+        ".read": "auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+        ".write": "(auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')) || (auth != null && auth.token.email == 'console.admin@asteroid8.net' && !newData.exists())",
+        ".validate": "newData.hasChildren(['ts','email','name','ig','genre','perform'])",
+        "ts": { ".validate": "newData.val() == now" },
+        "email": { ".validate": "newData.isString() && newData.val() == auth.token.email" },
+        "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 80" },
+        "ig": { ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9._]{1,30}$/)" },
+        "genre": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 60" },
+        "perform": { ".validate": "newData.isString() && newData.val().matches(/^(live|dj|both)$/)" },
+        "link": { ".validate": "newData.isString() && newData.val().beginsWith('https://') && newData.val().length <= 300" },
+        "note": { ".validate": "newData.isString() && newData.val().length <= 300" },
+        "via": { ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{1,40}$/)" },
+        "$other": { ".validate": false }
+      }
     }
   }
 }

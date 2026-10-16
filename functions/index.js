@@ -118,3 +118,7 @@ exports.publicConfig = config.publicConfig;
 // Concert fan perks: Stripe webhook shows shoutouts in the room and credits points
 const stripeWebhook = require('./stripe-webhook');
 exports.stripeWebhook = stripeWebhook.stripeWebhook;
+
+// Free concert passes: confirmation and 1 hour reminder emails (pass.html)
+const concertPassEmails = require('./concert-pass-emails');
+exports.concertPassEmails = concertPassEmails.concertPassEmails;

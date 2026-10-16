@@ -224,6 +224,7 @@
       const allow = {
         "index.html": 1, "studio.html": 1, "pat.html": 1, "lively.html": 1,
         "liveroom1.html": 1, "liveroom2.html": 1, "liveroom3.html": 1, "liveroom4.html": 1, "liveroom5.html": 1,
+        "pass.html": 1,
       };
       window.location.replace(allow[ret] ? ret : "index.html");
     }
@@ -249,9 +250,16 @@
       localStorage.removeItem("localAuthOnly");
     }
 
-    // If a session is already valid, bounce out immediately.
+    // If a session is already valid, bounce out immediately. Concert pages (passes, points)
+    // need the real Firebase login, so for them only bounce when it is still active: the
+    // app can remember someone whose Firebase login ended, and bouncing would loop.
     if (typeof window.isSessionValid === "function" && window.isSessionValid()) {
-      postLoginRedirect();
+      const ret = (new URLSearchParams(window.location.search).get("return") || "").trim();
+      if (!/^(pass|lively|liveroom[1-5])\.html$/.test(ret)) {
+        postLoginRedirect();
+      } else if (typeof auth.authStateReady === "function") {
+        auth.authStateReady().then(() => { if (auth.currentUser) postLoginRedirect(); }).catch(() => {});
+      }
     }
 
     // ---- error message mapping -----------------------------------------------

@@ -19,6 +19,8 @@ const CSS = `
 .lv-rooms{grid-template-columns:minmax(0,1fr)}
 .lv-room>div{min-width:0;flex:1}
 .lv-room small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lvx-banner[hidden],.lvx-pass[hidden]{display:none}
+.lvx-pass{display:flex;align-items:center;justify-content:center;gap:6px;margin:-8px 0 20px;padding:11px 14px;border-radius:12px;border:1px dashed rgba(255,127,80,.5);color:#ffad8f;font-size:13px;font-weight:700;text-decoration:none}
 `;
 
 function init() {
@@ -36,6 +38,13 @@ function init() {
   banner.className = "lvx-banner";
   banner.hidden = true;
   if (title) title.parentNode.insertBefore(banner, title);
+  // Free pass: fans pick their nights and get a reminder before each one
+  const pass = document.createElement("a");
+  pass.className = "lvx-pass";
+  pass.href = "pass.html";
+  pass.textContent = "Get a free pass and a reminder before it starts";
+  pass.hidden = true;
+  if (title) title.parentNode.insertBefore(pass, title);
 
   function card(n) {
     const a = document.querySelector('.lv-room[href="liveroom' + n + '.html"]');
@@ -78,6 +87,7 @@ function init() {
       }
     });
 
+    pass.hidden = !nextBanner || !!liveBanner;
     if (liveBanner) {
       banner.className = "lvx-banner live";
       banner.href = "liveroom" + liveBanner.n + ".html";

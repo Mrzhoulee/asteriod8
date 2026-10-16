@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Free pass: live concerts on Asteroid</title>
+  <meta name="description" content="Lineup concerts streamed live by independent artists. Free to watch. Grab your pass.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Asteroid">
+  <meta property="og:title" content="Live concerts on Asteroid. Free pass.">
+  <meta property="og:description" content="Lineup nights streamed live by the artists. Free to watch. Fans earn points for every show.">
+  <meta property="og:image" content="https://www.asteroid8.net/pass-og.jpg">
+  <meta property="og:url" content="https://www.asteroid8.net/pass">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#0b0c11">
+  <link rel="icon" href="astei.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet">
+  <style>
+    :root { --bg0: #0b0c11; --card: rgba(255,255,255,.045); --line: rgba(255,255,255,.09); --text: #f4f4f8; --muted: rgba(244,244,248,.62); --coral: #ff7f50; --pink: #ff5c8a; }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--text);
+      font-family: 'Montserrat', system-ui, sans-serif;
+      background:
+        radial-gradient(900px 520px at 0% -10%, rgba(255, 92, 138, .2), transparent 55%),
+        radial-gradient(800px 480px at 100% 10%, rgba(255, 127, 80, .2), transparent 50%),
+        linear-gradient(170deg, #12131a, var(--bg0) 50%, #08090d);
+      padding: max(18px, env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+    }
+    .material-symbols-outlined { font-family: "Material Symbols Outlined"; font-weight: normal; font-style: normal; font-size: 20px; line-height: 1; display: inline-block; vertical-align: middle; -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 520px; margin: 0 auto; }
+    .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
+    .brand { font-weight: 800; font-size: 20px; letter-spacing: -.3px; color: var(--text); text-decoration: none; }
+    .brand span { color: var(--coral); }
+    .who { font-size: 12px; color: var(--muted); text-align: right; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .kicker { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--coral); margin: 0 0 10px; }
+    h1 { font-size: 30px; line-height: 1.15; margin: 0 0 10px; letter-spacing: -.5px; }
+    h1 em { font-style: normal; background: linear-gradient(90deg, var(--coral), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .sub { color: var(--muted); font-size: 15px; line-height: 1.55; margin: 0 0 22px; }
+    h2 { font-size: 18px; margin: 0 0 4px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px 16px; margin: 0 0 16px; }
+    .hint { font-size: 13px; color: var(--muted); margin: 0 0 12px; line-height: 1.5; }
+    .night { display: flex; gap: 12px; align-items: flex-start; padding: 13px 12px; border-radius: 14px; border: 1px solid var(--line); margin: 0 0 10px; cursor: pointer; background: rgba(0,0,0,.18); }
+    .night.on { border-color: rgba(255,127,80,.65); background: rgba(255,127,80,.08); }
+    .night.in { cursor: default; border-color: rgba(74,222,128,.45); background: rgba(74,222,128,.07); }
+    .night input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--coral); flex-shrink: 0; }
+    .night .ok { color: #86efac; flex-shrink: 0; margin-top: 1px; }
+    .night b { display: block; font-size: 15px; }
+    .night small { display: block; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+    .night .lineup { color: var(--text); opacity: .9; }
+    .night .lineup strong { color: var(--coral); }
+    .tag { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; margin: 6px 6px 0 0; background: rgba(255,255,255,.08); color: var(--muted); }
+    .tag.live { background: #ff3b3b; color: #fff; }
+    .tag.boo { background: rgba(255,140,0,.18); color: #ffb366; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 15px 18px; border: none; border-radius: 14px; background: linear-gradient(90deg, var(--coral), var(--pink)); color: #fff; font: 800 15px 'Montserrat', system-ui, sans-serif; cursor: pointer; text-decoration: none; }
+    .btn[aria-busy="true"] { opacity: .6; pointer-events: none; }
+    .btn.ghost { background: transparent; border: 1px solid rgba(255,127,80,.55); color: #ffad8f; font-weight: 700; }
+    .btn.small { width: auto; padding: 9px 12px; font-size: 12.5px; border-radius: 11px; }
+    .btn:focus-visible, .link:focus-visible, .night:focus-within { outline: 2px solid #fff; outline-offset: 2px; }
+    .fine { font-size: 12px; color: var(--muted); text-align: center; margin: 10px 0 0; }
+    .err { font-size: 13px; color: #ff9a9a; margin: 10px 0 0; min-height: 1px; }
+    .mine { border-top: 1px solid var(--line); padding: 14px 0 0; margin: 14px 0 0; }
+    .mine:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+    .mine b { font-size: 14.5px; }
+    .mine small { display: block; color: var(--muted); font-size: 12.5px; margin: 3px 0 10px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .link { background: none; border: none; color: #ffad8f; font: 600 12.5px 'Montserrat', system-ui, sans-serif; cursor: pointer; padding: 6px 2px; }
+    .done h2 { display: flex; align-items: center; gap: 8px; }
+    .done h2 .material-symbols-outlined { color: #86efac; font-size: 24px; }
+    .perks { list-style: none; padding: 0; margin: 12px 0 16px; }
+    .perks li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; margin: 0 0 10px; }
+    .perks .material-symbols-outlined { color: var(--coral); font-size: 20px; margin-top: 1px; }
+    label { display: block; font-size: 12.5px; font-weight: 700; color: var(--muted); margin: 12px 0 6px; }
+    input[type=text], input[type=url], select, textarea { width: 100%; padding: 12px 13px; border-radius: 12px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.3); color: var(--text); font: 500 15px 'Montserrat', system-ui, sans-serif; }
+    textarea { min-height: 70px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--coral); }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .foot { text-align: center; color: var(--muted); font-size: 12.5px; line-height: 1.6; margin: 26px 0 0; }
+    .foot a { color: #ffad8f; }
+    .toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom)); transform: translate(-50%, 150%); background: #1d1f26; border: 1px solid rgba(255,127,80,.45); color: #fff; padding: 12px 16px; border-radius: 12px; font-size: 14px; transition: transform .3s; z-index: 9; max-width: 92vw; }
+    .toast:not(.show) { visibility: hidden; transition: transform .3s, visibility 0s .3s; }
+    .toast.show { transform: translate(-50%, 0); }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <a class="brand" href="index.html">asteroid<span>.</span></a>
+      <div class="who" id="who"></div>
+    </div>
+
+    <p class="kicker"><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span>Free pass</p>
+    <h1 id="title">Live concerts on <em>Asteroid</em></h1>
+    <p class="sub" id="sub">Lineup nights, streamed live by the artists. Free to watch. Fans earn points for every show they catch.</p>
+
+    <section class="card done" id="mineCard" hidden aria-live="polite"></section>
+
+    <section class="card" id="nightsCard">
+      <h2 id="nightsTitle">Pick your nights</h2>
+      <p class="hint" id="nightsHint">Tap the nights you want. Times are in your time zone.</p>
+      <div id="nights"><p class="hint">Loading the lineup…</p></div>
+      <button type="button" class="btn" id="claimBtn" hidden>Get my free pass</button>
+      <p class="err" id="claimErr" role="alert"></p>
+      <p class="fine" id="claimFine" hidden>Free. One sign in, no card needed.</p>
+    </section>
+
+    <section class="card" id="artistCard">
+      <p class="kicker"><span class="material-symbols-outlined" aria-hidden="true">mic_external_on</span>Make music?</p>
+      <h2>Play a future show</h2>
+      <ul class="perks">
+        <li><span class="material-symbols-outlined" aria-hidden="true">home</span><span>A 20 minute set from home. We handle the stream.</span></li>
+        <li><span class="material-symbols-outlined" aria-hidden="true">volunteer_activism</span><span>Fans tip you and send shoutouts while you play.</span></li>
+        <li><span class="material-symbols-outlined" aria-hidden="true">diversity_3</span><span>No algorithm. Every artist gets the same stage.</span></li>
+      </ul>
+      <div id="applyStatus" aria-live="polite"></div>
+      <button type="button" class="btn ghost" id="applyOpen">Apply to play</button>
+      <form id="applyForm" hidden novalidate>
+        <label for="ap_name">Artist name</label>
+        <input type="text" id="ap_name" maxlength="80" autocomplete="nickname" required>
+        <div class="row2">
+          <div>
+            <label for="ap_ig">Instagram</label>
+            <input type="text" id="ap_ig" maxlength="80" placeholder="@yourname" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+          </div>
+          <div>
+            <label for="ap_genre">Genre</label>
+            <input type="text" id="ap_genre" maxlength="60" placeholder="Indie pop" required>
+          </div>
+        </div>
+        <label for="ap_perform">What do you play?</label>
+        <select id="ap_perform">
+          <option value="live">Live vocals or instruments</option>
+          <option value="dj">DJ set</option>
+          <option value="both">Both</option>
+        </select>
+        <label for="ap_link">Link to your music (optional)</label>
+        <input type="url" id="ap_link" maxlength="300" placeholder="https://" autocapitalize="none" autocorrect="off" spellcheck="false">
+        <label for="ap_note">Anything else? (optional)</label>
+        <textarea id="ap_note" maxlength="300"></textarea>
+        <p class="err" id="applyErr" role="alert"></p>
+        <button type="submit" class="btn" id="applyBtn" style="margin-top:12px">Send application</button>
+        <p class="fine">You'll sign in once so we can reach you.</p>
+      </form>
+    </section>
+
+    <p class="foot">Upload music, go live, get heard. No algorithms, no ads, no pay to play.<br>
+      <a href="index.html">Explore Asteroid</a> · <a href="https://instagram.com/asteroidincofficial" rel="noopener">@asteroidincofficial</a></p>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script type="module" src="js/concert-pass.js"></script>
+</body>
+</html>

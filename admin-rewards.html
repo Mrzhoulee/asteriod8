@@ -93,7 +93,7 @@
     import {
       FIREBASE_CONFIG, readConfig, rewardsKey, computeRewards, listShows, splitCents, tipPoints,
       centsToUsd, ptsToUsd, fmtPts, esc, ADMIN_EMAIL, POINTS_PER_USD, REDEEM_LABELS, ROOMS, GIFT_CARDS,
-      cleanArtistList, artistsLabel, safeTipLink, MAX_SHOW_ARTISTS,
+      cleanArtistList, artistsLabel, safeTipLink, MAX_SHOW_ARTISTS, artistKey, passUrl, artistNameFor,
     } from "./js/concert-rewards-core.js";
 
     // The admin signs in on its own Firebase app instance, so signing in or out
@@ -110,6 +110,7 @@
     ];
     const S = {
       cfgRaw: null, cfg: readConfig(null), schedule: null, rewards: {}, survey: {}, orders: {}, optins: {}, shouts: {}, refCodes: {},
+      passes: {}, passMail: {}, apps: {},
       tab: "requests", reqFilter: "pending",
       tz: localStorage.getItem("astAdminTz") || "America/New_York",
       started: false,
@@ -155,6 +156,9 @@
       onValue(ref(db, "FAN_OPTIN"), (s) => { S.optins = s.val() || {}; render(); }, fail("optins"));
       onValue(ref(db, "CONCERT_SHOUTOUTS"), (s) => { S.shouts = s.val() || {}; render(); }, fail("shoutouts"));
       onValue(ref(db, "CONCERT_REF_CODES"), (s) => { S.refCodes = s.val() || {}; render(); }, fail("invite codes"));
+      onValue(ref(db, "CONCERT_PASSES"), (s) => { S.passes = s.val() || {}; render(); }, fail("passes"));
+      onValue(ref(db, "CONCERT_PASS_MAIL"), (s) => { S.passMail = s.val() || {}; render(); }, fail("pass emails"));
+      onValue(ref(db, "ARTIST_APPLICATIONS"), (s) => { S.apps = s.val() || {}; render(); }, fail("artist applications"));
       render();
     }
 
@@ -327,7 +331,7 @@
       }
     });
 
-    const TABS = [["requests", "Requests"], ["shows", "Shows"], ["tips", "Tips"], ["money", "Money"], ["payouts", "Payouts"], ["fans", "Fans"], ["settings", "Settings"]];
+    const TABS = [["requests", "Requests"], ["shows", "Shows"], ["passes", "Passes"], ["tips", "Tips"], ["money", "Money"], ["payouts", "Payouts"], ["fans", "Fans"], ["settings", "Settings"]];
     function render() {
       if (!S.started) return;
       const pending = allRedemptions().filter((r) => r.status === "pending").length;
@@ -337,7 +341,7 @@
       $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { S.tab = b.dataset.tab; render(); }));
       const focused = document.activeElement && document.activeElement.id;
       if (focused && /^f_/.test(focused)) return; // don't wipe a form while typing
-      ({ requests: renderRequests, shows: renderShows, tips: renderTips, money: renderMoney, payouts: renderPayouts, fans: renderFans, settings: renderSettings })[S.tab]();
+      ({ requests: renderRequests, shows: renderShows, passes: renderPasses, tips: renderTips, money: renderMoney, payouts: renderPayouts, fans: renderFans, settings: renderSettings })[S.tab]();
     }
 
     function renderRequests() {
@@ -807,6 +811,80 @@
       }));
       $("#csvContacts").addEventListener("click", () => downloadCsv("asteroid-artist-contacts.csv",
         ["artist", "email", "pay_with", "handle", "note"], list.map((c) => [c.name, c.email, c.method, c.handle, c.note])));
+    }
+
+    // ---------- Passes: who each artist's link brings, and artists who want to play ----------
+    const PERFORM = { live: "Live", dj: "DJ", both: "Live and DJ" };
+    function renderPasses() {
+      const now = Date.now();
+      const shows = listShows(S.schedule);
+      const att = (S.rewards || {}).attendance || {};
+      const passes = [];
+      for (const [showId, byUk] of Object.entries(S.passes || {})) for (const [uk, p] of Object.entries(byUk || {})) if (p) passes.push({ showId, uk, ...p });
+      const came = (p) => !!(att[p.uk] && att[p.uk][p.showId]);
+      const links = new Map();
+      const linkOf = (v) => { if (!links.has(v)) links.set(v, { people: new Set(), showed: new Set(), passes: 0 }); return links.get(v); };
+      for (const p of passes) {
+        const L = linkOf(p.via || "");
+        L.people.add(p.uk);
+        L.passes += 1;
+        if (came(p)) L.showed.add(p.uk);
+      }
+      for (const n of artistNames()) { const k = artistKey(n); if (k) linkOf(k); }
+      const nameOf = (v) => (v ? artistNameFor(v, shows, S.cfg) || v : "No artist link");
+      const linkRows = [...links.entries()].sort((a, b) => b[1].people.size - a[1].people.size || nameOf(a[0]).localeCompare(nameOf(b[0])));
+      const showRows = shows.filter((s) => s.endsAt >= now || (S.passes || {})[s.id]).map((s) => {
+        const list = passes.filter((p) => p.showId === s.id);
+        const mail = Object.values((S.passMail || {})[s.id] || {});
+        return { s, n: list.length, came: list.filter(came).length, confirmed: mail.filter((m) => m && m.confirmedAt && !m.confirmSkipped).length, reminded: mail.filter((m) => m && m.remindedAt && !m.remindSkipped).length };
+      });
+      const people = new Set(passes.map((p) => p.uk)).size;
+      const showedUp = new Set(passes.filter(came).map((p) => p.uk)).size;
+      const apps = Object.entries(S.apps || {}).map(([uk, a]) => ({ uk, ...(a || {}) })).filter((a) => a.name).sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      const igUrl = (h) => "https://instagram.com/" + encodeURIComponent(h);
+
+      $("#main").innerHTML =
+        '<div class="stats"><div class="stat"><b>' + people + '</b><span>Fans with a pass</span></div><div class="stat"><b>' + passes.length +
+        '</b><span>Passes (nights)</span></div><div class="stat"><b>' + showedUp + '</b><span>Showed up</span></div><div class="stat"><b>' + apps.length +
+        "</b><span>Artists applied</span></div></div>" +
+        '<div class="card"><h2>Artist links</h2><p class="note" style="margin:0 0 12px">Give each artist their own link. Fans who get a pass through it count for that artist, ' +
+        "so you can see who brings fans (and pay per fan if you want). Showed up means they watched " + S.cfg.attendMinutes + " minutes of a night on their pass.</p>" +
+        '<div class="table-wrap"><table id="passLinks"><thead><tr><th>Artist</th><th>Link</th><th class="num">Fans</th><th class="num">Showed up</th></tr></thead><tbody>' +
+        linkRows.map(([v, L]) => "<tr><td>" + esc(nameOf(v)) + "</td><td>" + (v ? '<span class="muted">' + esc(passUrl(v).replace("https://www.", "")) +
+          '</span> <button type="button" class="btn small ghost" data-copy="' + esc(passUrl(v)) + '">Copy</button>' : '<span class="muted">' + esc(passUrl("").replace("https://www.", "")) + "</span>") +
+          '</td><td class="num">' + L.people.size + '</td><td class="num">' + L.showed.size + "</td></tr>").join("") +
+        "</tbody></table></div></div>" +
+        '<div class="card"><div class="top" style="margin-bottom:8px"><h2 style="margin:0">By night</h2><button type="button" class="btn small ghost" id="csvPasses">Download pass list</button></div>' +
+        (showRows.length ? '<div class="table-wrap"><table id="passNights"><thead><tr><th>When (' + esc(tzLabel(S.tz)) + ')</th><th>Lineup</th><th class="num">Passes</th><th class="num">Showed up</th><th class="num">Emails</th></tr></thead><tbody>' +
+          showRows.map((r) => "<tr><td>" + esc(fmtTz(r.s.startsAt)) + "</td><td>" + esc(r.s.artist) + '</td><td class="num">' + r.n + '</td><td class="num">' + r.came +
+            '</td><td class="num"><span class="muted">' + r.confirmed + " confirmed · " + r.reminded + " reminded</span></td></tr>").join("") +
+          "</tbody></table></div>" : '<p class="muted">Add shows in the Shows tab. Passes open as soon as a show is listed.</p>') + "</div>" +
+        '<div class="card"><div class="top" style="margin-bottom:8px"><h2 style="margin:0">Artists who want to play <span class="muted">(' + apps.length + ")</span></h2>" +
+        '<div class="row-actions">' + (apps.length ? '<button type="button" class="btn small ghost" data-copy="' + esc(apps.map((a) => "@" + a.ig).join(" ")) + '">Copy Instagram handles</button>' : "") +
+        '<button type="button" class="btn small ghost" id="csvApps">Download CSV</button></div></div>' +
+        '<p class="note" style="margin:0 0 12px">Artists apply from the pass page. These are your next lineups.</p>' +
+        (apps.length ? '<div class="table-wrap"><table id="appsTable"><thead><tr><th>When</th><th>Artist</th><th>Instagram</th><th>Genre</th><th>Plays</th><th>Music</th><th>Email</th><th>From</th><th></th></tr></thead><tbody>' +
+          apps.map((a) => "<tr><td>" + esc(fmtDate(a.ts)) + "</td><td>" + esc(a.name) + (a.note ? '<br><span class="muted">' + esc(a.note) + "</span>" : "") +
+            '</td><td><a href="' + esc(igUrl(a.ig)) + '" target="_blank" rel="noopener">@' + esc(a.ig) + "</a></td><td>" + esc(a.genre) + "</td><td>" + esc(PERFORM[a.perform] || a.perform || "") +
+            "</td><td>" + (a.link ? '<a href="' + esc(a.link) + '" target="_blank" rel="noopener">Listen</a>' : "") + "</td><td>" + esc(a.email || "") +
+            '</td><td><span class="muted">' + esc(a.via ? nameOf(a.via) : "") + '</span></td><td><button type="button" class="btn small bad" data-del-app="' + esc(a.uk) + '">Delete</button></td></tr>').join("") +
+          "</tbody></table></div>" : '<p class="muted">No applications yet.</p>') + "</div>";
+
+      $("#csvPasses").addEventListener("click", () => {
+        const byId = new Map(shows.map((s) => [s.id, s]));
+        downloadCsv("asteroid-passes.csv", ["claimed", "email", "name", "night", "lineup", "artist_link", "showed_up"],
+          passes.sort((a, b) => (a.ts || 0) - (b.ts || 0)).map((p) => {
+            const sh = byId.get(p.showId);
+            return [new Date(p.ts || 0).toISOString(), p.email, p.name || "", sh ? fmtTz(sh.startsAt) : p.showId, sh ? sh.artist : "", p.via ? nameOf(p.via) : "", came(p) ? "yes" : "no"];
+          }));
+      });
+      $("#csvApps").addEventListener("click", () => downloadCsv("asteroid-artist-applications.csv",
+        ["date", "artist", "instagram", "genre", "plays", "music", "email", "note", "from_link"],
+        apps.map((a) => [new Date(a.ts || 0).toISOString(), a.name, "@" + a.ig, a.genre, PERFORM[a.perform] || a.perform, a.link || "", a.email, a.note || "", a.via ? nameOf(a.via) : ""])));
+      $("#main").querySelectorAll("[data-del-app]").forEach((b) => b.addEventListener("click", async () => {
+        if (!confirm("Delete this application?")) return;
+        await remove(ref(db, "ARTIST_APPLICATIONS/" + b.dataset.delApp)).catch((e) => alert(e && e.code));
+      }));
     }
 
     function renderFans() {

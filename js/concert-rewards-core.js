@@ -20,6 +20,11 @@
 //   REWARDS/referrals/{code}/{friend} {ts, showId}  friend writes once, after watching a show
 //   REWARDS/referred/{friend}         {code, ts}    written with it: one inviter per friend, ever
 //
+// Free passes (pass.html: each artist shares asteroid8.net/pass?a=theirname)
+//   CONCERT_PASSES/{showId}/{uk}     {ts, email, via?, name?, tz?}   fan claims or cancels their own, admin reads
+//   CONCERT_PASS_MAIL/{showId}/{uk}  {confirmedAt?, remindedAt?}     written by the concertPassEmails function
+//   ARTIST_APPLICATIONS/{uk}         {ts, email, name, ig, genre, perform, link?, note?, via?}  artists apply to play
+//
 // uk = rewardsKey(email). database.rules.json derives the same key from the
 // signed in Firebase user, so nobody can write points for another account.
 
@@ -439,4 +444,107 @@ export function fmtWhen(ms, now = Date.now()) {
   if (dayKey(d) === dayKey(today)) return "Today " + time;
   if (dayKey(d) === dayKey(tomorrow)) return "Tomorrow " + time;
   return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) + ", " + time;
+}
+
+// ---- Free passes -------------------------------------------------------------------
+export const SITE = "https://www.asteroid8.net/";
+export const PASS_PAGE = SITE + "pass";
+
+/** "T.K.S" -> "tks", "Aum Shiver" -> "aumshiver": the ?a= key in pass links. */
+export function artistKey(s) {
+  return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 40);
+}
+
+/** Pass link for an artist (and the fan's invite code when they share it). */
+export function passUrl(a, invite) {
+  const q = [];
+  const k = artistKey(a);
+  if (k) q.push("a=" + k);
+  if (isInviteCode(invite)) q.push("invite=" + invite);
+  return PASS_PAGE + (q.length ? "?" + q.join("&") : "");
+}
+
+/** Shows where the artist with this pass key plays. */
+export function showsWithArtist(shows, a) {
+  const k = artistKey(a);
+  if (!k) return [];
+  return (shows || []).filter((s) => (s.artists || []).some((n) => artistKey(n) === k));
+}
+
+/** Display name for a pass key, from the schedule or the admin artist list. */
+export function artistNameFor(a, shows, cfg) {
+  const k = artistKey(a);
+  if (!k) return "";
+  for (const s of shows || []) for (const n of s.artists || []) if (artistKey(n) === k) return n;
+  for (const x of Object.values((cfg && cfg.artists) || {})) if (x && artistKey(x.name) === k) return String(x.name).trim();
+  return "";
+}
+
+export function isHalloween(ms) {
+  return showDay(ms).endsWith("-10-31");
+}
+
+export function watchUrl(show) {
+  const n = show && /^Room([1-5])$/.exec(show.room);
+  return SITE + (n ? "liveroom" + n[1] + ".html" : "lively.html");
+}
+
+const US_TIME = {
+  ET: new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" }),
+  PT: new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", hour: "numeric", minute: "2-digit" }),
+};
+/** "8:30 PM ET / 5:30 PM PT" */
+export function fmtUsTimes(ms) {
+  const d = new Date(ms);
+  return US_TIME.ET.format(d) + " ET / " + US_TIME.PT.format(d) + " PT";
+}
+
+/** "Fri, Oct 23, 8:30 PM EDT" in the viewer's own time zone (or the one given). */
+export function fmtShowLocal(ms, timeZone) {
+  const o = { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" };
+  if (timeZone) o.timeZone = timeZone;
+  try { return new Intl.DateTimeFormat("en-US", o).format(new Date(ms)); }
+  catch (e) { delete o.timeZone; return new Intl.DateTimeFormat("en-US", o).format(new Date(ms)); }
+}
+
+function calStamp(ms) {
+  return new Date(ms).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
+export function showTitle(show) {
+  return (isHalloween(show.startsAt) ? "Halloween concert" : "Live concert") + " on Asteroid" + (show.artist ? ": " + show.artist : "");
+}
+
+/** Google Calendar "add event" link for a show. */
+export function googleCalUrl(show) {
+  const details = "Lineup: " + (show.artist || "Asteroid artists") + "\nWatch free: " + watchUrl(show) + "\nYour pass: " + PASS_PAGE;
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(showTitle(show)) +
+    "&dates=" + calStamp(show.startsAt) + "/" + calStamp(show.endsAt) +
+    "&details=" + encodeURIComponent(details) + "&location=" + encodeURIComponent(watchUrl(show));
+}
+
+function icsEscape(s) {
+  return String(s || "").replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+}
+
+/** .ics file text (Apple Calendar, Outlook) with a reminder 30 minutes before each show. */
+export function icsText(shows, now = Date.now()) {
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Asteroid//Concert pass//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"];
+  for (const s of shows || []) {
+    lines.push("BEGIN:VEVENT", "UID:" + s.id + "@asteroid8.net", "DTSTAMP:" + calStamp(now), "DTSTART:" + calStamp(s.startsAt), "DTEND:" + calStamp(s.endsAt),
+      "SUMMARY:" + icsEscape(showTitle(s)), "DESCRIPTION:" + icsEscape("Lineup: " + (s.artist || "Asteroid artists") + "\nWatch free: " + watchUrl(s)),
+      "URL:" + watchUrl(s), "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + icsEscape(showTitle(s)), "TRIGGER:-PT30M", "END:VALARM", "END:VEVENT");
+  }
+  lines.push("END:VCALENDAR");
+  // Lines longer than 75 characters continue on the next line after a space (RFC 5545)
+  return lines.map((l) => l.length <= 75 ? l : l.match(/.{1,74}/g).join("\r\n ")).join("\r\n") + "\r\n";
+}
+
+/** "@Elihu.Artist" or "instagram.com/elihu.artist/" -> "elihu.artist", or "" when it isn't a handle. */
+export function cleanHandle(raw) {
+  let s = String(raw || "").trim();
+  const m = /instagram\.com\/([^/?#\s]+)/i.exec(s);
+  if (m) s = m[1];
+  s = s.replace(/^@+/, "").toLowerCase();
+  return /^[a-z0-9._]{1,30}$/.test(s) ? s : "";
 }
