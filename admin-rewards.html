@@ -37,6 +37,7 @@
     .count { display:inline-block; min-width:18px; padding:0 5px; margin-left:4px; border-radius:9px; background:#ff3b3b; color:#fff; font-size:11px; }
     .grid { display:grid; gap:10px; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); align-items:end; }
     .table-wrap { overflow-x:auto; }
+    #main a { color:#ffad8f; }
     table { width:100%; border-collapse:collapse; font-size:13px; }
     th, td { text-align:left; padding:9px 8px; border-top:1px solid var(--line); vertical-align:top; }
     th { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.06em; border-top:none; }
@@ -94,6 +95,7 @@
       FIREBASE_CONFIG, readConfig, rewardsKey, computeRewards, listShows, splitCents, tipPoints,
       centsToUsd, ptsToUsd, fmtPts, esc, ADMIN_EMAIL, POINTS_PER_USD, REDEEM_LABELS, ROOMS, GIFT_CARDS,
       cleanArtistList, artistsLabel, safeTipLink, MAX_SHOW_ARTISTS, artistKey, passUrl, artistNameFor,
+      cleanHandle, backstageReply,
     } from "./js/concert-rewards-core.js";
 
     // The admin signs in on its own Firebase app instance, so signing in or out
@@ -110,7 +112,7 @@
     ];
     const S = {
       cfgRaw: null, cfg: readConfig(null), schedule: null, rewards: {}, survey: {}, orders: {}, optins: {}, shouts: {}, refCodes: {},
-      passes: {}, passMail: {}, apps: {},
+      passes: {}, passMail: {}, apps: {}, backstage: {}, bsFound: "", bsMsg: "",
       tab: "requests", reqFilter: "pending",
       tz: localStorage.getItem("astAdminTz") || "America/New_York",
       started: false,
@@ -159,6 +161,7 @@
       onValue(ref(db, "CONCERT_PASSES"), (s) => { S.passes = s.val() || {}; render(); }, fail("passes"));
       onValue(ref(db, "CONCERT_PASS_MAIL"), (s) => { S.passMail = s.val() || {}; render(); }, fail("pass emails"));
       onValue(ref(db, "ARTIST_APPLICATIONS"), (s) => { S.apps = s.val() || {}; render(); }, fail("artist applications"));
+      onValue(ref(db, "BACKSTAGE"), (s) => { S.backstage = s.val() || {}; render(); }, fail("backstage codes"));
       render();
     }
 
@@ -843,7 +846,7 @@
       const apps = Object.entries(S.apps || {}).map(([uk, a]) => ({ uk, ...(a || {}) })).filter((a) => a.name).sort((a, b) => (b.ts || 0) - (a.ts || 0));
       const igUrl = (h) => "https://instagram.com/" + encodeURIComponent(h);
 
-      $("#main").innerHTML =
+      $("#main").innerHTML = backstageHtml(shows) +
         '<div class="stats"><div class="stat"><b>' + people + '</b><span>Fans with a pass</span></div><div class="stat"><b>' + passes.length +
         '</b><span>Passes (nights)</span></div><div class="stat"><b>' + showedUp + '</b><span>Showed up</span></div><div class="stat"><b>' + apps.length +
         "</b><span>Artists applied</span></div></div>" +
@@ -885,6 +888,87 @@
         if (!confirm("Delete this application?")) return;
         await remove(ref(db, "ARTIST_APPLICATIONS/" + b.dataset.delApp)).catch((e) => alert(e && e.code));
       }));
+      bindBackstage();
+    }
+
+    // ---------- Backstage: fans DM their code to @asteroidincofficial, admin verifies it ----------
+    function backstageList() {
+      return Object.entries(S.backstage || {}).map(([uk, b]) => ({ uk, ...(b || {}) })).filter((b) => b.code).sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    }
+    function backstageWho(b) {
+      const app = (S.apps || {})[b.uk];
+      return (app && app.name) || b.name || b.email || b.uk;
+    }
+    function backstageHtml(shows) {
+      const list = backstageList();
+      const pts = S.cfg.backstagePoints;
+      const verified = list.filter((b) => b.verifiedAt).length;
+      const found = S.bsFound ? list.find((b) => b.uk === S.bsFound) : null;
+      let result = S.bsMsg ? '<p class="note" style="margin:10px 0 0">' + esc(S.bsMsg) + "</p>" : "";
+      if (found) {
+        const app = (S.apps || {})[found.uk];
+        const nights = shows.filter((s) => (S.passes || {})[s.id] && S.passes[s.id][found.uk]).map((s) => fmtTz(s.startsAt));
+        const reply = backstageReply({ role: found.role, name: app && app.name ? app.name : found.name }, pts);
+        result = '<div class="card" style="margin:12px 0 0;background:rgba(255,255,255,.03)" id="bsResult"><b>' + esc(backstageWho(found)) + "</b> " +
+          '<span class="pill ' + (found.verifiedAt ? "sent" : "pending") + '">' + (found.verifiedAt ? "Verified" : "Not verified yet") + "</span>" +
+          '<p class="note">' + esc(found.email || "") + " · " + (found.role === "artist" ? "Artist" : "Fan") + (found.ig ? " · @" + esc(found.ig) : "") +
+          (app ? " · applied to play: @" + esc(app.ig) + ", " + esc(app.genre) : "") + "</p>" +
+          '<p class="note">' + (nights.length ? "Nights: " + nights.map(esc).join(", ") : "No passes yet") + "</p>" +
+          (found.verifiedAt ? "" : '<button type="button" class="btn small" id="bsVerify" style="margin-top:10px">Verify' + (pts > 0 ? " and add " + fmtPts(pts) + " pts" : "") + "</button>") +
+          '<p class="note" style="margin-top:12px">Reply to send:</p><p style="margin:4px 0 8px">' + esc(reply) + "</p>" +
+          '<button type="button" class="btn small ghost" data-copy="' + esc(reply) + '">Copy reply</button></div>';
+      }
+      return '<div class="card"><div class="top" style="margin-bottom:8px"><h2 style="margin:0">Backstage DMs <span class="muted">(' + list.length + " codes · " + verified + " verified)</span></h2>" +
+        '<button type="button" class="btn small ghost" id="csvBackstage">Download CSV</button></div>' +
+        '<p class="note" style="margin:0 0 12px">Fans and artists get a code after their pass or application and DM it to @asteroidincofficial. Paste the DM here, verify it' +
+        (pts > 0 ? " (they get " + fmtPts(pts) + " pts)" : "") + ", then send the reply. Change the points in Settings.</p>" +
+        '<div class="grid"><div><label for="f_bsCode">Code or the whole DM</label><input id="f_bsCode" type="text" placeholder="AST7K3QX" autocomplete="off" value="' + esc(S.bsCodeInput || "") + '"></div>' +
+        '<div><label for="f_bsIg">Their Instagram (optional)</label><input id="f_bsIg" type="text" placeholder="@their_name" autocomplete="off" value="' + esc(S.bsIg ? "@" + S.bsIg : "") + '"></div></div>' +
+        '<button type="button" class="btn small" id="bsFind" style="margin-top:10px">Find</button>' + result +
+        (list.length ? '<div class="table-wrap" style="margin-top:14px"><table id="backstageTable"><thead><tr><th>When</th><th>Code</th><th>Who</th><th>Fan or artist</th><th>Instagram</th><th>Status</th><th></th></tr></thead><tbody>' +
+          list.slice(0, 200).map((b) => "<tr><td>" + esc(fmtDate(b.ts)) + "</td><td>" + esc(b.code) + "</td><td>" + esc(backstageWho(b)) + "</td><td>" + (b.role === "artist" ? "Artist" : "Fan") +
+            "</td><td>" + (b.ig ? '<a href="https://instagram.com/' + encodeURIComponent(b.ig) + '" target="_blank" rel="noopener">@' + esc(b.ig) + "</a>" : "") + "</td><td>" +
+            (b.verifiedAt ? '<span class="pill sent">Verified</span>' : '<span class="pill pending">Waiting</span>') +
+            '</td><td><button type="button" class="btn small ghost" data-bs-open="' + esc(b.uk) + '">Open</button></td></tr>').join("") +
+          "</tbody></table></div>" : "") + "</div>";
+    }
+    function bindBackstage() {
+      const find = () => {
+        S.bsCodeInput = ($("#f_bsCode").value || "").trim().slice(0, 200);
+        // Codes never use I, L, O, 0 or 1, so the word "Asteroid" in the DM isn't read as a code
+        const found = S.bsCodeInput.toUpperCase().replace(/\s+/g, "").match(/AST[ABCDEFGHJKMNPQRSTUVWXYZ2-9]{5}/g) || [];
+        const list = backstageList();
+        const code = found.find((c) => list.some((b) => b.code === c)) || found[0] || "";
+        const hit = code ? list.find((b) => b.code === code) : null;
+        S.bsFound = hit ? hit.uk : "";
+        S.bsMsg = !code ? "That doesn't look like a code. Codes look like AST7K3QX." : hit ? "" : "No one has the code " + code + " yet. Check it with them.";
+        S.bsIg = cleanHandle($("#f_bsIg").value);
+        $("#bsFind").focus();
+        render();
+      };
+      $("#bsFind").addEventListener("click", find);
+      $("#f_bsCode").addEventListener("keydown", (e) => { if (e.key === "Enter") find(); });
+      const v = $("#bsVerify");
+      if (v) v.addEventListener("click", async () => {
+        const b = backstageList().find((x) => x.uk === S.bsFound);
+        if (!b || b.verifiedAt) return;
+        const pts = S.cfg.backstagePoints;
+        const now = Date.now();
+        const upd = { ["BACKSTAGE/" + b.uk + "/verifiedAt"]: now };
+        if (S.bsIg) upd["BACKSTAGE/" + b.uk + "/ig"] = S.bsIg;
+        if (pts > 0) upd["REWARDS/adjust/" + b.uk + "/bs_" + b.code] = { points: pts, reason: "Backstage DM", ts: now };
+        v.disabled = true;
+        try { await update(ref(db), upd); S.bsMsg = "Verified. Send them the reply."; }
+        catch (e) { alert(e && e.code); v.disabled = false; }
+        render();
+      });
+      $("#main").querySelectorAll("[data-bs-open]").forEach((b) => b.addEventListener("click", () => {
+        S.bsFound = b.dataset.bsOpen; S.bsMsg = ""; S.bsCodeInput = ""; S.bsIg = ""; render();
+        const r = $("#bsResult"); if (r) r.scrollIntoView({ block: "center" });
+      }));
+      $("#csvBackstage").addEventListener("click", () => downloadCsv("asteroid-backstage.csv",
+        ["date", "code", "name", "email", "role", "instagram", "verified"],
+        backstageList().map((b) => [new Date(b.ts || 0).toISOString(), b.code, backstageWho(b), b.email || "", b.role || "fan", b.ig ? "@" + b.ig : "", b.verifiedAt ? "yes" : "no"])));
     }
 
     function renderFans() {
@@ -987,6 +1071,7 @@
         field("minGiftCardUsd", "Smallest gift card ($)", c.minGiftCardUsd) +
         field("referralPoints", "Invite points: inviter", c.referralPoints) +
         field("referralFriendPoints", "Invite points: friend", c.referralFriendPoints) +
+        field("backstagePoints", "Points for a backstage DM", c.backstagePoints) +
         "</div><p class=\"note\">" + POINTS_PER_USD + " points = $1. At " + c.pointsPerDollar + " points per $1 tipped, tip points cost exactly " + c.pointsPerDollar + "% of tips.</p></div>" +
         '<div class="card"><h2>Costs</h2><div class="grid">' +
         field("cost_shoutout", "Shoutout", c.costs.shoutout) + field("cost_badge", "Supporter badge", c.costs.badge) +
@@ -1017,7 +1102,7 @@
         const patch = {
           pointsPerDollar: num("pointsPerDollar"), pointsPerShow: num("pointsPerShow"), attendMinutes: num("attendMinutes"),
           streakDays: Math.max(1, num("streakDays")), streakBonusPoints: num("streakBonusPoints"), minGiftCardUsd: Math.max(1, num("minGiftCardUsd")),
-          referralPoints: num("referralPoints"), referralFriendPoints: num("referralFriendPoints"),
+          referralPoints: num("referralPoints"), referralFriendPoints: num("referralFriendPoints"), backstagePoints: num("backstagePoints"),
           artistSharePct: a, rewardsSharePct: r, asteroidSharePct: s, viewerCountThreshold: num("viewerCountThreshold"),
           costs: { shoutout: num("cost_shoutout"), badge: num("cost_badge"), early: num("cost_early"), minTip: Math.max(1, num("cost_minTip")) },
           instagram: $("#f_instagram").value.trim(),

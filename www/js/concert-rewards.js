@@ -55,6 +55,7 @@ const CSS = `
 .crx-sh p{margin:4px 0 0;font-size:13px;color:rgba(255,255,255,.85);line-height:1.45;word-break:break-word}
 .crx-support{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
 .crx-invite{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
+a.crx-line.crx-bs{text-decoration:none;color:#ffad8f;font-weight:600}
 .crx-support-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:2px}
 .crx-perks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .crx-perks .crx-btn{margin-top:8px;padding:11px 10px;font-size:13px;flex-direction:column;gap:2px}
@@ -449,7 +450,9 @@ export function mountConcertRewards(roomNum) {
       (att ? '<div class="crx-line">' + att + "</div>" : "") +
       (invited && cfg.referralFriendPoints > 0 ? '<div class="crx-line">' + icon("person_add") + "<span>A friend invited you. Watch " + cfg.attendMinutes +
         " minutes of a show and get +" + fmtPts(cfg.referralFriendPoints) + " pts.</span></div>" : "") +
-      '<button class="crx-btn" data-act="spend">' + icon("redeem") + "Spend points</button>" + tipBtn + inviteHtml(r) + fine);
+      '<button class="crx-btn" data-act="spend">' + icon("redeem") + "Spend points</button>" + tipBtn + inviteHtml(r) +
+      (cfg.backstagePoints > 0 ? '<a class="crx-line crx-bs" href="pass.html#backstageCard">' + icon("key") + "<span>Get +" + fmtPts(cfg.backstagePoints) +
+        " pts: grab a free pass, then DM your backstage code</span></a>" : "") + fine);
   }
 
   // ---- Invite friends -------------------------------------------------------------------

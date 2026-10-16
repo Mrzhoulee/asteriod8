@@ -145,6 +145,30 @@ describe('runPassEmails', () => {
     expect(sent[1].subject).toBe('Starting in 1 hour: Syante & Elihu on Asteroid');
   });
 
+  test('confirmation carries the backstage code until it is verified', async () => {
+    const db = fakeDb({
+      CONCERT_SCHEDULE: schedule,
+      CONCERT_PASSES: { fri: { fan_uk: pass(), b_uk: pass({ email: 'b@test.com' }), c_uk: pass({ email: 'c@test.com' }) } },
+      BACKSTAGE: { fan_uk: { code: 'AST7K3QX', role: 'fan' }, b_uk: { code: 'ASTB2C3D', role: 'fan', verifiedAt: 5 } },
+      CONCERT_CONFIG: { backstagePoints: 150 },
+    });
+    const sent = [];
+    await runPassEmails(db, async (emails) => { sent.push(...emails); }, FRI - 47 * H);
+    const fan = sent.find((e) => e.to[0] === 'fan@test.com');
+    expect(fan.text).toContain('DM your code AST7K3QX to @asteroidincofficial on Instagram for +150 points');
+    expect(fan.text).toContain('https://ig.me/m/asteroidincofficial');
+    expect(fan.html).toContain('AST7K3QX');
+    expect(sent.find((e) => e.to[0] === 'b@test.com').text).not.toContain('Backstage');
+    expect(sent.find((e) => e.to[0] === 'c@test.com').text).not.toContain('Backstage');
+  });
+
+  test('backstage points default to 100 when not set', async () => {
+    const db = fakeDb({ CONCERT_SCHEDULE: schedule, CONCERT_PASSES: { fri: { fan_uk: pass() } }, BACKSTAGE: { fan_uk: { code: 'AST7K3QX', role: 'fan' } } });
+    const sent = [];
+    await runPassEmails(db, async (emails) => { sent.push(...emails); }, FRI - 47 * H);
+    expect(sent[0].text).toContain('for +100 points');
+  });
+
   test('a failed send keeps the flags off so the next run tries again', async () => {
     const db = fakeDb({ CONCERT_SCHEDULE: schedule, CONCERT_PASSES: { fri: { fan_uk: pass() } } });
     const r = await runPassEmails(db, async () => { throw new Error('domain not verified'); }, FRI - 47 * H);

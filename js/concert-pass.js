@@ -12,6 +12,7 @@ import {
 import {
   firebaseApp, firebaseDb, readConfig, rewardsKey, esc, fmtPts, listShows, captureInvite, isInviteCode, newInviteCode,
   artistKey, passUrl, showsWithArtist, artistNameFor, isHalloween, fmtUsTimes, fmtShowLocal, googleCalUrl, icsText, watchUrl, cleanHandle,
+  isBackstageCode, newBackstageCode, backstageDmText, IG_DM_URL, IG_HANDLE,
 } from "./concert-rewards-core.js";
 
 const VIA_KEY = "astPassVia";
@@ -85,6 +86,9 @@ const state = {
   picksTouched: false,
   pendingDone: false,
   myInvite: "",
+  backstage: null,   // BACKSTAGE/{uk}: {code, role, verifiedAt?}
+  bsLoaded: false,
+  bsCreating: false,
 };
 
 function upcoming() {
@@ -198,11 +202,65 @@ function renderApplication() {
   }
 }
 
+// ---- Backstage code: DM it to @asteroidincofficial for points and a personal reply ------
+function bsEligible() {
+  return !!state.user && (claimedIds().length > 0 || !!(state.application && state.application.name));
+}
+
+async function ensureBackstage() {
+  if (!bsEligible() || !state.bsLoaded || state.backstage || state.bsCreating) return;
+  state.bsCreating = true;
+  const app = state.application && state.application.name ? state.application : null;
+  for (let i = 0; i < 3 && !state.backstage; i++) {
+    const code = newBackstageCode();
+    const rec = { code, ts: serverTimestamp(), email: state.user.email, role: app ? "artist" : "fan" };
+    const name = app ? app.name : firstName();
+    if (name) rec.name = String(name).slice(0, 80);
+    if (state.a) rec.via = state.a;
+    try {
+      await update(ref(db), {
+        ["BACKSTAGE/" + state.key]: rec,
+        ["BACKSTAGE_CODES/" + code]: { uk: state.key, ts: serverTimestamp() },
+      });
+      break;
+    } catch (e) { console.warn("[pass] backstage code", e && e.code); }
+  }
+  state.bsCreating = false;
+  renderBackstage();
+}
+
+function renderBackstage() {
+  const card = $("backstageCard");
+  const b = state.backstage;
+  if (!bsEligible() || !b || !isBackstageCode(b.code)) { card.hidden = true; return; }
+  card.hidden = false;
+  const pts = state.cfg.backstagePoints;
+  const artist = b.role === "artist";
+  $("bsCode").textContent = b.code;
+  $("bsBtn").href = IG_DM_URL;
+  $("bsCode").classList.toggle("ok", !!b.verifiedAt);
+  if (b.verifiedAt) {
+    $("bsTitle").textContent = "You're backstage";
+    $("bsText").textContent = (pts > 0 ? "+" + fmtPts(pts) + " points are in your account. " : "") +
+      "We'll message you on Instagram when new shows and open slots drop.";
+    $("bsBtn").hidden = true;
+    $("bsHint").textContent = "";
+    return;
+  }
+  $("bsTitle").textContent = pts > 0 ? "Get +" + fmtPts(pts) + " points on Instagram" : "Say hi on Instagram";
+  $("bsText").textContent = artist
+    ? "DM your code to @" + IG_HANDLE + " so we can talk about your set. We'll reply" + (pts > 0 ? " and add your points." : ".")
+    : "DM your code to @" + IG_HANDLE + ". We'll reply" + (pts > 0 ? ", add your points," : "") + " and message you when new shows and open slots drop.";
+  $("bsBtn").hidden = false;
+}
+
 function render() {
   renderHero();
   renderNights();
   renderMine();
   renderApplication();
+  renderBackstage();
+  ensureBackstage();
 }
 
 // ---- Passes ----------------------------------------------------------------------------
@@ -421,6 +479,7 @@ onValue(ref(db, "CONCERT_SCHEDULE"), (s) => {
 }, (e) => { console.warn("[pass] schedule", e && e.code); $("nights").innerHTML = '<p class="hint">Couldn\'t load the lineup. Refresh to try again.</p>'; });
 
 let offApp = null;
+let offBs = null;
 onAuthStateChanged(auth, (user) => {
   state.user = user && user.email ? user : null;
   state.key = state.user ? rewardsKey(state.user.email) : "";
@@ -429,11 +488,16 @@ onAuthStateChanged(auth, (user) => {
   state.mineSubs.clear();
   state.mine = {};
   if (offApp) { offApp(); offApp = null; }
+  if (offBs) { offBs(); offBs = null; }
   state.application = null;
+  state.backstage = null;
+  state.bsLoaded = false;
   if (state.key) {
     watchMine();
-    offApp = onValue(ref(db, "ARTIST_APPLICATIONS/" + state.key), (s) => { state.application = s.val(); renderApplication(); },
+    offApp = onValue(ref(db, "ARTIST_APPLICATIONS/" + state.key), (s) => { state.application = s.val(); renderApplication(); renderBackstage(); ensureBackstage(); },
       (e) => console.warn("[pass] read application", e && e.code));
+    offBs = onValue(ref(db, "BACKSTAGE/" + state.key), (s) => { state.backstage = s.val(); state.bsLoaded = true; renderBackstage(); ensureBackstage(); },
+      (e) => console.warn("[pass] read backstage", e && e.code));
   }
   render();
   runPending();
@@ -465,5 +529,13 @@ $("applyOpen").addEventListener("click", () => {
   $("ap_name").focus();
 });
 $("applyForm").addEventListener("submit", onApply);
+$("bsBtn").addEventListener("click", () => {
+  // The link opens the Instagram chat; the message with the code goes on the clipboard to paste
+  const b = state.backstage;
+  if (!b || !isBackstageCode(b.code)) return;
+  const text = backstageDmText(b.code);
+  try { navigator.clipboard.writeText(text).catch(() => {}); } catch (e) {}
+  $("bsHint").textContent = "Code copied. Paste it in the chat with @" + IG_HANDLE + " and send.";
+});
 setInterval(render, 60 * 1000);
 render();

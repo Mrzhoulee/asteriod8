@@ -71,6 +71,8 @@
     .link { background: none; border: none; color: #ffad8f; font: 600 12.5px 'Montserrat', system-ui, sans-serif; cursor: pointer; padding: 6px 2px; }
     .done h2 { display: flex; align-items: center; gap: 8px; }
     .done h2 .material-symbols-outlined { color: #86efac; font-size: 24px; }
+    .bscode { font: 800 30px/1 'Montserrat', system-ui, sans-serif; letter-spacing: .2em; text-align: center; padding: 16px 10px; margin: 2px 0 12px; border: 1px dashed rgba(255,127,80,.65); border-radius: 14px; background: rgba(0,0,0,.28); color: #fff; user-select: all; -webkit-user-select: all; }
+    .bscode.ok { border-style: solid; border-color: rgba(74,222,128,.5); color: #86efac; }
     .perks { list-style: none; padding: 0; margin: 12px 0 16px; }
     .perks li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; margin: 0 0 10px; }
     .perks .material-symbols-outlined { color: var(--coral); font-size: 20px; margin-top: 1px; }
@@ -99,6 +101,15 @@
     <p class="sub" id="sub">Lineup nights, streamed live by the artists. Free to watch. Fans earn points for every show they catch.</p>
 
     <section class="card done" id="mineCard" hidden aria-live="polite"></section>
+
+    <section class="card" id="backstageCard" hidden aria-live="polite">
+      <p class="kicker"><span class="material-symbols-outlined" aria-hidden="true">key</span>Backstage</p>
+      <h2 id="bsTitle">Get bonus points on Instagram</h2>
+      <p class="hint" id="bsText"></p>
+      <div class="bscode" id="bsCode"></div>
+      <a class="btn" id="bsBtn" href="https://ig.me/m/asteroidincofficial" target="_blank" rel="noopener"><span class="material-symbols-outlined" aria-hidden="true">send</span>Copy code and open Instagram</a>
+      <p class="fine" id="bsHint"></p>
+    </section>
 
     <section class="card" id="nightsCard">
       <h2 id="nightsTitle">Pick your nights</h2>

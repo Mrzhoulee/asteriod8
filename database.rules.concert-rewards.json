@@ -145,6 +145,30 @@
         "via": { ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{1,40}$/)" },
         "$other": { ".validate": false }
       }
+    },
+    "BACKSTAGE": {
+      ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      "$uk": {
+        ".read": "auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_')",
+        ".write": "(auth != null && auth.token.email != null && $uk == auth.token.email.toLowerCase().replace('.', '_') && !data.exists()) || (auth != null && auth.token.email == 'console.admin@asteroid8.net')",
+        ".validate": "newData.hasChildren(['code','ts','email','role']) && newData.child('code').isString() && newData.child('code').val().matches(/^AST[A-Z0-9]{5}$/) && newData.parent().parent().child('BACKSTAGE_CODES').child(newData.child('code').val()).child('uk').val() == $uk && (auth.token.email == 'console.admin@asteroid8.net' || (newData.child('email').val() == auth.token.email && !newData.hasChild('verifiedAt') && !newData.hasChild('ig')))",
+        "code": { ".validate": "newData.isString()" },
+        "ts": { ".validate": "newData.isNumber()" },
+        "email": { ".validate": "newData.isString() && newData.val().length <= 200" },
+        "role": { ".validate": "newData.isString() && newData.val().matches(/^(fan|artist)$/)" },
+        "name": { ".validate": "newData.isString() && newData.val().length <= 80" },
+        "via": { ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{1,40}$/)" },
+        "verifiedAt": { ".validate": "newData.isNumber()" },
+        "ig": { ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9._]{1,30}$/)" },
+        "$other": { ".validate": false }
+      }
+    },
+    "BACKSTAGE_CODES": {
+      ".read": "auth != null && auth.token.email == 'console.admin@asteroid8.net'",
+      "$code": {
+        ".write": "(!data.exists() && auth != null && auth.token.email != null && newData.child('uk').val() == auth.token.email.toLowerCase().replace('.', '_')) || (auth != null && auth.token.email == 'console.admin@asteroid8.net' && !newData.exists())",
+        ".validate": "$code.matches(/^AST[A-Z0-9]{5}$/) && newData.hasChildren(['uk','ts']) && newData.child('ts').isNumber() && newData.parent().parent().child('BACKSTAGE').child(newData.child('uk').val()).child('code').val() == $code"
+      }
     }
   }
 }

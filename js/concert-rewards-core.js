@@ -25,6 +25,11 @@
 //   CONCERT_PASS_MAIL/{showId}/{uk}  {confirmedAt?, remindedAt?}     written by the concertPassEmails function
 //   ARTIST_APPLICATIONS/{uk}         {ts, email, name, ig, genre, perform, link?, note?, via?}  artists apply to play
 //
+// Backstage codes (after a pass or an application, fans DM their code to @asteroidincofficial;
+// admin verifies it and adds points, so Otto can keep in touch with them on Instagram)
+//   BACKSTAGE/{uk}            {code, ts, email, role, name?, via?, verifiedAt?, ig?}  owner creates once, admin verifies
+//   BACKSTAGE_CODES/{code}    {uk, ts}   owner creates once with it, admin reads (code lookup)
+//
 // uk = rewardsKey(email). database.rules.json derives the same key from the
 // signed in Firebase user, so nobody can write points for another account.
 
@@ -68,6 +73,7 @@ export const DEFAULT_CONFIG = {
   viewerCountThreshold: 30, // viewer count stays hidden below this
   referralPoints: 50,       // for the fan who invited, per friend who watches a show
   referralFriendPoints: 50, // for the invited friend
+  backstagePoints: 100,     // for DMing the backstage code to @asteroidincofficial
   artistSharePct: 80,
   rewardsSharePct: 10,
   asteroidSharePct: 10,
@@ -81,7 +87,7 @@ export const DEFAULT_CONFIG = {
 const NUMERIC_KEYS = [
   "pointsPerDollar", "pointsPerShow", "attendMinutes", "streakDays", "streakBonusPoints",
   "minGiftCardUsd", "viewerCountThreshold", "artistSharePct", "rewardsSharePct", "asteroidSharePct",
-  "referralPoints", "referralFriendPoints",
+  "referralPoints", "referralFriendPoints", "backstagePoints",
 ];
 
 // ---- Concert invites ---------------------------------------------------------------
@@ -547,4 +553,36 @@ export function cleanHandle(raw) {
   if (m) s = m[1];
   s = s.replace(/^@+/, "").toLowerCase();
   return /^[a-z0-9._]{1,30}$/.test(s) ? s : "";
+}
+
+// ---- Backstage codes -----------------------------------------------------------------
+export const IG_HANDLE = "asteroidincofficial";
+export const IG_DM_URL = "https://ig.me/m/" + IG_HANDLE;
+
+export function isBackstageCode(s) {
+  return typeof s === "string" && /^AST[A-Z0-9]{5}$/.test(s);
+}
+
+export function newBackstageCode() {
+  const abc = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  const bytes = new Uint8Array(5);
+  try { crypto.getRandomValues(bytes); } catch (e) { for (let i = 0; i < 5; i++) bytes[i] = Math.floor(Math.random() * 256); }
+  return "AST" + Array.from(bytes, (b) => abc[b % abc.length]).join("");
+}
+
+/** What the fan pastes into the Instagram DM. */
+export function backstageDmText(code) {
+  return "Hi Asteroid! My backstage code is " + code;
+}
+
+/** The reply Otto sends after verifying a code. */
+export function backstageReply(entry, points) {
+  const name = String((entry && entry.name) || "").trim().split(/\s+/)[0] || "";
+  const hi = "Hey" + (name ? " " + name : "") + "!";
+  if (entry && entry.role === "artist") {
+    return hi + " Got your code, welcome backstage. " + (points > 0 ? "I added " + fmtPts(points) + " points to your Asteroid account. " : "") +
+      "Let's find you a slot: which nights work for you, and do you play live or a DJ set?";
+  }
+  return hi + " You're backstage. " + (points > 0 ? "I added " + fmtPts(points) + " points to your Asteroid account. " : "") +
+    "I'll message you here before each show and when new ones open up. Who should we book next?";
 }

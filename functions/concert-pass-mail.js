@@ -14,6 +14,8 @@ const MAX_EMAILS_PER_RUN = 300;
 const BATCH = 100;                       // Resend batch limit
 
 const ROOM_RE = /^Room([1-5])$/;
+const IG_HANDLE = 'asteroidincofficial';
+const IG_DM_URL = 'https://ig.me/m/' + IG_HANDLE;
 
 function cleanText(s, max) {
   return String(s == null ? '' : s).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
@@ -147,9 +149,12 @@ function confirmationEmail(c) {
   const first = c.shows[0];
   const subject = n === 1 ? "You're in: " + first.lineup + ' live on Asteroid' : "You're in for " + n + ' nights on Asteroid';
   const nightText = (s) => fmtLocal(s.startsAt, c.tz) + '\nLineup: ' + s.lineup + '\nWatch: ' + watchUrl(s) + '\nAdd to Google Calendar: ' + googleCalUrl(s);
+  const bs = c.backstage;
+  const bsText = bs ? '\n\nBackstage: DM your code ' + bs.code + ' to @' + IG_HANDLE + ' on Instagram' + (bs.points > 0 ? ' for +' + bs.points + ' points' : '') +
+    ". We'll reply and message you when new shows drop: " + IG_DM_URL : '';
   const text = hi + "\n\nYou're in! Here's your free pass:\n\n" + c.shows.map(nightText).join('\n\n') +
     "\n\nWe'll email you an hour before " + (n === 1 ? 'it starts' : 'each night') + '. Fans earn points for every show they watch, and you can spend them on gift cards and shoutouts.' +
-    "\n\nCan't make it? Remove a night from your pass: " + SITE + 'pass\n\nSee you there,\nAsteroid';
+    bsText + "\n\nCan't make it? Remove a night from your pass: " + SITE + 'pass\n\nSee you there,\nAsteroid';
   const html = wrapHtml(
     '<p style="font-size:15px;margin:0 0 6px">' + esc(hi) + '</p><h1 style="font-size:22px;margin:0 0 16px">You\'re in!</h1>' +
     c.shows.map((s) => '<div style="border-top:1px solid #2a2b33;padding:14px 0">' +
@@ -157,7 +162,12 @@ function confirmationEmail(c) {
       '<div style="font-size:13px;color:#b5b5c0;margin:4px 0 10px">' + esc(s.lineup) + ' · ' + esc(fmtUs(s.startsAt)) + '</div>' +
       button(watchUrl(s), 'Watch link') + button(googleCalUrl(s), 'Add to calendar') + '</div>').join('') +
     '<p style="font-size:14px;line-height:1.6;color:#d8d8e0;margin:12px 0 0">We\'ll email you an hour before ' + (n === 1 ? 'it starts' : 'each night') +
-    '. Fans earn points for every show they watch, and you can spend them on gift cards and shoutouts.</p>');
+    '. Fans earn points for every show they watch, and you can spend them on gift cards and shoutouts.</p>' +
+    (bs ? '<div style="border:1px dashed #ff7f50;border-radius:12px;padding:14px;margin:16px 0 0">' +
+      '<div style="font-size:11px;font-weight:800;letter-spacing:.14em;color:#ff7f50">BACKSTAGE</div>' +
+      '<div style="font-size:24px;font-weight:800;letter-spacing:.18em;margin:8px 0">' + esc(bs.code) + '</div>' +
+      '<p style="font-size:14px;line-height:1.5;color:#d8d8e0;margin:0 0 10px">DM this code to @' + IG_HANDLE + ' on Instagram' + (bs.points > 0 ? ' for +' + bs.points + ' points' : '') +
+      '. We\'ll reply and message you when new shows drop.</p>' + button(IG_DM_URL, 'DM us on Instagram') + '</div>' : ''));
   return { subject, text, html };
 }
 
@@ -184,14 +194,21 @@ function reminderEmail(r, now) {
  * @param {function} sendBatch async (emails[]) => void, throws on failure
  */
 async function runPassEmails(db, sendBatch, now = Date.now()) {
-  const [schedSnap, passSnap, mailSnap] = await Promise.all([
+  const [schedSnap, passSnap, mailSnap, bsSnap, bsPtsSnap] = await Promise.all([
     db.ref('CONCERT_SCHEDULE').once('value'),
     db.ref('CONCERT_PASSES').once('value'),
     db.ref('CONCERT_PASS_MAIL').once('value'),
+    db.ref('BACKSTAGE').once('value'),
+    db.ref('CONCERT_CONFIG/backstagePoints').once('value'),
   ]);
   const plan = planEmails({ schedule: schedSnap.val(), passes: passSnap.val(), mail: mailSnap.val(), now });
+  const backstage = bsSnap.val() || {};
+  const ptsRaw = Number(bsPtsSnap.val());
+  const bsPoints = bsPtsSnap.val() != null && Number.isFinite(ptsRaw) && ptsRaw >= 0 ? Math.round(ptsRaw) : 100;
   const jobs = [];
   for (const c of plan.confirmations) {
+    const b = backstage[c.uk];
+    if (b && typeof b.code === 'string' && /^AST[A-Z0-9]{5}$/.test(b.code) && !b.verifiedAt) c.backstage = { code: b.code, points: bsPoints };
     jobs.push({ email: { to: [c.email], ...confirmationEmail(c) }, flags: c.shows.map((s) => s.id + '/' + c.uk + '/confirmedAt') });
   }
   for (const r of plan.reminders) {
