@@ -8,7 +8,7 @@
 //
 // Setup (once): verify asteroid8.net in Resend (resend.com > Domains, add the DNS records it
 // shows in GoDaddy), then: firebase functions:secrets:set RESEND_API_KEY
-// Deploy:       firebase deploy --only functions:default:concertPassEmails
+// Deploy:       firebase deploy --only functions:default:concertPassEmails,functions:default:concertIcs
 
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { defineSecret } = require('firebase-functions/params');

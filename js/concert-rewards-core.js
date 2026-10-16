@@ -25,8 +25,8 @@
 //   CONCERT_PASS_MAIL/{showId}/{uk}  {confirmedAt?, remindedAt?}     written by the concertPassEmails function
 //   ARTIST_APPLICATIONS/{uk}         {ts, email, name, ig, genre, perform, link?, note?, via?}  artists apply to play
 //
-// Backstage codes (after a pass or an application, fans DM their code to @asteroidincofficial;
-// admin verifies it and adds points, so Otto can keep in touch with them on Instagram)
+// Perform codes (after a pass or an application, artists DM their code to @asteroidincofficial
+// to get booked; admin verifies it and replies with dates, so Otto books them on Instagram)
 //   BACKSTAGE/{uk}            {code, ts, email, role, name?, via?, verifiedAt?, ig?}  owner creates once, admin verifies
 //   BACKSTAGE_CODES/{code}    {uk, ts}   owner creates once with it, admin reads (code lookup)
 //
@@ -73,7 +73,6 @@ export const DEFAULT_CONFIG = {
   viewerCountThreshold: 30, // viewer count stays hidden below this
   referralPoints: 50,       // for the fan who invited, per friend who watches a show
   referralFriendPoints: 50, // for the invited friend
-  backstagePoints: 100,     // for DMing the backstage code to @asteroidincofficial
   artistSharePct: 80,
   rewardsSharePct: 10,
   asteroidSharePct: 10,
@@ -87,7 +86,7 @@ export const DEFAULT_CONFIG = {
 const NUMERIC_KEYS = [
   "pointsPerDollar", "pointsPerShow", "attendMinutes", "streakDays", "streakBonusPoints",
   "minGiftCardUsd", "viewerCountThreshold", "artistSharePct", "rewardsSharePct", "asteroidSharePct",
-  "referralPoints", "referralFriendPoints", "backstagePoints",
+  "referralPoints", "referralFriendPoints",
 ];
 
 // ---- Concert invites ---------------------------------------------------------------
@@ -490,9 +489,21 @@ export function isHalloween(ms) {
   return showDay(ms).endsWith("-10-31");
 }
 
-export function watchUrl(show) {
+/** The show's room page as a relative link, so the iOS app opens its own copy instead of Safari. */
+export function watchPath(show) {
   const n = show && /^Room([1-5])$/.exec(show.room);
-  return SITE + (n ? "liveroom" + n[1] + ".html" : "lively.html");
+  return n ? "liveroom" + n[1] + ".html" : "lively.html";
+}
+
+/** Full link to the show's room, for calendars, emails and shares. */
+export function watchUrl(show) {
+  return SITE + watchPath(show);
+}
+
+/** Calendar file from the concertIcs function. iPhones (Safari and the app) open it straight in Calendar. */
+export const ICS_URL = "https://us-central1-asteroid-cdc13.cloudfunctions.net/concertIcs";
+export function icsUrl(ids) {
+  return ICS_URL + "?s=" + encodeURIComponent([].concat(ids || []).join(","));
 }
 
 const US_TIME = {
@@ -530,7 +541,7 @@ export function googleCalUrl(show) {
 }
 
 function icsEscape(s) {
-  return String(s || "").replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+  return String(s || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
 }
 
 /** .ics file text (Apple Calendar, Outlook) with a reminder 30 minutes before each show. */
@@ -570,19 +581,64 @@ export function newBackstageCode() {
   return "AST" + Array.from(bytes, (b) => abc[b % abc.length]).join("");
 }
 
-/** What the fan pastes into the Instagram DM. */
+/** What the artist pastes into the Instagram DM. */
 export function backstageDmText(code) {
-  return "Hi Asteroid! My backstage code is " + code;
+  return "Hi Asteroid! I want to perform. My code is " + code;
 }
 
-/** The reply Otto sends after verifying a code. */
-export function backstageReply(entry, points) {
+/**
+ * The reply Otto sends after verifying a code. Artists who already sent their details (the old
+ * apply form) get asked about their set; everyone else is asked for their music and nights.
+ */
+export function backstageReply(entry) {
   const name = String((entry && entry.name) || "").trim().split(/\s+/)[0] || "";
   const hi = "Hey" + (name ? " " + name : "") + "!";
-  if (entry && entry.role === "artist") {
-    return hi + " Got your code, welcome backstage. " + (points > 0 ? "I added " + fmtPts(points) + " points to your Asteroid account. " : "") +
-      "Let's find you a slot: which nights work for you, and do you play live or a DJ set?";
+  if (entry && entry.applied) {
+    return hi + " Got your code, you're on the list to perform. Which nights work for you, and do you play live or a DJ set?";
   }
-  return hi + " You're backstage. " + (points > 0 ? "I added " + fmtPts(points) + " points to your Asteroid account. " : "") +
-    "I'll message you here before each show and when new ones open up. Who should we book next?";
+  return hi + " Got your code. Let's get you on stage: send me a link to your music and tell me which nights work for you.";
+}
+
+// ---- iOS app (Capacitor) ---------------------------------------------------------------
+/** True inside the Asteroid iOS app. */
+export function isNativeApp() {
+  try {
+    const C = window.Capacitor;
+    return !!(C && typeof C.isNativePlatform === "function" && C.isNativePlatform());
+  } catch (e) { return false; }
+}
+
+/** iPhone or iPad, in Safari or in the app. */
+export function isAppleMobile() {
+  try {
+    if (isNativeApp()) return true;
+    const ua = navigator.userAgent || "";
+    return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  } catch (e) { return false; }
+}
+
+/**
+ * Copies text: the native clipboard in the app, the browser clipboard on the web.
+ * Call it straight from a tap (before any await) so the browser allows it. Resolves true when copied.
+ */
+export async function copyText(text) {
+  const s = String(text);
+  try {
+    const P = isNativeApp() && window.Capacitor.Plugins && window.Capacitor.Plugins.Clipboard;
+    if (P && typeof P.write === "function") { await P.write({ string: s }); return true; }
+  } catch (e) { /* use the browser clipboard */ }
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(s); return true; }
+  } catch (e) { /* use a hidden text box */ }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = s;
+    ta.setAttribute("readonly", "");
+    ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return !!ok;
+  } catch (e) { return false; }
 }

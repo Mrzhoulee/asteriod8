@@ -55,7 +55,6 @@ const CSS = `
 .crx-sh p{margin:4px 0 0;font-size:13px;color:rgba(255,255,255,.85);line-height:1.45;word-break:break-word}
 .crx-support{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
 .crx-invite{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
-a.crx-line.crx-bs{text-decoration:none;color:#ffad8f;font-weight:600}
 .crx-support-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:2px}
 .crx-perks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .crx-perks .crx-btn{margin-top:8px;padding:11px 10px;font-size:13px;flex-direction:column;gap:2px}
@@ -68,6 +67,12 @@ a.crx-line.crx-bs{text-decoration:none;color:#ffad8f;font-weight:600}
 .crx-btn.done{background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.5);color:#86efac}
 .crx-link{background:none;border:none;color:#ff9a73;font:600 12px Montserrat,system-ui,sans-serif;cursor:pointer;padding:4px 0}
 .crx-fine{font-size:11px;color:rgba(255,255,255,.45);line-height:1.45;margin:10px 0 0}
+.crx-join{display:flex;flex-direction:column;gap:10px;background:linear-gradient(135deg,rgba(255,127,80,.2),rgba(255,92,138,.12));border:1px solid rgba(255,127,80,.55)}
+.crx-join-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;padding:17px 14px;border-radius:14px;background:#ff7f50;color:#fff;font:800 19px/1.2 Montserrat,system-ui,sans-serif;letter-spacing:.03em;text-transform:uppercase;text-align:center;text-decoration:none;box-shadow:0 8px 24px rgba(255,127,80,.35)}
+.crx-join-btn.alt{background:rgba(0,0,0,.25);border:2px solid #ff7f50;color:#ffb08f;font-size:15px;padding:14px;box-shadow:none}
+.crx-join-btn .material-symbols-outlined{font-size:24px}
+.crx-join-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.crx-join .crx-fine{margin:0;text-align:center;font-size:12px;color:rgba(255,255,255,.7)}
 .crx-overlay{position:fixed;inset:0;z-index:100000;background:rgba(5,6,10,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom));box-sizing:border-box}
 @media(min-width:600px){.crx-overlay{align-items:center}}
 .crx-modal{position:relative;width:100%;max-width:440px;max-height:calc(100vh - 32px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:#15161a;border:1px solid rgba(255,127,80,.3);border-radius:20px;padding:24px 20px 20px;box-sizing:border-box;color:#ececec;font-family:Montserrat,system-ui,sans-serif}
@@ -198,6 +203,14 @@ export function mountConcertRewards(roomNum) {
   const aside = document.querySelector(".cr-aside");
   const panel = el("div", "cr-panel crx-panel");
   if (aside) aside.insertBefore(panel, aside.firstChild);
+
+  // ---- Join: the biggest thing in the room, above points and chat. Fans get free passes for
+  // the next shows; artists join the partnership (no application) and DM their code to get booked.
+  const joinBox = el("div", "cr-panel crx-join");
+  joinBox.innerHTML = '<a class="crx-join-btn" href="pass.html">' + icon("confirmation_number") + "Join future concerts</a>" +
+    '<a class="crx-join-btn alt" href="pass.html#perform">' + icon("mic_external_on") + "Join the Asteroid partnership</a>" +
+    '<p class="crx-fine">Free passes for the next shows. Make music? Join and perform here, no application.</p>';
+  if (aside) aside.insertBefore(joinBox, panel);
 
   // ---- Shoutouts: paid perks arrive from the Stripe webhook (CONCERT_SHOUTOUTS) ----
   const shoutPanel = el("div", "cr-panel crx-shoutlist");
@@ -450,9 +463,7 @@ export function mountConcertRewards(roomNum) {
       (att ? '<div class="crx-line">' + att + "</div>" : "") +
       (invited && cfg.referralFriendPoints > 0 ? '<div class="crx-line">' + icon("person_add") + "<span>A friend invited you. Watch " + cfg.attendMinutes +
         " minutes of a show and get +" + fmtPts(cfg.referralFriendPoints) + " pts.</span></div>" : "") +
-      '<button class="crx-btn" data-act="spend">' + icon("redeem") + "Spend points</button>" + tipBtn + inviteHtml(r) +
-      (cfg.backstagePoints > 0 ? '<a class="crx-line crx-bs" href="pass.html#backstageCard">' + icon("key") + "<span>Get +" + fmtPts(cfg.backstagePoints) +
-        " pts: grab a free pass, then DM your backstage code</span></a>" : "") + fine);
+      '<button class="crx-btn" data-act="spend">' + icon("redeem") + "Spend points</button>" + tipBtn + inviteHtml(r) + fine);
   }
 
   // ---- Invite friends -------------------------------------------------------------------

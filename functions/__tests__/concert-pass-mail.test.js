@@ -1,6 +1,8 @@
 'use strict';
 
-const { parseShows, planEmails, confirmationEmail, reminderEmail, runPassEmails, fmtLocal, fmtUs, cleanTz } = require('../concert-pass-mail');
+const {
+  parseShows, planEmails, confirmationEmail, reminderEmail, runPassEmails, fmtLocal, fmtUs, cleanTz, icsText, icsUrl, icsResponse,
+} = require('../concert-pass-mail');
 
 const MIN = 60 * 1000;
 const H = 60 * MIN;
@@ -112,6 +114,8 @@ describe('email text', () => {
     expect(e.text).toContain('Lineup: Syante & Elihu');
     expect(e.text).toContain('https://www.asteroid8.net/liveroom2.html');
     expect(e.text).toContain('calendar.google.com');
+    expect(e.text).toContain('Add to Apple Calendar: https://us-central1-asteroid-cdc13.cloudfunctions.net/concertIcs?s=fri');
+    expect(e.html).toContain('concertIcs?s=sat');
     expect(e.html).toContain('Syante &amp; Elihu');
     const one = confirmationEmail({ name: '', tz: 'America/New_York', shows: [shows[1]] });
     expect(one.subject).toBe("You're in: AURAQL live on Asteroid");
@@ -145,7 +149,7 @@ describe('runPassEmails', () => {
     expect(sent[1].subject).toBe('Starting in 1 hour: Syante & Elihu on Asteroid');
   });
 
-  test('confirmation carries the backstage code until it is verified', async () => {
+  test('confirmation carries the perform code until it is verified, with no points promised', async () => {
     const db = fakeDb({
       CONCERT_SCHEDULE: schedule,
       CONCERT_PASSES: { fri: { fan_uk: pass(), b_uk: pass({ email: 'b@test.com' }), c_uk: pass({ email: 'c@test.com' }) } },
@@ -155,18 +159,19 @@ describe('runPassEmails', () => {
     const sent = [];
     await runPassEmails(db, async (emails) => { sent.push(...emails); }, FRI - 47 * H);
     const fan = sent.find((e) => e.to[0] === 'fan@test.com');
-    expect(fan.text).toContain('DM your code AST7K3QX to @asteroidincofficial on Instagram for +150 points');
-    expect(fan.text).toContain('https://ig.me/m/asteroidincofficial');
+    expect(fan.text).toContain('Want to perform on Asteroid? DM your code AST7K3QX to @asteroidincofficial on Instagram.');
+    expect(fan.text).toContain('Only artists who send their code get booked right away: https://ig.me/m/asteroidincofficial');
+    expect(fan.text).not.toContain('150');
     expect(fan.html).toContain('AST7K3QX');
-    expect(sent.find((e) => e.to[0] === 'b@test.com').text).not.toContain('Backstage');
-    expect(sent.find((e) => e.to[0] === 'c@test.com').text).not.toContain('Backstage');
-  });
-
-  test('backstage points default to 100 when not set', async () => {
-    const db = fakeDb({ CONCERT_SCHEDULE: schedule, CONCERT_PASSES: { fri: { fan_uk: pass() } }, BACKSTAGE: { fan_uk: { code: 'AST7K3QX', role: 'fan' } } });
-    const sent = [];
-    await runPassEmails(db, async (emails) => { sent.push(...emails); }, FRI - 47 * H);
-    expect(sent[0].text).toContain('for +100 points');
+    expect(fan.html).toContain('WANT TO PERFORM?');
+    expect(fan.html).toContain('Only artists who send their code get booked right away.');
+    const verified = sent.find((e) => e.to[0] === 'b@test.com');
+    expect(verified.text).not.toContain('Want to perform');
+    expect(verified.text).not.toContain('Join the Asteroid partnership');
+    const noCode = sent.find((e) => e.to[0] === 'c@test.com');
+    expect(noCode.text).not.toContain('Want to perform');
+    expect(noCode.text).toContain('Make music? Join the Asteroid partnership and perform at a future show, no application: https://www.asteroid8.net/pass#perform');
+    expect(noCode.html).toContain('Join as an artist');
   });
 
   test('a failed send keeps the flags off so the next run tries again', async () => {
@@ -174,5 +179,43 @@ describe('runPassEmails', () => {
     const r = await runPassEmails(db, async () => { throw new Error('domain not verified'); }, FRI - 47 * H);
     expect(r).toMatchObject({ sent: 0, failed: 1 });
     expect(db.data.CONCERT_PASS_MAIL).toBeUndefined();
+  });
+});
+
+describe('Apple Calendar file', () => {
+  test('link to the calendar function', () => {
+    expect(icsUrl('fri')).toBe('https://us-central1-asteroid-cdc13.cloudfunctions.net/concertIcs?s=fri');
+    expect(icsUrl(['fri', 'sat'])).toBe('https://us-central1-asteroid-cdc13.cloudfunctions.net/concertIcs?s=fri%2Csat');
+  });
+
+  test('events with times, watch link, a 30 minute alert and escaped text', () => {
+    const odd = { x: { room: 'Room3', artists: ['Ana, Bo', 'C;D'], startsAt: FRI, endsAt: FRI + 2 * H } };
+    const text = icsText(parseShows({ ...schedule, ...odd }).filter((s) => s.id === 'fri' || s.id === 'x'), FRI - 48 * H);
+    expect(text.startsWith('BEGIN:VCALENDAR\r\n')).toBe(true);
+    expect(text.endsWith('END:VCALENDAR\r\n')).toBe(true);
+    expect(text.match(/BEGIN:VEVENT/g)).toHaveLength(2);
+    expect(text).toContain('DTSTART:20261024T003000Z');
+    expect(text).toContain('DTEND:20261024T023000Z');
+    expect(text).toContain('UID:fri@asteroid8.net');
+    expect(text).toContain('TRIGGER:-PT30M');
+    expect(text).toContain('URL:https://www.asteroid8.net/liveroom2.html');
+    expect(text).toContain('SUMMARY:Live concert on Asteroid: Ana\\, Bo & C\\;D');
+    for (const line of text.split('\r\n')) expect(line.length).toBeLessThanOrEqual(75);
+  });
+
+  test('Halloween night gets its own title', () => {
+    const hall = { h: { room: 'Room1', artists: ['Syante'], startsAt: Date.UTC(2026, 10, 1, 0, 30), endsAt: Date.UTC(2026, 10, 1, 2, 30) } };
+    expect(icsText(parseShows(hall))).toContain('SUMMARY:Halloween concert on Asteroid: Syante');
+  });
+
+  test('function answer: only real nights, bad input refused', () => {
+    expect(icsResponse(schedule, '').status).toBe(400);
+    expect(icsResponse(schedule, '../etc,<x>').status).toBe(400);
+    expect(icsResponse(schedule, 'nope').status).toBe(404);
+    expect(icsResponse(schedule, 'bad').status).toBe(404);
+    const ok = icsResponse(schedule, 'fri,sat,nope');
+    expect(ok.status).toBe(200);
+    expect(ok.body.match(/BEGIN:VEVENT/g)).toHaveLength(2);
+    expect(icsResponse(null, 'fri').status).toBe(404);
   });
 });

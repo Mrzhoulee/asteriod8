@@ -3,16 +3,20 @@
 //   (via = the artist whose link brought them, so admin can see who brings fans).
 //   Passes come with calendar buttons, and the concertPassEmails function emails a
 //   confirmation and a reminder an hour before each night.
-//   Artists who follow these artists can apply to play a future show: ARTIST_APPLICATIONS/{uk}.
+//   Artists join the Asteroid partnership with one tap (no application, no screening) and get a
+//   code (BACKSTAGE/{uk}). They DM it to @asteroidincofficial to get booked: only artists who send
+//   their code get booked right away. Old applications (ARTIST_APPLICATIONS) still count as joined.
+//   The same page ships in the iOS app: room links stay relative, copying uses the native
+//   clipboard, and iPhones add nights to Apple Calendar through the concertIcs function.
 
-import { ref, onValue, get, set, update, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+import { ref, onValue, get, update, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 import {
   initializeAuth, getAuth, onAuthStateChanged, browserLocalPersistence, indexedDBLocalPersistence,
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import {
   firebaseApp, firebaseDb, readConfig, rewardsKey, esc, fmtPts, listShows, captureInvite, isInviteCode, newInviteCode,
-  artistKey, passUrl, showsWithArtist, artistNameFor, isHalloween, fmtUsTimes, fmtShowLocal, googleCalUrl, icsText, watchUrl, cleanHandle,
-  isBackstageCode, newBackstageCode, backstageDmText, IG_DM_URL, IG_HANDLE,
+  artistKey, passUrl, showsWithArtist, artistNameFor, isHalloween, fmtUsTimes, fmtShowLocal, googleCalUrl, icsText, icsUrl, watchPath,
+  isBackstageCode, newBackstageCode, backstageDmText, IG_DM_URL, IG_HANDLE, isAppleMobile, copyText,
 } from "./concert-rewards-core.js";
 
 const VIA_KEY = "astPassVia";
@@ -89,6 +93,9 @@ const state = {
   backstage: null,   // BACKSTAGE/{uk}: {code, role, verifiedAt?}
   bsLoaded: false,
   bsCreating: false,
+  authKnown: false,
+  joinRequested: false, // tapped "Join as an artist" this visit
+  showCode: false,      // scroll to the code card once it shows
 };
 
 function upcoming() {
@@ -175,6 +182,8 @@ function renderMine() {
   const a = cfg.referralPoints, b = cfg.referralFriendPoints;
   const invite = a > 0 && a === b ? "Bring a friend. You both get +" + fmtPts(a) + " pts when they watch a show."
     : "Bring a friend to the show.";
+  // iPhones can't add a downloaded file to Calendar, so they open the hosted one
+  const hostedIcs = isAppleMobile();
   card.hidden = false;
   card.innerHTML = "<h2>" + icon("check_circle") + "You're in</h2>" +
     '<p class="hint">Watch for ' + cfg.attendMinutes + " minutes of a show to earn +" + fmtPts(cfg.pointsPerShow) + " pts. Add your nights to your calendar so you don't miss them.</p>" +
@@ -182,83 +191,116 @@ function renderMine() {
       const live = s.startsAt <= now && now <= s.endsAt;
       return '<div class="mine"><b>' + esc(fmtShowLocal(s.startsAt)) + "</b><small>" + lineupHtml(s) + " · " + esc(fmtUsTimes(s.startsAt)) + "</small>" +
         '<div class="actions">' +
-        (live ? '<a class="btn small" href="' + esc(watchUrl(s)) + '">' + icon("play_circle") + "Watch now</a>" : "") +
+        (live ? '<a class="btn small" href="' + esc(watchPath(s)) + '">' + icon("play_circle") + "Watch now</a>" : "") +
         '<a class="btn small ghost" href="' + esc(googleCalUrl(s)) + '" target="_blank" rel="noopener">' + icon("event") + "Google Calendar</a>" +
-        '<button type="button" class="btn small ghost" data-ics="' + esc(s.id) + '">' + icon("calendar_add_on") + "Apple or Outlook</button>" +
+        (hostedIcs
+          ? '<a class="btn small ghost" href="' + esc(icsUrl(s.id)) + '" target="_blank" rel="noopener">' + icon("calendar_add_on") + "Apple Calendar</a>"
+          : '<button type="button" class="btn small ghost" data-ics="' + esc(s.id) + '">' + icon("calendar_add_on") + "Apple or Outlook</button>") +
         '<button type="button" class="link" data-cancel="' + esc(s.id) + '">Can\'t make it</button></div></div>';
     }).join("") +
     '<div class="mine"><b>' + esc(invite) + "</b><small>Send your pass link and catch the show together.</small>" +
     '<button type="button" class="btn ghost" data-act="invite">' + icon("ios_share") + "Share your pass link</button></div>";
 }
 
-function renderApplication() {
-  const box = $("applyStatus");
-  const r = state.application;
-  if (r && r.name) {
-    box.innerHTML = '<p class="hint">' + icon("task_alt") + " You applied as <b>" + esc(r.name) + "</b>. You're on the list for upcoming shows.</p>";
-    $("applyOpen").textContent = "Update my application";
-  } else {
-    box.innerHTML = "";
-  }
+// ---- Join as an artist: no application, no screening. Joining gives the perform code. -----
+function hasCode() {
+  return !!state.user && !!state.backstage && isBackstageCode(state.backstage.code);
+}
+/** Joined as an artist: tapped Join, or applied with the old form. */
+function joined() {
+  return !!state.user && (state.joinRequested || !!(state.application && state.application.name) ||
+    !!(state.backstage && state.backstage.role === "artist"));
 }
 
-// ---- Backstage code: DM it to @asteroidincofficial for points and a personal reply ------
-function bsEligible() {
-  return !!state.user && (claimedIds().length > 0 || !!(state.application && state.application.name));
+function renderJoin() {
+  const box = $("joinStatus");
+  const b = state.backstage;
+  const isIn = joined() && hasCode();
+  $("joinBtn").hidden = isIn;
+  $("joinFine").hidden = isIn;
+  if (!isIn) { box.innerHTML = ""; return; }
+  $("joinErr").textContent = "";
+  box.innerHTML = '<p class="hint">' + icon("task_alt") + " You're in. " +
+    (b.verifiedAt ? "We got your code. Check your Instagram DMs for dates."
+      : 'Last step: DM us your code. Only artists who send their code get booked right away. <button type="button" class="link" data-act="code">Show my code</button>') + "</p>";
 }
 
-async function ensureBackstage() {
-  if (!bsEligible() || !state.bsLoaded || state.backstage || state.bsCreating) return;
+/** Makes the perform code once they've joined. Every caller waits on the same attempt. */
+function ensureBackstage() {
+  if (state.bsPromise) return state.bsPromise;
+  if (!joined() || !state.bsLoaded || state.backstage) return Promise.resolve();
   state.bsCreating = true;
+  const key = state.key;
   const app = state.application && state.application.name ? state.application : null;
-  for (let i = 0; i < 3 && !state.backstage; i++) {
-    const code = newBackstageCode();
-    const rec = { code, ts: serverTimestamp(), email: state.user.email, role: app ? "artist" : "fan" };
-    const name = app ? app.name : firstName();
-    if (name) rec.name = String(name).slice(0, 80);
-    if (state.a) rec.via = state.a;
-    try {
-      await update(ref(db), {
-        ["BACKSTAGE/" + state.key]: rec,
-        ["BACKSTAGE_CODES/" + code]: { uk: state.key, ts: serverTimestamp() },
-      });
-      break;
-    } catch (e) { console.warn("[pass] backstage code", e && e.code); }
-  }
-  state.bsCreating = false;
-  renderBackstage();
+  state.bsPromise = (async () => {
+    for (let i = 0; i < 3 && !state.backstage && state.key === key; i++) {
+      const code = newBackstageCode();
+      const rec = { code, ts: serverTimestamp(), email: state.user.email, role: "artist" };
+      const name = app ? app.name : firstName();
+      if (name) rec.name = String(name).slice(0, 80);
+      if (state.a) rec.via = state.a;
+      try {
+        await update(ref(db), {
+          ["BACKSTAGE/" + key]: rec,
+          ["BACKSTAGE_CODES/" + code]: { uk: key, ts: serverTimestamp() },
+        });
+        break;
+      } catch (e) { console.warn("[pass] backstage code", e && e.code); }
+    }
+  })().finally(() => {
+    state.bsCreating = false;
+    state.bsPromise = null;
+    renderBackstage();
+    renderJoin();
+  });
+  return state.bsPromise;
 }
 
 function renderBackstage() {
   const card = $("backstageCard");
   const b = state.backstage;
-  if (!bsEligible() || !b || !isBackstageCode(b.code)) { card.hidden = true; return; }
+  if (!hasCode()) { card.hidden = true; scrollToPerform(); return; }
   card.hidden = false;
-  const pts = state.cfg.backstagePoints;
-  const artist = b.role === "artist";
+  // Codes made before joining (from a pass) are "fan" codes; joining later still counts
+  const artist = joined();
   $("bsCode").textContent = b.code;
   $("bsBtn").href = IG_DM_URL;
   $("bsCode").classList.toggle("ok", !!b.verifiedAt);
   if (b.verifiedAt) {
-    $("bsTitle").textContent = "You're backstage";
-    $("bsText").textContent = (pts > 0 ? "+" + fmtPts(pts) + " points are in your account. " : "") +
-      "We'll message you on Instagram when new shows and open slots drop.";
+    $("bsTitle").textContent = "You're on the list to perform";
+    $("bsText").textContent = "We got your code. Check your Instagram DMs for dates.";
     $("bsBtn").hidden = true;
     $("bsHint").textContent = "";
-    return;
+  } else {
+    $("bsTitle").textContent = artist ? "Send your code to get booked" : "Want to perform? Send your code";
+    $("bsText").textContent = (artist ? "" : "Make music? ") + "DM this code to @" + IG_HANDLE +
+      " on Instagram. Only artists who send their code get booked right away. We'll reply with dates.";
+    $("bsBtn").hidden = false;
   }
-  $("bsTitle").textContent = pts > 0 ? "Get +" + fmtPts(pts) + " points on Instagram" : "Say hi on Instagram";
-  $("bsText").textContent = artist
-    ? "DM your code to @" + IG_HANDLE + " so we can talk about your set. We'll reply" + (pts > 0 ? " and add your points." : ".")
-    : "DM your code to @" + IG_HANDLE + ". We'll reply" + (pts > 0 ? ", add your points," : "") + " and message you when new shows and open slots drop.";
-  $("bsBtn").hidden = false;
+  if (state.showCode) { state.showCode = false; card.scrollIntoView({ block: "start", behavior: "smooth" }); }
+  scrollToPerform();
 }
+
+// pass.html#perform (the concert rooms' "Join the Asteroid partnership"): go to the code, or to Join
+let performScroll = /^#(perform|backstageCard|artistCard)$/.test(location.hash || "");
+function scrollToPerform(force) {
+  if (!performScroll) return;
+  // wait until we know who this is, whether they have a code, and the nights above are drawn
+  if (!force && (!state.authKnown || !state.scheduleLoaded || (state.user && (!state.bsLoaded || state.bsCreating)))) return;
+  performScroll = false;
+  // a moment for the cards above to settle, so the target doesn't move after the scroll
+  setTimeout(() => {
+    const card = $("backstageCard");
+    (card.hidden ? $("artistCard") : card).scrollIntoView({ block: "start" });
+  }, force ? 0 : 250);
+}
+if (performScroll) setTimeout(() => scrollToPerform(true), 2500);
 
 function render() {
   renderHero();
   renderNights();
   renderMine();
-  renderApplication();
+  renderJoin();
   renderBackstage();
   ensureBackstage();
 }
@@ -369,67 +411,34 @@ async function shareInvite(btn) {
   try {
     if (navigator.share) { await navigator.share({ title: "Asteroid live concert", text, url }); return; }
   } catch (e) { if (e && e.name === "AbortError") return; }
-  try { await navigator.clipboard.writeText(url); toast("Link copied. Send it to your friends."); }
-  catch (e) { prompt("Copy your pass link:", url); }
+  if (await copyText(url)) toast("Link copied. Send it to your friends.");
+  else prompt("Copy your pass link:", url);
 }
 
-// ---- Artist applications --------------------------------------------------------------
-function readForm() {
-  const v = (id) => ($(id).value || "").trim();
-  const name = v("ap_name").replace(/\s+/g, " ").slice(0, 80);
-  const ig = cleanHandle(v("ap_ig"));
-  const genre = v("ap_genre").replace(/\s+/g, " ").slice(0, 60);
-  const perform = ["live", "dj", "both"].includes(v("ap_perform")) ? v("ap_perform") : "live";
-  const link = v("ap_link");
-  const note = v("ap_note").slice(0, 300);
-  if (!name) return { error: "Add your artist name." };
-  if (!ig) return { error: "Add your Instagram handle, like @yourname." };
-  if (!genre) return { error: "Add your genre." };
-  if (link && !/^https:\/\/\S{3,290}$/.test(link)) return { error: "Music link should start with https://" };
-  return { form: { name, ig, genre, perform, link, note } };
+// ---- Join as an artist -----------------------------------------------------------------
+/** Makes their perform code (or shows the one they have) and takes them to it. */
+async function join() {
+  state.joinRequested = true;
+  state.showCode = true;
+  if (!state.bsLoaded) return true;   // the code is made as soon as their data loads
+  if (!state.backstage) await ensureBackstage();
+  render();
+  return !!state.backstage;
 }
 
-function fillForm(f) {
-  if (!f) return;
-  $("ap_name").value = f.name || "";
-  $("ap_ig").value = f.ig ? "@" + f.ig : "";
-  $("ap_genre").value = f.genre || "";
-  $("ap_perform").value = f.perform || "live";
-  $("ap_link").value = f.link || "";
-  $("ap_note").value = f.note || "";
-}
-
-async function saveApplication(f) {
-  const rec = { ts: serverTimestamp(), email: state.user.email, name: f.name, ig: f.ig, genre: f.genre, perform: f.perform };
-  if (f.link) rec.link = f.link;
-  if (f.note) rec.note = f.note;
-  if (state.a) rec.via = state.a;
-  await set(ref(db, "ARTIST_APPLICATIONS/" + state.key), rec);
-}
-
-async function onApply(ev) {
-  ev.preventDefault();
-  $("applyErr").textContent = "";
-  const r = readForm();
-  if (r.error) { $("applyErr").textContent = r.error; return; }
+async function onJoin() {
+  $("joinErr").textContent = "";
   if (!state.user) {
-    writeJson(PENDING_KEY, { action: "apply", form: r.form, a: state.a, ts: Date.now() });
+    writeJson(PENDING_KEY, { action: "join", a: state.a, ts: Date.now() });
     location.href = LOGIN;
     return;
   }
-  const btn = $("applyBtn");
-  busy(btn, true, "Sending…");
-  try {
-    await saveApplication(r.form);
-    $("applyForm").hidden = true;
-    $("applyOpen").hidden = false;
-    toast("Thanks " + r.form.name + "! You're on the list.");
-  } catch (e) {
-    console.warn("[pass] apply", e && e.code);
-    $("applyErr").textContent = "Couldn't send it. Check your details and try again.";
-  } finally {
-    busy(btn, false);
-  }
+  const btn = $("joinBtn");
+  busy(btn, true, "Joining…");
+  const ok = await join();
+  busy(btn, false);
+  if (ok) toast("You're in! Last step: DM us your code.");
+  else { state.joinRequested = false; $("joinErr").textContent = "Couldn't join right now. Try again."; }
 }
 
 // ---- After signing in: finish what the fan started ------------------------------------
@@ -444,14 +453,15 @@ async function runPending() {
     if (p.action === "pass" && Array.isArray(p.ids)) {
       const n = await claim(p.ids.map(String));
       if (n) toast("You're in. See you there!");
-    } else if (p.action === "apply" && p.form) {
-      await saveApplication(p.form);
-      toast("Thanks " + p.form.name + "! You're on the list.");
+    } else if (p.action === "join" || p.action === "apply") {
+      // "apply" is from the old form: joining needs no details now
+      await join();
+      toast("You're in! Last step: DM us your code.");
     }
   } catch (e) {
     console.warn("[pass] pending", e && e.code);
-    if (p.action === "apply") { fillForm(p.form); $("applyForm").hidden = false; $("applyOpen").hidden = true; $("applyErr").textContent = "Couldn't send it. Try again."; }
-    else $("claimErr").textContent = "Couldn't get your pass. Try again.";
+    if (p.action === "pass") $("claimErr").textContent = "Couldn't get your pass. Try again.";
+    else $("joinErr").textContent = "Couldn't join right now. Try again.";
   }
   render();
 }
@@ -492,12 +502,19 @@ onAuthStateChanged(auth, (user) => {
   state.application = null;
   state.backstage = null;
   state.bsLoaded = false;
+  state.authKnown = true;
   if (state.key) {
     watchMine();
-    offApp = onValue(ref(db, "ARTIST_APPLICATIONS/" + state.key), (s) => { state.application = s.val(); renderApplication(); renderBackstage(); ensureBackstage(); },
+    // Artists who applied with the old form keep their place (and get a code)
+    offApp = onValue(ref(db, "ARTIST_APPLICATIONS/" + state.key), (s) => { state.application = s.val(); renderJoin(); renderBackstage(); ensureBackstage(); },
       (e) => console.warn("[pass] read application", e && e.code));
-    offBs = onValue(ref(db, "BACKSTAGE/" + state.key), (s) => { state.backstage = s.val(); state.bsLoaded = true; renderBackstage(); ensureBackstage(); },
-      (e) => console.warn("[pass] read backstage", e && e.code));
+    offBs = onValue(ref(db, "BACKSTAGE/" + state.key), (s) => {
+      state.backstage = s.val();
+      state.bsLoaded = true;
+      renderBackstage();
+      renderJoin();
+      ensureBackstage();
+    }, (e) => console.warn("[pass] read backstage", e && e.code));
   }
   render();
   runPending();
@@ -522,20 +539,19 @@ $("mineCard").addEventListener("click", (e) => {
   else if (t.dataset.ics) downloadIcs(t.dataset.ics);
   else if (t.dataset.act === "invite") shareInvite(t);
 });
-$("applyOpen").addEventListener("click", () => {
-  fillForm(state.application);
-  $("applyForm").hidden = false;
-  $("applyOpen").hidden = true;
-  $("ap_name").focus();
+$("joinBtn").addEventListener("click", onJoin);
+$("joinStatus").addEventListener("click", (e) => {
+  if (e.target.closest("[data-act=code]")) $("backstageCard").scrollIntoView({ block: "start", behavior: "smooth" });
 });
-$("applyForm").addEventListener("submit", onApply);
 $("bsBtn").addEventListener("click", () => {
-  // The link opens the Instagram chat; the message with the code goes on the clipboard to paste
+  // The link opens the Instagram chat (the Instagram app on phones); the message goes on the clipboard to paste
   const b = state.backstage;
   if (!b || !isBackstageCode(b.code)) return;
   const text = backstageDmText(b.code);
-  try { navigator.clipboard.writeText(text).catch(() => {}); } catch (e) {}
-  $("bsHint").textContent = "Code copied. Paste it in the chat with @" + IG_HANDLE + " and send.";
+  copyText(text).then((ok) => {
+    $("bsHint").textContent = ok ? "Copied. Paste it in the chat with @" + IG_HANDLE + " and send."
+      : "Send @" + IG_HANDLE + " this message: " + text;
+  });
 });
 setInterval(render, 60 * 1000);
 render();

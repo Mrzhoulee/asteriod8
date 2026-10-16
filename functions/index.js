@@ -122,3 +122,7 @@ exports.stripeWebhook = stripeWebhook.stripeWebhook;
 // Free concert passes: confirmation and 1 hour reminder emails (pass.html)
 const concertPassEmails = require('./concert-pass-emails');
 exports.concertPassEmails = concertPassEmails.concertPassEmails;
+
+// Free concert passes: Apple Calendar file for iPhones and the iOS app (pass.html, emails)
+const concertIcs = require('./concert-ics');
+exports.concertIcs = concertIcs.concertIcs;

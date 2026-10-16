@@ -103,8 +103,8 @@
     <section class="card done" id="mineCard" hidden aria-live="polite"></section>
 
     <section class="card" id="backstageCard" hidden aria-live="polite">
-      <p class="kicker"><span class="material-symbols-outlined" aria-hidden="true">key</span>Backstage</p>
-      <h2 id="bsTitle">Get bonus points on Instagram</h2>
+      <p class="kicker"><span class="material-symbols-outlined" aria-hidden="true">mic_external_on</span>Perform on Asteroid</p>
+      <h2 id="bsTitle">Want to perform? Send your code</h2>
       <p class="hint" id="bsText"></p>
       <div class="bscode" id="bsCode"></div>
       <a class="btn" id="bsBtn" href="https://ig.me/m/asteroidincofficial" target="_blank" rel="noopener"><span class="material-symbols-outlined" aria-hidden="true">send</span>Copy code and open Instagram</a>
@@ -122,41 +122,16 @@
 
     <section class="card" id="artistCard">
       <p class="kicker"><span class="material-symbols-outlined" aria-hidden="true">mic_external_on</span>Make music?</p>
-      <h2>Play a future show</h2>
+      <h2>Join the Asteroid partnership</h2>
       <ul class="perks">
-        <li><span class="material-symbols-outlined" aria-hidden="true">home</span><span>A 20 minute set from home. We handle the stream.</span></li>
+        <li><span class="material-symbols-outlined" aria-hidden="true">home</span><span>Perform a 20 minute set from home. We handle the stream.</span></li>
         <li><span class="material-symbols-outlined" aria-hidden="true">volunteer_activism</span><span>Fans tip you and send shoutouts while you play.</span></li>
         <li><span class="material-symbols-outlined" aria-hidden="true">diversity_3</span><span>No algorithm. Every artist gets the same stage.</span></li>
       </ul>
-      <div id="applyStatus" aria-live="polite"></div>
-      <button type="button" class="btn ghost" id="applyOpen">Apply to play</button>
-      <form id="applyForm" hidden novalidate>
-        <label for="ap_name">Artist name</label>
-        <input type="text" id="ap_name" maxlength="80" autocomplete="nickname" required>
-        <div class="row2">
-          <div>
-            <label for="ap_ig">Instagram</label>
-            <input type="text" id="ap_ig" maxlength="80" placeholder="@yourname" autocapitalize="none" autocorrect="off" spellcheck="false" required>
-          </div>
-          <div>
-            <label for="ap_genre">Genre</label>
-            <input type="text" id="ap_genre" maxlength="60" placeholder="Indie pop" required>
-          </div>
-        </div>
-        <label for="ap_perform">What do you play?</label>
-        <select id="ap_perform">
-          <option value="live">Live vocals or instruments</option>
-          <option value="dj">DJ set</option>
-          <option value="both">Both</option>
-        </select>
-        <label for="ap_link">Link to your music (optional)</label>
-        <input type="url" id="ap_link" maxlength="300" placeholder="https://" autocapitalize="none" autocorrect="off" spellcheck="false">
-        <label for="ap_note">Anything else? (optional)</label>
-        <textarea id="ap_note" maxlength="300"></textarea>
-        <p class="err" id="applyErr" role="alert"></p>
-        <button type="submit" class="btn" id="applyBtn" style="margin-top:12px">Send application</button>
-        <p class="fine">You'll sign in once so we can reach you.</p>
-      </form>
+      <div id="joinStatus" aria-live="polite"></div>
+      <button type="button" class="btn" id="joinBtn"><span class="material-symbols-outlined" aria-hidden="true">mic_external_on</span>Join as an artist</button>
+      <p class="err" id="joinErr" role="alert"></p>
+      <p class="fine" id="joinFine">No application. Join, get your code, DM it to us and get booked.</p>
     </section>
 
     <p class="foot">Upload music, go live, get heard. No algorithms, no ads, no pay to play.<br>

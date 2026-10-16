@@ -16,6 +16,9 @@ const BATCH = 100;                       // Resend batch limit
 const ROOM_RE = /^Room([1-5])$/;
 const IG_HANDLE = 'asteroidincofficial';
 const IG_DM_URL = 'https://ig.me/m/' + IG_HANDLE;
+// Served by the concertIcs function (concert-ics.js). iPhones open it straight in Calendar.
+const ICS_URL = 'https://us-central1-asteroid-cdc13.cloudfunctions.net/concertIcs';
+const SHOW_ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
 
 function cleanText(s, max) {
   return String(s == null ? '' : s).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
@@ -77,12 +80,45 @@ function isHalloween(ms) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', month: '2-digit', day: '2-digit' }).format(new Date(ms)) === '10-31';
 }
 
+function showTitle(show) {
+  return (isHalloween(show.startsAt) ? 'Halloween concert' : 'Live concert') + ' on Asteroid: ' + show.lineup;
+}
+
 function googleCalUrl(show) {
-  const title = (isHalloween(show.startsAt) ? 'Halloween concert' : 'Live concert') + ' on Asteroid: ' + show.lineup;
-  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(title) +
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(showTitle(show)) +
     '&dates=' + calStamp(show.startsAt) + '/' + calStamp(show.endsAt) +
     '&details=' + encodeURIComponent('Lineup: ' + show.lineup + '\nWatch free: ' + watchUrl(show)) +
     '&location=' + encodeURIComponent(watchUrl(show));
+}
+
+function icsUrl(ids) {
+  return ICS_URL + '?s=' + encodeURIComponent([].concat(ids).join(','));
+}
+
+function icsEscape(s) {
+  return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+}
+
+/** .ics text (Apple Calendar, Outlook) with a reminder 30 minutes before each show. */
+function icsText(shows, now = Date.now()) {
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Asteroid//Concert pass//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
+  for (const s of shows) {
+    lines.push('BEGIN:VEVENT', 'UID:' + s.id + '@asteroid8.net', 'DTSTAMP:' + calStamp(now), 'DTSTART:' + calStamp(s.startsAt), 'DTEND:' + calStamp(s.endsAt),
+      'SUMMARY:' + icsEscape(showTitle(s)), 'DESCRIPTION:' + icsEscape('Lineup: ' + s.lineup + '\nWatch free: ' + watchUrl(s)),
+      'URL:' + watchUrl(s), 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + icsEscape(showTitle(s)), 'TRIGGER:-PT30M', 'END:VALARM', 'END:VEVENT');
+  }
+  lines.push('END:VCALENDAR');
+  // Lines longer than 75 characters continue on the next line after a space (RFC 5545)
+  return lines.map((l) => (l.length <= 75 ? l : l.match(/.{1,74}/g).join('\r\n '))).join('\r\n') + '\r\n';
+}
+
+/** What the concertIcs function sends for ?s=id1,id2 */
+function icsResponse(schedule, param, now = Date.now()) {
+  const ids = String(param || '').split(',').map((x) => x.trim()).filter((x) => SHOW_ID_RE.test(x)).slice(0, 10);
+  if (!ids.length) return { status: 400, body: 'Pick a night on www.asteroid8.net/pass' };
+  const shows = parseShows(schedule).filter((s) => ids.includes(s.id));
+  if (!shows.length) return { status: 404, body: 'That night is no longer on the schedule. See www.asteroid8.net/pass' };
+  return { status: 200, body: icsText(shows, now) };
 }
 
 /**
@@ -148,10 +184,13 @@ function confirmationEmail(c) {
   const n = c.shows.length;
   const first = c.shows[0];
   const subject = n === 1 ? "You're in: " + first.lineup + ' live on Asteroid' : "You're in for " + n + ' nights on Asteroid';
-  const nightText = (s) => fmtLocal(s.startsAt, c.tz) + '\nLineup: ' + s.lineup + '\nWatch: ' + watchUrl(s) + '\nAdd to Google Calendar: ' + googleCalUrl(s);
+  const nightText = (s) => fmtLocal(s.startsAt, c.tz) + '\nLineup: ' + s.lineup + '\nWatch: ' + watchUrl(s) +
+    '\nAdd to Apple Calendar: ' + icsUrl(s.id) + '\nAdd to Google Calendar: ' + googleCalUrl(s);
   const bs = c.backstage;
-  const bsText = bs ? '\n\nBackstage: DM your code ' + bs.code + ' to @' + IG_HANDLE + ' on Instagram' + (bs.points > 0 ? ' for +' + bs.points + ' points' : '') +
-    ". We'll reply and message you when new shows drop: " + IG_DM_URL : '';
+  const joinUrl = SITE + 'pass#perform';
+  const bsText = bs ? '\n\nWant to perform on Asteroid? DM your code ' + bs.code + ' to @' + IG_HANDLE +
+    ' on Instagram. Only artists who send their code get booked right away: ' + IG_DM_URL
+    : c.joinArtist ? '\n\nMake music? Join the Asteroid partnership and perform at a future show, no application: ' + joinUrl : '';
   const text = hi + "\n\nYou're in! Here's your free pass:\n\n" + c.shows.map(nightText).join('\n\n') +
     "\n\nWe'll email you an hour before " + (n === 1 ? 'it starts' : 'each night') + '. Fans earn points for every show they watch, and you can spend them on gift cards and shoutouts.' +
     bsText + "\n\nCan't make it? Remove a night from your pass: " + SITE + 'pass\n\nSee you there,\nAsteroid';
@@ -160,14 +199,18 @@ function confirmationEmail(c) {
     c.shows.map((s) => '<div style="border-top:1px solid #2a2b33;padding:14px 0">' +
       '<div style="font-weight:700;font-size:16px">' + esc(fmtLocal(s.startsAt, c.tz)) + '</div>' +
       '<div style="font-size:13px;color:#b5b5c0;margin:4px 0 10px">' + esc(s.lineup) + ' · ' + esc(fmtUs(s.startsAt)) + '</div>' +
-      button(watchUrl(s), 'Watch link') + button(googleCalUrl(s), 'Add to calendar') + '</div>').join('') +
+      button(watchUrl(s), 'Watch link') + button(icsUrl(s.id), 'Apple Calendar') + button(googleCalUrl(s), 'Google Calendar') + '</div>').join('') +
     '<p style="font-size:14px;line-height:1.6;color:#d8d8e0;margin:12px 0 0">We\'ll email you an hour before ' + (n === 1 ? 'it starts' : 'each night') +
     '. Fans earn points for every show they watch, and you can spend them on gift cards and shoutouts.</p>' +
     (bs ? '<div style="border:1px dashed #ff7f50;border-radius:12px;padding:14px;margin:16px 0 0">' +
-      '<div style="font-size:11px;font-weight:800;letter-spacing:.14em;color:#ff7f50">BACKSTAGE</div>' +
+      '<div style="font-size:11px;font-weight:800;letter-spacing:.14em;color:#ff7f50">WANT TO PERFORM?</div>' +
       '<div style="font-size:24px;font-weight:800;letter-spacing:.18em;margin:8px 0">' + esc(bs.code) + '</div>' +
-      '<p style="font-size:14px;line-height:1.5;color:#d8d8e0;margin:0 0 10px">DM this code to @' + IG_HANDLE + ' on Instagram' + (bs.points > 0 ? ' for +' + bs.points + ' points' : '') +
-      '. We\'ll reply and message you when new shows drop.</p>' + button(IG_DM_URL, 'DM us on Instagram') + '</div>' : ''));
+      '<p style="font-size:14px;line-height:1.5;color:#d8d8e0;margin:0 0 10px">DM this code to @' + IG_HANDLE +
+      ' on Instagram. Only artists who send their code get booked right away.</p>' + button(IG_DM_URL, 'DM us on Instagram') + '</div>'
+      : c.joinArtist ? '<div style="border:1px dashed #ff7f50;border-radius:12px;padding:14px;margin:16px 0 0">' +
+        '<div style="font-size:11px;font-weight:800;letter-spacing:.14em;color:#ff7f50">MAKE MUSIC?</div>' +
+        '<p style="font-size:14px;line-height:1.5;color:#d8d8e0;margin:8px 0 10px">Join the Asteroid partnership and perform at a future show. No application.</p>' +
+        button(joinUrl, 'Join as an artist') + '</div>' : ''));
   return { subject, text, html };
 }
 
@@ -194,21 +237,21 @@ function reminderEmail(r, now) {
  * @param {function} sendBatch async (emails[]) => void, throws on failure
  */
 async function runPassEmails(db, sendBatch, now = Date.now()) {
-  const [schedSnap, passSnap, mailSnap, bsSnap, bsPtsSnap] = await Promise.all([
+  const [schedSnap, passSnap, mailSnap, bsSnap] = await Promise.all([
     db.ref('CONCERT_SCHEDULE').once('value'),
     db.ref('CONCERT_PASSES').once('value'),
     db.ref('CONCERT_PASS_MAIL').once('value'),
     db.ref('BACKSTAGE').once('value'),
-    db.ref('CONCERT_CONFIG/backstagePoints').once('value'),
   ]);
   const plan = planEmails({ schedule: schedSnap.val(), passes: passSnap.val(), mail: mailSnap.val(), now });
   const backstage = bsSnap.val() || {};
-  const ptsRaw = Number(bsPtsSnap.val());
-  const bsPoints = bsPtsSnap.val() != null && Number.isFinite(ptsRaw) && ptsRaw >= 0 ? Math.round(ptsRaw) : 100;
   const jobs = [];
   for (const c of plan.confirmations) {
+    // Joined artists get their perform code until it's verified; everyone else gets the invite to join
     const b = backstage[c.uk];
-    if (b && typeof b.code === 'string' && /^AST[A-Z0-9]{5}$/.test(b.code) && !b.verifiedAt) c.backstage = { code: b.code, points: bsPoints };
+    const hasCode = !!b && typeof b.code === 'string' && /^AST[A-Z0-9]{5}$/.test(b.code);
+    if (hasCode && !b.verifiedAt) c.backstage = { code: b.code };
+    else if (!hasCode) c.joinArtist = true;
     jobs.push({ email: { to: [c.email], ...confirmationEmail(c) }, flags: c.shows.map((s) => s.id + '/' + c.uk + '/confirmedAt') });
   }
   for (const r of plan.reminders) {
@@ -236,4 +279,5 @@ async function runPassEmails(db, sendBatch, now = Date.now()) {
 
 module.exports = {
   parseShows, planEmails, confirmationEmail, reminderEmail, runPassEmails, fmtLocal, fmtUs, cleanTz, googleCalUrl, watchUrl,
+  icsText, icsUrl, icsResponse,
 };
