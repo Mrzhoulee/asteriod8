@@ -479,19 +479,35 @@
     }
     if (isNativeApp()) googleBtn.classList.add("hidden");
 
+    /** Apple's own id for this person (Firebase keeps it as the Apple provider uid). */
+    function appleUserId(user) {
+      const p = ((user && user.providerData) || []).find((x) => x && x.providerId === "apple.com");
+      return p && p.uid ? String(p.uid).trim() : "";
+    }
+
     /** Same account keys the home page writes after Apple or Google sign-in. */
     function applyOAuthSession(user, nameHint) {
       const providers = (user && user.providerData) || [];
       const isApple = providers.some((p) => p && p.providerId === "apple.com");
       const email = String(user.email || (providers[0] && providers[0].email) || "").trim();
-      const id = isApple ? String(user.uid || email).trim() : String(email || user.uid || "").trim();
-      const name = user.displayName || nameHint || (email.includes("@") ? email.split("@")[0] : "");
+      let id = isApple ? String(user.uid || email).trim() : String(email || user.uid || "").trim();
+      // The iOS app keys Apple accounts by Apple's own id (its Apple sign-in has always saved that),
+      // so the profile someone already has in the app stays theirs. A phone on the Firebase id keeps it.
+      const prevId = (localStorage.getItem("CurrentUser") || "").trim();
+      const appleId = isApple && isNativeApp() ? appleUserId(user) : "";
+      if (appleId && prevId !== String(user.uid)) id = appleId;
+      // Apple only sends the name the first time: keep the one this phone has for the same account,
+      // and never use a hidden Apple relay address as a name
+      const kept = prevId === id ? (localStorage.getItem("fullName") || "").trim() : "";
+      const fromEmail = email.includes("@") && !/privaterelay\.appleid\.com$/i.test(email) ? email.split("@")[0] : "";
+      const name = user.displayName || nameHint || kept || fromEmail;
       ["isLoggedIn", "userEmail", "userName", "localAuthOnly"].forEach((k) => localStorage.removeItem(k));
       localStorage.setItem("asteroidSignedInBefore", "true");
       localStorage.setItem("email", email || id);
       localStorage.setItem("CurrentUser", id);
       localStorage.setItem("emailKey", sanitizeKey(id));
       if (name) { localStorage.setItem("fullName", name); localStorage.setItem("name", name); }
+      else if (prevId !== id) { localStorage.removeItem("fullName"); localStorage.removeItem("name"); }
       if (user.photoURL) localStorage.setItem("pfp", user.photoURL);
       // New Apple accounts in the iOS app start as artists (the home page saves it to the profile)
       if (isApple && isNativeApp() && !localStorage.getItem("profileType")) localStorage.setItem("profileType", "artist");
@@ -505,6 +521,14 @@
       if (code === "auth/popup-blocked") return "Your browser blocked the " + who + " window. Allow pop-ups, or use your email below.";
       if (code === "auth/network-request-failed") return "Network problem. Check your connection and try again.";
       return "Couldn't sign in with " + who + ". Try again, or use your email below.";
+    }
+
+    /** Short reason after the message, so a failed sign-in can be traced from a screenshot. */
+    function errDetail(e) {
+      const code = (e && e.code) ? String(e.code) : "";
+      if (/^(auth|app)\//.test(code)) return code;
+      const m = String((e && (e.message || e.errorMessage)) || "").match(/error (\d{3,5})/i);
+      return m ? "Apple " + m[1] : "";
     }
 
     function isCancel(e) {
@@ -559,7 +583,10 @@
         postLoginRedirect();
       } catch (e) {
         console.warn("[login] " + who, e && (e.code || e.message));
-        if (!isCancel(e)) oauthErr.textContent = oauthMessage(e, who);
+        if (!isCancel(e)) {
+          const d = errDetail(e);
+          oauthErr.textContent = oauthMessage(e, who) + (d ? " (" + d + ")" : "");
+        }
         appleBtn.disabled = googleBtn.disabled = false;
       }
     }

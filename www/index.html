@@ -7999,10 +7999,22 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             if (!user || !user.providerData) return false;
             return user.providerData.some((p) => p && p.providerId === "apple.com");
           }
+          /** Apple's own id for this person (Firebase keeps it as the Apple provider uid). */
+          function appleUserId(user) {
+            const p = ((user && user.providerData) || []).find((x) => x && x.providerId === "apple.com");
+            return p && p.uid ? String(p.uid).trim() : "";
+          }
           function getStableAccountId(user) {
             if (!user) return "";
             const isApple = isAppleAuthUser(user);
-            if (isApple) return (user.uid || user.email || user.providerData[0]?.email || "").trim();
+            if (isApple) {
+              // The iOS app keys Apple accounts by Apple's own id: its Apple sign-in has always saved
+              // that (see tryNativeAppleSignInThenFirebase), so profiles made in the app stay theirs
+              // once Firebase accepts the app's sign-in. A phone already on the Firebase id keeps it.
+              const appleId = __isCapNativeAuth ? appleUserId(user) : "";
+              if (appleId && (localStorage.getItem("CurrentUser") || "").trim() !== user.uid) return appleId;
+              return (user.uid || user.email || user.providerData[0]?.email || "").trim();
+            }
             return (user.email || user.providerData[0]?.email || user.uid || "").trim();
           }
 

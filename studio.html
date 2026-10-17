@@ -1452,9 +1452,21 @@
     if (!user || !user.providerData) return false;
     return user.providerData.some((p) => p && p.providerId === "apple.com");
   }
+  /** Apple's own id for this person (Firebase keeps it as the Apple provider uid). */
+  function appleUserId(user) {
+    const p = ((user && user.providerData) || []).find((x) => x && x.providerId === "apple.com");
+    return p && p.uid ? String(p.uid).trim() : "";
+  }
   function getStableAccountId(user) {
     if (!user) return "";
-    if (isAppleAuthUser(user)) return (user.uid || user.email || user.providerData[0]?.email || "").trim();
+    if (isAppleAuthUser(user)) {
+      // The iOS app keys Apple accounts by Apple's own id, like the home page there,
+      // so app profiles stay theirs. A phone already on the Firebase id keeps it.
+      const native = typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
+      const appleId = native ? appleUserId(user) : "";
+      if (appleId && (localStorage.getItem("CurrentUser") || "").trim() !== user.uid) return appleId;
+      return (user.uid || user.email || user.providerData[0]?.email || "").trim();
+    }
     return (user.email || user.providerData[0]?.email || user.uid || "").trim();
   }
 
