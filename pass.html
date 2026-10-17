@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-itunes-app" content="app-id=6752210015, app-argument=asteroid://open?to=pass.html">
+  <script src="js/app-links.js"></script>
   <title>Free pass: live concerts on Asteroid</title>
   <meta name="description" content="Lineup concerts streamed live by independent artists. Free to watch. Grab your pass.">
   <meta property="og:type" content="website">
@@ -29,7 +31,7 @@
         radial-gradient(900px 520px at 0% -10%, rgba(255, 92, 138, .2), transparent 55%),
         radial-gradient(800px 480px at 100% 10%, rgba(255, 127, 80, .2), transparent 50%),
         linear-gradient(170deg, #12131a, var(--bg0) 50%, #08090d);
-      padding: max(18px, env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+      padding: max(18px, env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom));
     }
     .material-symbols-outlined { font-family: "Material Symbols Outlined"; font-weight: normal; font-style: normal; font-size: 20px; line-height: 1; display: inline-block; vertical-align: middle; -webkit-font-smoothing: antialiased; }
     .wrap { max-width: 520px; margin: 0 auto; }
@@ -83,7 +85,7 @@
     .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .foot { text-align: center; color: var(--muted); font-size: 12.5px; line-height: 1.6; margin: 26px 0 0; }
     .foot a { color: #ffad8f; }
-    .toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom)); transform: translate(-50%, 150%); background: #1d1f26; border: 1px solid rgba(255,127,80,.45); color: #fff; padding: 12px 16px; border-radius: 12px; font-size: 14px; transition: transform .3s; z-index: 9; max-width: 92vw; }
+    .toast { position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); transform: translate(-50%, 150%); background: #1d1f26; border: 1px solid rgba(255,127,80,.45); color: #fff; padding: 12px 16px; border-radius: 12px; font-size: 14px; transition: transform .3s; z-index: 9; max-width: 92vw; }
     .toast:not(.show) { visibility: hidden; transition: transform .3s, visibility 0s .3s; }
     .toast.show { transform: translate(-50%, 0); }
     [hidden] { display: none !important; }
@@ -138,6 +140,24 @@
       <a href="index.html">Explore Asteroid</a> · <a href="https://instagram.com/asteroidincofficial" rel="noopener">@asteroidincofficial</a></p>
   </div>
   <div class="toast" id="toast" role="status"></div>
+
+  <!-- App bottom bar (same as the concert rooms) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <nav class="mobile-nav" aria-label="Main">
+    <a href="index.html" class="mobile-nav-item"><span class="material-symbols-outlined">home</span><span>Home</span></a>
+    <a href="lively.html" class="mobile-nav-item mobile-nav-active"><span class="material-symbols-outlined">mic</span><span>Concerts</span></a>
+    <a href="studio.html" class="mobile-nav-item"><span class="material-symbols-outlined">upload</span><span>Upload</span></a>
+    <a href="pat.html" class="mobile-nav-item"><span class="material-symbols-outlined">queue_music</span><span>Playlist</span></a>
+    <a href="ArtistDashboard.html" class="mobile-nav-item"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
+  </nav>
+  <style>
+    .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;width:100%;max-width:100vw;box-sizing:border-box;z-index:99999;background:#0a0a0a;border-top:1px solid rgba(255,127,80,0.25);padding:6px 0 max(6px,env(safe-area-inset-bottom));justify-content:space-around;align-items:center}
+    .mobile-nav-item{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:rgba(255,255,255,0.5);font-family:'Poppins',sans-serif;font-size:clamp(9px,2.6vw,11px);font-weight:500;padding:4px 3px;border-radius:10px;transition:color .2s,background .2s}
+    .mobile-nav-item span:not(.material-symbols-outlined){max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mobile-nav-item .material-symbols-outlined{font-size:clamp(20px,5.5vw,24px)}
+    .mobile-nav-item:hover,.mobile-nav-item.mobile-nav-active{color:#ff7f50}
+    .mobile-nav-item.mobile-nav-active{background:rgba(255,127,80,0.1)}
+  </style>
   <script type="module" src="js/concert-pass.js"></script>
 </body>
 </html>

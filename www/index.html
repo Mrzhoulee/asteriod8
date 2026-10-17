@@ -88,6 +88,7 @@
     app-argument is the deep-link URL opened when "Open" is tapped.
   -->
   <meta name="apple-itunes-app" content="app-id=6752210015, app-argument=asteroid://home">
+  <script src="js/app-links.js"></script>
 
   <!-- Firebase is loaded via ES6 modules in the script below -->
 
@@ -2469,7 +2470,7 @@ body.create-profile-active {
     <label>Profile type</label>
     <div class="apple-onboarding-choice-group" role="radiogroup" aria-label="Profile type">
       <label class="apple-onboarding-choice" for="appleProfileTypeArtist">
-        <input type="radio" id="appleProfileTypeArtist" name="appleOnboardingProfileType" value="artist" onchange="document.getElementById('artistGoogleNote').style.display='flex'">
+        <input type="radio" id="appleProfileTypeArtist" name="appleOnboardingProfileType" value="artist" onchange="var n=document.getElementById('artistGoogleNote');if(n)n.style.display=(window._artistSkipsGoogle&&window._artistSkipsGoogle())?'none':'flex'">
         <div>
           <strong>Public / Artist</strong>
           <span>Your profile shows in the app so others can find you, follow you, and hear your music.</span>
@@ -7193,6 +7194,9 @@ function openLogoutModal(user) {
   const listenerBtn = document.getElementById("switchToListenerBtn");
   if (artistBtn) artistBtn.style.display = isArtist ? "none" : "flex";
   if (listenerBtn) listenerBtn.style.display = isArtist ? "" : "none";
+  // No Google step for Apple accounts or in the iOS app, so no Google logo on the button there
+  const artistBtnLogo = artistBtn && artistBtn.querySelector("svg");
+  if (artistBtnLogo) artistBtnLogo.style.display = (window._artistSkipsGoogle && window._artistSkipsGoogle()) ? "none" : "";
 
   // Follower / following counts - only for artists
   const statsEl = document.getElementById('logoutFollowerStats');
@@ -7625,10 +7629,12 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               return;
             }
             try {
-              try { sessionStorage.setItem("_switchToArtistPending", "1"); } catch (_) {}
-              await window._signInWithGoogleForArtist(key);
-              // Popup succeeded - clear the flag.
-              try { sessionStorage.removeItem("_switchToArtistPending"); } catch (_) {}
+              if (!artistSkipsGoogle()) {
+                try { sessionStorage.setItem("_switchToArtistPending", "1"); } catch (_) {}
+                await window._signInWithGoogleForArtist(key);
+                // Popup succeeded - clear the flag.
+                try { sessionStorage.removeItem("_switchToArtistPending"); } catch (_) {}
+              }
 
               // OPEN THE FORM IMMEDIATELY - don't make the user wait for the DB write.
               // The PROFILES role write fires in the background. If it fails, the
@@ -8000,6 +8006,26 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             return (user.email || user.providerData[0]?.email || user.uid || "").trim();
           }
 
+          // Artists verify with Google on the web. Apple accounts and the iOS app skip that step:
+          // Apple already verifies the person, and Google sign-in can't finish inside the app.
+          function artistSkipsGoogle() {
+            try { return isCapacitorNative() || isAppleAuthUser(auth.currentUser); } catch (e) { return false; }
+          }
+          window._artistSkipsGoogle = artistSkipsGoogle;
+
+          // New accounts in the iOS app start as artists, so they can upload and join the lineup
+          // right away. The onboarding form still lets them pick Listener.
+          function autoArtistForNewAppUser(key, val) {
+            if (!isCapacitorNative() || !key) return;
+            const isNew = !val || (!val.profileType && !val.nickname && !val.profileNickname);
+            if (!isNew) return;
+            localStorage.setItem("profileType", "artist");
+            const dash = document.getElementById("mobile-artist-dashboard-link");
+            if (dash) dash.style.display = "inline-flex";
+            update(ref2(database, "PROFILES/" + key), { profileType: "artist", role: "Artist", profileRole: "Artist" })
+              .catch((e) => console.warn("[apple onboarding] auto artist:", e));
+          }
+
           function slugPublicUsernameFromLabel(label) {
             let s = String(label || "")
               .trim()
@@ -8038,7 +8064,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               const note = document.getElementById("artistGoogleNote");
               if (storedType === "artist") {
                 artistRadio.checked = true;
-                if (note) note.style.display = "flex";
+                if (note) note.style.display = artistSkipsGoogle() ? "none" : "flex";
               } else {
                 listenerRadio.checked = true;
                 if (note) note.style.display = "none";
@@ -8066,6 +8092,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               try {
                 const snap = await get(ref2(database, "PROFILES/" + key));
                 const val = snap.exists() ? snap.val() : null;
+                autoArtistForNewAppUser(key, val);
                 if (val && (val.nickname || val.profileNickname)) {
                   const pu = String(val.publicUsername || "")
                     .trim()
@@ -8149,8 +8176,9 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             const profileType = selectedTypeEl ? selectedTypeEl.value : "listener";
             const isPublicArtist = profileType === "artist";
 
-            // Artist role requires Google sign-in verification (skip if already linked this session).
-            if (isPublicArtist && localStorage.getItem("_googleLinked") !== "1") {
+            // Artist role requires Google sign-in verification (skip if already linked this session,
+            // and for Apple accounts and the iOS app, see artistSkipsGoogle).
+            if (isPublicArtist && localStorage.getItem("_googleLinked") !== "1" && !artistSkipsGoogle()) {
               const saveBtn = document.getElementById("appleOnboardingSaveBtn");
               const origText = saveBtn ? saveBtn.textContent : "Save";
               if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Opening Google sign-in…"; }

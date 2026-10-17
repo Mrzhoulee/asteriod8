@@ -70,7 +70,14 @@
   if (App && typeof App.addListener === "function") {
     App.addListener("appUrlOpen", function (e) { applyReferral(refFromUrl(e && e.url)); });
     if (typeof App.getLaunchUrl === "function") {
-      App.getLaunchUrl().then(function (l) { if (l && l.url) applyReferral(refFromUrl(l.url)); }).catch(function () {});
+      App.getLaunchUrl().then(function (l) {
+        // getLaunchUrl keeps returning the last link for as long as the app runs.
+        // Act on it once, or every visit to Home would bounce back to the join page.
+        var url = l && l.url;
+        if (!url) return;
+        try { if (sessionStorage.getItem("astRefLaunchDone") === url) return; sessionStorage.setItem("astRefLaunchDone", url); } catch (_) {}
+        applyReferral(refFromUrl(url));
+      }).catch(function () {});
     }
   }
 
@@ -88,10 +95,19 @@
     if (!skip) {
       try { localStorage.setItem("_deferredRefChecked", "1"); } catch (_) {}
       Clipboard.read().then(function (res) {
-        var m = String((res && res.value) || "").match(/^asteroid-ref:([A-Za-z0-9_-]+)$/);
+        var text = String((res && res.value) || "");
+        var m = text.match(/^asteroid-ref:([A-Za-z0-9_-]+)$/);
         if (m) {
           try { if (typeof Clipboard.write === "function") Clipboard.write({ string: "" }); } catch (_) {}
           applyReferral(m[1]);
+          return;
+        }
+        // The concert page someone was on before installing (app-links.js copies it on "Open in the app")
+        var page = text.match(/^asteroid-open:((?:index|pass|lively|liveroom[1-5])\.html(?:\?[^\s#]*)?)$/);
+        if (page) {
+          try { if (typeof Clipboard.write === "function") Clipboard.write({ string: "" }); } catch (_) {}
+          var here = (location.pathname.split("/").pop() || "index.html") + location.search;
+          if (page[1] !== here) location.href = page[1];
         }
       }).catch(function () {});
     }

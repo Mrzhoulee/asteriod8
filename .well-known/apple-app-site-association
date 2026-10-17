@@ -4,7 +4,21 @@
     "details": [
       {
         "appID": "ZAPY8N6Y2F.com.asteroid.asteroidinc8",
-        "paths": ["/join.html*", "/join*", "/r/*", "/t/*", "/u/*"]
+        "paths": [
+          "/r/*",
+          "/t/*",
+          "/u/*",
+          "/",
+          "/index.html",
+          "/pass",
+          "/pass.html",
+          "/lively.html",
+          "/liveroom1.html",
+          "/liveroom2.html",
+          "/liveroom3.html",
+          "/liveroom4.html",
+          "/liveroom5.html"
+        ]
       }
     ]
   }
