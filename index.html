@@ -4714,10 +4714,13 @@ const database = getDatabase(app);
 const __isCapNativeAuth = typeof window.Capacitor !== "undefined" && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
 let auth;
 try {
-  auth = initializeAuth(app, {
-    persistence: __isCapNativeAuth ? indexedDBLocalPersistence : browserLocalPersistence,
-    popupRedirectResolver: browserPopupRedirectResolver,
-  });
+  // The iOS app gets no popup helper: it loads a Google iframe that never finishes inside the
+  // app, and Firebase holds the auth state, every sign-in and every database call until it does
+  // (Save buttons that do nothing, no Dashboard tab). The app signs in with tokens instead.
+  // It also reads the same saved login as the pass page and the sign-in page.
+  auth = initializeAuth(app, __isCapNativeAuth
+    ? { persistence: [browserLocalPersistence, indexedDBLocalPersistence] }
+    : { persistence: browserLocalPersistence, popupRedirectResolver: browserPopupRedirectResolver });
 } catch (e) {
   const code = e && e.code ? String(e.code) : "";
   const msg = e && e.message ? String(e.message) : "";
@@ -6637,6 +6640,9 @@ function syncHeaderSignInGroupFromStorage() {
     const gcd = document.getElementById("gcd");
     if (!hasRememberedAppSession()) return;
     if (appleSignInHeader) appleSignInHeader.style.setProperty("display", "none", "important");
+    // Dashboard tab for anyone signed in on this device, without waiting for Firebase
+    const dashTab = document.getElementById("mobile-artist-dashboard-link");
+    if (dashTab && dashTab.style.display === "none") dashTab.style.display = "inline-flex";
     if (gcd) {
       const nm = (localStorage.getItem("fullName") || localStorage.getItem("profileNickname") || "").trim();
       const ac = (localStorage.getItem("CurrentUser") || localStorage.getItem("email") || "").trim();
@@ -8128,7 +8134,45 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             }
           }
 
+          /** Realtime Database over REST with a time limit. The SDK's socket can stall in the
+           *  iOS app's WebView, which left the Save button doing nothing. */
+          async function rtdbRest(method, path, body) {
+            const ctl = typeof AbortController === "function" ? new AbortController() : null;
+            const timer = ctl ? setTimeout(() => ctl.abort(), 15000) : 0;
+            try {
+              const r = await fetch("https://asteroid-cdc13-default-rtdb.firebaseio.com/" + path + ".json", {
+                method,
+                headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+                body: body === undefined ? undefined : JSON.stringify(body),
+                signal: ctl ? ctl.signal : undefined,
+              });
+              if (!r.ok) throw Object.assign(new Error("RTDB " + method + " " + path + " " + r.status), { status: r.status });
+              return await r.json();
+            } finally {
+              if (timer) clearTimeout(timer);
+            }
+          }
+
           async function saveAppleOnboardingProfile() {
+            const saveBtnEl = document.getElementById("appleOnboardingSaveBtn");
+            if (saveBtnEl && saveBtnEl.dataset.busy === "1") return;
+            const saveLabel = saveBtnEl ? (saveBtnEl.dataset.label || saveBtnEl.textContent) : "";
+            if (saveBtnEl) saveBtnEl.dataset.label = saveLabel;
+            const busy = (on) => {
+              if (!saveBtnEl) return;
+              saveBtnEl.dataset.busy = on ? "1" : "";
+              saveBtnEl.disabled = on;
+              saveBtnEl.textContent = on ? "Saving…" : saveLabel;
+            };
+            busy(true);
+            try {
+              await saveAppleOnboardingProfileNow(busy, saveLabel);
+            } finally {
+              busy(false);
+            }
+          }
+
+          async function saveAppleOnboardingProfileNow(busy, saveLabel) {
             const nickEl = document.getElementById("appleOnboardingNickname");
             const nickname = (nickEl && nickEl.value ? nickEl.value : "").trim();
             if (!nickname) {
@@ -8155,16 +8199,15 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               if (hdlEl) hdlEl.focus();
               return;
             }
-            const regRef = ref2(database, "USERNAME_REGISTRY/" + handleRaw);
-            let regSnap;
+            // REST rather than the database SDK, so this answers in the iOS app too
+            let owner = "";
             try {
-              regSnap = await get(regRef);
+              owner = String((await rtdbRest("GET", "USERNAME_REGISTRY/" + encodeURIComponent(handleRaw))) || "").trim();
             } catch (e1) {
               console.warn("[apple onboarding] registry read", e1);
               alert("Could not verify username. Check your connection and try again.");
               return;
             }
-            const owner = regSnap.exists() ? String(regSnap.val() || "").trim() : "";
             if (owner && owner !== key) {
               alert("That username is already taken. Pick another.");
               if (hdlEl) hdlEl.focus();
@@ -8172,7 +8215,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             }
             if (!owner) {
               try {
-                await set(regRef, key);
+                await rtdbRest("PUT", "USERNAME_REGISTRY/" + encodeURIComponent(handleRaw), key);
               } catch (e2) {
                 console.warn("[apple onboarding] registry claim", e2);
                 alert("That username was just taken or could not be saved. Try a different one.");
@@ -8192,7 +8235,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
             // and for Apple accounts and the iOS app, see artistSkipsGoogle).
             if (isPublicArtist && localStorage.getItem("_googleLinked") !== "1" && !artistSkipsGoogle()) {
               const saveBtn = document.getElementById("appleOnboardingSaveBtn");
-              const origText = saveBtn ? saveBtn.textContent : "Save";
+              const origText = saveLabel || "Save";
               if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Opening Google sign-in…"; }
               try {
                 await window._signInWithGoogleForArtist(key);
@@ -8245,7 +8288,7 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               if (payload[k] == null) delete payload[k];
             });
             try {
-              await update(ref2(database, "PROFILES/" + key), payload);
+              await rtdbRest("PATCH", "PROFILES/" + encodeURIComponent(key), payload);
             } catch (e) {
               console.warn("[apple onboarding] RTDB save failed:", e);
               try {
@@ -8506,8 +8549,8 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
                   const hadPreviousUser = localStorage.getItem("asteroidSignedInBefore") === "true";
                   if (isCapacitorNative()) {
                     try {
-                      if (await tryNativeAppleSignInThenFirebase(hadPreviousUser)) return;
-                      await signInWithRedirectCapacitorBrowser(auth, appleProvider);
+                      // The app has no web redirect (no popup helper there): the Apple sheet is the way in
+                      await tryNativeAppleSignInThenFirebase(hadPreviousUser);
                     } catch (redirectErr) {
                       console.error("Apple redirect sign-in (native):", redirectErr);
                       alert(
@@ -8562,8 +8605,8 @@ document.getElementById("deleteAccountConfirmBtn")?.addEventListener("click", fu
               const hadPreviousUser = localStorage.getItem("asteroidSignedInBefore") === "true";
               if (isCapacitorNative()) {
                 try {
-                  if (await tryNativeAppleSignInThenFirebase(hadPreviousUser)) return;
-                  await signInWithRedirectCapacitorBrowser(auth, appleProvider);
+                  // The app has no web redirect (no popup helper there): the Apple sheet is the way in
+                  await tryNativeAppleSignInThenFirebase(hadPreviousUser);
                 } catch (redirectErr) {
                   console.error("Apple redirect sign-in (native):", redirectErr);
                   alert(
