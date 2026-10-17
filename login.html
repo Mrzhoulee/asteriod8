@@ -247,10 +247,12 @@
     const app = initializeApp(firebaseConfig);
     let auth;
     try {
-      auth = initializeAuth(app, {
-        persistence: browserLocalPersistence,
-        popupRedirectResolver: browserPopupRedirectResolver,
-      });
+      // The iOS app gets no popup helper: it loads a Google iframe that never finishes inside
+      // the app, and Firebase holds every sign-in until it does (the button just stays stuck).
+      // The app signs in with tokens (Apple sheet, Google bridge), which need no popups.
+      auth = initializeAuth(app, isNativeApp()
+        ? { persistence: browserLocalPersistence }
+        : { persistence: browserLocalPersistence, popupRedirectResolver: browserPopupRedirectResolver });
     } catch (e) {
       const code = e && e.code ? String(e.code) : "";
       const msg = e && e.message ? String(e.message) : "";
@@ -469,15 +471,16 @@
     });
 
     // ---- Continue with Apple / Google ----------------------------------------
-    // Web: Firebase popups. iOS app: the native Sign in with Apple sheet; Google is hidden
-    // there because its sign-in can't come back into the app.
+    // Web: Firebase popups. iOS app: the native Sign in with Apple sheet, and for Google the
+    // bridge page (Google won't sign in inside an app), which sends the tokens back to the app.
     function isNativeApp() {
       try {
         const C = window.Capacitor;
         return !!(C && typeof C.isNativePlatform === "function" && C.isNativePlatform());
       } catch (e) { return false; }
     }
-    if (isNativeApp()) googleBtn.classList.add("hidden");
+    const GOOGLE_BRIDGE = "https://asteroid-cdc13.firebaseapp.com/google-auth-bridge?return=" + encodeURIComponent("asteroid://google-auth");
+    const SIGNIN_TIMEOUT_MS = window.__astSignInTimeoutForTest || 30000;
 
     /** Apple's own id for this person (Firebase keeps it as the Apple provider uid). */
     function appleUserId(user) {
@@ -520,13 +523,14 @@
       }
       if (code === "auth/popup-blocked") return "Your browser blocked the " + who + " window. Allow pop-ups, or use your email below.";
       if (code === "auth/network-request-failed") return "Network problem. Check your connection and try again.";
+      if (code === "app/timeout") return "Signing in with " + who + " is taking too long. Check your connection and try again.";
       return "Couldn't sign in with " + who + ". Try again, or use your email below.";
     }
 
     /** Short reason after the message, so a failed sign-in can be traced from a screenshot. */
     function errDetail(e) {
       const code = (e && e.code) ? String(e.code) : "";
-      if (/^(auth|app)\//.test(code)) return code;
+      if (/^(auth|app|google)\//.test(code)) return code;
       const m = String((e && (e.message || e.errorMessage)) || "").match(/error (\d{3,5})/i);
       return m ? "Apple " + m[1] : "";
     }
@@ -565,12 +569,65 @@
       const idToken = r.identityToken || r.identity_token;
       if (!idToken) throw Object.assign(new Error("No Apple token"), { code: "app/no-token" });
       const cred = new OAuthProvider("apple.com").credential({ idToken: String(idToken), rawNonce });
-      const result = await signInWithCredential(auth, cred);
+      const result = await withTimeout(signInWithCredential(auth, cred));
       const nameHint = [r.givenName || r.given_name, r.familyName || r.family_name].filter(Boolean).join(" ").trim();
       if (nameHint && result.user && !result.user.displayName) {
-        try { await updateProfile(result.user, { displayName: nameHint }); } catch (_) { /* non-fatal */ }
+        try { await withTimeout(updateProfile(result.user, { displayName: nameHint }), 8000); } catch (_) { /* non-fatal */ }
       }
       return { user: result.user, nameHint };
+    }
+
+    /** Never leave the buttons stuck: a sign-in step that hangs becomes an error after a while. */
+    function withTimeout(p, ms) {
+      return new Promise((resolve, reject) => {
+        const t = setTimeout(() => reject(Object.assign(new Error("timeout"), { code: "app/timeout" })), ms || SIGNIN_TIMEOUT_MS);
+        p.then((v) => { clearTimeout(t); resolve(v); }, (e) => { clearTimeout(t); reject(e); });
+      });
+    }
+
+    /** The iOS app: Google sign-in runs on the bridge page in the in-app browser, which comes
+     *  back to asteroid://google-auth with Google's tokens; Firebase signs in with them here. */
+    function googleInApp() {
+      const P = (window.Capacitor && window.Capacitor.Plugins) || {};
+      const Browser = P.Browser;
+      const App = P.App;
+      if (!Browser || typeof Browser.open !== "function" || !App || typeof App.addListener !== "function") {
+        return Promise.reject(Object.assign(new Error("Google sign-in isn't available"), { code: "app/no-browser" }));
+      }
+      return new Promise((resolve, reject) => {
+        let done = false;
+        let back = false;   // the bridge came back with an answer
+        const handles = [];
+        const keep = (h) => Promise.resolve(h).then((x) => { if (done) { try { x && x.remove(); } catch (_) {} } else handles.push(x); }).catch(() => {});
+        const finish = (ok, v) => {
+          if (done) return;
+          done = true;
+          handles.forEach((x) => { try { x && x.remove(); } catch (_) {} });
+          ok ? resolve(v) : reject(v);
+        };
+        keep(App.addListener("appUrlOpen", async (e) => {
+          const url = String((e && e.url) || "");
+          if (!/^asteroid:\/\/google-auth/i.test(url) || done) return;
+          back = true;
+          try { await Browser.close(); } catch (_) {}
+          const q = new URLSearchParams(url.split("?")[1] || "");
+          const err = q.get("error");
+          if (err) return finish(false, Object.assign(new Error(err), { code: "google/" + err.replace(/^auth\//, "") }));
+          const idToken = q.get("idToken") || "";
+          if (q.get("ok") !== "1" || !idToken) return finish(false, Object.assign(new Error("No Google token"), { code: "app/no-token" }));
+          try {
+            const result = await withTimeout(signInWithCredential(auth, GoogleAuthProvider.credential(idToken, q.get("accessToken") || undefined)));
+            finish(true, { user: result.user, nameHint: "" });
+          } catch (x) { finish(false, x); }
+        }));
+        // Closed with Done before finishing: give the buttons back quietly
+        if (typeof Browser.addListener === "function") {
+          keep(Browser.addListener("browserFinished", () => {
+            setTimeout(() => { if (!back) finish(false, Object.assign(new Error("closed"), { code: "auth/user-cancelled" })); }, 1200);
+          }));
+        }
+        Promise.resolve(Browser.open({ url: GOOGLE_BRIDGE, presentationStyle: "fullscreen" })).catch((x) => finish(false, x));
+      });
     }
 
     async function oauthSignIn(btn, who, run) {
@@ -601,6 +658,7 @@
     }));
 
     googleBtn.addEventListener("click", () => oauthSignIn(googleBtn, "Google", async () => {
+      if (isNativeApp()) return googleInApp();
       const provider = new GoogleAuthProvider();
       provider.addScope("email");
       provider.addScope("profile");
