@@ -378,7 +378,7 @@ onValue(roomPath, (snapshot) => {
     // - see js/concert-social.js). LiveRooms is writable so this is allowed.
     if (snapshot.exists() && embedValue && streamExpired) {
       try {
-        update(roomPath, { embed: "", donationEmbed: "", socials: "", passcode: "", status: "offline", chatEpoch: Date.now() });
+        update(roomPath, { embed: "", donationEmbed: "", socials: "", passcode: "", status: "offline", chatEpoch: Date.now(), endedAt: Date.now() });
       } catch (eExp) { console.warn("[liveroom] auto-end >10h failed", eExp); }
     }
 
@@ -438,7 +438,8 @@ update(roomPath, {
     socials: "",         // Clear social media links
     passcode: "",        // Set to an empty string instead of null
     status: "offline",   // Add a new key to keep the folder alive
-    chatEpoch: Date.now() // Hides prior chat for this room in the UI (see concert-social.js)
+    chatEpoch: Date.now(), // Hides prior chat for this room in the UI (see concert-social.js)
+    endedAt: Date.now()    // Ends tonight's show here: no LIVE badge, shoutouts and requests clear (concert-rewards-core.js)
 });
     // 2. Wait 2 seconds then hide it
     setTimeout(() => {

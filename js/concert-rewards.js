@@ -16,7 +16,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import {
   firebaseApp, firebaseDb, readConfig, rewardsKey, anonId, appEmailKey, esc, fmtPts, ptsToUsd,
-  listShows, roomStatus, computeRewards, fmtWhen, GIFT_CARDS, REDEEM_LABELS, POINTS_PER_USD, ptsToUsdShort, refSlug, directTipLink,
+  listShows, roomStatus, roomEndedAt, computeRewards, fmtWhen, GIFT_CARDS, REDEEM_LABELS, POINTS_PER_USD, ptsToUsdShort, refSlug, directTipLink,
   captureInvite, clearInvite, isInviteCode, newInviteCode, inviteUrl,
 } from "./concert-rewards-core.js";
 
@@ -224,11 +224,13 @@ export function mountConcertRewards(roomNum) {
   const bannerQueue = [];
   let bannerBusy = false;
 
+  /** Shoutouts and requests from this show only: once a stream ends the room starts clean. */
   function shoutsSince() {
     const st = status();
-    if (st.current) return st.current.startsAt - 30 * 60 * 1000;
+    const ended = roomEndedAt(state.roomData);
+    if (st.current) return Math.max(st.current.startsAt - 30 * 60 * 1000, ended);
     const startedAt = Number(state.roomData && state.roomData.startedAt) || 0;
-    return startedAt ? startedAt - 30 * 60 * 1000 : Date.now() - 6 * 60 * 60 * 1000;
+    return Math.max(startedAt ? startedAt - 30 * 60 * 1000 : Date.now() - 6 * 60 * 60 * 1000, ended);
   }
 
   /** " for Nova" when the show has several artists, so each one knows it's theirs. */

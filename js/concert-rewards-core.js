@@ -362,10 +362,18 @@ export function streamIsLive(roomData, now = Date.now()) {
   return !(startedAt > 0 && now - startedAt > STREAM_MAX_MS);
 }
 
-/** LIVE when a stream is embedded or a scheduled show is inside its time window. */
+/** When the host last tapped End stream in this room (0 if never). */
+export function roomEndedAt(roomData) {
+  return (roomData && typeof roomData === "object" && Number(roomData.endedAt)) || 0;
+}
+
+/** LIVE when a stream is embedded or a scheduled show is inside its time window.
+ *  A show whose stream was ended after it started is over, even inside its window. */
 export function roomStatus(room, roomData, shows, now = Date.now()) {
   const streamLive = streamIsLive(roomData, now);
-  const current = shows.find((s) => s.room === room && s.startsAt <= now && now <= s.endsAt) || null;
+  const endedAt = roomEndedAt(roomData);
+  const current = shows.find((s) => s.room === room && s.startsAt <= now && now <= s.endsAt &&
+    (streamLive || endedAt < s.startsAt)) || null;
   const next = shows.find((s) => s.room === room && s.startsAt > now) || null;
   return { live: streamLive || !!current, streamLive, current, next };
 }
